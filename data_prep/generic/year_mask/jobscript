@@ -1,0 +1,26 @@
+#!/bin/tcsh
+#PBS -N asg:ye-mask
+#PBS -l nodes=4:xeon:compute:ppn=8
+#PBS -l walltime=01:00:00
+#PBS -j oe
+
+
+set project_name = "kfw_grid_clip"
+
+# set shape_name = "KFW_ohFiveDecimalDegrees_grid_clipped.shp"
+set shape_name = "testclip.shp"
+
+set data_path = "ltdr_yearly/ndvi_max"
+
+set extract_name = "ltdr_yearly_max"
+
+set file_mask = "YYYY.tif"
+
+set data_base = "/sciclone/aiddata10/REU"
+
+set project_base = "/sciclone/aiddata10/REU"
+
+
+cd $PBS_O_WORKDIR
+mvp2run -c 4 -m cyclic python-mpi ./runscript.py ./extract.R "$project_name" "$shape_name" "$data_path" "$extract_name" "$file_mask" "$data_base" "$project_base"
+

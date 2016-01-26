@@ -1,0 +1,12 @@
+#!/bin/tcsh
+#PBS -N asg:kfw-modis-yr
+#PBS -l nodes=3:c11a:ppn=8
+#PBS -l walltime=180:00:00
+#PBS -j oe
+
+
+cd $PBS_O_WORKDIR
+
+mvp2run -m cyclic -c 15 python-mpi ./kfw_test.py
+
+# mpirun --mca mpi_warn_on_fork 0 -np 1 python-mpi ./kfw_test.py
