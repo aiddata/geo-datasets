@@ -1,0 +1,11 @@
+#!/bin/tcsh
+#PBS -N asg:mosaic:hansen
+#PBS -l nodes=1:c18b:ppn=5
+#PBS -l walltime=180:00:00
+#PBS -j oe
+
+cd $PBS_O_WORKDIR
+
+# mvp2run -m cyclic python-mpi ./runscript.py
+
+mpirun --mca mpi_warn_on_fork 0 -np 5 python-mpi ./runscript.py
