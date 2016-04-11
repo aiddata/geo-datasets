@@ -53,11 +53,6 @@ for i in $data_dir/*.shp; do
     # cp -u $bnd_dir.* $bnd_dir
     mv $bnd_dir.* $bnd_dir
 
-    abs_path=$(readlink -f ${bnd_dir})
-
-    # add to asdf
-    python "${src}"/asdf/src/add_gadm.py ${branch} ${abs_path} ${version} auto
-
 done
 
 
