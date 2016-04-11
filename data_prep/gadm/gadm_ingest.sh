@@ -26,3 +26,5 @@ for i in $data_dir/*/*.shp; do
 
 done
 
+# useful for clearing shapefiles if ingest was partially run before prep was run again
+# for i in *; do if [ -f ${i}/simplified.geojson ]; then find ${i} -not -name *.geojson -type f -delete; fi; done
