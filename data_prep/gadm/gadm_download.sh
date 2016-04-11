@@ -42,8 +42,8 @@ raw_dir='gadm'${version}
 
 mkdir -p $raw_dir
 
-
-iso3=($(cat gadm_iso3.txt))
+current=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+iso3=($(cat ${current}/gadm_iso3.txt))
 
 
 # wget -cNO tmp.gadm.html http://www.gadm.org/country
