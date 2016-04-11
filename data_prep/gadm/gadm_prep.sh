@@ -47,12 +47,13 @@ for i in $data_dir/*.shp; do
     name=$(basename ${i} .shp)
     # echo $name
 
-    mkdir -p $data_dir/$name
+    bnd_dir=$data_dir/$name
+    mkdir -p $bnd_dir
 
-    # cp -u $data_dir/$name.* $data_dir/$name
-    mv $data_dir/$name.* $data_dir/$name
+    # cp -u $bnd_dir.* $bnd_dir
+    mv $bnd_dir.* $bnd_dir
 
-    abs_path=$(readlink -f ${i})
+    abs_path=$(readlink -f ${bnd_dir})
 
     # add to asdf
     python "${src}"/asdf/src/add_gadm.py ${branch} ${abs_path} ${version} auto
