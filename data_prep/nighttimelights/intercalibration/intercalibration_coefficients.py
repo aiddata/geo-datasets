@@ -3,7 +3,7 @@
 @author: nik | Created on Wed Feb 25 23:20:05 2015
 
 Regression coefficients derived from models for
-Inter-Satellite Calibration  of  DMSP-OLS Night-Time Light Time Series 
+Inter-Satellite Calibration  of  DMSP-OLS Night-Time Light Time Series
 
 Elvidge 2009, 2014:  dn_adjusted = C0 + C1 × dn + C2 × dn^2
 Liu 2012:  dn_calibrated = a * dn^2 + b * dn + c
@@ -104,7 +104,8 @@ COEFFICIENTS = {
    '2009': (0.9492, 1.0683, -0.0016, 0.8918),
    '2010': (2.343, 0.5102, 0.0065, 0.8462),
    '2011': (1.8956, 0.7345, 0.003, 0.9095),
-   '2012': (1.875, 0.6203, 0.0052, 0.9392)}},
+   '2012': (1.875, 0.6203, 0.0052, 0.9392),
+   '2013': (1.84108,0.704930,0.00331362,0.932078)}},
  'LIU2012': {'F10': {'1992': (0.0029, 0.9699, -0.4454, 0.899),
    '1993': (0.003, 1.0904, -0.5829, 0.9027),
    '1994': (0.0056, 0.9038, -0.0699, 0.885)},
