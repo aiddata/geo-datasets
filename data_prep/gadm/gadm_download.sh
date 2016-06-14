@@ -23,7 +23,7 @@
 # input gadm version (eg: 2.8)
 version=$1
 
-if [ $version == "" ]; then
+if [[ $version == "" ]]; then
     echo 'No GADM version provided'
     exit 1
 fi
