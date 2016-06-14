@@ -23,6 +23,11 @@
 # input gadm version (eg: 2.8)
 version=$1
 
+if [ $version == "" ]; then
+    echo 'No GADM version provided'
+    exit 1
+fi
+
 url="http://biogeo.ucdavis.edu/data/gadm"${version}
 
 if ! curl --output /dev/null --silent --head --fail ${url}; then
