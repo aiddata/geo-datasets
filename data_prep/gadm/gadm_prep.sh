@@ -17,7 +17,7 @@ version_dir='gadm'${version}
 # data_dir='data/'${version_dir}
 
 raw_dir=${version_dir}
-data_dir='/sciclone/aiddata10/REU/data/boundaries/'${version_dir}
+data_dir='/sciclone/aiddata10/REU/data/boundaries_test/'${version_dir}
 
 if [ ! -d $raw_dir ]; then
     echo 'Could not find download directory for GADM version' ${version}
@@ -37,21 +37,36 @@ done
 iso_start=$((${#data_dir} + 2))
 iso_end=$(($iso_start + 2))
 
-for i in $data_dir/*.shp; do
+for i in $data_dir/*.gpkg; do
 
     # echo $i
 
     iso3=$(echo ${i} | cut -c ${iso_start}-${iso_end})
     # echo $iso3
 
-    name=$(basename ${i} .shp)
-    # echo $name
+    # name=$(basename ${i} .gpkg)
+    # # echo $name
 
-    bnd_dir=$data_dir/$name
-    mkdir -p $bnd_dir
 
-    # cp -u $bnd_dir.* $bnd_dir
-    mv $bnd_dir.* $bnd_dir
+    layers=$(ogrinfo "$iso3"_adm_gpkg/"$iso3"_adm.gpkg -so | grep '.: "$iso3"_adm. ')
+    echo "$layers"
+
+    echo "$layers" | while read -r line; do
+
+        echo $line;
+
+        layer=$(echo $line | cut -c 4-11)
+
+
+        bnd_dir=$data_dir/$layer
+        mkdir -p $bnd_dir
+
+        layer_file=$bnd_dir/$layer.geojson
+        ogr2ogr -f GeoJSON $layer_file $i $layer
+
+    done
+
+    rm $i
 
 done
 

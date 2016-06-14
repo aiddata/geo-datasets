@@ -54,7 +54,7 @@ mkdir -p $raw_dir
 for i in ${iso3[*]}; do
 
     # echo $i
-    file="http://biogeo.ucdavis.edu/data/gadm"${version}"/shp/"${i}"_adm_shp.zip"
+    file="http://biogeo.ucdavis.edu/data/gadm"${version}"/gpkg/"${i}"_adm_gpkg.zip"
 
     # echo $file
     wget -c -N -P $raw_dir $file
