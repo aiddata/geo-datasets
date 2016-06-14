@@ -19,7 +19,9 @@ coef = COEFFICIENTS['ELVIDGE2014']
 
 data_path = '/sciclone/aiddata10/REU/data/rasters/external/global/v4composites'
 
-qlist = [name for name in os.listdir(data_path) if not os.path.isdir(os.path.join(data_path, name)) and name.endswith('.tif')]
+qlist = [name for name in os.listdir(data_path)
+         if not os.path.isdir(os.path.join(data_path, name))
+         and name.endswith('.tif')]
 
 
 
@@ -40,7 +42,11 @@ for i in qlist:
     sensor = i[0:3]
     year = i[3:7]
 
+    if int(year) != 2013:
+        continue
+
     print sensor +' '+ year
+
 
     tmp_coefs = coef[sensor][year]
     c0 = tmp_coefs[0]
@@ -58,7 +64,7 @@ for i in qlist:
 
 
     input_array = np.array(tmp_file.GetRasterBand(1).ReadAsArray())
-    
+
 
     # =============
 
@@ -88,13 +94,13 @@ for i in qlist:
     make_dir(out_base)
 
     output_path = out_base +"/"+ i[0:-4] + '_calibrated.tif'
-    
 
-    output_raster = gdal.GetDriverByName('GTiff').Create(output_path, ncols, nrows, 1 , gdal.GDT_Byte )  
-    output_raster.SetGeoTransform(geotransform)  
+
+    output_raster = gdal.GetDriverByName('GTiff').Create(output_path, ncols, nrows, 1 , gdal.GDT_Byte )
+    output_raster.SetGeoTransform(geotransform)
     srs = osr.SpatialReference()
     srs.ImportFromEPSG(4326)
-    output_raster.SetProjection(srs.ExportToWkt()) 
+    output_raster.SetProjection(srs.ExportToWkt())
     output_raster.GetRasterBand(1).WriteArray(output_array)
 
 
