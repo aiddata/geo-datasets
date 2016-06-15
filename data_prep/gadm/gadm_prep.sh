@@ -31,12 +31,12 @@ iso_start=$((${#data_dir} + 2))
 iso_end=$(($iso_start + 2))
 
 
-for i in $raw_dir/*_gpkg.zip; do
+# for i in $raw_dir/*_gpkg.zip; do
 
-    # echo $i
-    unzip -n $i -d $data_dir
+#     # echo $i
+#     unzip -n $i -d $data_dir
 
-done
+# done
 
 for i in $data_dir/*.gpkg; do
 
@@ -48,7 +48,7 @@ for i in $data_dir/*.gpkg; do
     # name=$(basename ${i} .gpkg)
     # # echo $name
 
-    layers=$(ogrinfo "$iso3"_adm_gpkg/"$iso3"_adm.gpkg -so | grep '.: "$iso3"_adm. ')
+    layers=$(ogrinfo "$iso3"_adm.gpkg -so | grep '.: "$iso3"_adm. ')
     echo "$layers"
 
     echo "$layers" | while read -r line; do
