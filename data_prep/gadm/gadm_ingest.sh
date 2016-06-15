@@ -15,17 +15,10 @@ fi
 
 for i in $data_dir/*/*.geojson; do
 
-    name=$(basename ${i} .geojson)
+    abs_dir=$(dirname $i)
 
-    bnd_dir=$data_dir/$name
-
-    abs_path=$(readlink -f ${bnd_dir})
-
-    echo $i
-    echo $abs_path
-    dirname $i
     # add to asdf
-    echo 'pxython "${src}"/asdf/src/add_gadm.py ${branch} ${abs_path} ${version} auto'
+    python "${src}"/asdf/src/add_gadm.py ${branch} ${abs_dir} ${version} auto
 
 done
 
