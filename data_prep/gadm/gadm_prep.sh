@@ -27,7 +27,7 @@ fi
 
 mkdir -p $data_dir
 
-for i in $raw_dir/*.zip; do
+for i in $raw_dir/*_gpkg.zip; do
 
     # echo $i
     unzip -n $i -d $data_dir
