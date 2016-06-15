@@ -61,6 +61,7 @@ for i in $raw_dir/*_gpkg.zip; do
         layer_file=$bnd_dir/$layer.geojson
 
         ogr2ogr -f GeoJSON $layer_file $j $layer
+        chmod 664 $layer_file
 
     done
 
