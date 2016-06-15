@@ -21,8 +21,9 @@ for i in $data_dir/*/*.geojson; do
 
     abs_path=$(readlink -f ${bnd_dir})
 
-    print $i
-    print $abs_path
+    echo $i
+    echo $abs_path
+    dirname $i
     # add to asdf
     echo 'pxython "${src}"/asdf/src/add_gadm.py ${branch} ${abs_path} ${version} auto'
 
