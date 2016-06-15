@@ -43,8 +43,6 @@ for i in $raw_dir/*_gpkg.zip; do
     iso3=$(echo ${j} | cut -c ${iso_start}-${iso_end})
     echo $iso3
 
-    # name=$(basename ${j} .gpkg)
-    # # echo $name
 
     layers=$(ogrinfo "$j" -so | grep '.: '${iso3}'_adm. ')
     # echo "$layers"
@@ -68,7 +66,6 @@ for i in $raw_dir/*_gpkg.zip; do
 
     rm $j
 
-    exit
 
 done
 
