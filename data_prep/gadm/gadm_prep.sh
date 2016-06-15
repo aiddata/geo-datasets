@@ -31,12 +31,12 @@ iso_start=$((${#data_dir} + 2))
 iso_end=$(($iso_start + 2))
 
 
-# for i in $raw_dir/*_gpkg.zip; do
+for i in $raw_dir/*_gpkg.zip; do
 
-#     # echo $i
-#     unzip -n $i -d $data_dir
+    # echo $i
+    unzip -n $i -d $data_dir
 
-# done
+done
 
 for i in $data_dir/*.gpkg; do
 
@@ -48,25 +48,25 @@ for i in $data_dir/*.gpkg; do
     # name=$(basename ${i} .gpkg)
     # # echo $name
 
-    layers=$(ogrinfo "$iso3"_adm.gpkg -so | grep '.: '${iso3}'_adm. ')
-    echo "$layers"
+    # layers=$(ogrinfo "$i" -so | grep '.: '${iso3}'_adm. ')
+    # echo "$layers"
 
-    echo "$layers" | while read -r line; do
+    # echo "$layers" | while read -r line; do
 
-        echo $line;
+    #     echo $line;
 
-        layer=$(echo $line | cut -c 4-11)
+    #     layer=$(echo $line | cut -c 4-11)
 
 
-        bnd_dir=$data_dir/$layer
-        mkdir -p $bnd_dir
+    #     bnd_dir=$data_dir/$layer
+    #     mkdir -p $bnd_dir
 
-        layer_file=$bnd_dir/$layer.geojson
-        ogr2ogr -f GeoJSON $layer_file $i $layer
+    #     layer_file=$bnd_dir/$layer.geojson
+    #     ogr2ogr -f GeoJSON $layer_file $i $layer
 
-    done
+    # done
 
-    rm $i
+    # rm $i
 
 done
 
