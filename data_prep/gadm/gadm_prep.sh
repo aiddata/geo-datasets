@@ -17,7 +17,7 @@ version_dir='gadm'${version}
 # data_dir='data/'${version_dir}
 
 raw_dir=${version_dir}
-data_dir='/sciclone/aiddata10/REU/data/boundaries_test/'${version_dir}
+data_dir='/sciclone/aiddata10/REU/data/boundaries/'${version_dir}
 
 if [ ! -d $raw_dir ]; then
     echo 'Could not find download directory for GADM version' ${version}
