@@ -24,8 +24,12 @@ if [ ! -d $raw_dir ]; then
     exit 1
 fi
 
-
 mkdir -p $data_dir
+
+
+iso_start=$((${#data_dir} + 2))
+iso_end=$(($iso_start + 2))
+
 
 for i in $raw_dir/*_gpkg.zip; do
 
@@ -34,19 +38,15 @@ for i in $raw_dir/*_gpkg.zip; do
 
 done
 
-iso_start=$((${#data_dir} + 2))
-iso_end=$(($iso_start + 2))
-
 for i in $data_dir/*.gpkg; do
 
     # echo $i
 
     iso3=$(echo ${i} | cut -c ${iso_start}-${iso_end})
-    # echo $iso3
+    echo $iso3
 
     # name=$(basename ${i} .gpkg)
     # # echo $name
-
 
     layers=$(ogrinfo "$iso3"_adm_gpkg/"$iso3"_adm.gpkg -so | grep '.: "$iso3"_adm. ')
     echo "$layers"
