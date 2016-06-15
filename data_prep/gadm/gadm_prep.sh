@@ -48,7 +48,7 @@ for i in $data_dir/*.gpkg; do
     # name=$(basename ${i} .gpkg)
     # # echo $name
 
-    layers=$(ogrinfo "$iso3"_adm.gpkg -so | grep '.: "$iso3"_adm. ')
+    layers=$(ogrinfo "$iso3"_adm.gpkg -so | grep '.: '"$iso3"'_adm. ')
     echo "$layers"
 
     echo "$layers" | while read -r line; do
