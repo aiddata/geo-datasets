@@ -58,8 +58,10 @@ for i in $raw_dir/*_gpkg.zip; do
 
         bnd_dir=$data_dir/$layer
         mkdir -p $bnd_dir
+        rm -f $bnd_dir/*
 
         layer_file=$bnd_dir/$layer.geojson
+
         ogr2ogr -f GeoJSON $layer_file $j $layer
 
     done
