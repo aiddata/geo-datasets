@@ -18,7 +18,7 @@ for i in $data_dir/*/*.geojson; do
     abs_dir=$(dirname $i)
 
     # add to asdf
-    python "${src}"/asdf/src/add_gadm.py ${branch} ${abs_dir} ${version} auto
+    python "${src}"/asdf/src/add_gadm.py ${branch} ${abs_dir} auto full
 
 done
 
