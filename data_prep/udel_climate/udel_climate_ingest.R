@@ -53,8 +53,6 @@ build_monthly <- 'monthly' %in% raw_methods
 methods <- raw_methods[raw_methods != 'monthly']
 
 
-dir.create(sprintf('%s/monthly', data_dir), recursive=TRUE)
-
 
 for (fname in flist) {
   cat(sprintf('\nprocessing %s...\n', fname))
@@ -70,6 +68,7 @@ for (fname in flist) {
   # monthly
   if (build_monthly) {
     cat('\tbuilding monthly...\n')
+    dir.create(sprintf('%s/monthly', data_dir), recursive=TRUE)
     for (m in months) {
       data_trim <- data[, m]
       gridded(data_trim) = TRUE
