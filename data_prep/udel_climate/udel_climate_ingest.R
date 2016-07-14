@@ -21,7 +21,7 @@ data_dir <- sprintf('%s/data/rasters/external/global/udel_climate/%s',
 #                     base_dir, dataset)
 
 
-if (!dir.exists(raw_dir)) {
+if (!file.exists(raw_dir)) {
   msg <- sprintf("directory not found (%s)", raw_dir)
   stop(msg)
 }
