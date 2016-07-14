@@ -57,7 +57,7 @@ dir.create(sprintf('%s/monthly', data_dir), recursive=TRUE)
 
 
 for (fname in flist) {
-
+  cat(sprintf('\nprocessing %s...\n', fname))
   fpath <- sprintf('%s/%s', raw_dir, fname)
   data <- read.table(fpath)
   months <- as.character(c(1:12))
@@ -69,7 +69,7 @@ for (fname in flist) {
 
   # monthly
   if (build_monthly) {
-    print('building monthly...')
+    cat('\tbuilding monthly...\n')
     for (m in months) {
       data_trim <- data[, m]
       gridded(data_trim) = TRUE
@@ -84,7 +84,7 @@ for (fname in flist) {
 
   # yearly
   for (j in methods) {
-    print(sprintf('building yearly %s...', j))
+    cat(sprintf('\tbuilding yearly %s...\n', j))
     dir.create(sprintf('%s/yearly/%s', data_dir, j), recursive=TRUE)
 
     data[[j]] <- apply(data@data[,as.character(c(1:12))], 1, j)
