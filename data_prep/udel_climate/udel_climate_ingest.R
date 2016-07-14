@@ -76,7 +76,7 @@ for (fname in flist) {
       r <- raster(data_trim)
 
       out_name <- sprintf('%s_%s.tif', gsub("[.]", "_", fname), m)
-      out_path <- sprintf('%s/monthly/%s', data_dir, out_name)
+      out_path <- sprintf('%s/monthly/%s/%s', data_dir, year, out_name)
       writeRaster(r, file=out_path, overwrite=TRUE)
     }
   }
