@@ -10,15 +10,15 @@ dataset <- args[1]
 # dataset <- 'precip_2014'
 # dataset <- 'air_temp_2014'
 
-# base_dir <- '/sciclone/aiddata10/REU'
-# raw_dir <- sprintf('%s/raw/%s', base_dir, dataset)
-# data_dir <- sprintf('%s/data/rasters/external/global/udel_%s',
-#                     base_dir, dataset)
-
-base_dir <- '/home/userz/Desktop'
-raw_dir <- sprintf('%s/udel_test/%s', base_dir, dataset)
-data_dir <- sprintf('%s/udel_test/udel_%s',
+base_dir <- '/sciclone/aiddata10/REU'
+raw_dir <- sprintf('%s/raw/%s', base_dir, dataset)
+data_dir <- sprintf('%s/data/rasters/external/global/udel_%s',
                     base_dir, dataset)
+
+# base_dir <- '/home/userz/Desktop'
+# raw_dir <- sprintf('%s/udel_test/%s', base_dir, dataset)
+# data_dir <- sprintf('%s/udel_test/udel_%s',
+#                     base_dir, dataset)
 
 
 if (!dir.exists(raw_dir)) {
