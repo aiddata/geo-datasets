@@ -56,9 +56,10 @@ methods <- raw_methods[raw_methods != 'monthly']
 
 for (fname in flist) {
   cat(sprintf('\nprocessing %s...\n', fname))
+  year <- unlist(strsplit(fname, '[.]'))[2]
   fpath <- sprintf('%s/%s', raw_dir, fname)
   data <- read.table(fpath)
-  months <- as.character(c(1:12))
+  months <- sprintf('%02d', c(1:12))
   names(data) <- c("lon", "lat", months)
 
   coordinates(data) = ~lon+lat
@@ -68,7 +69,7 @@ for (fname in flist) {
   # monthly
   if (build_monthly) {
     cat('\tbuilding monthly...\n')
-    dir.create(sprintf('%s/monthly', data_dir), recursive=TRUE)
+    dir.create(sprintf('%s/monthly/%s', data_dir, year), recursive=TRUE)
     for (m in months) {
       data_trim <- data[, m]
       gridded(data_trim) = TRUE
