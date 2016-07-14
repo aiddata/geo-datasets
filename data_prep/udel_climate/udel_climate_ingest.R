@@ -34,28 +34,48 @@ if (length(flist) == 0) {
 }
 
 
-dir.create(data_dir)
+dir.create(sprintf('%s/monthly', data_dir), recursive=TRUE)
+dir.create(sprintf('%s/yearly/mean', data_dir), recursive=TRUE)
+dir.create(sprintf('%s/yearly/min', data_dir), recursive=TRUE)
+dir.create(sprintf('%s/yearly/max', data_dir), recursive=TRUE)
+
 
 for (fname in flist) {
 
   fpath <- sprintf('%s/%s', raw_dir, fname)
   data <- read.table(fpath)
-  names(data) <- c("lon", "lat",
-                   "1", "2", "3", "4", "5", "6",
-                   "7", "8", "9", "10", "11", "12")
+  months <- as.character(c(1:12))
+  names(data) <- c("lon", "lat", months)
 
   coordinates(data) = ~lon+lat
   proj4string(data) = CRS("+init=epsg:4326")
 
-  for (m in 1:12) {
+
+  # monthly
+  for (m in months) {
     data_trim <- data[, m]
     gridded(data_trim) = TRUE
     r <- raster(data_trim)
 
     out_name <- sprintf('%s_%s.tif', gsub("[.]", "_", fname), m)
-    out_path <- sprintf('%s/%s', data_dir, out_name)
+    out_path <- sprintf('%s/monthly/%s', data_dir, out_name)
     writeRaster(r, file=out_path, overwrite=TRUE)
   }
+
+
+  # yearly
+  methods <- c('mean', 'min', 'max')
+  for (j in methods) {
+    data[[j]] <- apply(data@data[,as.character(c(1:12))], 1, j)
+    data_trim <- data[, j]
+    gridded(data_trim) = TRUE
+    r <- raster(data_trim)
+
+    out_name <- sprintf('%s_%s.tif', gsub("[.]", "_", fname), j)
+    out_path <- sprintf('%s/yearly/%s/%s', data_dir, j, out_name)
+    writeRaster(r, file=out_path, overwrite=TRUE)
+  }
+
 
 }
 
