@@ -7,12 +7,12 @@ library(raster)
 args <- commandArgs(trailingOnly = TRUE)
 
 dataset <- args[1]
-# dataset <- 'precip_2014'
-# dataset <- 'air_temp_2014'
+# dataset <- 'precip_2014_v4.01'
+# dataset <- 'air_temp_2014_v4.01'
 
 base_dir <- '/sciclone/aiddata10/REU'
-raw_dir <- sprintf('%s/raw/%s', base_dir, dataset)
-data_dir <- sprintf('%s/data/rasters/external/global/udel_%s',
+raw_dir <- sprintf('%s/raw/udel_climate/%s', base_dir, dataset)
+data_dir <- sprintf('%s/data/rasters/external/global/udel_climate/%s',
                     base_dir, dataset)
 
 # base_dir <- '/home/userz/Desktop'

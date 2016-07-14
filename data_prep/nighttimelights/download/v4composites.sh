@@ -10,7 +10,7 @@
 
 # raw_dir=/sciclone/aiddata10/REU/raw/v4avg_lights_x_pct
 
-raw_dir=/sciclone/aiddata10/REU/raw/v4composites
+raw_dir=/sciclone/aiddata10/REU/raw/dmsp_ntl/v4composites
 mkdir -p ${raw_dir}
 
 cd ${raw_dir}
@@ -19,13 +19,11 @@ cd ${raw_dir}
 # -------------------------
 # files download
 
-# z=(F101992 F101993
-#     F121994 F121995 F121996
-#     F141997 F141998 F141999 F152000 F152001 F152002 F152003
-#     F162004 F162005 F162006 F162007 F162008 F162009
-#     F182010 F182011 F182012)
-
-z=(F182013)
+z=(F101992 F101993
+    F121994 F121995 F121996
+    F141997 F141998 F141999 F152000 F152001 F152002 F152003
+    F162004 F162005 F162006 F162007 F162008 F162009
+    F182010 F182011 F182012 F182013)
 
 for i in ${z[*]}; do
 
@@ -41,7 +39,7 @@ done
 # downloaded files must be unpacked with tar
 # the unpackage tif files must then be decompressed with gunzip
 
-data_dir=/sciclone/aiddata10/REU/data/rasters/external/global/v4composites
+data_dir=/sciclone/aiddata10/REU/data/rasters/external/global/dmsp_ntl/v4composites
 mkdir -p ${data_dir}
 
 for i in *; do
