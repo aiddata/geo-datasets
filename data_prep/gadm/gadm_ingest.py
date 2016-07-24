@@ -25,6 +25,8 @@ if config.connection_status != 0:
 
 # -------------------------------------
 
+import time
+
 
 version = sys.argv[2]
 
@@ -61,9 +63,23 @@ qlist = [os.path.join(data_dir, i) for i in os.listdir(data_dir)
          if os.path.isdir(os.path.join(data_dir, i))]
 
 if method == "serial":
+    
+
+    Ts = int(time.time())
+    T_start = time.localtime()
+    print 'Start: ' + time.strftime('%Y-%m-%d  %H:%M:%S', T_start)
+
     for path in qlist:
         add_gadm.run(path=path, config=config, 
                      update=update, dry_run=dry_run)
+
+    T_run = int(time.time() - Ts)
+    T_end = time.localtime()
+    print '\n\n'
+    print 'Start: ' + time.strftime('%Y-%m-%d  %H:%M:%S', T_start)
+    print 'End: '+ time.strftime('%Y-%m-%d  %H:%M:%S', T_end)
+    print 'Runtime: ' + str(T_run//60) +'m '+ str(int(T_run%60)) +'s'
+    print '\n\n'
 
 
 elif method == "parallel":
