@@ -96,6 +96,10 @@ elif method == "parallel":
         print 'Start: ' + time.strftime('%Y-%m-%d  %H:%M:%S', self.T_start)
 
 
+    def tmp_master_process(self, worker_data):
+        pass
+
+
     def tmp_master_final(self):
 
         # stop job timer
@@ -122,6 +126,7 @@ elif method == "parallel":
     job.set_task_list(qlist)
 
     job.set_master_init(tmp_master_init)
+    job.set_master_process(tmp_master_process)
     job.set_master_final(tmp_master_final)
     job.set_worker_job(tmp_worker_job)
 
