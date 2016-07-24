@@ -116,8 +116,10 @@ elif method == "parallel":
 
         path = self.task_list[task_id]
 
-        add_gadm.run(path=path, config=config, 
+        with mpi_utility.Capturing() as output:
+            add_gadm.run(path=path, config=config, 
                      update=update, dry_run=dry_run)
+            print output
 
         return 0
 
