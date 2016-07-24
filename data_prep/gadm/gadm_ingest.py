@@ -34,8 +34,8 @@ data_dir = os.path.join('/sciclone/aiddata10/REU/data/boundaries', version_dir)
 
 
 if not os.path.isdir(data_dir):
-	msg = 'Could not find download directory for GADM version ({0})'.format(
-		version)
+    msg = 'Could not find download directory for GADM version ({0})'.format(
+        version)
     raise Exception(msg)
 
 
@@ -58,60 +58,60 @@ else:
 
 
 qlist = [os.path.join(data_dir, i) for i in os.listdir(data_dir) 
-		 if os.path.isdir(os.path.join(data_dir, i))]
+         if os.path.isdir(os.path.join(data_dir, i))]
 
 if method == "serial":
-	for path in qlist:
-		add_gadm.run(path=path, config=config, 
-					 update=update, dry_run=dry_run)
+    for path in qlist:
+        add_gadm.run(path=path, config=config, 
+                     update=update, dry_run=dry_run)
 
 
 elif method == "parallel":
 
-	sys.path.insert(0, os.path.dir(ingest_dir))
-	import mpi_utility
-	job = mpi_utility.NewParallel()
+    sys.path.insert(0, os.path.dir(ingest_dir))
+    import mpi_utility
+    job = mpi_utility.NewParallel()
 
 
-	def tmp_master_init(self):
-	    # start job timer
-	    self.Ts = int(time.time())
-	    self.T_start = time.localtime()
-	    print 'Start: ' + time.strftime('%Y-%m-%d  %H:%M:%S', self.T_start)
+    def tmp_master_init(self):
+        # start job timer
+        self.Ts = int(time.time())
+        self.T_start = time.localtime()
+        print 'Start: ' + time.strftime('%Y-%m-%d  %H:%M:%S', self.T_start)
 
 
-	def tmp_master_final(self):
+    def tmp_master_final(self):
 
-	    # stop job timer
-	    T_run = int(time.time() - self.Ts)
-	    T_end = time.localtime()
-	    print '\n\n'
-	    print 'Start: ' + time.strftime('%Y-%m-%d  %H:%M:%S', self.T_start)
-	    print 'End: '+ time.strftime('%Y-%m-%d  %H:%M:%S', T_end)
-	    print 'Runtime: ' + str(T_run//60) +'m '+ str(int(T_run%60)) +'s'
-	    print '\n\n'
-
-
-	def tmp_worker_job(self, task_id):
-
-	    path = self.task_list[task_id]
-
-		add_gadm.run(path=path, config=config, 
-					 update=update, dry_run=dry_run)
-
-	    return 0
+        # stop job timer
+        T_run = int(time.time() - self.Ts)
+        T_end = time.localtime()
+        print '\n\n'
+        print 'Start: ' + time.strftime('%Y-%m-%d  %H:%M:%S', self.T_start)
+        print 'End: '+ time.strftime('%Y-%m-%d  %H:%M:%S', T_end)
+        print 'Runtime: ' + str(T_run//60) +'m '+ str(int(T_run%60)) +'s'
+        print '\n\n'
 
 
-	# init / run job
-	job.set_task_list(qlist)
+    def tmp_worker_job(self, task_id):
 
-	job.set_master_init(tmp_master_init)
-	job.set_master_final(tmp_master_final)
-	job.set_worker_job(tmp_worker_job)
+        path = self.task_list[task_id]
 
-	job.run()
+        add_gadm.run(path=path, config=config, 
+                     update=update, dry_run=dry_run)
+
+        return 0
+
+
+    # init / run job
+    job.set_task_list(qlist)
+
+    job.set_master_init(tmp_master_init)
+    job.set_master_final(tmp_master_final)
+    job.set_worker_job(tmp_worker_job)
+
+    job.run()
 
 
 else:
-	raise Exception("Invalid processing method provided ({0})".format(method))
+    raise Exception("Invalid processing method provided ({0})".format(method))
 
