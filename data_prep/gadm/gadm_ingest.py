@@ -119,7 +119,7 @@ elif method == "parallel":
         with mpi_utility.Capturing() as output:
             add_gadm.run(path=path, config=config, 
                      update=update, dry_run=dry_run)
-            print output
+        print output
 
         return 0
 
