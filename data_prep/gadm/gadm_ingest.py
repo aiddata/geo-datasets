@@ -48,12 +48,12 @@ import add_gadm
 method = sys.argv[3]
 
 
-if len(sys.argv) == 5:
+if len(sys.argv) >= 5:
     update = sys.argv[4]
 else:
     update = False
 
-if len(sys.argv) == 6:
+if len(sys.argv) >= 6:
     dry_run = sys.argv[5]
 else:
     dry_run = False
