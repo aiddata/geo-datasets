@@ -1,6 +1,6 @@
 #!/bin/tcsh
 #PBS -N ax-gadm
-#PBS -l nodes=3:c18c:ppn=
+#PBS -l nodes=3:c18c:ppn=4
 #PBS -l walltime=24:00:00
 #PBS -j oe
 
