@@ -68,7 +68,7 @@ if method == "serial":
 
 elif method == "parallel":
 
-    sys.path.insert(0, os.path.dir(ingest_dir))
+    sys.path.insert(0, os.path.dirname(ingest_dir))
     import mpi_utility
     job = mpi_utility.NewParallel()
 
