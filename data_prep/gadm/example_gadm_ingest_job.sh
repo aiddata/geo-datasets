@@ -4,4 +4,6 @@
 #PBS -l walltime=24:00:00
 #PBS -j oe
 
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 12 python-mpi gadm_ingest.py develop 2.8 parallel update true
+set f = ${HOME}/active/develop/asdf-datasets/data_prep/gadm/gadm_ingest.py
+
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 12 python-mpi $f develop 2.8 parallel update true
