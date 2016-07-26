@@ -59,18 +59,19 @@ else:
     dry_run = False
 
 
-qlist = [os.path.join(data_dir, i) for i in os.listdir(data_dir) 
+qlist = [os.path.join(data_dir, i) for i in os.listdir(data_dir)
          if os.path.isdir(os.path.join(data_dir, i))]
+qlist.sort()
 
 if method == "serial":
-    
+
 
     Ts = int(time.time())
     T_start = time.localtime()
     print 'Start: ' + time.strftime('%Y-%m-%d  %H:%M:%S', T_start)
 
     for path in qlist:
-        add_gadm.run(path=path, config=config, 
+        add_gadm.run(path=path, config=config,
                      update=update, dry_run=dry_run)
 
     T_run = int(time.time() - Ts)
@@ -117,7 +118,7 @@ elif method == "parallel":
         path = self.task_list[task_id]
 
         with mpi_utility.Capturing() as output:
-            add_gadm.run(path=path, config=config, 
+            add_gadm.run(path=path, config=config,
                      update=update, dry_run=dry_run)
         print '\n'.join(output)
 
