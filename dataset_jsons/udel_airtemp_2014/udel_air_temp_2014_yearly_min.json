@@ -9,7 +9,7 @@
 	"version": 4.01,
 	"options": {
 	    "resolution": 0.5,
-	    "extract_types": ["max," "mean", "min"],
+        "extract_types": ["max", "mean", "min"],
 	    "factor": 1,
 	    "variable_description": "Air temperature (degrees Celsius) per .5 square degree",
 	    "mini_name": "uaym"
