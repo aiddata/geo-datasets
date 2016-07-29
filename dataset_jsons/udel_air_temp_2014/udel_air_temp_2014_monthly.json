@@ -1,0 +1,25 @@
+{
+	"base": "/sciclone/aiddata10/REU/data/rasters/external/global/udel_climate/air_temp_2014_v4.01/monthly",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "xxxx/air_temp_YYYY_MM.tif",
+	"name": "udel_air_temp_v401",
+	"title": "UDel Monthly Air Temperature (v4.01)",
+	"description": "Monthly Air Temperature from UDel v4.01.",
+	"version": 4.01,
+	"options": {
+	    "resolution": 0.5,
+        "extract_types": ["max", "mean", "min"],
+	    "factor": 1,
+	    "variable_description": "Air temperature (degrees Celsius) per .5 square degree",
+	    "mini_name": "uamm"
+	},
+	"extras": {
+	    "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
+	    "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html#T2014",
+	    "sources_name": "University of Delaware",
+	    "tags": ["temperature", "UDel"]
+	},
+	"active": 0
+}
+
