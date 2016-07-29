@@ -3,7 +3,7 @@
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "xxxxxxxx_YYYY_max.tif",
-	"name": "precip_max",
+	"name": "udel_precip_v401_max",
 	"title": "UDEL Precipitation v4.01",
 	"description": "Precipitation from UDEL v4.01.",
 	"version": 4.01,
