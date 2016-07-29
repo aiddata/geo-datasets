@@ -12,7 +12,7 @@
         "extract_types": ["mean", "max", "min"],
         "factor": 1,
         "variable_description": "degrees",
-        "mini_name": "se5h"
+        "mini_name": "ss5h"
     },
     "extras": {
         "citation": "Jarvis A., H.I. Reuter, A. Nelson, E. Guevara, 2008, Hole-filled seamless SRTM data V4, International Centre for Tropical Agriculture (CIAT), available from http://srtm.csi.cgiar.org.",
