@@ -8,7 +8,7 @@
 	"description": "Population density (UN Adjusted values) from GPW v4. Data provided in 30 arc-second (~1 km) grid cells.",
 	"version": 4,
 	"options": {
-	    "resolution": 0.041667,
+	    "resolution": 0.00833,
 	    "extract_types": ["mean", "max", "min"],
 	    "factor": 1,
 	    "variable_description": "persons per square kilometer",
