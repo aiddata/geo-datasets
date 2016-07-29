@@ -9,7 +9,7 @@
 	"version": 3,
 	"options": {
 	    "resolution": 0.00833,
-	    "extract_types": ["mean", "max", "min"],
+	    "extract_types": ["mean", "max", "min", "min"],
 	    "factor": 1,
 	    "variable_description": "persons per grid cell",
 	    "mini_name": "g4cu"
