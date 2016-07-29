@@ -1,5 +1,5 @@
 {
-	"base": "/sciclone/aiddata10/REU/data/rasters/external/global/gpw/gpw_v3/density",
+	"base": "/sciclone/aiddata10/REU/data/rasters/external/global/gpw/gpw_v3/count",
 	"type": "raster",
 	"file_extension": ".asc",
 	"file_mask": "glpyyag_YYYY.asc",
