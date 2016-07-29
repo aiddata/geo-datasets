@@ -11,7 +11,7 @@
 	    "resolution": 0.5,
         "extract_types": ["max", "mean", "min"],
 	    "factor": 1,
-	    "variable_description": "Air temperature (degrees Celsius) per .5 square degree",
+        "variable_description": "degrees Celsius",
 	    "mini_name": "uayx"
 	},
 	"extras": {
