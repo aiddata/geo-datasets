@@ -4,8 +4,8 @@
 	"file_extension": ".tif",
 	"file_mask": "precip_YYYY_min.tif",
 	"name": "udel_precip_v401_min",
-	"title": "UDEL Precipitation v4.01",
-	"description": "Precipitation from UDEL v4.01.",
+    "title": "UDel Precipitation (v4.01) Yearly Aggregate (min)",
+    "description": "Yearly Aggregate (min) of Precipitation from UDel v4.01.",
 	"version": 4.01,
 	"options": {
 	    "resolution": 0.5,
@@ -18,7 +18,7 @@
 	    "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
 	    "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html#P2014",
 	    "sources_name": "University of Delaware",
-	    "tags": ["precipitation", "UDEL"]
+	    "tags": ["precipitation", "UDel"]
 	},
 	"active": 1
 }
