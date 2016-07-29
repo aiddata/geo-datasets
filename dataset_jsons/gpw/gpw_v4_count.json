@@ -1,9 +1,9 @@
 {
-	"base": "/sciclone/aiddata10/REU/data/rasters/external/global/gpw/gpw_v4/density",
+	"base": "/sciclone/aiddata10/REU/data/rasters/external/global/gpw/gpw_v4/count",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "gpw-v4-population-count-adjusted-to-2015-unwpp-country-totals_YYYY.tif",
-	"name": "gpw_v4_density",
+	"name": "gpw_v4_count",
 	"title": "GPW V4 Population Count (UN Adjusted)",
 	"description": "Population count (UN Adjusted values) from GPW v4. Data provided in 30 arc-second (~1 km) grid cells.",
 	"version": 3,
