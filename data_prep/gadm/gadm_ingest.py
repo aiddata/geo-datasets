@@ -63,8 +63,15 @@ qlist = [os.path.join(data_dir, i) for i in os.listdir(data_dir)
          if os.path.isdir(os.path.join(data_dir, i))]
 qlist.sort()
 
-if method == "serial":
 
+###
+active_iso3_list = config.release_gadm.values() + config.other_gadm
+print "Active iso3 list: {0}".format(active_iso3_list)
+qlist = [i for i in qlist if i[:3] in active_iso3_list]
+###
+
+
+if method == "serial":
 
     Ts = int(time.time())
     T_start = time.localtime()
