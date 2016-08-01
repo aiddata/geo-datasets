@@ -66,8 +66,10 @@ qlist.sort()
 
 ###
 active_iso3_list = config.release_gadm.values() + config.other_gadm
-print "Active iso3 list: {0}".format(active_iso3_list)
-qlist = [i for i in qlist if i[:3] in active_iso3_list]
+# print qlist
+# print "Active iso3 list: {0}".format(active_iso3_list)
+qlist = [i for i in qlist if os.path.basename(i)[:3] in active_iso3_list]
+# print qlist
 ###
 
 
