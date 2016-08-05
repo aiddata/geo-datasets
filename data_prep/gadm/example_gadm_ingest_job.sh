@@ -1,7 +1,7 @@
 #!/bin/tcsh
 #PBS -N ax-gadm
-#PBS -l nodes=6:c18c:ppn=16
-#PBS -l walltime=72:00:00
+#PBS -l nodes=10:c18c:ppn=4
+#PBS -l walltime=180:00:00
 #PBS -j oe
 
 set branch = develop
