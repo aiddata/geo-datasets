@@ -1,0 +1,25 @@
+{
+    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/acled/v3",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "acled_v3_count",
+    "title": "Conflict Event Count (ACLED v3)",
+    "description": "Conflict event counts per 0.1 decimal degree grid cell using ACLED (Armed Conflict Location & Event Data Project) v3.",
+    "version": 3,
+    "options": {
+        "resolution": 0.1,
+        "extract_types": ["sum", "mean", "count"],
+        "factor": 1,
+        "variable_description": "count of conflict events",
+        "mini_name": "a3cd"
+    },
+    "extras": {
+        "citation": "Raleigh, Clionadh, Andrew Linke, Håvard Hegre and Joakim Karlsen. 2010. Introducing ACLED-Armed Conflict Location and Event Data. Journal of Peace Research 47(5) 651-660.",
+        "sources_web": "http://www.acleddata.com",
+        "sources_name": "ACLED",
+        "tags": ["acled", "conflict", "africa"]
+    },
+    "active": 1
+}
+

@@ -1,0 +1,25 @@
+{
+	"base": "/sciclone/aiddata10/REU/data/rasters/external/global/wdpa",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "None",
+	"name": "wdpa_binary_201609",
+    "title": "World Database on Protected Areas Binary (September 2016)",
+	"description": "The World Database on Protected Areas (WDPA) is the most comprehensive global database of marine and terrestrial protected areas. This is a rasterized (binary) indicating protected areas.",
+	"version": 201609,
+	"options": {
+	    "resolution": 0.01,
+        "extract_types": ["sum", "mean", "count"],
+	    "factor": 1,
+        "variable_description": "binary indicating protected area.",
+	    "mini_name": "wdpa"
+	},
+	"extras": {
+	    "citation": "IUCN and UNEP-WCMC (2016), The World Database on Protected Areas (WDPA) [On-line], [September 2016], Cambridge, UK: UNEP-WCMC. Available at: www.protectedplanet.net.",
+	    "sources_web": "www.protectedplanet.net",
+	    "sources_name": "IUCN and UNEP-WCMC",
+	    "tags": ["protected", "conservation"]
+	},
+	"active": 1
+}
+

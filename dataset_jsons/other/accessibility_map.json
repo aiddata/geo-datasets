@@ -1,0 +1,24 @@
+{
+    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/accessibility_map",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "access_50k",
+    "title": "Travel time to major cities",
+    "description": "Estimated travel time to the nearest city of 50,000 or more people in year 2000.",
+    "version": 1,
+    "options": {
+        "resolution": 0.008333333333333,
+        "extract_types": ["mean", "max", "min"],
+        "factor": 1,
+        "variable_description": "minutes",
+        "mini_name": "a50k"
+    },
+    "extras": {
+        "citation": "Nelson, A. (2008) Estimated travel time to the nearest city of 50,000 or more people in year 2000. Global Environment Monitoring Unit - Joint Research Centre of the European Commission, Ispra Italy. Available at http://forobs.jrc.ec.europa.eu/products/gam/",
+        "sources_web": "http://forobs.jrc.ec.europa.eu/products/gam",
+        "sources_name": " Global Environment Monitoring Unit - Joint Research Centre of the European Commission",
+        "tags": ["jrc", "accessibility"]
+    },
+    "active": 1
+}
