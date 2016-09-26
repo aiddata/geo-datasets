@@ -18,7 +18,7 @@
 	    "citation": "Jarvis A., H.I. Reuter, A. Nelson, E. Guevara, 2008, Hole-filled seamless SRTM data V4, International Centre for Tropical Agriculture (CIAT), available from http://srtm.csi.cgiar.org.",
 	    "sources_web": "http://www.cgiar-csi.org/data/srtm-90m-digital-elevation-database-v4-1",
 	    "sources_name": "CGIAR-CSI",
-	    "tags": ["nasa", "srtm", "dem", "elevation", "cgiar", "csi"]
+	    "tags": ["nasa", "srtm", "dem", "elevation", "cgiar", "csi", "environment"]
 	},
 	"active": 1
 }

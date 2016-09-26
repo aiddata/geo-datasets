@@ -1,0 +1,24 @@
+{
+    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "aaaaa",
+    "title": "aaaa",
+    "description": "aaaaa",
+    "version": 1,
+    "options": {
+        "resolution": 0.008333333333333,
+        "extract_types": ["mean", "max", "min"],
+        "factor": 1,
+        "variable_description": "aaaaa",
+        "mini_name": "aaaaa"
+    },
+    "extras": {
+        "citation": "aaaa",
+        "sources_web": "aaaaa",
+        "sources_name": " aaaaa",
+        "tags": ["accessibility"]
+    },
+    "active": 1
+}
