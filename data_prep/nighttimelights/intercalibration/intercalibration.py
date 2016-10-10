@@ -42,8 +42,8 @@ for i in qlist:
     sensor = i[0:3]
     year = i[3:7]
 
-    if int(year) != 2013:
-        continue
+    # if int(year) != 2013:
+    #     continue
 
     print sensor +' '+ year
 
@@ -83,9 +83,12 @@ for i in qlist:
 
     output_array = c0 + (tmp_array * c1) + (tmp_array ** c2)
 
-    output_array = np.int8(np.round(output_array))
-    output_array = output_array.filled(0)
     output_array[np.where(output_array > 63)] = 63
+    output_array = np.uint8(np.round(output_array))
+
+    output_array[np.where(tmp_array == 255)] = 255
+
+    output_array = output_array.filled(0)
 
 
 
@@ -101,8 +104,10 @@ for i in qlist:
     srs = osr.SpatialReference()
     srs.ImportFromEPSG(4326)
     output_raster.SetProjection(srs.ExportToWkt())
+    output_raster.GetRasterBand(1).SetNoDataValue(255)
     output_raster.GetRasterBand(1).WriteArray(output_array)
 
+    del output_raster
 
     T_init = int(time.time() - Ts)
     print('Single Calibration Runtime: ' + str(T_init//60) +'m '+ str(int(T_init%60)) +'s')
