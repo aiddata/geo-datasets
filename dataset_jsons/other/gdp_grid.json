@@ -1,0 +1,25 @@
+{
+	"base": "/sciclone/aiddata10/REU/data/rasters/external/global/GDP_grid/GDP_grid_fit.tif",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "None",
+	"name": "wdpa_binary_201609",
+    "title": "Global GDP Grid",
+	"description": "The World Database on Protected Areas (WDPA) is the most comprehensive global database of marine and terrestrial protected areas. Dataset downloaded September 2016. This is a rasterized (binary) indicating protected areas. For more refined subsets of this data (i.e., different classes of protected areas), please contact us at geo@aiddata.org.",
+	"version": 1,
+	"options": {
+	    "resolution": 0.01,
+        "extract_types": ["sum", "mean"],
+	    "factor": 1,
+        "variable_description": "millions of dollars",
+	    "mini_name": "gdpg"
+	},
+	"extras": {
+	    "citation": "IUCN and UNEP-WCMC (2016), The World Database on Protected Areas (WDPA) [On-line], [September 2016], Cambridge, UK: UNEP-WCMC. Available at: www.protectedplanet.net.",
+	    "sources_web": "www.protectedplanet.net",
+	    "sources_name": "IUCN and UNEP-WCMC",
+	    "tags": ["gdp", "socioeconomic"]
+	},
+	"active": 1
+}
+
