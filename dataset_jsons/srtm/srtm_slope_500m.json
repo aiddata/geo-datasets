@@ -4,8 +4,8 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "srtm_slope_500m",
-    "title": "SRTM Slope (500m)",
-    "description": "Global slope derived from SRTM dataset (v4.1) at 500m resolution.",
+    "title": "Ground Slope",
+    "description": "Global slope (in degrees) derived from Shuttle Radar Topography Mission (SRTM) dataset (v4.1) at 500m resolution.",
     "version": 1,
     "options": {
         "resolution": 0.004166,

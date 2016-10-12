@@ -4,8 +4,8 @@
 	"file_extension": ".tif",
 	"file_mask": "precip_YYYY_min.tif",
 	"name": "udel_precip_v401_min",
-    "title": "UDel Precipitation (v4.01) Yearly Aggregate (min)",
-    "description": "Yearly Aggregate (min) of Precipitation from UDel v4.01.",
+    "title": "Precipitation (Yearly Minimum)",
+    "description": "Minimum precipitation per year. Created using UDel Precipitation dataset (v4.01)",
 	"version": 4.01,
 	"options": {
 	    "resolution": 0.5,

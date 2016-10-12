@@ -4,14 +4,14 @@
 	"file_extension": ".tif",
 	"file_mask": "FxxYYYY.v4x_web.stable_lights.avg_vis_calibrated.tif",
 	"name": "v4composites_calibrated",
-    "title": "Version 4 DMSP-OLS Nighttime Lights",
-	"description": "The lights from cities, towns, and other sites with persistent lighting, including gas flares. Ephemeral events, such as fires have been discarded. Calibrated across sensors and years using Elivdge 2014 coeficients.",
+    "title": "Nighttime Lights",
+	"description": "Version 4 DMSP-OLS Nighttime Lights. The lights from cities, towns, and other sites with persistent lighting, including gas flares. Ephemeral events, such as fires have been discarded. Calibrated across sensors and years using Elivdge 2014 coeficients.",
 	"version": 4,
 	"options": {
 	    "resolution": 0.008333333333333,
         "extract_types": ["max", "mean", "min"],
 	    "factor": 1,
-        "variable_description": "Background noise was identified and replaced with values of zero. Data values range from 1-63. Areas with zero cloud-free observations are represented by the value 255.",
+        "variable_description": "digital number 0-63.",
 	    "mini_name": "v4cc"
 	},
 	"extras": {

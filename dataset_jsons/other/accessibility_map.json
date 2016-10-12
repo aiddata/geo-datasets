@@ -5,13 +5,13 @@
     "file_mask": "None",
     "name": "access_50k",
     "title": "Travel time to major cities",
-    "description": "Estimated travel time to the nearest city of 50,000 or more people in year 2000.",
+    "description": "Estimated travel time (in minutes) to the nearest city of 50,000 or more people in year 2000.",
     "version": 1,
     "options": {
         "resolution": 0.008333333333333,
         "extract_types": ["mean", "max", "min"],
         "factor": 1,
-        "variable_description": "minutes",
+        "variable_description": "time in minutes",
         "mini_name": "a50k"
     },
     "extras": {

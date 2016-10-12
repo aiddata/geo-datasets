@@ -11,8 +11,8 @@
         "resolution": 0.008333333333333,
         "extract_types": ["mean", "max", "min"],
         "factor": 1,
-        "variable_description": "aaaaa",
-        "mini_name": "aaaaa"
+        "variable_description": "distance in meters",
+        "mini_name": "dcsl"
     },
     "extras": {
         "citation": "aaaa",

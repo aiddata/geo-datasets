@@ -4,8 +4,8 @@
 	"file_extension": ".tif",
 	"file_mask": "precip_YYYY_var.tif",
 	"name": "udel_precip_v401_var",
-    "title": "UDel Precipitation (v4.01) Yearly Aggregate (var)",
-    "description": "Yearly Aggregate (var) of Precipitation from UDel v4.01.",
+    "title": "Precipitation (Yearly Variance)",
+    "description": "Variance of monthly precipitation per year. Created using UDel Precipitation dataset (v4.01)",
 	"version": 4.01,
 	"options": {
 	    "resolution": 0.5,

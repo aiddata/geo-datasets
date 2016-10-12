@@ -4,8 +4,8 @@
 	"file_extension": ".tif",
 	"file_mask": "air_temp_YYYY_min.tif",
 	"name": "udel_air_temp_v401_min",
-    "title": "UDel Air Temperature (v4.01) Yearly Aggregate (min)",
-	"description": "Yearly Aggregate (min) of Air Temperature from UDel v4.01.",
+    "title": "Air Temperature (Yearly Minimum)",
+    "description": "Minimum air temperature per year. Created using UDel Air Temperature dataset (v4.01)",
 	"version": 4.01,
 	"options": {
 	    "resolution": 0.5,

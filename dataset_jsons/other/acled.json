@@ -4,8 +4,8 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "acled_v3_count",
-    "title": "Conflict Event Count (ACLED v3)",
-    "description": "Conflict event counts per 0.1 decimal degree grid cell using ACLED (Armed Conflict Location & Event Data Project) v3.",
+    "title": "Conflict Events",
+    "description": "Number of conflict event counts per 0.1 decimal degree grid cell using ACLED (Armed Conflict Location & Event Data Project) v3. For subsets or other permutations of ACLED, please contact us at geo@aiddata.org.",
     "version": 3,
     "options": {
         "resolution": 0.1,

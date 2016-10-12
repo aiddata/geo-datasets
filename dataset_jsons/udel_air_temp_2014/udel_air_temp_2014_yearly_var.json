@@ -4,8 +4,8 @@
 	"file_extension": ".tif",
 	"file_mask": "air_temp_YYYY_var.tif",
 	"name": "udel_air_temp_v401_var",
-    "title": "UDel Air Temperature (v4.01) Yearly Aggregate (var)",
-    "description": "Yearly Aggregate (var) of Air Temperature from UDel v4.01.",
+    "title": "Air Temperature (Yearly Variance)",
+    "description": "Variance of monthly air temperature per year. Created using UDel Air Temperature dataset (v4.01)",
 	"version": 4.01,
 	"options": {
 	    "resolution": 0.5,

@@ -4,8 +4,8 @@
 	"file_extension": ".tif",
 	"file_mask": "xxxx/air_temp_YYYY_MM.tif",
 	"name": "udel_air_temp_v401",
-	"title": "UDel Monthly Air Temperature (v4.01)",
-	"description": "Monthly Air Temperature from UDel v4.01.",
+	"title": "Monthly Air Temperature",
+	"description": "Monthly air temperature from UDel v4.01.",
 	"version": 4.01,
 	"options": {
 	    "resolution": 0.5,
