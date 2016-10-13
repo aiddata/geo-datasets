@@ -3,21 +3,21 @@
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "None",
-	"name": "wdpa_binary_201609",
+	"name": "gdp_grid",
     "title": "Global GDP Grid",
-	"description": "The World Database on Protected Areas (WDPA) is the most comprehensive global database of marine and terrestrial protected areas. Dataset downloaded September 2016. This is a rasterized (binary) indicating protected areas. For more refined subsets of this data (i.e., different classes of protected areas), please contact us at geo@aiddata.org.",
+	"description": "Map of total economic activity, including both formal and informal economic activity, created from nighttime lights and LandScan population grid.",
 	"version": 1,
 	"options": {
-	    "resolution": 0.01,
+	    "resolution": 0.00833333,
         "extract_types": ["sum", "mean"],
 	    "factor": 1,
         "variable_description": "millions of dollars",
 	    "mini_name": "gdpg"
 	},
 	"extras": {
-	    "citation": "IUCN and UNEP-WCMC (2016), The World Database on Protected Areas (WDPA) [On-line], [September 2016], Cambridge, UK: UNEP-WCMC. Available at: www.protectedplanet.net.",
-	    "sources_web": "www.protectedplanet.net",
-	    "sources_name": "IUCN and UNEP-WCMC",
+	    "citation": "Ghosh, T., Powell, R.L., Elvidge, C.D., Baugh, K.E., Sutton, P.C., Anderson, S.: Shedding light on the global distribution of economic activity. The Open Geography Journal 3, 148-161 (2010)",
+	    "sources_web": "http://ngdc.noaa.gov/eog/data/GDP/",
+	    "sources_name": "Cooperative Institute for Research in Environmental Sciences, University of Colorado",
 	    "tags": ["gdp", "socioeconomic"]
 	},
 	"active": 1
