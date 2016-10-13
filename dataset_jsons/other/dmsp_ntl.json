@@ -9,7 +9,7 @@
 	"version": 4,
 	"options": {
 	    "resolution": 0.008333333333333,
-        "extract_types": ["max", "mean", "min"],
+        "extract_types": ["max", "mean", "min", "sum", "count"],
 	    "factor": 1,
         "variable_description": "digital number 0-63.",
 	    "mini_name": "v4cc"

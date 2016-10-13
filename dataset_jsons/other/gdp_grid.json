@@ -9,7 +9,7 @@
 	"version": 1,
 	"options": {
 	    "resolution": 0.00833333,
-        "extract_types": ["sum", "mean"],
+        "extract_types": ["sum", "mean", "max", "min"],
 	    "factor": 1,
         "variable_description": "millions of dollars",
 	    "mini_name": "gdpg"

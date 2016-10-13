@@ -9,7 +9,7 @@
 	"version": 3,
 	"options": {
 	    "resolution": 0.041667,
-	    "extract_types": ["mean", "max", "min", "sum"],
+	    "extract_types": ["sum"],
 	    "factor": 1,
 	    "variable_description": "persons per grid cell",
 	    "mini_name": "g3cu"
