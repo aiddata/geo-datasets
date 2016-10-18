@@ -10,7 +10,7 @@ if not os.path.isdir(branch_dir):
     raise Exception('Branch directory does not exist')
 
 
-config_dir = os.path.join(branch_dir, 'asdf', 'src', 'tools')
+config_dir = os.path.join(branch_dir, 'asdf', 'src', 'utils')
 sys.path.insert(0, config_dir)
 
 from config_utility import BranchConfig
@@ -41,7 +41,7 @@ if not os.path.isdir(data_dir):
     raise Exception(msg)
 
 
-ingest_dir = os.path.join(branch_dir, 'asdf', 'src')
+ingest_dir = os.path.join(branch_dir, 'asdf', 'src', 'ingest')
 sys.path.insert(0, ingest_dir)
 import add_gadm
 
