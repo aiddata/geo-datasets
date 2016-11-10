@@ -4,7 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "None",
 	"name": "gdp_grid",
-    "title": "Global GDP Grid",
+    "title": "Global Gross Domestic Product",
 	"description": "Map of total economic activity, including both formal and informal economic activity, created from nighttime lights and LandScan population grid.",
 	"version": 1,
 	"options": {

@@ -4,7 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "gpw-v4-population-count-adjusted-to-2015-unwpp-country-totals_YYYY.tif",
 	"name": "gpw_v4_count",
-	"title": "GPW V4 Population Count (UN Adjusted)",
+	"title": "Population (GPW V4, UN Adjusted)",
 	"description": "Population count (UN Adjusted values) from Gridded Population of the World v4. GPWv4 depicts the distribution of human population across the globe. Source data provided in 30 arc-second (~1 km) grid cells.",
 	"version": 3,
 	"options": {

@@ -4,7 +4,7 @@
 	"file_extension": ".asc",
 	"file_mask": "glpyyag_YYYY.asc",
 	"name": "gpw_v3_count",
-	"title": "GPW V3 Population Count (UN Adjusted)",
+	"title": "Population (GPW V3, UN Adjusted)",
 	"description": "Population count (UN Adjusted values) from the Gridded Population of the World v3. GPWv3 depicts the distribution of human population across the globe. Source data provided in 2.5 arc-minute grid cells.",
 	"version": 3,
 	"options": {
