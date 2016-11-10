@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/acled/v3/count/acled_v3_count.tif",
+    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/acled/v3/count",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
