@@ -20,5 +20,5 @@
         "sources_name": "NASA/Goddard Space Flight Center",
         "tags": ["nasa", "ltdr", "ndvi", "avhrr", "modis", "vegetation", "environment"]
     },
-    "active": 0
+    "active": 1
 }
