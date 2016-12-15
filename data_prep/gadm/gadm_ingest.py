@@ -123,9 +123,10 @@ elif method == "parallel":
         print '\n\n'
 
 
-    def tmp_worker_job(self, task_id):
+    def tmp_worker_job(self, task):
 
-        path = self.task_list[task_id]
+        task_index, task_data = task
+        path = task_data
 
         try:
             with mpi_utility.Capturing() as output:
