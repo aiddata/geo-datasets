@@ -10,6 +10,11 @@
     "options": {
         "resolution": 0.01,
         "extract_types": ["sum", "mean", "count"],
+        "extract_types_info" : {
+            "sum" : "number of pixels in each unit of analysis which are a protected area",
+            "mean" : "percentage of pixels per unit of analysis which are a protected area",
+            "count" : "total count of pixels per unit of analysis"
+        },
         "factor": 1,
         "variable_description": "binary indicating protected area",
         "mini_name": "wdpa"

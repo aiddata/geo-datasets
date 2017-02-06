@@ -5,11 +5,18 @@
 	"file_mask": "None",
 	"name": "gdp_grid",
     "title": "Gross Domestic Product",
-	"description": "Map of total economic activity, including both formal and informal economic activity, created from nighttime lights and LandScan population grid.",
+	"description": "Map of total economic activity, including both formal and informal economic activity for ~2006; created from nighttime lights and LandScan population grid.",
 	"version": 1,
 	"options": {
 	    "resolution": 0.00833333,
-        "extract_types": ["sum", "mean", "max", "min"],
+        "extract_types": ["sum", "mean", "max", "min", "count"],
+        "extract_types_info" : {
+            "sum": "total gdp for each unit of analysis",
+            "mean" : "average gdp within each unit of analysis",
+            "max" : "maximum gdp assigned to a pixel within each unit of analysis",
+            "min" : "minimum gdp assigned to a pixel within each unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
 	    "factor": 1,
         "variable_description": "millions of dollars",
 	    "mini_name": "gdpg"

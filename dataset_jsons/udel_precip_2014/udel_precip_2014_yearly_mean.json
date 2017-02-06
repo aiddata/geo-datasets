@@ -9,7 +9,13 @@
 	"version": 4.01,
 	"options": {
 	    "resolution": 0.5,
-        "extract_types": ["max", "mean", "min"],
+        "extract_types": ["max", "mean", "min", "count"],
+        "extract_types_info" : {
+            "max" : "maximum precipitation per unit of analysis",
+            "mean" : "average precipitation per unit of analysis",
+            "min" : "minimum precipitation per unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
 	    "factor": 1,
         "variable_description": "millimeters",
 	    "mini_name": "upye"

@@ -9,7 +9,13 @@
     "version": 1,
     "options": {
         "resolution": 0.008333333333333,
-        "extract_types": ["mean", "max", "min"],
+        "extract_types": ["mean", "max", "min", "count"],
+        "extract_types_info" : {
+            "mean" : "average travel time per unit of analysis",
+            "max" : "maximum travel time per unit of analysis",
+            "min" : "minimum travel time per unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
         "factor": 1,
         "variable_description": "time in minutes",
         "mini_name": "a50k"

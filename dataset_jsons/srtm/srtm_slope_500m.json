@@ -9,7 +9,13 @@
     "version": 1,
     "options": {
         "resolution": 0.004166,
-        "extract_types": ["mean", "max", "min"],
+        "extract_types": ["mean", "max", "min", "count"],
+        "extract_types_info" : {
+            "mean" : "average slope within each unit of analysis",
+            "max" : "maximum slope within each unit of analysis",
+            "min" : "minimum slope within each unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
         "factor": 1,
         "variable_description": "degrees",
         "mini_name": "ss5h"
