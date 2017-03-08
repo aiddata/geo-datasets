@@ -1,14 +1,14 @@
 {
-    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/",
+    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/roads/roads_distance.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "distance_to_roads",
+    "name": "dist_to_roads",
     "title": "Distance to Roads (Circa 2010)",
-    "description": "Distance to Roads, measured in meters, based on the Global Roads Open Access Dataset (gRoads) version 1.0.  The Global Roads Open Access Data Set, Version 1 (gROADSv1) was developed under the auspices of the CODATA Global Roads Data Development Task Group. The data set combines the best available roads data by country into a global roads coverage, using the UN Spatial Data Infrastructure Transport (UNSDI-T) version 2 as a common data model. All country road networks have been joined topologically at the borders, and many countries have been edited for internal topology. Source data for each country are provided in the documentation, and users are encouraged to refer to the readme file for use constraints that apply to a small number of countries. Because the data are compiled from multiple sources, the date range for road network representations ranges from the 1980s to 2010 depending on the country (most countries have no confirmed date), and spatial accuracy varies. The baseline global data set was compiled by the Information Technology Outreach Services (ITOS) of the University of Georgia. Updated data for 27 countries and 6 smaller geographic entities were assembled by Columbia University's Center for International Earth Science Information Network (CIESIN), with a focus largely on developing countries with the poorest data coverage.",
+    "description": "Distance to roads, measured in meters, based on the Global Roads Open Access Dataset (gRoads) version 1.0.  The Global Roads Open Access Data Set, Version 1 (gROADSv1) was developed under the auspices of the CODATA Global Roads Data Development Task Group. The data set combines the best available roads data by country into a global roads coverage, using the UN Spatial Data Infrastructure Transport (UNSDI-T) version 2 as a common data model. All country road networks have been joined topologically at the borders, and many countries have been edited for internal topology. Source data for each country are provided in the documentation, and users are encouraged to refer to the readme file for use constraints that apply to a small number of countries. Because the data are compiled from multiple sources, the date range for road network representations ranges from the 1980s to 2010 depending on the country (most countries have no confirmed date), and spatial accuracy varies. The baseline global data set was compiled by the Information Technology Outreach Services (ITOS) of the University of Georgia. Updated data for 27 countries and 6 smaller geographic entities were assembled by Columbia University's Center for International Earth Science Information Network (CIESIN), with a focus largely on developing countries with the poorest data coverage.",
     "version": 1,
     "options": {
-        "resolution": 0.008333333333333,
+        "resolution": 0.01,
         "extract_types": ["mean", "max", "min"],
         "factor": 1,
         "variable_description": "distance in meters",
