@@ -4,4 +4,4 @@
 #PBS -l walltime=24:00:00
 #PBS -j oe
 
-python ~/active/master/asdf-datasets/data_prep/distance_to_water/build_dist_to_country_border.py
+python ~/active/master/asdf-datasets/data_prep/distance_to_country_border/build_dist_to_country_border.py
