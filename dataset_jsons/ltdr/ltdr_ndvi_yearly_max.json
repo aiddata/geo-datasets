@@ -4,8 +4,8 @@
 	"file_extension": ".tif",
 	"file_mask": "YYYY.tif",
 	"name": "ltdr_yearly_max",
-	"title": "Normalized Difference Vegatation Index - NDVI (Yearly Maximum using LTDR v4)",
-	"description": "Yearly maximum value for Normalized Difference Vegatation Index (NDVI). Created using the NASA Long Term Data Record (v4).",
+	"title": "Normalized Difference Vegetation Index - NDVI (Yearly Maximum using LTDR v4)",
+	"description": "Yearly maximum value for Normalized Difference Vegetation Index (NDVI). Created using the NASA Long Term Data Record (v4).",
 	"version": 4,
 	"options": {
 	    "resolution": 0.05,
