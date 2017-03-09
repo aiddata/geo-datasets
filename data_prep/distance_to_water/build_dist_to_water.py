@@ -1,11 +1,6 @@
 
-import sys
-import os
-base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(base)
 
-from main import build_distance_array
-from utils import rasterize, export_raster
+from distancerasters import build_distance_array, rasterize, export_raster
 
 
 # -----------------------------------------------------------------------------
