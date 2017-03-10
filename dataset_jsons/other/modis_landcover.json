@@ -1,0 +1,28 @@
+{
+    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/glcf/modis_landcover_5.1",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "YYYY.xx.xx.tif",
+    "name": "modis_landcover_51",
+    "title": "MODIS Land Cover (GLCF, Version 5.1)",
+    "description": "Standard MODIS land cover type data product (MCD12Q1) in the IGBP Land Cover Type Classification.",
+    "version": 5.1,
+    "options": {
+        "resolution": 0.00416667,
+        "extract_types": ["categorical", "count"],
+        "extract_types_info" : {
+            "categorical" : "categories based on IGBP Land Cover Type Classification",
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "IGBP Land Cover Type Classification",
+        "mini_name": "gmlc"
+    },
+    "extras": {
+        "citation": "Friedl, M.A., D. Sulla-Menashe, B. Tan, A. Schneider, N. Ramankutty, A. Sibley and X. Huang (2010), MODIS Collection 5 global land cover: Algorithm refinements and characterization of new datasets, 2001-2012, Collection 5.1 IGBP Land Cover, Boston University, Boston, MA, USA.",
+        "sources_web": "http://www.landcover.org",
+        "sources_name": "Global Land Cover Facility",
+        "tags": [ "glcf", "modis", "land cover", "environment"]
+    },
+    "active": 1
+}

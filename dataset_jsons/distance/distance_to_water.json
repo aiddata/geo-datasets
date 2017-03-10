@@ -9,7 +9,13 @@
     "version": 1,
     "options": {
         "resolution": 0.01,
-        "extract_types": ["mean", "max", "min"],
+        "extract_types": ["mean", "max", "min", "count"],
+        "extract_types_info" : {
+            "mean" : "average distance per unit of analysis",
+            "max" : "maximum distance per unit of analysis",
+            "min" : "minimum distance per unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
         "factor": 1,
         "variable_description": "distance in meters",
         "mini_name": "dwat"
@@ -20,5 +26,5 @@
         "sources_name": "GSHHG: A Global Self-consistent, Hierarchical, High-resolution Geography Database",
         "tags": ["accessibility", "other"]
     },
-    "active": 0
+    "active": 1
 }
