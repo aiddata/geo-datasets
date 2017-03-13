@@ -22,7 +22,28 @@
         "citation": "Friedl, M.A., D. Sulla-Menashe, B. Tan, A. Schneider, N. Ramankutty, A. Sibley and X. Huang (2010), MODIS Collection 5 global land cover: Algorithm refinements and characterization of new datasets, 2001-2012, Collection 5.1 IGBP Land Cover, Boston University, Boston, MA, USA.",
         "sources_web": "http://www.landcover.org",
         "sources_name": "Global Land Cover Facility",
-        "tags": [ "glcf", "modis", "land cover", "environment"]
+        "tags": [ "glcf", "modis", "land cover", "environment"],
+        "category_map": {
+            "Water": 0,
+            "Evergreen Needleleaf forest": 1,
+            "Evergreen Broadleaf forest": 2,
+            "Deciduous Needleleaf forest": 3,
+            "Deciduous Broadleaf forest": 4,
+            "Mixed forest": 5,
+            "Closed shrublands": 6,
+            "Open shrublands": 7,
+            "Woody savannas": 8,
+            "Savannas": 9,
+            "Grasslands": 10,
+            "Permanent wetlands": 11,
+            "Croplands": 12,
+            "Urban and built-up": 13,
+            "Cropland/Natural vegetation mosaic": 14,
+            "Snow and ice": 15,
+            "Barren or sparsely vegetated": 16,
+            "Unclassified": 254,
+            "Fill Value": 255
+        }
     },
     "active": 1
 }
