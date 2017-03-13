@@ -11,7 +11,7 @@
         "resolution": 0.00416667,
         "extract_types": ["categorical", "count"],
         "extract_types_info" : {
-            "categorical" : "categories based on IGBP Land Cover Type Classification",
+            "categorical" : "categories based on IGBP Land Cover Type Classification. Warning: provides 19 category columns for each year selected",
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
