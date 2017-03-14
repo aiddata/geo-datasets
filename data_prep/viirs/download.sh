@@ -5,6 +5,5 @@ src="https://data.ngdc.noaa.gov/instruments/remote-sensing/passive/spectrometers
 
 dst="/sciclone/aiddata10/REU/raw/viirs"
 
-wget -rcNv --level=0 -P ${dst} ${src}
-
+wget -rcNv -nH --cut-dirs=6 --level=0 -P ${dst} ${src}
 
