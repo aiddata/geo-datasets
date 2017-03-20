@@ -33,7 +33,7 @@ for n in names:
     roads = roads | rv_array
 
 
-roads_output_raster_path = "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/groads/groads_binary.tif"
+roads_output_raster_path = "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/groads/binary/groads_binary.tif"
 
 export_raster(roads, affine, roads_output_raster_path)
 

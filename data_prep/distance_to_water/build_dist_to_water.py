@@ -37,7 +37,7 @@ rivers, _ = rasterize(path=rivers_path, affine=affine, shape=shape)
 water = shorelines + lakes + rivers
 
 
-water_output_raster_path = "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/water/water_binary.tif"
+water_output_raster_path = "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/water/binary/water_binary.tif"
 
 export_raster(water, affine, water_output_raster_path)
 

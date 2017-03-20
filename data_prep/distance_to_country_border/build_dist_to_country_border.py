@@ -29,7 +29,7 @@ borders, _ = rasterize(path=borders_path, affine=affine, shape=shape)
 
 
 
-borders_output_raster_path = "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/gadm28_borders/gadm28_borders_binary.tif"
+borders_output_raster_path = "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/gadm28_borders/binary/gadm28_borders_binary.tif"
 
 export_raster(borders, affine, borders_output_raster_path)
 
