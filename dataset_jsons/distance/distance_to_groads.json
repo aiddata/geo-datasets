@@ -4,7 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "dist_to_groads",
-    "title": "Distance to Roads (Circa 2010)",
+    "title": "Distance to Roads",
     "description": "Distance to roads, measured in meters, based on the Global Roads Open Access Dataset (gRoads) version 1.0. The data set combines the best available roads data by country into a global roads coverage. Because the data are compiled from multiple sources, the date range for road network representations ranges from the 1980s to 2010 depending on the country (most countries have no confirmed date), and spatial accuracy varies.",
     "version": 1,
     "options": {
