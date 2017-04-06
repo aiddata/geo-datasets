@@ -27,11 +27,11 @@ affine = Affine(pixel_size, 0, xmin,
 
 shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
 
-shorelines, _ = rasterize(path=shorelines_path, affine=affine, shape=shape)
+shorelines, _ = rasterize(shorelines_path, affine=affine, shape=shape)
 shorelines = np.logical_not(shorelines).astype(int)
 
-lakes, _ = rasterize(path=lakes_path, affine=affine, shape=shape)
-rivers, _ = rasterize(path=rivers_path, affine=affine, shape=shape)
+lakes, _ = rasterize(lakes_path, affine=affine, shape=shape)
+rivers, _ = rasterize(rivers_path, affine=affine, shape=shape)
 
 
 water = shorelines + lakes + rivers

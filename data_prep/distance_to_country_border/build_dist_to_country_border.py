@@ -25,7 +25,7 @@ affine = Affine(pixel_size, 0, xmin,
 
 shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
 
-borders, _ = rasterize(path=borders_path, affine=affine, shape=shape)
+borders, _ = rasterize(borders_path, affine=affine, shape=shape)
 
 
 

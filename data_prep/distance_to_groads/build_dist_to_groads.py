@@ -29,7 +29,7 @@ roads = np.zeros(shape, dtype='byte')
 for n in names:
     path = "{0}/{1}".format("/sciclone/aiddata10/REU/raw/groads",
                             "groads-v1-{0}-shp/gROADS-v1-{0}.shp".format(n))
-    rv_array, _ = rasterize(path=path, affine=affine, shape=shape)
+    rv_array, _ = rasterize(path, affine=affine, shape=shape)
     roads = roads | rv_array
 
 
