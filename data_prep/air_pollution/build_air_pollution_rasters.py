@@ -34,6 +34,7 @@ gdf = gpd.GeoDataFrame(df)
 
 for pre in col_prefixes:
     for y in years:
+        print "rasterizing {0} {1}".format(pre, y)
         rasterize(
             gdf,
             attribute="{0}_{1}".format(pre, y),

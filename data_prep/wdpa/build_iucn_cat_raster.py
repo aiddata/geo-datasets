@@ -70,7 +70,7 @@ for cat in field_values:
         len(features_filtered), cat)
 
     if len(features_filtered) == 0:
-        print "no feature selected for year {0}".format(cat)
+        print "\tno feature selected for year {0}".format(cat)
         pass
 
     cat_raster = rasterize(features_filtered, affine=affine, shape=out_shape)
@@ -83,6 +83,7 @@ for cat in field_values:
 output_raster = np.zeros(shape=(out_shape[0], out_shape[1]))
 
 for index in range(len(cat_layers)):
+    print "merging layer {0}".format(index)
     output_raster = output_raster + cat_layers[index] * (index + 1)
     output_raster = np.where(output_raster > (index + 1), 11, output_raster)
 
