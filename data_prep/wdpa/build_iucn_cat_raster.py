@@ -43,18 +43,26 @@ elif len(poly_layer) == 0:
 features_input = fiona.open(shp_path, layer=poly_layer[0])
 
 
+###
+
+# final_output = "/home/userz/Desktop/potential_data/wdpa/iucn_cat_201704/wdpa_iucn_cat_201704.tif"
+
+# shp_path = "/home/userz/Desktop/potential_data/wdpa/WDPA_Apr2017_poly_subset.shp"
+
+# features_input = fiona.open(shp_path)
+
+###
+
+
 try:
     pixel_size = float(pixel_size)
 except:
     raise Exception("Invalid pixel size (could not be converted to float)")
 
-(minx, miny, maxx, maxy) = features_input.bounds
+out_shape = (int(180 / pixel_size), int(360 / pixel_size))
 
-out_shape = (int(round((maxy - miny) / pixel_size))+1,
-             int(round((maxx - minx) / pixel_size))+1)
-
-affine = Affine(pixel_size, 0, minx,
-                0, -pixel_size, maxy)
+affine = Affine(pixel_size, 0, -180,
+                0, -pixel_size, 90)
 
 
 # build intermediary rasters for individual categories
@@ -62,7 +70,6 @@ affine = Affine(pixel_size, 0, minx,
 cat_layers = list()
 
 for cat in field_values:
-
     features_filtered = [f for f in features_input
                          if f["properties"][field_name] == cat]
 
@@ -73,8 +80,7 @@ for cat in field_values:
         print "\tno feature selected for year {0}".format(cat)
         pass
 
-    cat_raster = rasterize(features_filtered, affine=affine, shape=out_shape)
-
+    cat_raster, _ = rasterize(features_filtered, affine=affine, shape=out_shape)
     cat_layers.append(cat_raster)
 
 
