@@ -43,17 +43,6 @@ elif len(poly_layer) == 0:
 features_input = fiona.open(shp_path, layer=poly_layer[0])
 
 
-###
-
-# final_output = "/home/userz/Desktop/potential_data/wdpa/iucn_cat_201704/wdpa_iucn_cat_201704.tif"
-
-# shp_path = "/home/userz/Desktop/potential_data/wdpa/WDPA_Apr2017_poly_subset.shp"
-
-# features_input = fiona.open(shp_path)
-
-###
-
-
 try:
     pixel_size = float(pixel_size)
 except:
