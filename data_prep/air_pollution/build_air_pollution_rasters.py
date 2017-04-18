@@ -2,6 +2,7 @@
 rasterize ambient air pollution data to 0.1 degree resolution
 """
 
+import itertools
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
@@ -25,22 +26,27 @@ output_base = "/sciclone/aiddata10/REU/data/rasters/external/global/ambient_air_
 
 # -----------------------------------------------------------------------------
 
+field_list = ["{0}_{1}".format(*i) for i in itertools.product(col_prefixes, years)]
 
 df = pd.read_csv(input_csv, delimiter=",", encoding='utf-8')
+
+df = df[field_list + ['x', 'y']]
 
 df['geometry'] = df.apply(lambda z: Point(z['x'], z['y']), axis=1)
 
 gdf = gpd.GeoDataFrame(df)
 
-for pre in col_prefixes:
-    for y in years:
-        print "rasterizing {0} {1}".format(pre, y)
-        rasterize(
-            gdf,
-            attribute="{0}_{1}".format(pre, y),
-            pixel_size=pixel_size,
-            bounds=gdf.geometry.total_bounds,
-            output="{0}/{1}/{1}_{2}.tif".format(output_base, pre, y))
+
+for field in field_list:
+    print "rasterizing {0}".format(field)
+    rasterize(
+        gdf,
+        attribute=field,
+        pixel_size=pixel_size,
+        bounds=gdf.geometry.total_bounds,
+        output="{0}/{1}/{2}.tif".format(output_base, field[:-5], field),
+        fill=-1,
+        nodata=-1)
 
 
 
