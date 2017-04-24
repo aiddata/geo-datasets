@@ -21,7 +21,9 @@ df['geometry'] = df.apply(lambda z: Point(z['lon'], z['lat']), axis=1)
 
 gdf = gpd.GeoDataFrame(df)
 
+
 for year in years:
+    gdf = gdf[gdf["decade"]==year]
     rasterize(
             gdf,
             attribute='est5m0',
@@ -30,3 +32,4 @@ for year in years:
             output="{0}/{1}_{2}.tif".format(path, "ChildMortality" ,year),
             fill=-1,
             nodata=-1)
+
