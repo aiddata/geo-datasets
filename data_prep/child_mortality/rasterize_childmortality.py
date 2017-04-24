@@ -15,21 +15,22 @@ df = pandas.read_table(file_path, sep=' ')
 
 years = [1980, 1990, 2000]
 pixel_size = 0.1
+#raster_field = 'est5m0'
 
-#df = df['est5m0' + ['lon', 'lat']]
 df['geometry'] = df.apply(lambda z: Point(z['lon'], z['lat']), axis=1)
 
 gdf = gpd.GeoDataFrame(df)
 
 
 for year in years:
-    gdf = gdf[gdf["decade"]==year]
+    rst_gdf = gdf[gdf["decade"]==year]
+    print "rasterize year", year
     rasterize(
-            gdf,
-            attribute='est5m0',
-            pixel_size=pixel_size,
-            bounds=gdf.geometry.total_bounds,
-            output="{0}/{1}_{2}.tif".format(path, "ChildMortality" ,year),
-            fill=-1,
-            nodata=-1)
+        rst_gdf,
+        attribute='est5m0',
+        pixel_size=pixel_size,
+        bounds=rst_gdf.geometry.total_bounds,
+        output="{0}/{1}_{2}.tif".format(path, "ChildMortality" ,year),
+        fill=-1,
+        nodata=-1)
 
