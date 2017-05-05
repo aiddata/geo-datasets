@@ -15,7 +15,9 @@ over a full year and the maximum of these values was selected.",
         "extract_types": ["mean", "count"],
         "extract_types_info" : {
             "mean" : "average ozone concentration for each unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+            "count" : "total count of pixels per unit of analysis",
+            "max": "maximum ozone concentration per unit of analysis",
+            "min": "minimum ozone concentration per unit of analysis"
         },
         "factor": 1,
         "variable_description": "Ozone concentration (ug/m3)",

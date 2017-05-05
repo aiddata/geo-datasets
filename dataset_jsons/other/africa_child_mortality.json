@@ -11,8 +11,10 @@
         "resolution": 0.1,
         "extract_types": ["mean", "count"],
         "extract_types_info" : {
-            "mean" : "average deaths per 1,000 child-years for each unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+            "mean" : "average under-5 mortality for each unit of analysis",
+            "count" : "total count of pixels per unit of analysis",
+            "max": "maximum under-5 mortality per unit of analysis",
+            "min": "minimum under-5 mortality per unit of analysis"
         },
         "factor": 1,
         "variable_description": "deaths per 1,000 child-years",
