@@ -1,0 +1,29 @@
+{
+    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/ambient_air_pollution_2013/fus_calibrated/",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "fus_calibrated_YYYY.tif",
+    "name": "ambient_air_pollution_2013_fus_calibrated",
+    "title": "Particulate Matter (PM2.5) Concentration",
+    "description": "Particulate matter (PM2.5) estimate, based on prediction model using combination of satellite-based estimate and TM5-FASST simulation.",
+    "version": 2013,
+    "options": {
+        "resolution": 0.1,
+        "extract_types": ["mean", "count"],
+        "extract_types_info" : {
+            "mean" : "average PM2.5 concentration for each unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "PM2.5 concentration (ug/m3)",
+        "mini_name": "apfc"
+    },
+    "extras": {
+        "citation": "Brauer M, Freedman G, Frostad J, van Donkelaar A, Martin RV, Dentener F, Van Dingenen R, Estep K, Amini H, Apte JS, Balakrishnan K, Barregard L, Broday DM, Feigin V, Ghosh S, Hopke PK, Knibbs LD, Kokubo Y, Liu Y, Ma S, Morawska L, Sangrador JLT, Shaddick G, Anderson HR, Vos T, Forouzanfar MH, Burnett RT, Cohen A. Ambient air pollution exposure estimation for the Global Burden of Disease 2013. Environmental Science & Technology. 2015 Nov 23. doi: 10.1021/acs.est.5b03709.",
+        "sources_web": "http://www.healthdata.org/research-article/ambient-air-pollution-exposure-estimation-global-burden-disease-2013",
+        "sources_name": "Ambient air pollution exposure estimation for the Global Burden of Disease 2013",
+        "tags": ["pollution", "air", "environment", "disease", "particulate"]
+    },
+    "active": 1
+}
+

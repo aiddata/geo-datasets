@@ -1,0 +1,43 @@
+{
+    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/wdpa/iucn_cat_201704",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "wdpa_iucn_cat_201704",
+    "title": "Protected Areas (IUCN Categories)",
+    "description": "The World Database on Protected Areas (WDPA) is the most comprehensive global database of marine and terrestrial protected areas. Dataset downloaded April 2017. This is a categorical raster indicating the IUCN category (or relevant information when no category exists) of the protected area covering each pixel. ",
+    "version": 201704,
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["categorical", "count"],
+        "extract_types_info" : {
+            "categorical" : "IUCN category (or relevant information when no category exists). Note: provides 12 category columns in total.",
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "IUCN category information",
+        "mini_name": "wdpa"
+    },
+    "extras": {
+        "citation": "IUCN and UNEP-WCMC (2016), The World Database on Protected Areas (WDPA) [On-line], [September 2016], Cambridge, UK: UNEP-WCMC. Available at: www.protectedplanet.net.",
+        "sources_web": "www.protectedplanet.net",
+        "sources_name": "IUCN and UNEP-WCMC",
+        "tags": ["protected", "conservation", "environment", "iucn"],
+        "category_map": {
+            "unprotected": 0,
+            "ia": 1,
+            "ib": 2,
+            "ii": 3,
+            "iii": 4,
+            "iv": 5,
+            "v": 6,
+            "vi": 7,
+            "not_applicable": 8,
+            "not_assigned": 9,
+            "not_reported": 10,
+            "mix": 11
+        }
+    },
+    "active": 1
+}
+

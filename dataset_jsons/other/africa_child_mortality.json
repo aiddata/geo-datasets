@@ -1,0 +1,31 @@
+{
+    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/africa_child_mortality/",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "africa_child_mortality_YYYY.tif",
+    "name": "africa_child_mortality",
+    "title": "Child Mortality in Africa",
+    "description": "Under-5 mortality (estimated deaths per 1,000 child-years) for the 1980s, 1990s, and 2000s. Based on geo-spatial interpolation methods using data from the Demographic and Health Survey across 28 Sub-Saharan countries.",
+    "version": 1,
+    "options": {
+        "resolution": 0.1,
+        "extract_types": ["mean", "count"],
+        "extract_types_info" : {
+            "mean" : "average deaths per 1,000 child-years for each unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "deaths per 1,000 child-years",
+        "mini_name": "afcm"
+    },
+    "extras": {
+        "citation": "Marshall Burke, Sam Heft-Neal, and Eran Bendavid.
+Understanding variation in child mortality across Sub-Saharan Africa: A spatial analysis.
+The Lancet Global Health, 2016, Volume 4, Issue 12, e936-e94.",
+        "sources_web": "http://sheftneal9.wixsite.com/fse-data/paper-1",
+        "sources_name": "Standford Data Portal",
+        "tags": ["africa", "child", "mortality", "population", "welfare"]
+    },
+    "active": 1
+}
+

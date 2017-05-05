@@ -13,7 +13,7 @@ from distancerasters import rasterize, export_raster
 # -----------------------------------------------------------------------------
 
 
-input_csv = "/sciclone/aiddata10/REU/raw/ambient_air_pollution/GBD2013final.csv"
+input_csv = "/sciclone/aiddata10/REU/raw/ambient_air_pollution_2013/GBD2013final.csv"
 
 pixel_size = 0.1
 
@@ -21,7 +21,7 @@ col_prefixes = ['o3', 'fus_calibrated']
 
 years = [1990, 1995, 2000, 2005, 2010, 2011, 2012, 2013]
 
-output_base = "/sciclone/aiddata10/REU/data/rasters/external/global/ambient_air_pollution"
+output_base = "/sciclone/aiddata10/REU/data/rasters/external/global/ambient_air_pollution_2013"
 
 
 # -----------------------------------------------------------------------------
