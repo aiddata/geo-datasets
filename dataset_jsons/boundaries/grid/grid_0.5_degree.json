@@ -1,0 +1,27 @@
+{
+	"base": "/sciclone/aiddata10/REU/data/boundaries/grid/grid_0_5_degree",
+	"type": "boundary",
+	"file_extension": ".geojson",
+	"file_mask": "None",
+	"name": "grid_0_5_degree",
+    "title": "0.5 Decimal Degree Grid (with PRIO Grid ids)",
+	"description": "Global grid at 0.5 decimal degree resolution, with cells ids to join to PRIO Grid data/shapefile.",
+	"version": 1,
+    "options" : {
+        "group" : "global_grid",
+        "group_title" : "Global Grid",
+        "group_class" : "actual"
+    },
+
+    "extras" : {
+        "tags" : [
+            "grid",
+            "prio",
+        ],
+        "citation" : "Tollefsen, Andreas Forø; Håvard Strand & Halvard Buhaug (2012) PRIO-GRID: A unified spatial data structure. Journal of Peace Research, 49(2): 363-374. doi: 10.1177/0022343311431287",
+        "sources_name" : "PRIO-GRID",
+        "sources_web" : "http://grid.prio.org"
+    },
+	"active": 1
+}
+
