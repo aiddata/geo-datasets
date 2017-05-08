@@ -16,7 +16,7 @@
         },
         "factor": 1,
         "variable_description": "IUCN category information",
-        "mini_name": "wdpa"
+        "mini_name": "iucn"
     },
     "extras": {
         "citation": "IUCN and UNEP-WCMC (2016), The World Database on Protected Areas (WDPA) [On-line], [April 2017], Cambridge, UK: UNEP-WCMC. Available at: www.protectedplanet.net.",
