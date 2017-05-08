@@ -5,10 +5,7 @@
     "file_mask": "o3_YYYY.tif",
     "name": "ambient_air_pollution_2013_o3",
     "title": "Ozone Concentration",
-    "description": "Ozone concentration (ug/m3) from TM5 FASST simulation. Since the
-ozone (summer) season varies throughout the globe, it was calculated using a
-running 3-month average (of daily 1 hour max values) for each grid cell
-over a full year and the maximum of these values was selected.",
+    "description": "Ozone concentration (ug/m3) from TM5 FASST simulation. Since the ozone (summer) season varies throughout the globe, it was calculated using a running 3-month average (of daily 1 hour max values) for each grid cell over a full year and the maximum of these values was selected.",
     "version": 2013,
     "options": {
         "resolution": 0.1,
