@@ -21,9 +21,7 @@
         "mini_name": "afcm"
     },
     "extras": {
-        "citation": "Marshall Burke, Sam Heft-Neal, and Eran Bendavid.
-Understanding variation in child mortality across Sub-Saharan Africa: A spatial analysis.
-The Lancet Global Health, 2016, Volume 4, Issue 12, e936-e94.",
+        "citation": "Marshall Burke, Sam Heft-Neal, and Eran Bendavid. Understanding variation in child mortality across Sub-Saharan Africa: A spatial analysis. The Lancet Global Health, 2016, Volume 4, Issue 12, e936-e94.",
         "sources_web": "http://sheftneal9.wixsite.com/fse-data/paper-1",
         "sources_name": "Standford Data Portal",
         "tags": ["africa", "child", "mortality", "population", "welfare"]
