@@ -18,17 +18,19 @@ ref = {}
 
 
 # get sensors
-sensors = [name for name in os.listdir(path_base) if os.path.isdir(os.path.join(path_base, name))]
+sensors = [name for name in os.listdir(path_base)
+           if os.path.isdir(os.path.join(path_base, name))]
 sensors.sort()
 
-# use limited sensors for testing 
+# use limited sensors for testing
 # sensors = ['2001']
 
 for sensor in sensors:
 
 	# get years for sensors
 	path_sensor = path_base +"/"+ sensor
-	years = [name for name in os.listdir(path_sensor) if os.path.isdir(os.path.join(path_sensor, name))]
+	years = [name for name in os.listdir(path_sensor)
+             if os.path.isdir(os.path.join(path_sensor, name))]
 	years.sort()
 
 
@@ -40,7 +42,12 @@ for sensor in sensors:
 
 		# get days for year
 		path_year = path_sensor +"/"+ year
-		filenames = [name for name in os.listdir(path_year) if not os.path.isdir(os.path.join(path_year, name)) and name.endswith(".tif") and name.split(".")[0] == "AVH13C1"]
+		filenames = [
+            name for name in os.listdir(path_year)
+            if not os.path.isdir(os.path.join(path_year, name))
+                and name.endswith(".tif")
+                and name.split(".")[0] == "AVH13C1"
+        ]
 		filenames.sort()
 
 		for filename in filenames:
@@ -52,9 +59,9 @@ for sensor in sensors:
 				ref[year][day] = [sensor, filename]
 
 
-# creates directories 
+# creates directories
 def make_dir(path):
-	try: 
+	try:
 		os.makedirs(path)
 	except OSError as exception:
 		if exception.errno != errno.EEXIST:
@@ -66,7 +73,7 @@ for year in ref:
 
 	for day in ref[year]:
 
- 		# qlist.append(ref[year][day] + [year, day]) 
+ 		# qlist.append(ref[year][day] + [year, day])
  		pin = "/home/userz/globus-data/data/ltdr.nascom.nasa.gov/allData/Ver4/"+ref[year][day][0]+"/"+year+"/"+ref[year][day][1]+".tif"
 
  		pout_dir = "/home/userz/globus-data/data/ltdr.nascom.nasa.gov/allData/ndvi/"+year
@@ -77,4 +84,4 @@ for year in ref:
  		os.rename(pin, pout)
  		# print pout
  		# copy file
- 		# 
+ 		#

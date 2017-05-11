@@ -8,10 +8,10 @@
 # AVH13C1.A1981181.N07.004.2013227210959.hdf
 
 # split file name by "."
-# eg: 
-# 
+# eg:
+#
 # full file name - "AVH13C1.A1981181.N07.004.2013227210959.hdf"
-# 
+#
 # 0		product code	 	AVH13C1
 # 1 	date of image		A1981181
 # 2 	sensor code			N07
@@ -49,10 +49,11 @@ ref = {}
 # list of all [year, day] combos
 
 # get sensors
-sensors = [name for name in os.listdir(path_base) if os.path.isdir(os.path.join(path_base, name))]
+sensors = [name for name in os.listdir(path_base)
+           if os.path.isdir(os.path.join(path_base, name))]
 sensors.sort()
 
-# use limited sensors for testing 
+# use limited sensors for testing
 # sensors = ['2001']
 
 
@@ -60,7 +61,8 @@ for sensor in sensors:
 
 	# get years for sensors
 	path_sensor = path_base +"/"+ sensor
-	years = [name for name in os.listdir(path_sensor) if os.path.isdir(os.path.join(path_sensor, name))]
+	years = [name for name in os.listdir(path_sensor)
+             if os.path.isdir(os.path.join(path_sensor, name))]
 	years.sort()
 
 	for year in years:
@@ -71,7 +73,12 @@ for sensor in sensors:
 
 		# get days for year
 		path_year = path_sensor +"/"+ year
-		filenames = [name for name in os.listdir(path_year) if not os.path.isdir(os.path.join(path_year, name)) and name.endswith(".hdf") and name.split(".")[0] == "AVH13C1"]
+		filenames = [
+            name for name in os.listdir(path_year)
+            if not os.path.isdir(os.path.join(path_year, name))
+                and name.endswith(".hdf")
+                and name.split(".")[0] == "AVH13C1"
+        ]
 		filenames.sort()
 
 		for filename in filenames:
@@ -91,7 +98,7 @@ for sensor in sensors:
 qlist = []
 for year in ref:
 	for day in ref[year]:
- 		qlist.append(ref[year][day] + [year, day]) 
+ 		qlist.append(ref[year][day] + [year, day])
 
 c = rank
 while c < len(qlist):
@@ -103,7 +110,7 @@ while c < len(qlist):
 		sts = sp.check_output(cmd, stderr=sp.STDOUT, shell=True)
 		print sts
 
-	except sp.CalledProcessError as sts_err:                                                                                                   
+	except sp.CalledProcessError as sts_err:
 	    print "subprocess error code", sts_err.returncode, sts_err.output
 
 	c += size
