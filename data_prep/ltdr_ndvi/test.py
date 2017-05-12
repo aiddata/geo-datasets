@@ -1,95 +1,104 @@
+"""
+unpack a single subdataset from a HDF container, reprojectm and write to GeoTiff
 
+Parts of code pulled from:
 
-from osgeo import gdal
+https://gis.stackexchange.com/questions/174017/extract-scientific-layers-from-modis-hdf-dataeset-using-python-gdal
+https://gis.stackexchange.com/questions/42584/how-to-call-gdal-translate-from-python-code
+https://stackoverflow.com/questions/10454316/how-to-project-and-resample-a-grid-to-match-another-grid-with-gdal-python/10538634#10538634
+https://jgomezdans.github.io/gdal_notes/reprojection.html
+
+Notes:
+
+Rebuilding geotransform is not really necessary in this case but might
+be useful for future data prep scripts that can use this as startng point.
+
+"""
+import os
 import numpy as np
+from osgeo import gdal, osr
 
 
+hdf_file = "/home/userw/Desktop/AVH13C1.A2010153.N19.004.2015206181729.hdf"
+dst_dir = "/home/userw/Desktop"
+subdataset = 0
+band_path = os.path.join(
+    dst_dir,
+    "{0}-sd{1}.tif".format(
+        os.path.basename(os.path.splitext(hdf_file)[0]),
+        subdataset + 1
+    )
+)
 
 # -----------------------------------------------------------------------------
-# https://gis.stackexchange.com/questions/174017/extract-scientific-layers-from-modis-hdf-dataeset-using-python-gdal
-# also: https://gis.stackexchange.com/questions/42584/how-to-call-gdal-translate-from-python-code
 
-hdf_file = ""
-dst_dir = ""
-subdataset = ""
-
-"""unpack a single subdataset from a HDF5 container and write to GeoTiff"""
 # open the dataset
 hdf_ds = gdal.Open(hdf_file, gdal.GA_ReadOnly)
 band_ds = gdal.Open(hdf_ds.GetSubDatasets()[subdataset][0], gdal.GA_ReadOnly)
 
+# -----------------------------------------------------------------------------
+
+src_proj = osr.SpatialReference()
+src_proj.ImportFromWkt(band_ds.GetProjection())
+
+dst_proj = osr.SpatialReference()
+dst_proj.ImportFromEPSG(4326)
+
+tx = osr.CoordinateTransformation(src_proj, dst_proj)
+
+src_gt = band_ds.GetGeoTransform()
+pixel_xsize = src_gt[1]
+pixel_ysize = abs(src_gt[5])
+
+(ulx, uly, ulz ) = tx.TransformPoint(src_gt[0], src_gt[3])
+
+(lrx, lry, lrz ) = tx.TransformPoint(src_gt[0] + src_gt[1]*band_ds.RasterXSize,
+                                     src_gt[3] + src_gt[5]*band_ds.RasterYSize)
+
+# Calculate the new geotransform
+dst_gt = (ulx, pixel_xsize, src_gt[2],
+           uly, src_gt[4], -pixel_ysize)
+
+# -----------------------------------------------------------------------------
 
 
-
-# build output path
-band_path = os.path.join(dst_dir, os.path.basename(os.path.splitext(hdf_file)[0]) + "-sd" + str(subdataset+1) + ".tif")
-
-# write raster
 driver = gdal.GetDriverByName('GTiff')
-
-# -----------------
-# method 1
-
-# read into numpy array
-band_array = band_ds.ReadAsArray().astype(np.int16)
-
 out_ds = driver.Create(
     band_path,
-    band_ds.RasterXSize,
-    band_ds.RasterYSize,
-    1,  #Number of bands
-    gdal.GDT_Int16,
-    ['COMPRESS=LZW', 'TILED=YES']
+    int((lrx - ulx)/pixel_xsize),
+    int((uly - lry)/pixel_ysize),
+    1,
+    gdal.GDT_Int16
 )
-
-out_ds.SetGeoTransform(band_ds.GetGeoTransform())
-out_ds.SetProjection(band_ds.GetProjection())
-out_ds.GetRasterBand(1).WriteArray(band_array)
-out_ds.GetRasterBand(1).SetNoDataValue(-32768)
-
-
-# -----------------
-# method 2
-
-out_ds = driver.CreateCopy( band_path, band_ds, 0 )
-
-# -----------------
-
-hdf_ds = None
-band_ds = None
-out_ds = None  #close dataset to write to disc
-
-
 
 
 # -----------------------------------------------------------------------------
-# https://stackoverflow.com/questions/10454316/how-to-project-and-resample-a-grid-to-match-another-grid-with-gdal-python/10538634#10538634
+
+out_ds.SetGeoTransform(dst_gt)
+out_ds.SetProjection(dst_proj.ExportToWkt())
+
+# need to test different resampling methods
+# (nearest is default, probably used by gdal_translate)
+# do not actually  think it matters for this case though
+# as there does not seem to be much if any need for r
+# resampling when reprojecting between these projections
+gdal.ReprojectImage(band_ds, out_ds,
+                    src_proj.ExportToWkt(), dst_proj.ExportToWkt(),
+                    gdal.GRA_Bilinear)
 
 
-# Source
-src_filename = 'MENHMAgome01_8301/mllw.gtx'
-src = gdal.Open(src_filename, gdal.GA_ReadOnly)
-src_proj = src.GetProjection()
-src_geotrans = src.GetGeoTransform()
+band_array = out_ds.ReadAsArray().astype(np.int16)
+band_array[np.where(band_array < 0)] = -9999
 
+out_ds.GetRasterBand(1).WriteArray(band_array)
+out_ds.GetRasterBand(1).SetNoDataValue(-9999)
 
-# We want a section of source that matches this:
-match_filename = 'F00574_MB_2m_MLLW_2of3.bag'
-match_ds = gdal.Open(match_filename, gdal.GA_ReadOnly)
-match_proj = match_ds.GetProjection()
-match_geotrans = match_ds.GetGeoTransform()
-wide = match_ds.RasterXSize
-high = match_ds.RasterYSize
+# out_ds.GetRasterBand(1).ReadAsArray()
 
-# Output / destination
-dst_filename = 'F00574_MB_2m_MLLW_2of3_mllw_offset.tif'
-dst = gdal.GetDriverByName('GTiff').Create(dst_filename, wide, high, 1, gdal.GDT_Float32)
-dst.SetGeoTransform( match_geotrans )
-dst.SetProjection( match_proj)
+# -----------------------------------------------------------------------------
 
+hdf_ds = None
+band_ds = None
+out_ds = None
 
-# Do the work
-
-# need to test different resampling methods (nearest is default, probably used by gdal_translate)
-gdal.ReprojectImage(src, dst, src_proj, match_proj, gdal.GRA_Bilinear)
 
