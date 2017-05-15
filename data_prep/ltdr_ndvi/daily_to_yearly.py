@@ -29,13 +29,13 @@ nodata = -9999
 
 
 # verify data_path contains daily data
-# 
+#
 
 # verify out_base exists
-# 
+#
 
 # create method folder in out_base if it does not exists
-# 
+#
 
 
 def enum(*sequential, **named):
@@ -59,9 +59,9 @@ if method not in method_list:
 
 accept = ['1981']
 qlist = [name for name in os.listdir(data_path) if os.path.isdir(os.path.join(data_path, name)) and name in accept]
-        
 
-for i in range(len(qlist)): 
+
+for i in range(len(qlist)):
 
     year = qlist[i]
 
@@ -87,7 +87,7 @@ for i in range(len(qlist)):
             data = comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status=status)
             source = status.Get_source()
             tag = status.Get_tag()
-            
+
             if tag == tags.READY:
                 if task_index < len(tasks):
                     comm.send(tasks[task_index], dest=source, tag=tags.START)
@@ -135,11 +135,11 @@ for i in range(len(qlist)):
 
         if geotransform != None:
             output_path = out_base +"/"+ method +"/"+ year + ".tif"
-            output_raster = gdal.GetDriverByName('GTiff').Create(output_path,ncols, nrows, 1 ,gdal.GDT_Float32)  
-            output_raster.SetGeoTransform(geotransform)  
-            srs = osr.SpatialReference()                 
-            srs.ImportFromEPSG(4326)  
-            output_raster.SetProjection(srs.ExportToWkt()) 
+            output_raster = gdal.GetDriverByName('GTiff').Create(output_path,ncols, nrows, 1 ,gdal.GDT_Float32)
+            output_raster.SetGeoTransform(geotransform)
+            srs = osr.SpatialReference()
+            srs.ImportFromEPSG(4326)
+            output_raster.SetProjection(srs.ExportToWkt())
             output_raster.GetRasterBand(1).SetNoDataValue(nodata)
             output_raster.GetRasterBand(1).WriteArray(result)
 
