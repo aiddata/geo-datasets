@@ -122,7 +122,7 @@ def process_data(input_path, output_dir):
     out_ds = None
 
 
-
+# -----------------------------------------------------------------------------
 
 path_base = "/sciclone/aiddata10/REU/geo/raw/ltdr/ltdr.nascom.nasa.gov/allData/Ver4"
 
@@ -133,12 +133,18 @@ ref = {}
 
 # list of all [year, day] combos
 
-sensor_accept = ["N18"]
+# sensor_accept = []
 
 # get sensors
-sensors = [name for name in os.listdir(path_base)
-           if os.path.isdir(os.path.join(path_base, name)) and name in sensor_accept]
+sensors = [
+    name for name in os.listdir(path_base)
+    if os.path.isdir(os.path.join(path_base, name))
+        and name.startswith("N")
+        and len(name) == 3
+        # and name in sensor_accept
+]
 sensors.sort()
+
 
 # use limited sensors for testing
 # sensors = ['2001']
@@ -147,8 +153,10 @@ for sensor in sensors:
 
     # get years for sensors
     path_sensor = path_base +"/"+ sensor
-    years = [name for name in os.listdir(path_sensor)
-             if os.path.isdir(os.path.join(path_sensor, name))]
+    years = [
+        name for name in os.listdir(path_sensor)
+        if os.path.isdir(os.path.join(path_sensor, name))
+    ]
     years.sort()
 
     for year in years:
