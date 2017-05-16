@@ -264,7 +264,104 @@ else:
 # -----------------------------------------------------------------------------
 
 
-# import datetime
+from datetime import datetime
+import rasterio
+import numpy as np
 
-# "{0:02d}".format(datetime.datetime.strptime("2004+88", "%Y+%j").month)
+
+month = None
+month_list = []
+
+for year in ref:
+
+    for day in ref[year]:
+
+        sensor, filename = ref[year][day]
+
+        day_path = os.path.join(dst_base, year, filename + ".tif")
+
+
+        cur_month = "{0:02d}".format(
+            datetime.strptime("{0}+{1}".format(year, day), "%Y+%j").month)
+
+
+        if month is not None and cur_month != month:
+
+            # hit end of month, run aggregation
+            aggregate_rasters(file_list=month_list, method="max")
+
+            # init next month
+            month = cur_month
+            month_list = [day_path]
+
+
+        # add day to month list
+        month_list.append([day_path])
+
+
+
+def aggregate_rasters(file_list, method="mean"):
+    """Aggregate multiple rasters
+
+    Aggregates multiple rasters with same features (dimensions, transform,
+    pixel size, etc.) and creates single layer using aggregation method
+    specified.
+
+    Supported methods: mean (default), max, min, sum
+
+    Arguments
+        file_list (list): list of file paths for rasters to be aggregated
+        method (str): method used for aggregation
+
+    Return
+        result: rasterio Raster instance
+    """
+    store = None
+    active = None
+
+    for ix, file_path in enumerate(file_list):
+
+        raster = rasterio.open(file_path)
+
+        active = raster.read()
+
+        if store is None:
+
+            store = active
+
+        else:
+
+            # make sure dimensions match
+            if active.shape != store.shape:
+                raise Exception("Dimensions of rasters do not match")
+
+            if method == "max":
+                store = max([store, active])
+
+            elif method == "min":
+                pass
+            elif method == "mean":
+                pass
+            elif method == "sum":
+                pass
+            else:
+                raise Exception("Invalid method")
+
+
+    # use last raster instance as template for result raster instance
+    result = ""
+    return result
+
+
+
+
+
+
+
+
+
+
+
+
+
 
