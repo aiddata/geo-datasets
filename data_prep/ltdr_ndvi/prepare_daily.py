@@ -137,11 +137,11 @@ dst_base = "/sciclone/aiddata10/REU/data/ltdr/ndvi/daily"
 # sensors or years will run
 # all values must be strings
 
-# sensor_accept = []
-# sensor_deny= []
+sensor_accept = []
+sensor_deny= []
 
-year_accept = ['1986']
-# year_deny= []
+year_accept = ['2009']
+year_deny= []
 
 ###
 
@@ -176,7 +176,7 @@ for sensor in sensors:
     for year in years:
 
         if not year in ref:
-            ref[year] = OrderedDict()
+            ref[year] = {}
 
         # get days for year
         path_year = path_sensor +"/"+ year
@@ -193,19 +193,19 @@ for sensor in sensors:
             filename = filename[:-4]
             day = filename.split(".")[1][5:]
 
-            # check if a file for same day as current file exists
-            # and if a file does exist, check if current sensor is newer
-            if not day in ref[year] or int(sensor[1:]) > int(ref[year][day][0][1:]):
-                ref[year][day] = [sensor, filename]
-                # print "\n {0} {1} {2} {3}".format(year, day, sensor, filename)
+            # sensor list is sorted so duplicate day will always be newer
+            ref[year][day] = filename
 
 
+        # sort filenames after year finishes
+        ref[year] = OrderedDict(sorted(ref[year].iteritems(), key=lambda (k,v): v))
 
-# qlist item format = [sensor, filename, year, day]
+
+# qlist item format = [year, day, filename]
 qlist = []
 for year in ref:
-    for day in ref[year]:
-        qlist.append(ref[year][day] + [year, day])
+    for day, filename in ref[year].iteritems():
+        qlist.append([year, day, filename])
 
 
 
@@ -214,7 +214,9 @@ for year in ref:
 
 def prep_data(task, input_base, output_base):
 
-    sensor, filename, year, day = item
+    year, day, filename = item
+
+    sensor = filename.split['.'][2]
 
     src_file = os.path.join(src_base, sensor, year, filename + ".hdf")
 
@@ -233,31 +235,31 @@ def prep_data(task, input_base, output_base):
 # -----------------------------------------------------------------------------
 
 
-mode = "parallel"
-# mode = "serial"
+# mode = "parallel"
+# # mode = "serial"
 
-if mode == "parallel":
+# if mode == "parallel":
 
-    from mpi4py import MPI
+#     from mpi4py import MPI
 
-    comm = MPI.COMM_WORLD
-    size = comm.Get_size()
-    rank = comm.Get_rank()
+#     comm = MPI.COMM_WORLD
+#     size = comm.Get_size()
+#     rank = comm.Get_rank()
 
-    c = rank
-    while c < len(qlist):
+#     c = rank
+#     while c < len(qlist):
 
-        prep_data(qlist[c], src_base, dst_base)
-        c += size
+#         prep_data(qlist[c], src_base, dst_base)
+#         c += size
 
-elif mode == "serial":
+# elif mode == "serial":
 
-    for c in range(len(qlist)):
-        prep_data(qlist[c], src_base, dst_base)
+#     for c in range(len(qlist)):
+#         prep_data(qlist[c], src_base, dst_base)
 
 
-else:
-    raise Exception("Invalid `mode` value for script.")
+# else:
+#     raise Exception("Invalid `mode` value for script.")
 
 
 
@@ -268,36 +270,53 @@ from datetime import datetime
 import rasterio
 import numpy as np
 
+master_list = []
 
 month = None
-month_list = []
+month_files = []
 
 for year in ref:
 
-    for day in ref[year]:
-
-        sensor, filename = ref[year][day]
+    for day, filename in ref[year].iteritems():
 
         day_path = os.path.join(dst_base, year, filename + ".tif")
-
 
         cur_month = "{0:02d}".format(
             datetime.strptime("{0}+{1}".format(year, day), "%Y+%j").month)
 
+        print "{0} {1} {2}".format(year, day, cur_month)
+        print filename
 
-        if month is not None and cur_month != month:
+        if month is None:
+            month = cur_month
 
-            # hit end of month, run aggregation
-            aggregate_rasters(file_list=month_list, method="max")
+        elif cur_month != month:
+
+            # filenames are sorted, so when month does not match
+            # it mean you hit end of month: so run aggregation
+            # aggregate_rasters(file_list=month_files, method="max")
+            master_list.append((year, month, len(month_files)))
+
+            # print "{0} {1} {2}".format(sensor, year, month)
+            # for i in month_files: print i
 
             # init next month
             month = cur_month
-            month_list = [day_path]
+            month_files = [day_path]
 
 
         # add day to month list
-        month_list.append([day_path])
+        month_files.append(day_path)
 
+
+"""
+# make sure to process final month of final year
+aggregate_rasters(file_list=month_files, method="max")
+master_list.append((year, month, len(month_files)))
+"""
+
+
+# for i in master_list: print i
 
 
 def aggregate_rasters(file_list, method="mean"):
@@ -326,11 +345,9 @@ def aggregate_rasters(file_list, method="mean"):
         active = raster.read()
 
         if store is None:
-
             store = active
 
         else:
-
             # make sure dimensions match
             if active.shape != store.shape:
                 raise Exception("Dimensions of rasters do not match")
@@ -349,18 +366,10 @@ def aggregate_rasters(file_list, method="mean"):
 
 
     # use last raster instance as template for result raster instance
-    result = ""
+    result_path = ""
+    result = rasterio.open(result_path, 'w', **raster.profile)
+    result.write(store, 1)
     return result
-
-
-
-
-
-
-
-
-
-
 
 
 
