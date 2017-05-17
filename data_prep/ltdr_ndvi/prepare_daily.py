@@ -19,16 +19,150 @@ full file name - "AVH13C1.A1981181.N07.004.2013227210959.hdf"
 
 """
 
+
+# mode = "parallel"
+mode = "serial"
+
+build_list = [
+    "daily",
+    "monthly",
+    "yearly"
+]
+
+
+src_base = "/sciclone/aiddata10/REU/geo/raw/ltdr/ltdr.nascom.nasa.gov/allData/Ver4"
+
+dst_base = "/sciclone/aiddata10/REU/data/rasters/external/global/ltdr/avhrr_ndvi_v4"
+
+
+
+
+# filter options to accept/deny based on sensor, year
+# all values must be strings
+# do not enable/use both accept/deny for a given field
+# if you use both, only the deny field will apply
+
+filter_options = {
+    'use_sensor_accept': False,
+    'sensor_accept': [],
+    'use_sensor_deny': False,
+    'sensor_deny': [],
+    'use_year_accept': False,
+    'year_accept': ['2000'],
+    'use_year_deny': False,
+    'year_deny': ['2017']
+}
+
+
+# -----------------------------------------------------------------------------
+
+
 import os
 import errno
 from collections import OrderedDict
 import numpy as np
 from osgeo import gdal, osr
 
+from datetime import datetime
+import rasterio
 
-def process_data(input_path, output_dir):
-    """
-    unpack a single subdataset from a HDF container, reprojectm and write to GeoTiff
+
+
+def build_data_list(src_base, ops):
+
+    # reference object used to eliminate duplicate year / day combos
+    # when overlaps between sensors exists, always use data from newer sensor
+    ref = OrderedDict()
+
+    # get sensors
+    sensors = [
+        name for name in os.listdir(src_base)
+        if os.path.isdir(os.path.join(src_base, name))
+            and name.startswith("N")
+            and len(name) == 3
+    ]
+
+    if op['use_sensor_accept']:
+        sensors = [i for i in sensors if i in op['sensor_accept']]
+    if op['use_sensor_deny']:
+        sensors = [i for i in sensors if i not in op['sensor_deny']]
+
+    sensors.sort()
+
+
+    for sensor in sensors:
+
+        # get years for sensors
+        path_sensor = src_base +"/"+ sensor
+
+        years = [
+            name for name in os.listdir(path_sensor)
+            if os.path.isdir(os.path.join(path_sensor, name))
+        ]
+
+        if op['use_year_accept']:
+            years = [i for i in years if i in op['year_accept']]
+        if op['use_year_deny']:
+            years = [i for i in years if i not in op['year_deny']]
+
+        years.sort()
+
+        for year in years:
+
+            if not year in ref:
+                ref[year] = {}
+
+            # get days for year
+            path_year = path_sensor +"/"+ year
+            filenames = [
+                name for name in os.listdir(path_year)
+                if not os.path.isdir(os.path.join(path_year, name))
+                    and name.endswith(".hdf")
+                    and name.split(".")[0] == "AVH13C1"
+            ]
+            filenames.sort()
+
+            for filename in filenames:
+
+                filename = filename[:-4]
+                day = filename.split(".")[1][5:]
+
+                # sensor list is sorted so duplicate day will always be newer
+                ref[year][day] = filename
+
+
+            # sort filenames after year finishes
+            ref[year] = OrderedDict(
+                sorted(ref[year].iteritems(), key=lambda (k,v): v))
+
+
+def prep_daily_data(task, input_base, output_base):
+
+    year, day, filename = task
+
+    sensor = filename.split('.')[2]
+
+    src_file = os.path.join(input_base, sensor, year, filename + ".hdf")
+
+    dst_dir = os.path.join(output_base, 'daily', year)
+
+    try:
+        os.makedirs(dst_dir)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+
+    print "{0} {1} {2}".format(sensor, year, day)
+    process_daily_data(src_file, dst_dir)
+
+
+def process_daily_data(input_path, output_dir):
+    """Process input raster and create output in output directory
+
+    Unpack NDVI subdataset from a HDF container
+    Reproject to EPSG:4326
+    Set values <0 to nodata
+    Write to GeoTiff
 
     Parts of code pulled from:
 
@@ -48,15 +182,12 @@ def process_data(input_path, output_dir):
         os.path.basename(os.path.splitext(input_path)[0])
     )
 
-    print input_path
-    print output_path
-
     # open the dataset and subdataset
     hdf_ds = gdal.Open(input_path, gdal.GA_ReadOnly)
 
-    ndvi_subdataset = 0
-    band_ds = gdal.Open(hdf_ds.GetSubDatasets()[ndvi_subdataset][0], gdal.GA_ReadOnly)
-
+    subdataset = 0
+    band_ds = gdal.Open(
+        hdf_ds.GetSubDatasets()[subdataset][0], gdal.GA_ReadOnly)
 
     # prep projections and transformations
     src_proj = osr.SpatialReference()
@@ -74,8 +205,9 @@ def process_data(input_path, output_dir):
     # extents
     (ulx, uly, ulz ) = tx.TransformPoint(src_gt[0], src_gt[3])
 
-    (lrx, lry, lrz ) = tx.TransformPoint(src_gt[0] + src_gt[1]*band_ds.RasterXSize,
-                                         src_gt[3] + src_gt[5]*band_ds.RasterYSize)
+    (lrx, lry, lrz ) = tx.TransformPoint(
+        src_gt[0] + src_gt[1]*band_ds.RasterXSize,
+        src_gt[3] + src_gt[5]*band_ds.RasterYSize)
 
     # new geotransform
     dst_gt = (ulx, pixel_xsize, src_gt[2],
@@ -120,203 +252,12 @@ def process_data(input_path, output_dir):
     out_ds = None
 
 
-# -----------------------------------------------------------------------------
-
-
-
-src_base = "/sciclone/aiddata10/REU/geo/raw/ltdr/ltdr.nascom.nasa.gov/allData/Ver4"
-
-dst_base = "/sciclone/aiddata10/REU/data/ltdr/ndvi/daily"
-
-
-# build list of all [year, day] combos
-
-###
-
-# use accept/deny to manually limit which
-# sensors or years will run
-# all values must be strings
-
-sensor_accept = []
-sensor_deny= []
-
-year_accept = ['2009']
-year_deny= []
-
-###
-
-# get sensors
-sensors = [
-    name for name in os.listdir(src_base)
-    if os.path.isdir(os.path.join(src_base, name))
-        and name.startswith("N")
-        and len(name) == 3
-        # and name in sensor_accept
-        # and name not in sensor_deny
-]
-sensors.sort()
-
-
-# reference object used to eliminate duplicate year / day combos
-# when overlaps between sensors exists, always use data from newer sensor
-ref = OrderedDict()
-
-for sensor in sensors:
-
-    # get years for sensors
-    path_sensor = src_base +"/"+ sensor
-    years = [
-        name for name in os.listdir(path_sensor)
-        if os.path.isdir(os.path.join(path_sensor, name))
-            and name in year_accept
-            # and name not in year_deny
-    ]
-    years.sort()
-
-    for year in years:
-
-        if not year in ref:
-            ref[year] = {}
-
-        # get days for year
-        path_year = path_sensor +"/"+ year
-        filenames = [
-            name for name in os.listdir(path_year)
-            if not os.path.isdir(os.path.join(path_year, name))
-                and name.endswith(".hdf")
-                and name.split(".")[0] == "AVH13C1"
-        ]
-        filenames.sort()
-
-        for filename in filenames:
-
-            filename = filename[:-4]
-            day = filename.split(".")[1][5:]
-
-            # sensor list is sorted so duplicate day will always be newer
-            ref[year][day] = filename
-
-
-        # sort filenames after year finishes
-        ref[year] = OrderedDict(sorted(ref[year].iteritems(), key=lambda (k,v): v))
-
-
-# qlist item format = [year, day, filename]
-qlist = []
-for year in ref:
-    for day, filename in ref[year].iteritems():
-        qlist.append([year, day, filename])
-
-
-
-# -----------------------------------------------------------------------------
-
-
-def prep_data(task, input_base, output_base):
-
-    year, day, filename = item
-
-    sensor = filename.split['.'][2]
-
-    src_file = os.path.join(src_base, sensor, year, filename + ".hdf")
-
-    dst_dir = os.path.join(dst_base, year)
-
-    try:
-        os.makedirs(dst_dir)
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
-
-    print "{0} {1} {2}".format(sensor, year, day)
-    process_data(src_file, dst_dir)
-
-
-# -----------------------------------------------------------------------------
-
-
-# mode = "parallel"
-# # mode = "serial"
-
-# if mode == "parallel":
-
-#     from mpi4py import MPI
-
-#     comm = MPI.COMM_WORLD
-#     size = comm.Get_size()
-#     rank = comm.Get_rank()
-
-#     c = rank
-#     while c < len(qlist):
-
-#         prep_data(qlist[c], src_base, dst_base)
-#         c += size
-
-# elif mode == "serial":
-
-#     for c in range(len(qlist)):
-#         prep_data(qlist[c], src_base, dst_base)
-
-
-# else:
-#     raise Exception("Invalid `mode` value for script.")
-
-
-
-# -----------------------------------------------------------------------------
-
-
-from datetime import datetime
-import rasterio
-import numpy as np
-
-master_list = []
-
-month = None
-month_files = []
-
-for year in ref:
-
-    for day, filename in ref[year].iteritems():
-
-        day_path = os.path.join(dst_base, year, filename + ".tif")
-
-        cur_month = "{0:02d}".format(
-            datetime.strptime("{0}+{1}".format(year, day), "%Y+%j").month)
-
-        print "{0} {1} {2}".format(year, day, cur_month)
-        print filename
-
-        if month is None:
-            month = cur_month
-
-        elif cur_month != month:
-
-            # filenames are sorted, so when month does not match
-            # it mean you hit end of month: so run aggregation
-            # aggregate_rasters(file_list=month_files, method="max")
-            master_list.append((year, month, len(month_files)))
-
-            # print "{0} {1} {2}".format(sensor, year, month)
-            # for i in month_files: print i
-
-            # init next month
-            month = cur_month
-            month_files = [day_path]
-
-
-        # add day to month list
-        month_files.append(day_path)
-
-
-"""
-# make sure to process final month of final year
-aggregate_rasters(file_list=month_files, method="max")
-master_list.append((year, month, len(month_files)))
-"""
-
-
-# for i in master_list: print i
+def prep_monthly_data(task, output_base):
+    year, month, month_files = task
+
+    data, meta = aggregate_rasters(file_list=month_files, method="max")
+    month_path = os.path.join(output_base, 'monthly', year, "avhrr_ndvi_{0}_{1}.tif".format(year, month))
+    write_monthly_raster(month_path, data, meta)
 
 
 def aggregate_rasters(file_list, method="mean"):
@@ -341,11 +282,10 @@ def aggregate_rasters(file_list, method="mean"):
     for ix, file_path in enumerate(file_list):
 
         raster = rasterio.open(file_path)
-
         active = raster.read()
 
         if store is None:
-            store = active
+            store = active.copy()
 
         else:
             # make sure dimensions match
@@ -353,23 +293,157 @@ def aggregate_rasters(file_list, method="mean"):
                 raise Exception("Dimensions of rasters do not match")
 
             if method == "max":
-                store = max([store, active])
-
+                store = np.maximum.reduce([store, active])
+                # alternate method
+                # store = np.vstack([store, active]).max(axis=0)
             elif method == "min":
-                pass
+                store = np.minimum.reduce([store, active])
             elif method == "mean":
-                pass
+                # probably need to make sure it is float type
+                store = np.mean([store, active], axis=0)
             elif method == "sum":
-                pass
+                store = np.sum([store, active], axis=0)
             else:
                 raise Exception("Invalid method")
 
 
-    # use last raster instance as template for result raster instance
-    result_path = ""
-    result = rasterio.open(result_path, 'w', **raster.profile)
-    result.write(store, 1)
-    return result
+    return store, raster.profile
+
+
+def write_monthly_raster(path, data, meta):
+    try:
+        os.makedirs(os.path.dirname(path))
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+
+    result = rasterio.open(path, 'w', **meta)
+    result.write(data)
+
+
+
+
+# -----------------------------------------------------------------------------
+
+
+ref = build_data_list(src_base, filter_options)
+
+
+# day_qlist item format = [year, day, filename]
+day_qlist = []
+for year in ref:
+    for day, filename in ref[year].iteritems():
+        day_qlist.append([year, day, filename])
+
+
+if "daily" in build_list:
+
+    if mode == "parallel":
+
+        from mpi4py import MPI
+
+        comm = MPI.COMM_WORLD
+        size = comm.Get_size()
+        rank = comm.Get_rank()
+
+        c = rank
+        while c < len(day_qlist):
+
+            prep_daily_data(day_qlist[c], src_base, dst_base)
+            c += size
+
+    elif mode == "serial":
+
+        for c in range(len(day_qlist)):
+            prep_daily_data(day_qlist[c], src_base, dst_base)
+
+
+    else:
+        raise Exception("Invalid `mode` value for script.")
+
+
+
+month_qlist = []
+
+month = None
+month_files = []
+for year in ref:
+
+    for day, filename in ref[year].iteritems():
+
+        day_path = os.path.join(dst_base, 'daily', year, filename + ".tif")
+
+        cur_month = "{0:02d}".format(
+            datetime.strptime("{0}+{1}".format(year, day), "%Y+%j").month)
+
+        # print "{0} {1} {2}".format(year, day, cur_month)
+        # print filename
+
+        if month is None:
+            month = cur_month
+
+        elif cur_month != month:
+
+            # filenames are sorted, so when month does not match
+            # it mean you hit end of month
+
+            list_year = str(int(year) - 1) if month == '12' else year
+            month_qlist.append((list_year, month, month_files))
+
+            # print "{0} {1}".format(list_year, month)
+            # for i in month_files: print i
+
+            # init next month
+            month = cur_month
+            month_files = []
+
+
+        # add day to month list
+        month_files.append(day_path)
+
+
+# make sure to add final month of final year
+month_qlist.append((year, month, month_files))
+
+for i in month_qlist: print i
+
+
+if "monthly" in build_list:
+
+    if mode == "parallel":
+
+        from mpi4py import MPI
+
+        comm = MPI.COMM_WORLD
+        size = comm.Get_size()
+        rank = comm.Get_rank()
+
+        c = rank
+        while c < len(month_qlist):
+
+            prep_monthly_data(month_qlist[c], dst_base)
+            c += size
+
+    elif mode == "serial":
+
+        for c in range(len(month_qlist)):
+            prep_monthly_data(month_qlist[c], dst_base)
+
+
+    else:
+        raise Exception("Invalid `mode` value for script.")
+
+
+
+
+
+
+
+
+
+year_qlist = []
+
+
 
 
 
