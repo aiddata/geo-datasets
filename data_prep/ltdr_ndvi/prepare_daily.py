@@ -19,9 +19,28 @@ full file name - "AVH13C1.A1981181.N07.004.2013227210959.hdf"
 
 """
 
+import os
+import errno
+from collections import OrderedDict
+import numpy as np
+from osgeo import gdal, osr
+
+from datetime import datetime
+import rasterio
+
+
 
 # mode = "parallel"
 mode = "serial"
+
+
+if mode == "parallel":
+    from mpi4py import MPI
+    comm = MPI.COMM_WORLD
+    size = comm.Get_size()
+    rank = comm.Get_rank()
+
+
 
 build_list = [
     "daily",
@@ -54,17 +73,6 @@ filter_options = {
 
 
 # -----------------------------------------------------------------------------
-
-
-import os
-import errno
-from collections import OrderedDict
-import numpy as np
-from osgeo import gdal, osr
-
-from datetime import datetime
-import rasterio
-
 
 
 def build_data_list(input_base, ops):
@@ -267,6 +275,14 @@ def prep_monthly_data(task, output_base):
     write_raster(month_path, data, meta)
 
 
+def prep_yearly_data(task, output_base):
+    year, year_files = task
+
+    data, meta = aggregate_rasters(file_list=year_files, method="mean")
+    year_path = os.path.join(output_base, 'yearly', "avhrr_ndvi_{0}.tif".format(year))
+    write_raster(year_path, data, meta)
+
+
 def aggregate_rasters(file_list, method="mean"):
     """Aggregate multiple rasters
 
@@ -349,12 +365,6 @@ if "daily" in build_list:
 
     if mode == "parallel":
 
-        from mpi4py import MPI
-
-        comm = MPI.COMM_WORLD
-        size = comm.Get_size()
-        rank = comm.Get_rank()
-
         c = rank
         while c < len(day_qlist):
 
@@ -427,12 +437,6 @@ if "monthly" in build_list:
 
     if mode == "parallel":
 
-        from mpi4py import MPI
-
-        comm = MPI.COMM_WORLD
-        size = comm.Get_size()
-        rank = comm.Get_rank()
-
         c = rank
         while c < len(month_qlist):
 
@@ -451,8 +455,22 @@ if "monthly" in build_list:
 # build year list
 
 
-year_qlist = []
+year_months = {}
+for year, month, _ in month_qlist:
 
+    # first year of data, not enough months
+    if year == '1981':
+        pass
+
+    if not year in year_months:
+        year_months[year] = []
+
+    month_path = os.path.join(dst_base, 'monthly', year, "avhrr_ndvi_{0}_{1}.tif".format(year, month))
+
+    year_months[year].append(month_path)
+
+
+year_qlist = [(year, month_path) for year, month_path in year_months.iteritems()]
 
 
 # -------------------------------------
@@ -462,22 +480,16 @@ if "yearly" in build_list:
 
     if mode == "parallel":
 
-        from mpi4py import MPI
-
-        comm = MPI.COMM_WORLD
-        size = comm.Get_size()
-        rank = comm.Get_rank()
-
         c = rank
-        while c < len(month_qlist):
+        while c < len(year_qlist):
 
-            # yearly_func
+            prep_yearly_data(year_qlist[c], dst_base)
             c += size
 
     elif mode == "serial":
 
-        for c in range(len(month_qlist)):
-            # yearly_func
+        for c in range(len(year_qlist)):
+            prep_yearly_data(year_qlist[c], dst_base)
 
     else:
         raise Exception("Invalid `mode` value for script.")
