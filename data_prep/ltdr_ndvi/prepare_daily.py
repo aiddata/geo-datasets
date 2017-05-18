@@ -152,6 +152,8 @@ def build_data_list(input_base, ops):
             ref[year] = OrderedDict(
                 sorted(ref[year].iteritems(), key=lambda (k,v): v))
 
+    return ref
+
 
 def prep_daily_data(task, input_base, output_base):
 
