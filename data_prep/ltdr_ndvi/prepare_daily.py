@@ -29,10 +29,12 @@ from datetime import datetime
 import rasterio
 
 
-
-mode = "parallel"
 # mode = "serial"
+mode = "parallel"
 
+# example commands for parallel job
+# qsub -I -l nodes=2:c18c:ppn=16 -l walltime=48:00:00
+# mpirun --mca mpi_warn_on_fork 0 --map-by node -np 32 python-mpi /sciclone/home00/sgoodman/active/master/asdf-datasets/data_prep/ltdr_ndvi/prepare_daily.py
 
 if mode == "parallel":
     from mpi4py import MPI
@@ -80,10 +82,10 @@ def build_data_list(input_base, ops):
     # reference object used to eliminate duplicate year / day combos
     # when overlaps between sensors exists, always use data from newer sensor
 
-    if op['use_sensor_accept'] and op['use_sensor_deny']:
+    if ops['use_sensor_accept'] and ops['use_sensor_deny']:
         raise Exception('Cannot use accept and deny options for sensors')
 
-    if op['use_year_accept'] and op['use_year_deny']:
+    if ops['use_year_accept'] and ops['use_year_deny']:
         raise Exception('Cannot use accept and deny options for years')
 
 
@@ -97,10 +99,10 @@ def build_data_list(input_base, ops):
             and len(name) == 3
     ]
 
-    if op['use_sensor_accept']
-        sensors = [i for i in sensors if i in op['sensor_accept']]
-    elif op['use_sensor_deny']:
-        sensors = [i for i in sensors if i not in op['sensor_deny']]
+    if ops['use_sensor_accept']:
+        sensors = [i for i in sensors if i in ops['sensor_accept']]
+    elif ops['use_sensor_deny']:
+        sensors = [i for i in sensors if i not in ops['sensor_deny']]
 
     sensors.sort()
 
@@ -115,10 +117,10 @@ def build_data_list(input_base, ops):
             if os.path.isdir(os.path.join(path_sensor, name))
         ]
 
-        if op['use_year_accept']:
-            years = [i for i in years if i in op['year_accept']]
-        elif op['use_year_deny']:
-            years = [i for i in years if i not in op['year_deny']]
+        if ops['use_year_accept']:
+            years = [i for i in years if i in ops['year_accept']]
+        elif ops['use_year_deny']:
+            years = [i for i in years if i not in ops['year_deny']]
 
         years.sort()
 
