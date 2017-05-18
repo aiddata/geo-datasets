@@ -67,9 +67,9 @@ filter_options = {
     'sensor_accept': [],
     'use_sensor_deny': False,
     'sensor_deny': [],
-    'use_year_accept': False,
-    'year_accept': ['2000'],
-    'use_year_deny': True,
+    'use_year_accept': True,
+    'year_accept': ['1982', '1983'],
+    'use_year_deny': False,
     'year_deny': ['2017']
 }
 
