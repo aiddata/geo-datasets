@@ -40,7 +40,6 @@ dst_base = "/sciclone/aiddata10/REU/data/rasters/external/global/ltdr/avhrr_ndvi
 # filter options to accept/deny based on sensor, year
 # all values must be strings
 # do not enable/use both accept/deny for a given field
-# if you use both, only the deny field will apply
 
 filter_options = {
     'use_sensor_accept': False,
@@ -49,7 +48,7 @@ filter_options = {
     'sensor_deny': [],
     'use_year_accept': False,
     'year_accept': ['2000'],
-    'use_year_deny': False,
+    'use_year_deny': True,
     'year_deny': ['2017']
 }
 
@@ -68,23 +67,31 @@ import rasterio
 
 
 
-def build_data_list(src_base, ops):
+def build_data_list(input_base, ops):
 
     # reference object used to eliminate duplicate year / day combos
     # when overlaps between sensors exists, always use data from newer sensor
+
+    if op['use_sensor_accept'] and op['use_sensor_deny']:
+        raise Exception('Cannot use accept and deny options for sensors')
+
+    if op['use_year_accept'] and op['use_year_deny']:
+        raise Exception('Cannot use accept and deny options for years')
+
+
     ref = OrderedDict()
 
     # get sensors
     sensors = [
-        name for name in os.listdir(src_base)
-        if os.path.isdir(os.path.join(src_base, name))
+        name for name in os.listdir(input_base)
+        if os.path.isdir(os.path.join(input_base, name))
             and name.startswith("N")
             and len(name) == 3
     ]
 
-    if op['use_sensor_accept']:
+    if op['use_sensor_accept']
         sensors = [i for i in sensors if i in op['sensor_accept']]
-    if op['use_sensor_deny']:
+    elif op['use_sensor_deny']:
         sensors = [i for i in sensors if i not in op['sensor_deny']]
 
     sensors.sort()
@@ -93,7 +100,7 @@ def build_data_list(src_base, ops):
     for sensor in sensors:
 
         # get years for sensors
-        path_sensor = src_base +"/"+ sensor
+        path_sensor = input_base +"/"+ sensor
 
         years = [
             name for name in os.listdir(path_sensor)
@@ -102,7 +109,7 @@ def build_data_list(src_base, ops):
 
         if op['use_year_accept']:
             years = [i for i in years if i in op['year_accept']]
-        if op['use_year_deny']:
+        elif op['use_year_deny']:
             years = [i for i in years if i not in op['year_deny']]
 
         years.sort()
@@ -257,7 +264,7 @@ def prep_monthly_data(task, output_base):
 
     data, meta = aggregate_rasters(file_list=month_files, method="max")
     month_path = os.path.join(output_base, 'monthly', year, "avhrr_ndvi_{0}_{1}.tif".format(year, month))
-    write_monthly_raster(month_path, data, meta)
+    write_raster(month_path, data, meta)
 
 
 def aggregate_rasters(file_list, method="mean"):
@@ -310,7 +317,7 @@ def aggregate_rasters(file_list, method="mean"):
     return store, raster.profile
 
 
-def write_monthly_raster(path, data, meta):
+def write_raster(path, data, meta):
     try:
         os.makedirs(os.path.dirname(path))
     except OSError as exception:
@@ -321,13 +328,13 @@ def write_monthly_raster(path, data, meta):
     result.write(data)
 
 
-
-
 # -----------------------------------------------------------------------------
 
-
+# generate initial data list
 ref = build_data_list(src_base, filter_options)
 
+# -------------------------------------
+# build day list
 
 # day_qlist item format = [year, day, filename]
 day_qlist = []
@@ -335,6 +342,8 @@ for year in ref:
     for day, filename in ref[year].iteritems():
         day_qlist.append([year, day, filename])
 
+# -------------------------------------
+# run daily data
 
 if "daily" in build_list:
 
@@ -357,11 +366,11 @@ if "daily" in build_list:
         for c in range(len(day_qlist)):
             prep_daily_data(day_qlist[c], src_base, dst_base)
 
-
     else:
         raise Exception("Invalid `mode` value for script.")
 
-
+# -------------------------------------
+# build month list
 
 month_qlist = []
 
@@ -407,6 +416,12 @@ month_qlist.append((year, month, month_files))
 
 for i in month_qlist: print i
 
+# filter out months with insufficient data
+minimum_days_in_month = 20
+month_qlist = [i for i in month_qlist if len(i[2]) > minimum_days_in_month]
+
+# -------------------------------------
+# run monthly data
 
 if "monthly" in build_list:
 
@@ -429,22 +444,41 @@ if "monthly" in build_list:
         for c in range(len(month_qlist)):
             prep_monthly_data(month_qlist[c], dst_base)
 
-
     else:
         raise Exception("Invalid `mode` value for script.")
 
-
-
-
-
-
-
+# -------------------------------------
+# build year list
 
 
 year_qlist = []
 
 
 
+# -------------------------------------
+# run yearly data
 
+if "yearly" in build_list:
 
+    if mode == "parallel":
+
+        from mpi4py import MPI
+
+        comm = MPI.COMM_WORLD
+        size = comm.Get_size()
+        rank = comm.Get_rank()
+
+        c = rank
+        while c < len(month_qlist):
+
+            # yearly_func
+            c += size
+
+    elif mode == "serial":
+
+        for c in range(len(month_qlist)):
+            # yearly_func
+
+    else:
+        raise Exception("Invalid `mode` value for script.")
 
