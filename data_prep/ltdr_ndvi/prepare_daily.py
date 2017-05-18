@@ -378,6 +378,8 @@ if "daily" in build_list:
             prep_daily_data(day_qlist[c], src_base, dst_base)
             c += size
 
+        comm.Barrier()
+
     elif mode == "serial":
 
         for c in range(len(day_qlist)):
@@ -452,6 +454,8 @@ if "monthly" in build_list:
             prep_monthly_data(month_qlist[c], dst_base)
             c += size
 
+        comm.Barrier()
+
     elif mode == "serial":
 
         for c in range(len(month_qlist)):
@@ -495,6 +499,8 @@ if "yearly" in build_list:
 
             prep_yearly_data(year_qlist[c], dst_base)
             c += size
+
+        comm.Barrier()
 
     elif mode == "serial":
 
