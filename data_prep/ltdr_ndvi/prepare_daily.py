@@ -30,8 +30,8 @@ import rasterio
 
 
 
-# mode = "parallel"
-mode = "serial"
+mode = "parallel"
+# mode = "serial"
 
 
 if mode == "parallel":
@@ -346,11 +346,13 @@ def write_raster(path, data, meta):
 
 # -----------------------------------------------------------------------------
 
-# generate initial data list
+print "generating initial data list..."
+
 ref = build_data_list(src_base, filter_options)
 
 # -------------------------------------
-# build day list
+
+print "building day list..."
 
 # day_qlist item format = [year, day, filename]
 day_qlist = []
@@ -359,7 +361,8 @@ for year in ref:
         day_qlist.append([year, day, filename])
 
 # -------------------------------------
-# run daily data
+
+print "running daily data..."
 
 if "daily" in build_list:
 
@@ -380,7 +383,8 @@ if "daily" in build_list:
         raise Exception("Invalid `mode` value for script.")
 
 # -------------------------------------
-# build month list
+
+print "building month list..."
 
 month_qlist = []
 
@@ -431,7 +435,8 @@ minimum_days_in_month = 20
 month_qlist = [i for i in month_qlist if len(i[2]) > minimum_days_in_month]
 
 # -------------------------------------
-# run monthly data
+
+print "running monthly data..."
 
 if "monthly" in build_list:
 
@@ -452,8 +457,8 @@ if "monthly" in build_list:
         raise Exception("Invalid `mode` value for script.")
 
 # -------------------------------------
-# build year list
 
+print "building year list..."
 
 year_months = {}
 for year, month, _ in month_qlist:
@@ -474,7 +479,8 @@ year_qlist = [(year, month_path) for year, month_path in year_months.iteritems()
 
 
 # -------------------------------------
-# run yearly data
+
+print "running yearly data..."
 
 if "yearly" in build_list:
 
