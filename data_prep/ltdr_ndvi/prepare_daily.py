@@ -1,6 +1,14 @@
 """
 for use with NDVI product from LTDR raw dataset
 
+- Prepares list of all files
+- Builds list of day files to process
+- Processes day files
+- Builds list of day files to aggregate to months
+- Run month aggregation
+- Builds list of month files to aggregate to years
+- Run year aggregation
+
 example LTDR product file names (ndvi product code is AVH13C1)
 
 AVH13C1.A1981181.N07.004.2013227210959.hdf
@@ -32,10 +40,7 @@ import rasterio
 # mode = "serial"
 mode = "parallel"
 
-# example commands for parallel job
-# qsub -I -l nodes=2:c18c:ppn=16 -l walltime=48:00:00
-# mpirun --mca mpi_warn_on_fork 0 --map-by node -np 32 python-mpi /sciclone/home00/sgoodman/active/master/asdf-datasets/data_prep/ltdr_ndvi/prepare_daily.py
-
+# NOTE: use `qsub jobscript` for running parallel
 if mode == "parallel":
     from mpi4py import MPI
     comm = MPI.COMM_WORLD
@@ -303,8 +308,6 @@ def aggregate_rasters(file_list, method="mean"):
     Return
         result: rasterio Raster instance
     """
-    store = None
-    active = None
 
     for ix, file_path in enumerate(file_list):
 
@@ -314,9 +317,9 @@ def aggregate_rasters(file_list, method="mean"):
             print "Could not include file in aggregation ({0})".format(file_path)
             continue
 
-        active = raster.read()
+        active = raster.read(1, masked=True)
 
-        if store is None:
+        if ix == 0:
             store = active.copy()
 
         else:
@@ -325,20 +328,29 @@ def aggregate_rasters(file_list, method="mean"):
                 raise Exception("Dimensions of rasters do not match")
 
             if method == "max":
-                store = np.maximum.reduce([store, active])
-                # alternate method
+                store = np.ma.array((store, active)).max(axis=0)
+
+                # non masked array alternatives
+                # store = np.maximum.reduce([store, active])
                 # store = np.vstack([store, active]).max(axis=0)
-            elif method == "min":
-                store = np.minimum.reduce([store, active])
+
             elif method == "mean":
-                # probably need to make sure it is float type
-                store = np.mean([store, active], axis=0)
+                if ix == 1:
+                    weights = (~store.mask).astype(int)
+
+                store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
+                weights += (~active.mask).astype(int)
+
+            elif method == "min":
+                store = np.ma.array((store, active)).min(axis=0)
+
             elif method == "sum":
-                store = np.sum([store, active], axis=0)
+                store = np.ma.array((store, active)).sum(axis=0)
+
             else:
                 raise Exception("Invalid method")
 
-
+    store = store.filled(raster.nodata)
     return store, raster.profile
 
 
