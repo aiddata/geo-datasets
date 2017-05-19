@@ -67,9 +67,9 @@ filter_options = {
     'sensor_accept': [],
     'use_sensor_deny': False,
     'sensor_deny': [],
-    'use_year_accept': True,
-    'year_accept': ['1982', '1983'],
-    'use_year_deny': False,
+    'use_year_accept': False,
+    'year_accept': ['1984', '1985'],
+    'use_year_deny': True,
     'year_deny': ['2017']
 }
 
@@ -308,7 +308,12 @@ def aggregate_rasters(file_list, method="mean"):
 
     for ix, file_path in enumerate(file_list):
 
-        raster = rasterio.open(file_path)
+        try:
+            raster = rasterio.open(file_path)
+        except:
+            print "Could not include file in aggregation ({0})".format(file_path)
+            continue
+
         active = raster.read()
 
         if store is None:
@@ -344,8 +349,10 @@ def write_raster(path, data, meta):
         if exception.errno != errno.EEXIST:
             raise
 
-    result = rasterio.open(path, 'w', **meta)
-    result.write(data)
+    meta['dtype'] = data.dtype
+
+    with rasterio.open(path, 'w', **meta) as result:
+        result.write(data)
 
 
 # -----------------------------------------------------------------------------
@@ -375,7 +382,12 @@ if "daily" in build_list:
         c = rank
         while c < len(day_qlist):
 
-            prep_daily_data(day_qlist[c], src_base, dst_base)
+            try:
+                prep_daily_data(day_qlist[c], src_base, dst_base)
+            except:
+                print "Error processing day: {0} {1} ({2})".format(*day_qlist[c])
+                # raise Exception('day processing')
+
             c += size
 
         comm.Barrier()
@@ -434,7 +446,7 @@ for year in ref:
 # make sure to add final month of final year
 month_qlist.append((year, month, month_files))
 
-for i in month_qlist: print i
+for i in month_qlist: print "{0} {1} {2}".format(i[0], i[1], len(i[2]))
 
 # filter out months with insufficient data
 minimum_days_in_month = 20
@@ -451,7 +463,12 @@ if "monthly" in build_list:
         c = rank
         while c < len(month_qlist):
 
-            prep_monthly_data(month_qlist[c], dst_base)
+            try:
+                prep_monthly_data(month_qlist[c], dst_base)
+            except:
+                print "Error processing month: {0} {1}".format(month_qlist[c][0], month_qlist[c][1])
+                # raise Exception('month processing')
+
             c += size
 
         comm.Barrier()
@@ -497,7 +514,13 @@ if "yearly" in build_list:
         c = rank
         while c < len(year_qlist):
 
-            prep_yearly_data(year_qlist[c], dst_base)
+            try:
+                prep_yearly_data(year_qlist[c], dst_base)
+            except:
+                print "Error processing year: {0}".format(year_qlist[c][0])
+                # raise Exception('year processing')
+
+
             c += size
 
         comm.Barrier()
