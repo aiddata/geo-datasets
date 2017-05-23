@@ -213,6 +213,11 @@ def process_daily_data(input_path, output_dir):
     band_ds = gdal.Open(
         hdf_ds.GetSubDatasets()[subdataset][0], gdal.GA_ReadOnly)
 
+    # clean data
+    band_array = band_ds.ReadAsArray().astype(np.int16)
+    band_array[np.where(band_array < 0)] = -9999
+
+
     # prep projections and transformations
     src_proj = osr.SpatialReference()
     src_proj.ImportFromWkt(band_ds.GetProjection())
@@ -251,29 +256,43 @@ def process_daily_data(input_path, output_dir):
     out_ds.SetGeoTransform(dst_gt)
     out_ds.SetProjection(dst_proj.ExportToWkt())
 
-    # reproject
-    # need to test different resampling methods
-    # (nearest is default, probably used by gdal_translate)
-    # do not actually  think it matters for this case though
-    # as there does not seem to be much if any need for r
-    # resampling when reprojecting between these projections
-    gdal.ReprojectImage(band_ds, out_ds,
-                        src_proj.ExportToWkt(), dst_proj.ExportToWkt(),
-                        gdal.GRA_Bilinear)
+    out_band = out_ds.GetRasterBand(1)
+    out_band.WriteArray(band_array)
+    out_band.SetNoDataValue(-9999)
 
-    # clean data
-    band_array = out_ds.ReadAsArray().astype(np.int16)
-    band_array[np.where(band_array < 0)] = -9999
-
-    out_ds.GetRasterBand(1).WriteArray(band_array)
-    out_ds.GetRasterBand(1).SetNoDataValue(-9999)
-
-    # out_ds.GetRasterBand(1).ReadAsArray()
+    # ***
+    # reproject is converting all nodata to zero
+    # https://gis.stackexchange.com/questions/158503/9999-no-data-value-becomes-0-when-writing-array-to-gdal-memory-file
+    # (issue may have been resolve in gdal 2.0, currently
+    # have older version on sciclone)
+    #
+    # since out data isn't actually changing shape due to the reproj
+    # from epsg 4008, just another geographic datum proj
+    # we don't really need to reproject, just reassign the proj
+    # and fill in the data. hacky and not ideal, but we rarely use
+    # python gdal bindings anymore and i don't want to dig into
+    # an issue that was probably fixed in a newer version.
+    #
+    # will look into updating gdal at some point on sciclone,
+    # or readdress when/if we need python gdal bindings in future
+    # ***
+    #
+    # # reproject
+    # # need to test different resampling methods
+    # # (nearest is default, probably used by gdal_translate)
+    # # do not actually  think it matters for this case though
+    # # as there does not seem to be much if any need for r
+    # # resampling when reprojecting between these projections
+    # gdal.ReprojectImage(band_ds, out_ds,
+    #                     src_proj.ExportToWkt(), dst_proj.ExportToWkt(),
+    #                     gdal.GRA_Bilinear)
+    #                     # gdal.GRA_NearestNeighbour)
 
     # close out datasets
     hdf_ds = None
     band_ds = None
     out_ds = None
+
 
 
 def prep_monthly_data(task, output_base):
@@ -317,7 +336,7 @@ def aggregate_rasters(file_list, method="mean"):
             print "Could not include file in aggregation ({0})".format(file_path)
             continue
 
-        active = raster.read(1, masked=True)
+        active = raster.read(masked=True)
 
         if ix == 0:
             store = active.copy()
@@ -364,8 +383,13 @@ def write_raster(path, data, meta):
     meta['dtype'] = data.dtype
 
     with rasterio.open(path, 'w', **meta) as result:
-        result.write(data)
-
+        try:
+            result.write(data)
+        except:
+            print path
+            print meta
+            print data.shape
+            raise
 
 # -----------------------------------------------------------------------------
 
@@ -396,8 +420,9 @@ if "daily" in build_list:
 
             try:
                 prep_daily_data(day_qlist[c], src_base, dst_base)
-            except:
+            except Exception as e:
                 print "Error processing day: {0} {1} ({2})".format(*day_qlist[c])
+                print e
                 # raise Exception('day processing')
 
             c += size
@@ -477,8 +502,10 @@ if "monthly" in build_list:
 
             try:
                 prep_monthly_data(month_qlist[c], dst_base)
-            except:
+            except Exception as e:
                 print "Error processing month: {0} {1}".format(month_qlist[c][0], month_qlist[c][1])
+                raise
+                print e
                 # raise Exception('month processing')
 
             c += size
@@ -528,8 +555,10 @@ if "yearly" in build_list:
 
             try:
                 prep_yearly_data(year_qlist[c], dst_base)
-            except:
+            except Exception as e:
                 print "Error processing year: {0}".format(year_qlist[c][0])
+                raise
+                print e
                 # raise Exception('year processing')
 
 
