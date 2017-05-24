@@ -12,7 +12,7 @@ import numpy as np
 # tile_id_list = ["00N060E", "00N060W", "00N180W", "75N060E", "75N060W", "75N180W"]
 
 data_path = "/sciclone/aiddata10/REU/geo/raw/viirs/monthly_vcmcfg_dnb_composites_v10"
-out_path = "/home/userz/Desktop/viirs_test"
+out_path = "/sciclone/aiddata10/REU/scr/viirs"
 
 # minimum cloud free day threshold
 cf_minimum = 2
@@ -116,7 +116,7 @@ for tile_id, file_tuples in tile_files.iteritems():
 
     #  --------------------------------
 
-    tile_output = os.path.join(out_path, tile_id) + ".tif"
+    tile_output = os.path.join(out_path, tile_id) + "_cloud_mask_count.tif"
 
     with rasterio.open(tile_output, 'w', **tile_profile) as export_tile:
 
