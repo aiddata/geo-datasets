@@ -32,7 +32,7 @@ for pth, dirs, files in os.walk(data_path):
 
             lights_file = os.path.join(pth, f)
 
-            cloud_name = os.path.basename(lights_file).split('.')[0] + '.' + 'cf_cvg' + '.tif'
+            cloud_name = os.path.basename(lights_file).split('.')[0] + '.cf_cvg.tif'
             cloud_file = os.path.join(os.path.dirname(lights_file), cloud_name)
 
             if not os.path.isfile(cloud_file):
