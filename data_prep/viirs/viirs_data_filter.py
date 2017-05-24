@@ -20,6 +20,8 @@ cf_minimum = 2
 
 # -----------------------------------------------------------------------------
 
+# dict where tile ids are keys and values are list of file_tuples
+# e.g., {"00N060E": [(lights_file, cloud_file), (), ...], "00N060W": [...]}
 
 tile_files = {}
 
@@ -48,7 +50,7 @@ for pth, dirs, files in os.walk(data_path):
 # -----------------------------------------------------------------------------
 
 
-
+# iterate over one tile section at a time
 for tile_id, file_tuples in tile_files.iteritems():
 
     print "Processing Tile: {0} ({1} layers)".format(tile_id, len(file_tuples))
@@ -67,9 +69,10 @@ for tile_id, file_tuples in tile_files.iteritems():
         if not os.path.isdir(dst_dir):
             os.makedirs(dst_dir)
 
-        # get output name
+        # build output path for filtered lights
         out_lights = os.path.join(dst_dir, os.path.basename(lights_path)) + ".tif"
 
+        # read in lights and cloud data
         src_lights = rasterio.open(lights_path)
         array_lights = src_lights.read(1)
         profile_lights = src_lights.profile
@@ -78,6 +81,7 @@ for tile_id, file_tuples in tile_files.iteritems():
         array_cloud = src_cloud.read(1)
         profile_cloud = src_cloud.profile
 
+        # set profile for tile using first layer
         if tile_profile is None:
             tile_profile = profile_cloud.copy()
 
@@ -86,41 +90,47 @@ for tile_id, file_tuples in tile_files.iteritems():
         if array_cloud.shape != array_lights.shape:
             raise ('The shape of cloud image is not same with ntl image', cloud_path)
 
-        mask = (array_cloud <= cf_minimum)
-
-        out_mask = os.path.join(dst_dir, os.path.basename(lights_path)) + "_mask.tif"
-
-        with rasterio.open(out_mask, 'w', **profile_cloud) as export_img:
-            export_img.write(mask.astype('uint16'), 1)
-
+        # generate mask
+        mask = (array_cloud <= cf_minimum).astype('uint16')
 
         # ---------------------------------
 
+        # build output path for mask
+        out_mask = os.path.join(dst_dir, os.path.basename(lights_path)) + "_mask.tif"
+
+        with rasterio.open(out_mask, 'w', **profile_cloud) as export_img:
+            export_img.write(mask, 1)
+
+        # ---------------------------------
+
+        # create masked lights layer using cloud mask
         masked_lights = np.ma.masked_array(array_lights, mask=mask)
 
         # fill with non zero (eg: -9999) make sure matches nodata in profile
-        masked_lights_array = masked_lights.filled(0)
+        masked_lights_array = masked_lights.filled(-9999)
+
+        profile_lights['nodata'] = -9999
 
         with rasterio.open(out_lights, 'w', **profile_lights) as export_img:
             export_img.write(masked_lights_array, 1)
 
         # ---------------------------------
 
-
+        # update tile cloud array
         if tile_cloud_count_array is None:
-            tile_cloud_count_array = mask.astype('uint16')
-
+            tile_cloud_count_array = mask
         else:
-            tile_cloud_count_array = np.add(tile_cloud_count_array, mask.astype('uint16'))
+            tile_cloud_count_array = np.add(tile_cloud_count_array, mask)
 
 
     #  --------------------------------
 
+    # build tile cloud summary path and export
     tile_output = os.path.join(out_path, tile_id) + "_cloud_mask_count.tif"
 
     with rasterio.open(tile_output, 'w', **tile_profile) as export_tile:
 
-        export_tile.write(tile_cloud_count_array.astype(rasterio.uint16), 1)
+        export_tile.write(tile_cloud_count_array, 1)
 
 
 
