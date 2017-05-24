@@ -91,7 +91,7 @@ for tile_id, file_tuples in tile_files.iteritems():
         out_mask = os.path.join(dst_dir, os.path.basename(lights_path)) + "_mask.tif"
 
         with rasterio.open(out_mask, 'w', **profile_cloud) as export_img:
-            export_img.write(mask.astype(int), 1)
+            export_img.write(mask.astype('int16'), 1)
 
 
         # ---------------------------------
@@ -108,10 +108,10 @@ for tile_id, file_tuples in tile_files.iteritems():
 
 
         if tile_cloud_count_array is None:
-            tile_cloud_count_array = mask.astype(int)
+            tile_cloud_count_array = mask.astype('int16')
 
         else:
-            tile_cloud_count_array = np.add(tile_cloud_count_array, mask.astype(int))
+            tile_cloud_count_array = np.add(tile_cloud_count_array, mask.astype('int16'))
 
 
     #  --------------------------------
