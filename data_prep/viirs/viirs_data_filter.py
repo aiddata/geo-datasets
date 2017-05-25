@@ -3,6 +3,7 @@
 
 import os
 import rasterio
+from rasterio.merge import merge
 import numpy as np
 
 
@@ -49,6 +50,8 @@ for pth, dirs, files in os.walk(data_path):
 
 # -----------------------------------------------------------------------------
 
+# create a list of tiles for later merge
+tile_list = list()
 
 # iterate over one tile section at a time
 for tile_id, file_tuples in tile_files.iteritems():
@@ -128,10 +131,32 @@ for tile_id, file_tuples in tile_files.iteritems():
     # build tile cloud summary path and export
     tile_output = os.path.join(out_path, tile_id) + "_cloud_mask_count.tif"
 
+    tile_list.append(tile_output)
+
     with rasterio.open(tile_output, 'w', **tile_profile) as export_tile:
 
         export_tile.write(tile_cloud_count_array, 1)
 
 
+# merge tiles
+
+atile_output = os.path.join(out_path, "cloud_mask_count.tif")
+
+rtiles = [rasterio.open(tile) for tile in tile_list]
+
+dst_array, transform = merge(rtiles)
+
+profile = rtiles[0].profile
 
 
+if 'affine' in profile:
+        profile.pop('affine')
+
+profile["transform"] = transform
+profile['height'] = dst_array.shape[1]
+profile['width'] = dst_array.shape[2]
+profile['driver'] = 'GTiff'
+
+
+with rasterio.open(atile_output, 'w', **profile) as dst:
+    dst.write(dst_array)
