@@ -114,8 +114,11 @@ for tile_id, file_tuples in tile_files.iteritems():
 
         profile_lights['nodata'] = -9999
 
+        # converting negative radiance to None data
+        masked2_lights_array = np.where(masked_lights_array < 0, -9999, masked_lights_array)
+
         with rasterio.open(out_lights, 'w', **profile_lights) as export_img:
-            export_img.write(masked_lights_array, 1)
+            export_img.write(masked2_lights_array, 1)
 
         # ---------------------------------
 
