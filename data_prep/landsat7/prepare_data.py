@@ -37,8 +37,8 @@ active_path_row = [str(i['properties']['PR']) for i in wrs2]
 # prepare data info
 
 # actual
-raw_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/raw_landsat"
-file_list = glob.glob(raw_data+"/*.tar.gz")
+compressed_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/compressed_landsat"
+file_list = glob.glob(compressed_data+"/*.tar.gz")
 
 
 # test
@@ -69,16 +69,101 @@ data_df['season'] = data_df.apply(lambda z: get_season(z.month), axis=1)
 
 
 # -----------------------------------------------------------------------------
+
+
+import tarfile
+
+compressed_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/compressed_landsat"
+uncompressed_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/uncompressed_landsat"
+
+tar_list = list(enumerate(data_df['file']))
+
+
+def unpack_scene(data, overwrite=False):
+    index, scene_targz = data
+    print index
+    scene_name = os.path.basename(scene_targz).split('.')[0]
+    uncompressed_dir = os.path.join(uncompressed_data, scene_name)
+    tar = tarfile.open(scene_targz, 'r:gz')
+    # extract just ndvi tif
+    ndvi_name = [i for i in tar.getnames() if i.endswith('sr_ndvi.tif')][0]
+    if not os.path.isfile(os.path.join(uncompressed_dir, ndvi_name)) or overwrite:
+        tar.extract(ndvi_name, path=uncompressed_dir)
+    # used to extract everything
+    # tar.extractall(uncompressed_dir)
+
+
+# mode = "serial"
+mode = "parallel"
+
+# NOTE: use `qsub jobscript` for running parallel
+if mode == "parallel":
+    from mpi4py import MPI
+    comm = MPI.COMM_WORLD
+    size = comm.Get_size()
+    rank = comm.Get_rank()
+
+
+if mode == "parallel":
+
+    c = rank
+    while c < len(tar_list):
+
+        try:
+            unpack_scene(tar_list[c])
+        except Exception as e:
+            print "Error processing scene: {0} ({1})".format(*tar_list[c])
+            print e
+            # raise Exception('day processing')
+
+        c += size
+
+    comm.Barrier()
+
+elif mode == "serial":
+
+    for c in range(len(tar_list)):
+        unpack_scene(tar_list[c])
+
+else:
+    raise Exception("Invalid `mode` value for script.")
+
+
+
+raise
+
+
+# -----------------------------------------------------------------------------
 # get files by year-season
 
 process_df = data_df.groupby(['path_row', 'year', 'season'], as_index=False).aggregate(lambda x: tuple(x))
 
 process_df.drop(['path', 'row', 'count'],inplace=True,axis=1)
 
+
 for index, data in process_df.iterrows():
     print index
     # aggregate files for year-season
     #
+import rasterio
+r = rasterio.open(ndvi)
+
+
+
+tar.getnames()
+[i for i in tar.getnames() if i.endswith('sr_ndvi.tif')]
+ndvi = tar.extractfile([i for i in tar.getnames() if i.endswith('sr_ndvi.tif')][0])
+ndvi is not None
+
+
+
+
+
+
+
+
+
+
 
 
 # -----------------------------------------------------------------------------
