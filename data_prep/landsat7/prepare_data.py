@@ -70,6 +70,8 @@ data_df['season'] = data_df.apply(lambda z: get_season(z.month), axis=1)
 
 # -----------------------------------------------------------------------------
 
+# qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
+# mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclctive/master/asdf-datasets/data_prep/landsat7/prepare_data.py
 
 import tarfile
 
@@ -175,42 +177,77 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
     Return
         result: rasterio Raster instance
     """
+    meta_list = []
     for ix, file_path in enumerate(file_list):
         try:
             raster = rasterio.open(file_path)
-            print raster.meta
+            meta_list.append(raster.meta)
         except:
             print "Could not include file in aggregation ({0})".format(file_path)
-    for ix, file_path in enumerate(file_list):
-        raster = rasterio.open(file_path)
-        active = raster.read(masked=True, window=None, boundless=True, fill_value=-9999)
-        if custom_fun is not None:
-            active = custom_fun(active)
-        print active.shape
-        if ix == 0:
-            store = active.copy()
-        else:
-            # make sure dimensions match
-            if active.shape != store.shape:
-                raise Exception("Dimensions of rasters do not match")
-            if method == "max":
-                store = np.ma.array((store, active)).max(axis=0)
-                # non masked array alternatives
-                # store = np.maximum.reduce([store, active])
-                # store = np.vstack([store, active]).max(axis=0)
-            elif method == "mean":
-                if ix == 1:
-                    weights = (~store.mask).astype(int)
-                store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
-                weights += (~active.mask).astype(int)
-            elif method == "min":
-                store = np.ma.array((store, active)).min(axis=0)
-            elif method == "sum":
-                store = np.ma.array((store, active)).sum(axis=0)
-            else:
-                raise Exception("Invalid method")
-    store = store.filled(raster.nodata)
-    return store, raster.profile
+    resolution_list = [i['transform'][0] for i in meta_list]
+    if len(set(resolution_list)) != 1:
+        for i in meta_list: print i
+        raise Exception('Resolution of files are different')
+    resolution = resolution_list[0]
+    xmin_list = []
+    xmax_list = []
+    ymin_list = []
+    ymax_list = []
+    print "meta:"
+    for meta in meta_list:
+        print meta
+        xmin_list.append(meta['transform'][2])
+        xmax_list.append(meta['transform'][2] + meta['width'] * resolution)
+        ymax_list.append(meta['transform'][5])
+        ymin_list.append(meta['transform'][5] - meta['height'] * resolution)
+    xmin = min(xmin_list)
+    xmax = max(xmax_list)
+    ymax = max(ymax_list)
+    ymin = min(ymin_list)
+    print "overall:"
+    print xmin, xmax, ymin, ymax
+    print "offsets:"
+    for meta in meta_list:
+        col_start = (meta['transform'][2] - xmin) / resolution
+        col_stop =  meta['width'] + (xmax - meta['transform'][2] + meta['width'] * resolution) / resolution
+        row_start = (meta['transform'][5] - ymax) / resolution
+        row_stop = meta['height'] + abs((ymin - meta['transform'][5] - meta['height'] * resolution) / resolution)
+        print col_start, col_stop, row_start, row_stop
+
+aggregate_rasters(file_list, method="max", custom_fun=custom_raster_adjustments)
+
+    # for ix, file_path in enumerate(file_list):
+    #     raster = rasterio.open(file_path)
+    #     active = raster.read(masked=True, window=None, boundless=True, fill_value=-9999)
+    #     if custom_fun is not None:
+    #         active = custom_fun(active)
+    #     print active.shape
+    #     if ix == 0:
+    #         store = active.copy()
+    #     else:
+    #         # make sure dimensions match
+    #         if active.shape != store.shape:
+    #             raise Exception("Dimensions of rasters do not match")
+    #         if method == "max":
+    #             store = np.ma.array((store, active)).max(axis=0)
+    #             # non masked array alternatives
+    #             # store = np.maximum.reduce([store, active])
+    #             # store = np.vstack([store, active]).max(axis=0)
+    #         elif method == "mean":
+    #             if ix == 1:
+    #                 weights = (~store.mask).astype(int)
+    #             store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
+    #             weights += (~active.mask).astype(int)
+    #         elif method == "min":
+    #             store = np.ma.array((store, active)).min(axis=0)
+    #         elif method == "sum":
+    #             store = np.ma.array((store, active)).sum(axis=0)
+    #         else:
+    #             raise Exception("Invalid method")
+    # store = store.filled(raster.nodata)
+    # return store, raster.profile
+
+
 
 
 def write_raster(path, data, meta):
@@ -246,9 +283,9 @@ import numpy as np
 
 data = process_df.iterrows().next()[1]
 
-for index, data in process_df.iterrows():
-    print index
-    print "{0} {1} {2}".format(data['year'], data['path_row'], data['season'])
+# for index, data in process_df.iterrows():
+#     print index
+#     print "{0} {1} {2}".format(data['year'], data['path_row'], data['season'])
 
 file_list = [
     filter(
