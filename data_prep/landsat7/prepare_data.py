@@ -140,24 +140,135 @@ process_df = data_df.groupby(['path_row', 'year', 'season'], as_index=False).agg
 
 process_df.drop(['path', 'row', 'count'],inplace=True,axis=1)
 
+def convert_compressed_file_name(x):
+    """convert compressed file names to dir
+
+    input tuple of tar.gz files converted to
+    output tuple of dir which contains extracted files
+    """
+    return tuple([
+        i[:-len('.tar.gz')].replace('compressed', 'uncompressed') for i in x
+    ])
+
+
+process_df['folder'] = process_df['file'].apply(lambda z: convert_compressed_file_name(z))
+
+
+# -----------------------------------------------------------------------------
+
+
+def aggregate_rasters(file_list, method="mean", custom_fun=None):
+    """Aggregate multiple rasters
+
+    Aggregates multiple rasters with same features (dimensions, transform,
+    pixel size, etc.) and creates single layer using aggregation method
+    specified.
+
+    Supported methods: mean (default), max, min, sum
+
+    Arguments
+        file_list (list): list of file paths for rasters to be aggregated
+        method (str): method used for aggregation
+        custom_fun (function): applied to all rasters when they are read in,
+                               prior to aggregation
+
+    Return
+        result: rasterio Raster instance
+    """
+    for ix, file_path in enumerate(file_list):
+        try:
+            raster = rasterio.open(file_path)
+            print raster.meta
+        except:
+            print "Could not include file in aggregation ({0})".format(file_path)
+    for ix, file_path in enumerate(file_list):
+        raster = rasterio.open(file_path)
+        active = raster.read(masked=True, window=None, boundless=True, fill_value=-9999)
+        if custom_fun is not None:
+            active = custom_fun(active)
+        print active.shape
+        if ix == 0:
+            store = active.copy()
+        else:
+            # make sure dimensions match
+            if active.shape != store.shape:
+                raise Exception("Dimensions of rasters do not match")
+            if method == "max":
+                store = np.ma.array((store, active)).max(axis=0)
+                # non masked array alternatives
+                # store = np.maximum.reduce([store, active])
+                # store = np.vstack([store, active]).max(axis=0)
+            elif method == "mean":
+                if ix == 1:
+                    weights = (~store.mask).astype(int)
+                store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
+                weights += (~active.mask).astype(int)
+            elif method == "min":
+                store = np.ma.array((store, active)).min(axis=0)
+            elif method == "sum":
+                store = np.ma.array((store, active)).sum(axis=0)
+            else:
+                raise Exception("Invalid method")
+    store = store.filled(raster.nodata)
+    return store, raster.profile
+
+
+def write_raster(path, data, meta):
+    try:
+        os.makedirs(os.path.dirname(path))
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+    #
+    meta['dtype'] = data.dtype
+    #
+    with rasterio.open(path, 'w', **meta) as result:
+        try:
+            result.write(data)
+        except:
+            print path
+            print meta
+            print data.shape
+            raise
+
+
+def custom_raster_adjustments(raster):
+    raster[np.where((raster < 0) & (raster > -9999))] = 0
+    raster[np.where(raster == 20000)] = 10000
+    return raster
+
+
+
+import rasterio
+import numpy as np
+
+
+
+data = process_df.iterrows().next()[1]
 
 for index, data in process_df.iterrows():
     print index
-    # aggregate files for year-season
-    #
-import rasterio
-r = rasterio.open(ndvi)
+    print "{0} {1} {2}".format(data['year'], data['path_row'], data['season'])
+
+file_list = [
+    filter(
+        lambda x: x.endswith('_sr_ndvi.tif'),
+        [os.path.join(d, f) for f in os.listdir(d)]
+    )
+    for d in data['folder']
+]
+
+file_list = [y for x in file_list for y in x]
 
 
+# aggregate files for year-season
+scene_array, scene_profile = aggregate_rasters(file_list, method="max", custom_fun=custom_raster_adjustments)
 
-tar.getnames()
-[i for i in tar.getnames() if i.endswith('sr_ndvi.tif')]
-ndvi = tar.extractfile([i for i in tar.getnames() if i.endswith('sr_ndvi.tif')][0])
-ndvi is not None
+scene_season_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/season_scenes"
+scene_season_name = "{0}_{1}_{2}.tif".format(data['year'], data['path_row'], data['season'])
+scene_season_path = os.path.join(scene_season_data, scene_season_name)
 
-
-
-
+write_raster(scene_season_path, scene_array, scene_profile)
 
 
 
