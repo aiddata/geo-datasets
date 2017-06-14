@@ -70,21 +70,12 @@ data_df['season'] = data_df.apply(lambda z: get_season(z.month), axis=1)
 
 # -----------------------------------------------------------------------------
 
-# qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
-# mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclctive/master/asdf-datasets/data_prep/landsat7/prepare_data.py
-
-import tarfile
-
-compressed_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/compressed_landsat"
-uncompressed_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/uncompressed_landsat"
-
-tar_list = list(enumerate(data_df['file']))
-
 
 def unpack_scene(data, overwrite=False):
     index, scene_targz = data
     print index
     scene_name = os.path.basename(scene_targz).split('.')[0]
+    uncompressed_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/uncompressed_landsat"
     uncompressed_dir = os.path.join(uncompressed_data, scene_name)
     tar = tarfile.open(scene_targz, 'r:gz')
     # extract just ndvi tif
@@ -95,44 +86,50 @@ def unpack_scene(data, overwrite=False):
     # tar.extractall(uncompressed_dir)
 
 
+def run_data_unpacking(tar_list, mode):
+    if mode == "parallel":
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        size = comm.Get_size()
+        rank = comm.Get_rank()
+
+        c = rank
+        while c < len(tar_list):
+
+            try:
+                unpack_scene(tar_list[c])
+            except Exception as e:
+                print "Error processing scene: {0} ({1})".format(*tar_list[c])
+                print e
+                # raise Exception('day processing')
+
+            c += size
+
+        comm.Barrier()
+
+    elif mode == "serial":
+
+        for c in range(len(tar_list)):
+            unpack_scene(tar_list[c])
+
+    else:
+        raise Exception("Invalid `mode` value for script.")
+
+
+# -------------------------------------
+
+# qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
+# mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclctive/master/asdf-datasets/data_prep/landsat7/prepare_data.py
+
+import tarfile
+
+tar_list = list(enumerate(data_df['file']))
+
 # mode = "serial"
 mode = "parallel"
 
-# NOTE: use `qsub jobscript` for running parallel
-if mode == "parallel":
-    from mpi4py import MPI
-    comm = MPI.COMM_WORLD
-    size = comm.Get_size()
-    rank = comm.Get_rank()
-
-
-if mode == "parallel":
-
-    c = rank
-    while c < len(tar_list):
-
-        try:
-            unpack_scene(tar_list[c])
-        except Exception as e:
-            print "Error processing scene: {0} ({1})".format(*tar_list[c])
-            print e
-            # raise Exception('day processing')
-
-        c += size
-
-    comm.Barrier()
-
-elif mode == "serial":
-
-    for c in range(len(tar_list)):
-        unpack_scene(tar_list[c])
-
-else:
-    raise Exception("Invalid `mode` value for script.")
-
-
-
-raise
+# comment out if scenes were already unpacked
+# run_data_unpacking(tar_list, mode)
 
 
 # -----------------------------------------------------------------------------
@@ -157,6 +154,24 @@ process_df['folder'] = process_df['file'].apply(lambda z: convert_compressed_fil
 
 
 # -----------------------------------------------------------------------------
+
+
+
+def adjust_pixel_coordinate(val, res):
+    """adjust pixel coordinates to uniform grid
+
+    this function uses arbitrary grid based at (0,0)
+    specifically for afghanistan (lon, lat both positive)
+
+    needed for landsat (30m or 0.0002695) resolution because 1 degree
+    cannot be cleanly divided by the pixel resolution
+    """
+    mod = val % res
+    if mod < res * 0.5:
+        new = val - mod
+    else:
+        new = val + res - mod
+    return new
 
 
 def aggregate_rasters(file_list, method="mean", custom_fun=None):
@@ -188,31 +203,43 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
     if len(set(resolution_list)) != 1:
         for i in meta_list: print i
         raise Exception('Resolution of files are different')
-    resolution = resolution_list[0]
+    res = resolution_list[0]
     xmin_list = []
+    ymax_list = []
     xmax_list = []
     ymin_list = []
-    ymax_list = []
-    print "meta:"
+    print "meta list:"
+    for meta in meta_list:
+        tmp_xmin = adjust_pixel_coordinate(meta['transform'][2], res)
+        tmp_ymax = adjust_pixel_coordinate(meta['transform'][5], res)
+        xmin_list.append(tmp_xmin)
+        ymax_list.append(tmp_ymax)
+        xmax_list.append(tmp_xmin + meta['width'] * res)
+        ymin_list.append(tmp_ymax - meta['height'] * res)
+    xmin = min(xmin_list)
+    ymax = max(ymax_list)
+    xmax = max(xmax_list)
+    ymin = min(ymin_list)
+    print "(xmin, ymax), (xmax, ymin):"
+    print (xmin, ymax), (xmax, ymin)
+    print "\noffsets:\n"
     for meta in meta_list:
         print meta
-        xmin_list.append(meta['transform'][2])
-        xmax_list.append(meta['transform'][2] + meta['width'] * resolution)
-        ymax_list.append(meta['transform'][5])
-        ymin_list.append(meta['transform'][5] - meta['height'] * resolution)
-    xmin = min(xmin_list)
-    xmax = max(xmax_list)
-    ymax = max(ymax_list)
-    ymin = min(ymin_list)
-    print "overall:"
-    print xmin, xmax, ymin, ymax
-    print "offsets:"
-    for meta in meta_list:
-        col_start = (meta['transform'][2] - xmin) / resolution
-        col_stop =  meta['width'] + (xmax - meta['transform'][2] + meta['width'] * resolution) / resolution
-        row_start = (meta['transform'][5] - ymax) / resolution
-        row_stop = meta['height'] + abs((ymin - meta['transform'][5] - meta['height'] * resolution) / resolution)
-        print col_start, col_stop, row_start, row_stop
+        tmp_xmin = adjust_pixel_coordinate(meta['transform'][2], res)
+        tmp_ymax = adjust_pixel_coordinate(meta['transform'][5], res)
+        print tmp_xmin, xmin
+        #
+        col_start = (xmin - tmp_xmin) / res
+        col_stop_diff = abs(((tmp_xmin + meta['width'] * res) - xmax) / res)
+        col_stop =  meta['width'] + col_stop_diff
+        #
+        row_start = (tmp_ymax - ymax) / res
+        row_stop_diff = abs(((tmp_ymax - meta['height'] * res) - ymin) / res)
+        row_stop = meta['height'] + row_stop_diff
+        #
+        print col_stop_diff, row_stop_diff
+        print ((int(round(col_start)), int(round(col_stop))), (int(round(row_start)), int(round(row_stop))))
+        print "\n"
 
 aggregate_rasters(file_list, method="max", custom_fun=custom_raster_adjustments)
 
@@ -296,6 +323,10 @@ file_list = [
 ]
 
 file_list = [y for x in file_list for y in x]
+
+
+
+
 
 
 # aggregate files for year-season
