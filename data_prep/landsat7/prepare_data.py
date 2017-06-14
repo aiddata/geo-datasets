@@ -208,7 +208,7 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
     ymax_list = []
     xmax_list = []
     ymin_list = []
-    print "meta list:"
+    # print "meta list:"
     for meta in meta_list:
         tmp_xmin = adjust_pixel_coordinate(meta['transform'][2], res)
         tmp_ymax = adjust_pixel_coordinate(meta['transform'][5], res)
@@ -220,14 +220,34 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
     ymax = max(ymax_list)
     xmax = max(xmax_list)
     ymin = min(ymin_list)
-    print "(xmin, ymax), (xmax, ymin):"
+    # print "(xmin, ymax), (xmax, ymin):"
     print (xmin, ymax), (xmax, ymin)
-    print "\noffsets:\n"
-    for meta in meta_list:
-        print meta
+    # print "\noffsets:\n"
+    # for meta in meta_list:
+    #     # print meta
+    #     tmp_xmin = adjust_pixel_coordinate(meta['transform'][2], res)
+    #     tmp_ymax = adjust_pixel_coordinate(meta['transform'][5], res)
+    #     # print tmp_xmin, xmin
+    #     #
+    #     col_start = (xmin - tmp_xmin) / res
+    #     col_stop_diff = abs(((tmp_xmin + meta['width'] * res) - xmax) / res)
+    #     col_stop =  meta['width'] + col_stop_diff
+    #     #
+    #     row_start = (tmp_ymax - ymax) / res
+    #     row_stop_diff = abs(((tmp_ymax - meta['height'] * res) - ymin) / res)
+    #     row_stop = meta['height'] + row_stop_diff
+    #     #
+    #     window = ((int(round(col_start)), int(round(col_stop))), (int(round(row_start)), int(round(row_stop))))
+    #     # print col_stop_diff, row_stop_diff
+    #     # print window
+    #     # print "\n"
+    for ix, file_path in enumerate(file_list):
+        raster = rasterio.open(file_path)
+        meta = raster.profile
+        # print meta
         tmp_xmin = adjust_pixel_coordinate(meta['transform'][2], res)
         tmp_ymax = adjust_pixel_coordinate(meta['transform'][5], res)
-        print tmp_xmin, xmin
+        # print tmp_xmin, xmin
         #
         col_start = (xmin - tmp_xmin) / res
         col_stop_diff = abs(((tmp_xmin + meta['width'] * res) - xmax) / res)
@@ -237,44 +257,40 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
         row_stop_diff = abs(((tmp_ymax - meta['height'] * res) - ymin) / res)
         row_stop = meta['height'] + row_stop_diff
         #
-        print col_stop_diff, row_stop_diff
-        print ((int(round(col_start)), int(round(col_stop))), (int(round(row_start)), int(round(row_stop))))
-        print "\n"
-
-aggregate_rasters(file_list, method="max", custom_fun=custom_raster_adjustments)
-
-    # for ix, file_path in enumerate(file_list):
-    #     raster = rasterio.open(file_path)
-    #     active = raster.read(masked=True, window=None, boundless=True, fill_value=-9999)
-    #     if custom_fun is not None:
-    #         active = custom_fun(active)
-    #     print active.shape
-    #     if ix == 0:
-    #         store = active.copy()
-    #     else:
-    #         # make sure dimensions match
-    #         if active.shape != store.shape:
-    #             raise Exception("Dimensions of rasters do not match")
-    #         if method == "max":
-    #             store = np.ma.array((store, active)).max(axis=0)
-    #             # non masked array alternatives
-    #             # store = np.maximum.reduce([store, active])
-    #             # store = np.vstack([store, active]).max(axis=0)
-    #         elif method == "mean":
-    #             if ix == 1:
-    #                 weights = (~store.mask).astype(int)
-    #             store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
-    #             weights += (~active.mask).astype(int)
-    #         elif method == "min":
-    #             store = np.ma.array((store, active)).min(axis=0)
-    #         elif method == "sum":
-    #             store = np.ma.array((store, active)).sum(axis=0)
-    #         else:
-    #             raise Exception("Invalid method")
-    # store = store.filled(raster.nodata)
-    # return store, raster.profile
-
-
+        # print "hi"
+        window = ((int(round(row_start)), int(round(row_stop))), (int(round(col_start)), int(round(col_stop))))
+        # print row_stop_diff, col_stop_diff
+        print window
+        # print "\n"
+        #
+        active = raster.read(masked=True, window=window, boundless=True)#, fill_value=-9999)
+        if custom_fun is not None:
+            active = custom_fun(active)
+        print active.shape
+        if ix == 0:
+            store = active.copy()
+        else:
+            # make sure dimensions match
+            if active.shape != store.shape:
+                raise Exception("Dimensions of rasters do not match")
+            if method == "max":
+                store = np.ma.array((store, active)).max(axis=0)
+                # non masked array alternatives
+                # store = np.maximum.reduce([store, active])
+                # store = np.vstack([store, active]).max(axis=0)
+            elif method == "mean":
+                if ix == 1:
+                    weights = (~store.mask).astype(int)
+                store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
+                weights += (~active.mask).astype(int)
+            elif method == "min":
+                store = np.ma.array((store, active)).min(axis=0)
+            elif method == "sum":
+                store = np.ma.array((store, active)).sum(axis=0)
+            else:
+                raise Exception("Invalid method")
+    store = store.filled(raster.nodata)
+    return store, raster.profile
 
 
 def write_raster(path, data, meta):
@@ -283,7 +299,7 @@ def write_raster(path, data, meta):
     except OSError as exception:
         if exception.errno != errno.EEXIST:
             raise
-    #
+    #ras
     meta['dtype'] = data.dtype
     #
     with rasterio.open(path, 'w', **meta) as result:
