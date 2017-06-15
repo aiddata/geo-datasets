@@ -1,0 +1,8 @@
+#!/bin/tcsh
+#PBS -N asg:landsat_ndvi
+#PBS -l nodes=8:c18c:ppn=16
+#PBS -l walltime=72:00:00
+#PBS -j oe
+
+
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclone/home00/sgoodman/active/master/asdf-datasets/data_prep/ltdr_ndvi/prepare_daily.py

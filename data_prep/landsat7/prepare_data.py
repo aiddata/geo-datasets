@@ -350,7 +350,7 @@ def prepare_season(index, data):
 
 
     # aggregate files for year-season
-    scene_array, scene_profile = aggregate_rasters(file_list, method="mean",
+    scene_array, scene_profile = aggregate_rasters(file_list, method="max",
                                                    custom_fun=raster_calc)
 
     scene_season_data = os.path.join(project_dir, "season_scenes")
