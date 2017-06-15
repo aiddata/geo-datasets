@@ -7,9 +7,10 @@ import fiona
 
 
 # -----------------------------------------------------------------------------
-
-# qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
-# mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclctive/master/asdf-datasets/data_prep/landsat7/prepare_data.py
+"""
+qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclone/home00/sgoodman/active/master/asdf-datasets/data_prep/landsat7/prepare_data.py
+"""
 
 run_scene_unpack = False
 run_season_agg = True
@@ -212,10 +213,10 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
         try:
             raster = rasterio.open(file_path)
             meta_list.append(raster.meta)
-            print "hi"
-            print raster.meta
-            print raster.profile
-            print "bye"
+            # print "hi"
+            # print raster.meta
+            # print raster.profile
+            # print "bye"
         except:
             print "Could not include file in aggregation ({0})".format(file_path)
 
