@@ -7,6 +7,22 @@ import fiona
 
 
 # -----------------------------------------------------------------------------
+
+# qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
+# mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclctive/master/asdf-datasets/data_prep/landsat7/prepare_data.py
+
+run_scene_unpack = False
+run_season_agg = True
+
+# mode = "serial"
+mode = "parallel"
+
+
+# -----------------------------------------------------------------------------
+
+project_dir = "/sciclone/aiddata10/REU/projects/afghanistan_gie"
+
+# -----------------------------------------------------------------------------
 # define seasons
 
 seasons = {
@@ -28,7 +44,7 @@ def get_season(month):
 # -----------------------------------------------------------------------------
 # define active path rows
 
-wrs2_path = "/sciclone/aiddata10/REU/projects/afghanistan_gie/data_prep/afg_canals_wrs2_descending.shp"
+wrs2_path = os.path.join(project_dir, "data_prep/afg_canals_wrs2_descending.shp")
 wrs2 = fiona.open(wrs2_path)
 
 active_path_row = [str(i['properties']['PR']) for i in wrs2]
@@ -38,7 +54,7 @@ active_path_row = [str(i['properties']['PR']) for i in wrs2]
 # prepare data info
 
 # actual
-compressed_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/compressed_landsat"
+compressed_data = os.path.join(project_dir, "compressed_landsat")
 file_list = glob.glob(compressed_data+"/*.tar.gz")
 
 
@@ -76,7 +92,7 @@ def unpack_scene(data, overwrite=False):
     index, scene_targz = data
     print index
     scene_name = os.path.basename(scene_targz).split('.')[0]
-    uncompressed_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/uncompressed_landsat"
+    uncompressed_data = os.path.join(project_dir, "uncompressed_landsat")
     uncompressed_dir = os.path.join(uncompressed_data, scene_name)
     tar = tarfile.open(scene_targz, 'r:gz')
     # extract just ndvi tif
@@ -119,24 +135,21 @@ def run_data_unpacking(tar_list, mode):
 
 # -------------------------------------
 
-# qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
-# mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclctive/master/asdf-datasets/data_prep/landsat7/prepare_data.py
 
 import tarfile
 
 tar_list = list(enumerate(data_df['file']))
 
-# mode = "serial"
-mode = "parallel"
+if run_scene_unpack:
+    run_data_unpacking(tar_list, mode)
 
-# comment out if scenes were already unpacked
-# run_data_unpacking(tar_list, mode)
 
 
 # -----------------------------------------------------------------------------
 # get files by year-season
 
-process_df = data_df.groupby(['path_row', 'year', 'season'], as_index=False).aggregate(lambda x: tuple(x))
+process_df = data_df.groupby(
+    ['path_row', 'year', 'season'], as_index=False).aggregate(lambda x: tuple(x))
 
 process_df.drop(['path', 'row', 'count'],inplace=True,axis=1)
 
@@ -151,7 +164,8 @@ def convert_compressed_file_name(x):
     ])
 
 
-process_df['folder'] = process_df['file'].apply(lambda z: convert_compressed_file_name(z))
+process_df['folder'] = process_df['file'].apply(
+    lambda z: convert_compressed_file_name(z))
 
 
 # -----------------------------------------------------------------------------
@@ -198,12 +212,17 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
         try:
             raster = rasterio.open(file_path)
             meta_list.append(raster.meta)
+            print "hi"
+            print raster.meta
+            print raster.profile
+            print "bye"
         except:
             print "Could not include file in aggregation ({0})".format(file_path)
 
-    resolution_list = [i['transform'][0] for i in meta_list]
+    resolution_list = [i['affine'][0] for i in meta_list]
     if len(set(resolution_list)) != 1:
         for i in meta_list: print i
+        print set(resolution_list)
         raise Exception('Resolution of files are different')
 
     res = resolution_list[0]
@@ -213,8 +232,8 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
     xmax_list = []
     ymin_list = []
     for meta in meta_list:
-        tmp_xmin = adjust_pixel_coordinate(meta['transform'][2], res)
-        tmp_ymax = adjust_pixel_coordinate(meta['transform'][5], res)
+        tmp_xmin = adjust_pixel_coordinate(meta['affine'][2], res)
+        tmp_ymax = adjust_pixel_coordinate(meta['affine'][5], res)
         xmin_list.append(tmp_xmin)
         ymax_list.append(tmp_ymax)
         xmax_list.append(tmp_xmin + meta['width'] * res)
@@ -228,9 +247,9 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
 
     for ix, file_path in enumerate(file_list):
         raster = rasterio.open(file_path)
-        meta = raster.profile
-        tmp_xmin = adjust_pixel_coordinate(meta['transform'][2], res)
-        tmp_ymax = adjust_pixel_coordinate(meta['transform'][5], res)
+        meta = raster.meta
+        tmp_xmin = adjust_pixel_coordinate(meta['affine'][2], res)
+        tmp_ymax = adjust_pixel_coordinate(meta['affine'][5], res)
         # print meta
         # print tmp_xmin, xmin
 
@@ -242,7 +261,8 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
         row_stop_diff = abs(((tmp_ymax - meta['height'] * res) - ymin) / res)
         row_stop = meta['height'] + row_stop_diff
 
-        window = ((int(round(row_start)), int(round(row_stop))), (int(round(col_start)), int(round(col_stop))))
+        window = ((int(round(row_start)), int(round(row_stop))),
+                  (int(round(col_start)), int(round(col_stop))))
 
         # print row_stop_diff, col_stop_diff
         # print window
@@ -268,7 +288,8 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
             elif method == "mean":
                 if ix == 1:
                     weights = (~store.mask).astype(int)
-                store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
+                store = np.ma.average(np.ma.array((store, active)), axis=0,
+                                      weights=[weights, (~active.mask).astype(int)])
                 weights += (~active.mask).astype(int)
             elif method == "min":
                 store = np.ma.array((store, active)).min(axis=0)
@@ -306,20 +327,14 @@ def write_raster(path, data, meta):
             raise
 
 
-def custom_raster_adjustments(raster):
+def raster_calc(raster):
     raster[np.where((raster < 0) & (raster > -9999))] = 0
     raster[np.where(raster == 20000)] = 10000
     return raster
 
 
 
-import rasterio
-import numpy as np
-from affine import Affine
-
-
-for index, data in process_df.iterrows():
-
+def prepare_season(index, data):
     print "{0}) {1} {2} {3}".format(index, data['year'], data['path_row'], data['season'])
 
     file_list = [
@@ -334,19 +349,73 @@ for index, data in process_df.iterrows():
 
 
     # aggregate files for year-season
-    scene_array, scene_profile = aggregate_rasters(file_list, method="max", custom_fun=custom_raster_adjustments)
+    scene_array, scene_profile = aggregate_rasters(file_list, method="mean",
+                                                   custom_fun=raster_calc)
 
-    scene_season_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/season_scenes"
-    scene_season_name = "{0}_{1}_{2}.tif".format(data['year'], data['path_row'], data['season'])
+    scene_season_data = os.path.join(project_dir, "season_scenes")
+    scene_season_name = "{0}_{1}_{2}.tif".format(
+        data['year'], data['path_row'], data['season'])
     scene_season_path = os.path.join(scene_season_data, scene_season_name)
 
+    print "writing {0}".format(scene_season_path)
     write_raster(scene_season_path, scene_array, scene_profile)
 
 
 
+def run_season_aggregation(process_df, mode):
+    if mode == "parallel":
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        size = comm.Get_size()
+        rank = comm.Get_rank()
+
+        c = rank
+        while c < len(process_df):
+
+            try:
+                prepare_season(c, process_df.iloc[c])
+            except Exception as e:
+                print "Error processing season-scene: {0}".format(c)
+                print e
+                # raise Exception('something')
+
+            c += size
+
+        comm.Barrier()
+
+    elif mode == "serial":
+
+        for c in range(len(process_df)):
+            prepare_season(c, process_df.iloc[c])
+            raise
+
+    else:
+        raise Exception("Invalid `mode` value for script.")
+
+
+# -------------------------------------
+
+
+import rasterio
+import numpy as np
+from affine import Affine
+
+
+if run_season_agg:
+    run_season_aggregation(process_df, mode)
+
+
+# -----------------------------------------------------------------------------
+
 
 
 assert(0)
+
+
+
+
+
+
 
 
 
