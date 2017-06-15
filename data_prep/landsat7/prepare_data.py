@@ -427,7 +427,7 @@ if run_season_agg:
 # mosaic scenes for each season
 
 
-from rasterio.merge import merge as mosaic
+from rasterio.merge import merge as scene_mosaic
 
 
 mosaic_df = process_df[['path_row', 'year', 'season']].groupby(
@@ -450,14 +450,11 @@ for index, data in mosaic_df.iterrows():
         project_dir, "season_mosaics", "{0}_{1}.tif".format(data['year'], data['season']))
 
     mosaic_scenes = [rasterio.open(path) for path in season_scene_files]
-
-    try:
-        mosaic_array, transform = mosaic(mosaic_scenes)
-    except:
-        for i in mosaic_scenes: print i
-        raise
-
     mosaic_profile = mosaic_scenes[0].profile
+
+    mosaic_array, transform = scene_mosaic(mosaic_scenes)
+
+    for i in mosaic_scenes: i.close()
 
     if 'affine' in mosaic_profile:
         mosaic_profile.pop('affine')
@@ -467,9 +464,9 @@ for index, data in mosaic_df.iterrows():
     mosaic_profile['width'] = mosaic_array.shape[2]
     mosaic_profile['driver'] = 'GTiff'
 
-    with rasterio.open(mosaic_output_path, 'w', **mosaic_profile) as mosaic:
-        mosaic.write(mosaic_array)
-
+    mosaic = rasterio.open(mosaic_output_path, 'w', **mosaic_profile)
+    mosaic.write(mosaic_array)
+    mosaic.close()
 
 
 # -----------------------------------------------------------------------------
