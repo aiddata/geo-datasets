@@ -21,7 +21,7 @@ mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi
 
 # use for testing without access to sciclone filesystem
 # (assumes you are running script out of git repo "~/git/asdf-datasets")
-test_mode = 1
+test_mode = 0
 
 run_scene_unpack = False
 run_season_agg = False
@@ -451,7 +451,11 @@ for index, data in mosaic_df.iterrows():
 
     mosaic_scenes = [rasterio.open(path) for path in season_scene_files]
 
-    mosaic_array, transform = merge(mosaic_scenes)
+    try:
+        mosaic_array, transform = mosaic(mosaic_scenes)
+    except:
+        for i in mosaic_scenes: print i
+        raise
 
     mosaic_profile = mosaic_scenes[0].profile
 
@@ -466,7 +470,6 @@ for index, data in mosaic_df.iterrows():
     with rasterio.open(mosaic_output_path, 'w', **mosaic_profile) as mosaic:
         mosaic.write(mosaic_array)
 
-    raise
 
 
 # -----------------------------------------------------------------------------
