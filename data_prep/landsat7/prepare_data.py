@@ -1,5 +1,6 @@
 
 import os
+import errno
 import glob
 import pandas as pd
 import fiona
@@ -199,16 +200,18 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
             meta_list.append(raster.meta)
         except:
             print "Could not include file in aggregation ({0})".format(file_path)
+
     resolution_list = [i['transform'][0] for i in meta_list]
     if len(set(resolution_list)) != 1:
         for i in meta_list: print i
         raise Exception('Resolution of files are different')
+
     res = resolution_list[0]
+
     xmin_list = []
     ymax_list = []
     xmax_list = []
     ymin_list = []
-    # print "meta list:"
     for meta in meta_list:
         tmp_xmin = adjust_pixel_coordinate(meta['transform'][2], res)
         tmp_ymax = adjust_pixel_coordinate(meta['transform'][5], res)
@@ -216,57 +219,41 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
         ymax_list.append(tmp_ymax)
         xmax_list.append(tmp_xmin + meta['width'] * res)
         ymin_list.append(tmp_ymax - meta['height'] * res)
+
     xmin = min(xmin_list)
     ymax = max(ymax_list)
     xmax = max(xmax_list)
     ymin = min(ymin_list)
-    # print "(xmin, ymax), (xmax, ymin):"
-    print (xmin, ymax), (xmax, ymin)
-    # print "\noffsets:\n"
-    # for meta in meta_list:
-    #     # print meta
-    #     tmp_xmin = adjust_pixel_coordinate(meta['transform'][2], res)
-    #     tmp_ymax = adjust_pixel_coordinate(meta['transform'][5], res)
-    #     # print tmp_xmin, xmin
-    #     #
-    #     col_start = (xmin - tmp_xmin) / res
-    #     col_stop_diff = abs(((tmp_xmin + meta['width'] * res) - xmax) / res)
-    #     col_stop =  meta['width'] + col_stop_diff
-    #     #
-    #     row_start = (tmp_ymax - ymax) / res
-    #     row_stop_diff = abs(((tmp_ymax - meta['height'] * res) - ymin) / res)
-    #     row_stop = meta['height'] + row_stop_diff
-    #     #
-    #     window = ((int(round(col_start)), int(round(col_stop))), (int(round(row_start)), int(round(row_stop))))
-    #     # print col_stop_diff, row_stop_diff
-    #     # print window
-    #     # print "\n"
+    # print (xmin, ymax), (xmax, ymin)
+
     for ix, file_path in enumerate(file_list):
         raster = rasterio.open(file_path)
         meta = raster.profile
-        # print meta
         tmp_xmin = adjust_pixel_coordinate(meta['transform'][2], res)
         tmp_ymax = adjust_pixel_coordinate(meta['transform'][5], res)
+        # print meta
         # print tmp_xmin, xmin
-        #
+
         col_start = (xmin - tmp_xmin) / res
         col_stop_diff = abs(((tmp_xmin + meta['width'] * res) - xmax) / res)
         col_stop =  meta['width'] + col_stop_diff
-        #
+
         row_start = (tmp_ymax - ymax) / res
         row_stop_diff = abs(((tmp_ymax - meta['height'] * res) - ymin) / res)
         row_stop = meta['height'] + row_stop_diff
-        #
-        # print "hi"
+
         window = ((int(round(row_start)), int(round(row_stop))), (int(round(col_start)), int(round(col_stop))))
+
         # print row_stop_diff, col_stop_diff
-        print window
-        # print "\n"
-        #
-        active = raster.read(masked=True, window=window, boundless=True)#, fill_value=-9999)
+        # print window
+
+        active = raster.read(masked=True, window=window, boundless=True)
+
         if custom_fun is not None:
             active = custom_fun(active)
-        print active.shape
+
+        # print active.shape
+
         if ix == 0:
             store = active.copy()
         else:
@@ -289,8 +276,15 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
                 store = np.ma.array((store, active)).sum(axis=0)
             else:
                 raise Exception("Invalid method")
+
+    output_profile = raster.profile.copy()
+    output_profile['transform'] = Affine(res, 0, xmin, 0, -res, ymax)
+    output_profile['width'] = int(round((xmax - xmin) / res))
+    output_profile['height'] = int(round((ymax - ymin) / res))
+
     store = store.filled(raster.nodata)
-    return store, raster.profile
+    return store, output_profile
+
 
 
 def write_raster(path, data, meta):
@@ -299,9 +293,9 @@ def write_raster(path, data, meta):
     except OSError as exception:
         if exception.errno != errno.EEXIST:
             raise
-    #ras
+
     meta['dtype'] = data.dtype
-    #
+
     with rasterio.open(path, 'w', **meta) as result:
         try:
             result.write(data)
@@ -321,43 +315,38 @@ def custom_raster_adjustments(raster):
 
 import rasterio
 import numpy as np
+from affine import Affine
 
 
+for index, data in process_df.iterrows():
 
-data = process_df.iterrows().next()[1]
+    print "{0}) {1} {2} {3}".format(index, data['year'], data['path_row'], data['season'])
 
-# for index, data in process_df.iterrows():
-#     print index
-#     print "{0} {1} {2}".format(data['year'], data['path_row'], data['season'])
+    file_list = [
+        filter(
+            lambda x: x.endswith('_sr_ndvi.tif'),
+            [os.path.join(d, f) for f in os.listdir(d)]
+        )
+        for d in data['folder']
+    ]
 
-file_list = [
-    filter(
-        lambda x: x.endswith('_sr_ndvi.tif'),
-        [os.path.join(d, f) for f in os.listdir(d)]
-    )
-    for d in data['folder']
-]
-
-file_list = [y for x in file_list for y in x]
+    file_list = [y for x in file_list for y in x]
 
 
+    # aggregate files for year-season
+    scene_array, scene_profile = aggregate_rasters(file_list, method="max", custom_fun=custom_raster_adjustments)
 
+    scene_season_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/season_scenes"
+    scene_season_name = "{0}_{1}_{2}.tif".format(data['year'], data['path_row'], data['season'])
+    scene_season_path = os.path.join(scene_season_data, scene_season_name)
 
-
-
-# aggregate files for year-season
-scene_array, scene_profile = aggregate_rasters(file_list, method="max", custom_fun=custom_raster_adjustments)
-
-scene_season_data = "/sciclone/aiddata10/REU/projects/afghanistan_gie/season_scenes"
-scene_season_name = "{0}_{1}_{2}.tif".format(data['year'], data['path_row'], data['season'])
-scene_season_path = os.path.join(scene_season_data, scene_season_name)
-
-write_raster(scene_season_path, scene_array, scene_profile)
+    write_raster(scene_season_path, scene_array, scene_profile)
 
 
 
 
 
+assert(0)
 
 
 
