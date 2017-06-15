@@ -8,12 +8,21 @@ import fiona
 
 # -----------------------------------------------------------------------------
 """
+TO run job, use jobscript
+
+For interactive job (debug)
+use following lines to start job, then run (parallel)
+
 qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
 mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclone/home00/sgoodman/active/master/asdf-datasets/data_prep/landsat7/prepare_data.py
 """
 
+# use for testing without access to sciclone filesystem
+# (assumes you are running script out of git repo "~/git/asdf-datasets")
+test_mode = 1
+
 run_scene_unpack = False
-run_season_agg = True
+run_season_agg = False
 
 # mode = "serial"
 mode = "parallel"
@@ -45,7 +54,12 @@ def get_season(month):
 # -----------------------------------------------------------------------------
 # define active path rows
 
-wrs2_path = os.path.join(project_dir, "data_prep/afg_canals_wrs2_descending.shp")
+if test_mode:
+    wrs2_path = os.path.expanduser(
+        "~/git/asdf-datasets/data_prep/landsat7/test_data/afg_canals_wrs2_descending.shp")
+else:
+    wrs2_path = os.path.join(project_dir, "data_prep/afg_canals_wrs2_descending.shp")
+
 wrs2 = fiona.open(wrs2_path)
 
 active_path_row = [str(i['properties']['PR']) for i in wrs2]
@@ -54,14 +68,15 @@ active_path_row = [str(i['properties']['PR']) for i in wrs2]
 # -----------------------------------------------------------------------------
 # prepare data info
 
-# actual
-compressed_data = os.path.join(project_dir, "compressed_landsat")
-file_list = glob.glob(compressed_data+"/*.tar.gz")
 
-
-# test
-# file_df = pd.read_csv("/home/userw/git/asdf-datasets/data_prep/landsat7/test_scene_list.txt", header=None)
-# file_list = list(file_df[0])
+if test_mode:
+    test_scene_list = os.path.expanduser(
+        "~/git/asdf-datasets/data_prep/landsat7/test_data/test_scene_list.txt")
+    file_df = pd.read_csv(test_scene_list, header=None)
+    file_list = list(file_df[0])
+else:
+    compressed_data = os.path.join(project_dir, "compressed_landsat")
+    file_list = glob.glob(compressed_data+"/*.tar.gz")
 
 
 data = []
