@@ -8,13 +8,15 @@ import fiona
 
 # -----------------------------------------------------------------------------
 """
-TO run job, use jobscript
+To run job, use jobscript
 
 For interactive job (debug)
 use following lines to start job, then run (parallel)
 
 qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclone/home00/sgoodman/active/master/asdf-datasets/data_prep/landsat7/prepare_data.py
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi
+    /sciclone/home00/sgoodman/active/master/asdf-datasets/data_prep/landsat7/prepare_data.py
+
 """
 
 # use for testing without access to sciclone filesystem
@@ -422,17 +424,55 @@ if run_season_agg:
 
 
 # -----------------------------------------------------------------------------
+# mosaic scenes for each season
 
+
+from rasterio.merge import merge as mosaic
+
+
+mosaic_df = process_df[['path_row', 'year', 'season']].groupby(
+    ['year', 'season'], as_index=False).aggregate(lambda x: tuple(x))
+
+for index, data in mosaic_df.iterrows():
+    print "{0} {1}".format(data['year'], data['season'])
+    if len(data['path_row']) != len(active_path_row):
+        print data['path_row']
+
+    season_scene_files = [
+        os.path.join(
+            project_dir,
+            "season_scenes",
+            "{0}_{1}_{2}.tif".format(data['year'], pr, data['season']))
+        for pr in data['path_row']
+    ]
+
+    mosaic_output_path = os.path.join(
+        project_dir, "season_mosaics", "{0}_{1}.tif".format(data['year'], data['season']))
+
+    mosaic_scenes = [rasterio.open(path) for path in season_scene_files]
+
+    mosaic_array, transform = merge(mosaic_scenes)
+
+    mosaic_profile = mosaic_scenes[0].profile
+
+    if 'affine' in mosaic_profile:
+        mosaic_profile.pop('affine')
+
+    mosaic_profile["transform"] = transform
+    mosaic_profile['height'] = mosaic_array.shape[1]
+    mosaic_profile['width'] = mosaic_array.shape[2]
+    mosaic_profile['driver'] = 'GTiff'
+
+    with rasterio.open(mosaic_output_path, 'w', **mosaic_profile) as mosaic:
+        mosaic.write(mosaic_array)
+
+    raise
+
+
+# -----------------------------------------------------------------------------
 
 
 assert(0)
-
-
-
-
-
-
-
 
 
 # -----------------------------------------------------------------------------
