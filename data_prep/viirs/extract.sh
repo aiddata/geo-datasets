@@ -4,7 +4,7 @@
 
 src="/sciclone/aiddata10/REU/geo/raw/viirs/source/dnb_composites/v10"
 
-dst="/sciclone/aiddata10/REU/geo/raw/viirs/monthly_vcmcfg_dnb_composites_v10"
+dst="/sciclone/aiddata10/REU/geo/raw/viirs/vcmcfg_dnb_composites_v10/raw_monthly"
 
 cd $src
 

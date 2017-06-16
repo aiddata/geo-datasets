@@ -13,8 +13,9 @@ import numpy as np
 
 # tile_id_list = ["00N060E", "00N060W", "00N180W", "75N060E", "75N060W", "75N180W"]
 
-data_path = "/sciclone/aiddata10/REU/geo/raw/viirs/monthly_vcmcfg_dnb_composites_v10"
-out_path = "/sciclone/aiddata10/REU/geo/data/viirs/vcmcfg_dnb_composites_v10"
+data_path = "/sciclone/aiddata10/REU/geo/raw/viirs/vcmcfg_dnb_composites_v10/raw_monthly"
+out_path = "/sciclone/aiddata10/REU/geo/data/viirs/vcmcfg_dnb_composites_v10/filtered_monthly"
+cloud_count_path = "/sciclone/aiddata10/REU/geo/data/viirs/vcmcfg_dnb_composites_v10/cloud_count"
 
 # minimum cloud free day threshold
 cf_minimum = 2
@@ -92,7 +93,7 @@ def prepare_tiles(tile_id, file_tuples):
 
         # create output folder
         src_dirname = lights_path.split("/")[-2]
-        dst_dir = os.path.join(out_path, "monthly", src_dirname)
+        dst_dir = os.path.join(out_path, src_dirname)
 
         make_dir(dst_dir)
 
@@ -159,7 +160,7 @@ def prepare_tiles(tile_id, file_tuples):
     #  --------------------------------
 
     # build tile cloud summary path and export cumulative mask count for tile
-    tile_output = os.path.join(out_path, "monthly_cloud_sum", tile_id + "_cloud_mask_count.tif")
+    tile_output = os.path.join(cloud_count_path, "tiles", tile_id + "_cloud_mask_count.tif")
 
     with rasterio.open(tile_output, 'w', **tile_profile) as export_tile:
         export_tile.write(tile_cloud_count_array, 1)
@@ -208,12 +209,12 @@ if mode == "serial" or rank == 0:
 
     # mosaic the tiles for the cumulative cloud mask count
 
-    cm_mosaic_path = os.path.join(out_path, "monthly_cloud_sum", "cloud_mask_count_mosaic.tif")
+    cm_mosaic_path = os.path.join(cloud_count_path, "cloud_mask_count_mosaic.tif")
 
 
     # recreate a list of the cumulate cloud count tile outputs
     cm_tiles = [
-        os.path.join(out_path, tile_id + "_cloud_mask_count.tif")
+        os.path.join(cloud_count_path, "tiles", tile_id + "_cloud_mask_count.tif")
         for tile_id in tile_files.keys()
     ]
 
