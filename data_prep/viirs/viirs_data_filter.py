@@ -3,7 +3,7 @@
 
 import os
 import rasterio
-from rasterio.merge import merge
+from rasterio.merge import merge as tile_mosaic
 import numpy as np
 
 
@@ -21,8 +21,14 @@ cf_minimum = 2
 
 # -----------------------------------------------------------------------------
 
-# dict where tile ids are keys and values are list of file_tuples
-# e.g., {"00N060E": [(lights_file, cloud_file), (), ...], "00N060W": [...]}
+"""
+dict where tile ids are keys and values are list of file_tuples
+e.g., {"00N060E": [(lights_file, cloud_file), (), ...], "00N060W": [...]}
+
+this format is used to iterate over all year-months of a single tile before
+moving on to a different tile, so that we only have to store the cumulative
+cloud count for a single tile at a time
+"""
 
 tile_files = {}
 
@@ -50,13 +56,14 @@ for pth, dirs, files in os.walk(data_path):
 
 # -----------------------------------------------------------------------------
 
-# create a list of tiles for later merge
-tile_list = list()
 
-# iterate over one tile section at a time
-for tile_id, file_tuples in tile_files.iteritems():
-
-    print "Processing Tile: {0} ({1} layers)".format(tile_id, len(file_tuples))
+def prepare_tiles(tile_id, file_tuples):
+    """
+    process all monthly tiles for a given tile section at the same time
+    use cloud free layer and 'cf_minimum' threshold to generate mask
+    """
+    print "Processing Tile: {0} ({1} layers)".format(
+        tile_id, len(file_tuples))
 
     tile_cloud_count_array = None
     tile_profile = None
@@ -64,6 +71,8 @@ for tile_id, file_tuples in tile_files.iteritems():
     for lights_path, cloud_path in file_tuples:
 
         print lights_path
+
+        lights_basename = os.path.basename(lights_path)[:-4]
 
         # create output folder
         src_dirname = lights_path.split("/")[-2]
@@ -73,7 +82,8 @@ for tile_id, file_tuples in tile_files.iteritems():
             os.makedirs(dst_dir)
 
         # build output path for filtered lights
-        out_lights = os.path.join(dst_dir, os.path.basename(lights_path)) + ".tif"
+        out_lights = os.path.join(
+            dst_dir, lights_basename) + ".tif"
 
         # read in lights and cloud data
         src_lights = rasterio.open(lights_path)
@@ -91,7 +101,7 @@ for tile_id, file_tuples in tile_files.iteritems():
         # check if cloud and ntl has same dimension
         # raise error if not same dimension
         if array_cloud.shape != array_lights.shape:
-            raise ('The shape of cloud image is not same with ntl image', cloud_path)
+            raise Exception('Cloud/ntl different shapes ', cloud_path)
 
         # generate mask
         mask = (array_cloud <= cf_minimum).astype('uint16')
@@ -99,7 +109,8 @@ for tile_id, file_tuples in tile_files.iteritems():
         # ---------------------------------
 
         # build output path for mask
-        out_mask = os.path.join(dst_dir, os.path.basename(lights_path)) + "_mask.tif"
+        out_mask = os.path.join(
+            dst_dir, lights_basename.split('.')[0]) + ".mask.tif"
 
         with rasterio.open(out_mask, 'w', **profile_cloud) as export_img:
             export_img.write(mask, 1)
@@ -115,10 +126,11 @@ for tile_id, file_tuples in tile_files.iteritems():
         profile_lights['nodata'] = -9999
 
         # converting negative radiance to None data
-        masked2_lights_array = np.where(masked_lights_array < 0, -9999, masked_lights_array)
+        # masked_lights_array = np.where(
+        #     masked_lights_array < 0, -9999, masked_lights_array)
 
         with rasterio.open(out_lights, 'w', **profile_lights) as export_img:
-            export_img.write(masked2_lights_array, 1)
+            export_img.write(masked_lights_array, 1)
 
         # ---------------------------------
 
@@ -131,35 +143,87 @@ for tile_id, file_tuples in tile_files.iteritems():
 
     #  --------------------------------
 
-    # build tile cloud summary path and export
+    # build tile cloud summary path and export cumulative mask count for tile
     tile_output = os.path.join(out_path, tile_id) + "_cloud_mask_count.tif"
 
-    tile_list.append(tile_output)
-
     with rasterio.open(tile_output, 'w', **tile_profile) as export_tile:
-
         export_tile.write(tile_cloud_count_array, 1)
 
 
-# merge tiles
 
-atile_output = os.path.join(out_path, "cloud_mask_count.tif")
+mode = "parallel"
+mode = "serial"
 
-rtiles = [rasterio.open(tile) for tile in tile_list]
+if mode == "parallel":
+    from mpi4py import MPI
+    comm = MPI.COMM_WORLD
+    size = comm.Get_size()
+    rank = comm.Get_rank()
 
-dst_array, transform = merge(rtiles)
+    c = rank
+    while c < len(tile_files):
 
-profile = rtiles[0].profile
+        try:
+            tile_id = tile_files.keys()[c]
+            prepare_tiles(tile_id, tile_files[tile_id])
+        except Exception as e:
+            print "Error processing tile section: {0}".format(c)
+            print e
+            # raise Exception('something')
+
+        c += size
+
+    comm.Barrier()
+
+elif mode == "serial":
+
+    for c in range(len(tile_files)):
+        tile_id = tile_files.keys()[c]
+        prepare_tiles(tile_id, tile_files[tile_id])
+
+else:
+    raise Exception("Invalid `mode` value for script.")
 
 
-if 'affine' in profile:
-        profile.pop('affine')
-
-profile["transform"] = transform
-profile['height'] = dst_array.shape[1]
-profile['width'] = dst_array.shape[2]
-profile['driver'] = 'GTiff'
 
 
-with rasterio.open(atile_output, 'w', **profile) as dst:
-    dst.write(dst_array)
+# -----------------------------------------------------------------------------
+
+
+if mode == "serial" or rank == 0:
+
+    # mosaic the tiles for the cumulative cloud mask count
+
+    cm_mosaic_path = os.path.join(out_path, "cloud_mask_count.tif")
+
+
+    # recreate a list of the cumulate cloud count tile outputs
+    cm_tiles = [
+        os.path.join(out_path, tile_id) + "_cloud_mask_count.tif"
+        for tile_id in tile_files.keys()
+    ]
+
+
+    cm_tiles = [rasterio.open(tile) for tile in cm_tile_list]
+
+    cm_array, cm_transform = tile_mosaic(cm_tiles)
+
+    cm_profile = cm_tiles[0].profile
+
+
+    if 'affine' in cm_profile:
+            cm_profile.pop('affine')
+
+    cm_profile["transform"] = cm_transform
+    cm_profile['height'] = cm_array.shape[1]
+    cm_profile['width'] = cm_array.shape[2]
+    cm_profile['driver'] = 'GTiff'
+
+
+    with rasterio.open(cm_mosaic_path, 'w', **cm_profile) as cm_dst:
+        cm_dst.write(cm_array)
+
+
+
+
+

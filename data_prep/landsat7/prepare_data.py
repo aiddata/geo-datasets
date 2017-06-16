@@ -406,7 +406,6 @@ def run_season_aggregation(process_df, mode):
 
         for c in range(len(process_df)):
             prepare_season(c, process_df.iloc[c])
-            raise
 
     else:
         raise Exception("Invalid `mode` value for script.")
@@ -481,7 +480,7 @@ def run_mosaic_builder(mosaic_df, mode):
                 print "Error building mosaic: {0}".format(c)
                 print e
                 # raise Exception('something')
-            break
+
             c += size
 
         comm.Barrier()
@@ -490,7 +489,6 @@ def run_mosaic_builder(mosaic_df, mode):
 
         for c in range(len(mosaic_df)):
             build_mosaic(c, mosaic_df.iloc[c])
-            raise
 
     else:
         raise Exception("Invalid `mode` value for script.")
@@ -507,9 +505,6 @@ mosaic_df = process_df[['path_row', 'year', 'season']].groupby(
 
 if run_mosaic:
     run_mosaic_builder(mosaic_df, mode)
-
-
-
 
 
 
