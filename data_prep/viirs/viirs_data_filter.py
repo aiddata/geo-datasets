@@ -2,6 +2,7 @@
 
 
 import os
+import errno
 import rasterio
 from rasterio.merge import merge as tile_mosaic
 import numpy as np
@@ -57,6 +58,21 @@ for pth, dirs, files in os.walk(data_path):
 # -----------------------------------------------------------------------------
 
 
+def make_dir(path):
+    """Make directory.
+
+    Args:
+        path (str): absolute path for directory
+
+    Raise error if error other than directory exists occurs.
+    """
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+
+
 def prepare_tiles(tile_id, file_tuples):
     """
     process all monthly tiles for a given tile section at the same time
@@ -78,8 +94,7 @@ def prepare_tiles(tile_id, file_tuples):
         src_dirname = lights_path.split("/")[-2]
         dst_dir = os.path.join(out_path, src_dirname)
 
-        if not os.path.isdir(dst_dir):
-            os.makedirs(dst_dir)
+        make_dir(dst_dir)
 
         # build output path for filtered lights
         out_lights = os.path.join(
@@ -152,7 +167,7 @@ def prepare_tiles(tile_id, file_tuples):
 
 
 mode = "parallel"
-mode = "serial"
+# mode = "serial"
 
 if mode == "parallel":
     from mpi4py import MPI
@@ -168,8 +183,7 @@ if mode == "parallel":
             prepare_tiles(tile_id, tile_files[tile_id])
         except Exception as e:
             print "Error processing tile section: {0}".format(c)
-            print e
-            # raise Exception('something')
+            raise
 
         c += size
 
