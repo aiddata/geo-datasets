@@ -25,6 +25,7 @@ test_mode = 0
 
 run_scene_unpack = False
 run_season_agg = False
+run_mosaic = True
 
 # mode = "serial"
 mode = "parallel"
@@ -427,13 +428,8 @@ if run_season_agg:
 # mosaic scenes for each season
 
 
-from rasterio.merge import merge as scene_mosaic
 
-
-mosaic_df = process_df[['path_row', 'year', 'season']].groupby(
-    ['year', 'season'], as_index=False).aggregate(lambda x: tuple(x))
-
-for index, data in mosaic_df.iterrows():
+def build_mosaic(index, data):
     print "{0} {1}".format(data['year'], data['season'])
     if len(data['path_row']) != len(active_path_row):
         print data['path_row']
@@ -467,6 +463,56 @@ for index, data in mosaic_df.iterrows():
     mosaic = rasterio.open(mosaic_output_path, 'w', **mosaic_profile)
     mosaic.write(mosaic_array)
     mosaic.close()
+
+
+def run_mosaic_builder(mosaic_df, mode):
+    if mode == "parallel":
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        size = comm.Get_size()
+        rank = comm.Get_rank()
+
+        c = rank
+        while c < len(mosaic_df):
+
+            try:
+                build_mosaic(c, mosaic_df.iloc[c])
+            except Exception as e:
+                print "Error building mosaic: {0}".format(c)
+                print e
+                # raise Exception('something')
+            break
+            c += size
+
+        comm.Barrier()
+
+    elif mode == "serial":
+
+        for c in range(len(mosaic_df)):
+            build_mosaic(c, mosaic_df.iloc[c])
+            raise
+
+    else:
+        raise Exception("Invalid `mode` value for script.")
+
+
+
+
+from rasterio.merge import merge as scene_mosaic
+
+
+mosaic_df = process_df[['path_row', 'year', 'season']].groupby(
+    ['year', 'season'], as_index=False).aggregate(lambda x: tuple(x))
+
+
+if run_mosaic:
+    run_mosaic_builder(mosaic_df, mode)
+
+
+
+
+
+
 
 
 # -----------------------------------------------------------------------------
