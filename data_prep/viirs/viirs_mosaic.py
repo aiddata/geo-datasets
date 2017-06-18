@@ -4,10 +4,6 @@ import glob
 from rasterio.merge import merge as scene_mosaic
 
 
-
-compressed_data = os.path.join(project_dir, "compressed_landsat")
-file_list = glob.glob(compressed_data+"/*.tar.gz")
-
 tile_data = "/sciclone/aiddata10/REU/geo/raw/viirs/vcmcfg_dnb_composites_v10/filtered_monthly"
 
 mosaic_data = "/sciclone/aiddata10/REU/geo/data/rasters/external/global/viirs/vcmcfg_dnb_composites_v10/monthly"
