@@ -48,7 +48,7 @@ def run_mosaic(i):
     mosaic_profile['width'] = mosaic_array.shape[2]
     mosaic_profile['driver'] = 'GTiff'
 
-    mosaic_output_path = os.path.join(mosaic_data, "i.tif")
+    mosaic_output_path = os.path.join(mosaic_data, i + ".tif")
 
     make_dir(os.path.dirname(mosaic_output_path))
 
