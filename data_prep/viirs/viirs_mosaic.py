@@ -22,11 +22,11 @@ def make_dir(path):
             raise
 
 
-def run_mosaic(i):
+def run_mosaic(datestr):
 
-    print "Running {0}".format(i)
+    print "Running {0}".format(datestr)
 
-    tile_dir = os.path.join(tile_data, i)
+    tile_dir = os.path.join(tile_data, datestr)
     tile_list = glob.glob(tile_dir + "/*.avg_rade9.tif")
 
     if len(tile_list) != 6:
@@ -48,7 +48,7 @@ def run_mosaic(i):
     mosaic_profile['width'] = mosaic_array.shape[2]
     mosaic_profile['driver'] = 'GTiff'
 
-    mosaic_output_path = os.path.join(mosaic_data, i + ".tif")
+    mosaic_output_path = os.path.join(mosaic_data, datestr + ".tif")
 
     make_dir(os.path.dirname(mosaic_output_path))
 
@@ -56,7 +56,7 @@ def run_mosaic(i):
     mosaic.write(mosaic_array)
     mosaic.close()
 
-    print "\tFinished {0}".format(i)
+    print "\tFinished {0}".format(datestr)
 
 
 
