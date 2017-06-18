@@ -34,6 +34,7 @@ cloud count for a single tile at a time
 
 tile_files = {}
 
+
 for pth, dirs, files in os.walk(data_path):
     for f in files:
 
@@ -128,6 +129,7 @@ def prepare_tiles(tile_id, file_tuples):
         out_mask = os.path.join(
             dst_dir, lights_basename.split('.')[0]) + ".mask.tif"
 
+	make_dir(os.path.dirname(out_mask))
         with rasterio.open(out_mask, 'w', **profile_cloud) as export_img:
             export_img.write(mask, 1)
 
@@ -145,6 +147,7 @@ def prepare_tiles(tile_id, file_tuples):
         # masked_lights_array = np.where(
         #     masked_lights_array < 0, -9999, masked_lights_array)
 
+        make_dir(os.path.dirname(out_lights))
         with rasterio.open(out_lights, 'w', **profile_lights) as export_img:
             export_img.write(masked_lights_array, 1)
 
@@ -162,6 +165,7 @@ def prepare_tiles(tile_id, file_tuples):
     # build tile cloud summary path and export cumulative mask count for tile
     tile_output = os.path.join(cloud_count_path, "tiles", tile_id + "_cloud_mask_count.tif")
 
+    make_dir(os.path.dirname(tile_output))
     with rasterio.open(tile_output, 'w', **tile_profile) as export_tile:
         export_tile.write(tile_cloud_count_array, 1)
 
@@ -219,7 +223,7 @@ if mode == "serial" or rank == 0:
     ]
 
 
-    cm_tiles = [rasterio.open(tile) for tile in cm_tile_list]
+    cm_tiles = [rasterio.open(tile) for tile in cm_tiles]
 
     cm_array, cm_transform = tile_mosaic(cm_tiles)
 
@@ -234,7 +238,7 @@ if mode == "serial" or rank == 0:
     cm_profile['width'] = cm_array.shape[2]
     cm_profile['driver'] = 'GTiff'
 
-
+    make_dir(os.path.dirname(cm_mosaic_path))
     with rasterio.open(cm_mosaic_path, 'w', **cm_profile) as cm_dst:
         cm_dst.write(cm_array)
 
