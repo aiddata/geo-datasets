@@ -1,9 +1,25 @@
 
 import os
+import errno
 import glob
 import rasterio
 from rasterio.merge import merge as scene_mosaic
 
+
+
+def make_dir(path):
+    """Make directory.
+
+    Args:
+        path (str): absolute path for directory
+
+    Raise error if error other than directory exists occurs.
+    """
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
 
 
 def run_mosaic(i):
@@ -34,9 +50,13 @@ def run_mosaic(i):
 
     mosaic_output_path = os.path.join(mosaic_data, "i.tif")
 
+    make_dir(os.path.dirname(mosaic_output_path))
+
     mosaic = rasterio.open(mosaic_output_path, 'w', **mosaic_profile)
     mosaic.write(mosaic_array)
     mosaic.close()
+
+    print "\tFinished {0}".format(i)
 
 
 
