@@ -28,11 +28,7 @@ def make_dir(path):
 
 
 def write_raster(path, data, meta):
-    try:
-        os.makedirs(os.path.dirname(path))
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
+    make_dir(os.path.dirname(path))
 
     meta['dtype'] = data.dtype
 
@@ -248,7 +244,6 @@ tile_qlist.sort()
 def run_yearly_tile_agg(year, tile_id):
     tile_files =  glob.glob(monthly_tiles + "/{0}*/*{1}*.avg_rade9.tif".format(year, tile_id))
     year_dir = os.path.join(yearly_tiles, year)
-    make_dir(year_dir)
     for method in aggregation_methods:
         print "Running {0} {1} {2}".format(year, tile_id, method)
         array, profile = aggregate_rasters(tile_files, method=method)
@@ -306,7 +301,6 @@ def run_yearly_tile_mosaic(year, method):
     array, profile = create_mosaic(tile_list)
 
     mosaic_output_path = os.path.join(yearly_mosaics, method, "{0}_{1}.tif".format(year, method))
-    make_dir(os.path.dirname(mosaic_output_path))
     write_raster(mosaic_output_path, array, profile)
 
     print "\tFinished {0} {1}".format(year, method)
