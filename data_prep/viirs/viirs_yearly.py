@@ -324,7 +324,7 @@ if mode == "parallel":
         try:
             run_yearly_tile_mosaic(*tile_qlist[c])
         except Exception as e:
-            print "Error processing tiles: {0}".format(tile_qlist[c])
+            print "Error processing mosaic: {0}".format(tile_qlist[c])
             raise
 
         c += size
@@ -337,7 +337,7 @@ elif mode == "serial":
         try:
             run_yearly_tile_mosaic(*tile_qlist[c])
         except Exception as e:
-            print "Error processing tiles: {0}".format(tile_qlist[c])
+            print "Error processing mosaic: {0}".format(tile_qlist[c])
             raise
 
 else:
