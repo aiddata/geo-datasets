@@ -234,7 +234,7 @@ for year in year_month_dict.keys():
 
 
 tile_qlist = [(year, tile_id) for year in year_month_dict.keys() for tile_id in tile_id_list]
-
+tile_qlist.sort()
 
 def run_yearly_tile_agg(year, tile_id):
     tile_files =  glob.glob(monthly_tiles + "/{0}*/*{1}*.avg_rade9.tif".format(year, tile_id))
@@ -284,7 +284,7 @@ else:
 
 
 agg_qlist = [(year, method) for year in year_month_dict.keys() for method in aggregation_methods]
-
+agg_qlist.sort()
 
 def run_yearly_tile_mosaic(year, method):
     print "Running {0} {1}".format(year, method)
@@ -292,7 +292,7 @@ def run_yearly_tile_mosaic(year, method):
     tile_list = glob.glob(yearly_tiles + "/{0}/{0}_*_{1}.tif".format(year, method))
 
     if len(tile_list) != 6:
-        raise Exception("Bad tile count ({0})".format(len(tile_list)))
+        raise Exception("Bad tile count ({0} {1}: {2})".format(year, method, len(tile_list)))
 
     array, profile = create_mosaic(tile_list)
 
