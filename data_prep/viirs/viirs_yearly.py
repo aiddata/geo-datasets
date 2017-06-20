@@ -46,6 +46,23 @@ def write_raster(path, data, meta):
             raise
 
 
+def adjust_pixel_coordinate(val, res):
+    """adjust pixel coordinates to uniform grid
+
+    this function uses arbitrary grid based at (0,0)
+    specifically for afghanistan (lon, lat both positive)
+
+    needed for landsat (30m or 0.0002695) resolution because 1 degree
+    cannot be cleanly divided by the pixel resolution
+    """
+    mod = val % res
+    if mod < res * 0.5:
+        new = val - mod
+    else:
+        new = val + res - mod
+    return new
+
+
 def aggregate_rasters(file_list, method="mean", custom_fun=None):
     """Aggregate multiple rasters
 
@@ -69,10 +86,6 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
         try:
             raster = rasterio.open(file_path)
             meta_list.append(raster.meta)
-            # print "hi"
-            # print raster.meta
-            # print raster.profile
-            # print "bye"
         except:
             print "Could not include file in aggregation ({0})".format(file_path)
 
@@ -189,11 +202,7 @@ def create_mosaic(tile_list):
     return mosaic_array, mosaic_profile
 
 
-
-
 # -----------------------------------------------------------------------------
-
-
 
 
 mode = "parallel"
