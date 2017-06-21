@@ -153,22 +153,20 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
                 # store = np.vstack([store, active]).max(axis=0)
 
             elif method == "mean":
-            #     if ix == 1:
-            #         weights = (~store.mask).astype(int)
-            #     store = np.ma.average(np.ma.array((store, active)), axis=0,
-            #                           weights=[weights, (~active.mask).astype(int)])
-            #     weights += (~active.mask).astype(int)
-
-                store = np.ma.array((store*ix, active)).sum(axis=0) / (ix+1)
+                if ix == 1:
+                    weights = (~store.mask).astype(int)
+                store = np.ma.average(np.ma.array((store, active)), axis=0,
+                                      weights=[weights, (~active.mask).astype(int)])
+                weights += (~active.mask).astype(int)
 
             elif method == "min":
                 store = np.ma.array((store, active)).min(axis=0)
             elif method == "sum":
                 store = np.ma.array((store, active)).sum(axis=0)
-            elif method == "var":
-                store = np.ma.array((store, active)).var(axis=0)
-            elif method == "sd":
-                store = np.ma.array((store, active)).std(axis=0)
+            # elif method == "var":
+            #     store = np.ma.array((store, active)).var(axis=0)
+            # elif method == "sd":
+            #     store = np.ma.array((store, active)).std(axis=0)
 
             else:
                 raise Exception("Invalid method")
@@ -221,9 +219,8 @@ yearly_mosaics = "/sciclone/aiddata10/REU/geo/data/rasters/external/global/viirs
 
 tile_id_list = ["00N060E", "00N060W", "00N180W", "75N060E", "75N060W", "75N180W"]
 
-aggregation_methods = ["max", "mean", "var", "std"]
-aggregation_methods = ["mean"]
-aggregation_methods = ["max", "var", "std"]
+# aggregation_methods = ["max", "mean", "var", "std"]
+aggregation_methods = ["max"]
 
 
 # -----------------------------------------------------------------------------
