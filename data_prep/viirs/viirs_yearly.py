@@ -152,7 +152,7 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
                 # store = np.maximum.reduce([store, active])
                 # store = np.vstack([store, active]).max(axis=0)
 
-            # elif method == "mean":
+            elif method == "mean":
             #     if ix == 1:
             #         weights = (~store.mask).astype(int)
             #     store = np.ma.average(np.ma.array((store, active)), axis=0,
@@ -205,6 +205,10 @@ def create_mosaic(tile_list):
 # -----------------------------------------------------------------------------
 
 
+run_agg = False
+run_mosaic = True
+
+
 mode = "parallel"
 # mode = "serial"
 
@@ -218,6 +222,7 @@ yearly_mosaics = "/sciclone/aiddata10/REU/geo/data/rasters/external/global/viirs
 tile_id_list = ["00N060E", "00N060W", "00N180W", "75N060E", "75N060W", "75N180W"]
 
 aggregation_methods = ["max", "mean", "var", "std"]
+aggregation_methods = ["mean"]
 
 
 # -----------------------------------------------------------------------------
@@ -258,35 +263,37 @@ def run_yearly_tile_agg(year, tile_id):
         print "\tFinished {0} {1} {2}".format(year, tile_id, method)
 
 
-if mode == "parallel":
-    from mpi4py import MPI
-    comm = MPI.COMM_WORLD
-    size = comm.Get_size()
-    rank = comm.Get_rank()
+if run_agg:
 
-    c = rank
-    while c < len(tile_qlist):
-        try:
-            run_yearly_tile_agg(*tile_qlist[c])
-        except Exception as e:
-            print "Error processing tiles: {0}".format(tile_qlist[c])
-            raise
+    if mode == "parallel":
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        size = comm.Get_size()
+        rank = comm.Get_rank()
 
-        c += size
+        c = rank
+        while c < len(tile_qlist):
+            try:
+                run_yearly_tile_agg(*tile_qlist[c])
+            except Exception as e:
+                print "Error processing tiles: {0}".format(tile_qlist[c])
+                raise
 
-    comm.Barrier()
+            c += size
 
-elif mode == "serial":
+        comm.Barrier()
 
-    for c in range(len(tile_qlist)):
-        try:
-            run_yearly_tile_agg(*tile_qlist[c])
-        except Exception as e:
-            print "Error processing tiles: {0}".format(tile_qlist[c])
-            raise
+    elif mode == "serial":
 
-else:
-    raise Exception("Invalid `mode` value for script.")
+        for c in range(len(tile_qlist)):
+            try:
+                run_yearly_tile_agg(*tile_qlist[c])
+            except Exception as e:
+                print "Error processing tiles: {0}".format(tile_qlist[c])
+                raise
+
+    else:
+        raise Exception("Invalid `mode` value for script.")
 
 
 # -----------------------------------------------------------------------------
@@ -311,35 +318,36 @@ def run_yearly_tile_mosaic(year, method):
     print "\tFinished {0} {1}".format(year, method)
 
 
+if run_mosaic:
 
-if mode == "parallel":
-    from mpi4py import MPI
-    comm = MPI.COMM_WORLD
-    size = comm.Get_size()
-    rank = comm.Get_rank()
+    if mode == "parallel":
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        size = comm.Get_size()
+        rank = comm.Get_rank()
 
-    c = rank
-    while c < len(tile_qlist):
-        try:
-            run_yearly_tile_mosaic(*tile_qlist[c])
-        except Exception as e:
-            print "Error processing mosaic: {0}".format(tile_qlist[c])
-            raise
+        c = rank
+        while c < len(agg_qlist):
+            try:
+                run_yearly_tile_mosaic(*agg_qlist[c])
+            except Exception as e:
+                print "Error processing mosaic: {0}".format(agg_qlist[c])
+                raise
 
-        c += size
+            c += size
 
-    comm.Barrier()
+        comm.Barrier()
 
-elif mode == "serial":
+    elif mode == "serial":
 
-    for c in range(len(tile_qlist)):
-        try:
-            run_yearly_tile_mosaic(*tile_qlist[c])
-        except Exception as e:
-            print "Error processing mosaic: {0}".format(tile_qlist[c])
-            raise
+        for c in range(len(agg_qlist)):
+            try:
+                run_yearly_tile_mosaic(*agg_qlist[c])
+            except Exception as e:
+                print "Error processing mosaic: {0}".format(agg_qlist[c])
+                raise
 
-else:
-    raise Exception("Invalid `mode` value for script.")
+    else:
+        raise Exception("Invalid `mode` value for script.")
 
 
