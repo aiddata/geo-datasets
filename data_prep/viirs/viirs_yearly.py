@@ -246,6 +246,7 @@ def run_yearly_tile_agg(year, tile_id):
     year_dir = os.path.join(yearly_tiles, year)
     for method in aggregation_methods:
         print "Running {0} {1} {2}".format(year, tile_id, method)
+        array = None
         array, profile = aggregate_rasters(tile_files, method=method)
         file_name = "{0}_{1}_{2}.tif".format(year, tile_id, method)
         path = os.path.join(year_dir, file_name)
