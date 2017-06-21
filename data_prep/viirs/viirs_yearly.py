@@ -205,7 +205,7 @@ def create_mosaic(tile_list):
 # -----------------------------------------------------------------------------
 
 
-run_agg = False
+run_agg = True
 run_mosaic = True
 
 
@@ -223,6 +223,7 @@ tile_id_list = ["00N060E", "00N060W", "00N180W", "75N060E", "75N060W", "75N180W"
 
 aggregation_methods = ["max", "mean", "var", "std"]
 aggregation_methods = ["mean"]
+aggregation_methods = ["max", "var", "std"]
 
 
 # -----------------------------------------------------------------------------
