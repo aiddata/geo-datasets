@@ -151,12 +151,16 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
                 # non masked array alternatives
                 # store = np.maximum.reduce([store, active])
                 # store = np.vstack([store, active]).max(axis=0)
-            elif method == "mean":
-                if ix == 1:
-                    weights = (~store.mask).astype(int)
-                store = np.ma.average(np.ma.array((store, active)), axis=0,
-                                      weights=[weights, (~active.mask).astype(int)])
-                weights += (~active.mask).astype(int)
+
+            # elif method == "mean":
+            #     if ix == 1:
+            #         weights = (~store.mask).astype(int)
+            #     store = np.ma.average(np.ma.array((store, active)), axis=0,
+            #                           weights=[weights, (~active.mask).astype(int)])
+            #     weights += (~active.mask).astype(int)
+
+                store = np.ma.array((store*ix, active)).sum(axis=0) / (ix+1)
+
             elif method == "min":
                 store = np.ma.array((store, active)).min(axis=0)
             elif method == "sum":
