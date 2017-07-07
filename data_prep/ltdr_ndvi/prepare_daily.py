@@ -58,7 +58,7 @@ build_list = [
 
 src_base = "/sciclone/aiddata10/REU/geo/raw/ltdr/ltdr.nascom.nasa.gov/allData/Ver4"
 
-dst_base = "/sciclone/aiddata10/REU/data/rasters/external/global/ltdr/avhrr_ndvi_v4_03"
+dst_base = "/sciclone/aiddata10/REU/data/rasters/external/global/ltdr/avhrr_ndvi_v4"
 
 
 
