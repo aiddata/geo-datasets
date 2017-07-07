@@ -1,8 +1,8 @@
 #!/bin/tcsh
 #PBS -N asg:ltdr_ndvi
-#PBS -l nodes=5:c18c:ppn=16
+#PBS -l nodes=7:c18c:ppn=16
 #PBS -l walltime=48:00:00
 #PBS -j oe
 
 
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi ~/active/master/asdf-datasets/data_prep/ltdr_ndvi/prepare_daily.py
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 112 python-mpi ~/active/master/asdf-datasets/data_prep/ltdr_ndvi/prepare_daily.py
