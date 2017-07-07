@@ -1,11 +1,8 @@
 #!/bin/bash
 
+# download viirs monthly/yearly dnb composites
 
-# dst="/sciclone/aiddata10/REU/raw/viirs/"
 
-# src="https://data.ngdc.noaa.gov/instruments/remote-sensing/passive/spectrometers-radiometers/imaging/viirs/dnb_composites/v10"
-
-# wget -r -c -N -nH --cut-dirs=6 --level=0 --accept tgz -P ${dst} ${src}
 
 
 

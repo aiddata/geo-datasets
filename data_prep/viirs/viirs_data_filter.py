@@ -1,4 +1,10 @@
-
+"""
+filters "raw_monthly" vcmcfg tiles based on minimum cloud free scenes
+threshold to produce "filter_monthly" along with "cloud count" tiles
+aggregates and mosaic. cloud count layer pixels represent sum of pixels
+across all process tiles where cloud free observation were below specified
+threshold
+"""
 
 
 import os

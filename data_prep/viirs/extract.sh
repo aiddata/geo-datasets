@@ -1,6 +1,8 @@
 #!/bin/bash
 
-
+# unzip monthly data from viirs dnb composite downloads
+# ignores yearly data via regex on files
+# only unzips vcmcfg (no stray light correction)
 
 src="/sciclone/aiddata10/REU/geo/raw/viirs/source/dnb_composites/v10"
 

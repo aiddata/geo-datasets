@@ -1,3 +1,6 @@
+"""
+produces monthly mosaics (final monthly product) from filtered monthly tiles
+"""
 
 import os
 import errno

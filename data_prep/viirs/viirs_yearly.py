@@ -1,4 +1,7 @@
-
+"""
+aggregates monthly tiles to yearly and creates yearly
+mosaics (final yearly product)
+"""
 
 import os
 import errno
