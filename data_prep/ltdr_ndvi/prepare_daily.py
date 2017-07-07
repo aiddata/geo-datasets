@@ -51,8 +51,8 @@ if mode == "parallel":
 
 build_list = [
     "daily",
-    "monthly",
-    "yearly"
+    # "monthly",
+    # "yearly"
 ]
 
 
@@ -333,6 +333,7 @@ def aggregate_rasters(file_list, method="mean"):
         result: rasterio Raster instance
     """
 
+    store = None
     for ix, file_path in enumerate(file_list):
 
         try:
@@ -343,7 +344,7 @@ def aggregate_rasters(file_list, method="mean"):
 
         active = raster.read(masked=True)
 
-        if ix == 0:
+        if store is None:
             store = active.copy()
 
         else:
@@ -488,7 +489,8 @@ for year in ref:
 # make sure to add final month of final year
 month_qlist.append((year, month, month_files))
 
-for i in month_qlist: print "{0} {1} {2}".format(i[0], i[1], len(i[2]))
+if mode == "serial" or rank == 0:
+    for i in month_qlist: print "{0} {1} {2}".format(i[0], i[1], len(i[2]))
 
 # filter out months with insufficient data
 minimum_days_in_month = 20
