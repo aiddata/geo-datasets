@@ -215,7 +215,12 @@ def process_daily_data(input_path, output_dir):
 
     # clean data
     band_array = band_ds.ReadAsArray().astype(np.int16)
-    band_array[np.where(band_array < 0)] = -9999
+
+    # band_array[np.where(band_array < 0)] = -9999
+
+    band_array[np.where((band_array < 0) & (band_array > -9999))] = 0
+    band_array[np.where(band_array > 10000)] = 10000
+
 
 
     # prep projections and transformations
