@@ -72,9 +72,9 @@ filter_options = {
     'sensor_accept': [],
     'use_sensor_deny': False,
     'sensor_deny': [],
-    'use_year_accept': True,
+    'use_year_accept': False,
     'year_accept': ['1987'],
-    'use_year_deny': False,
+    'use_year_deny': True,
     'year_deny': ['2017']
 }
 
@@ -429,7 +429,6 @@ if "daily" in build_list:
             except Exception as e:
                 print "Error processing day: {0} {1} ({2})".format(*day_qlist[c])
                 print e
-                raise
                 # raise Exception('day processing')
 
             c += size
