@@ -4,4 +4,4 @@
 #PBS -l walltime=24:00:00
 #PBS -j oe
 
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 16 python-mpi /sciclone/home00/sgoodman/active/master/asdf-datasets/data_prep/viirs/viirs_data_filter.py
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 16 python-mpi ~/active/master/asdf-datasets/data_prep/viirs/viirs_data_filter.py
