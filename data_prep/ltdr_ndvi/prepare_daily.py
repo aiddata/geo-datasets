@@ -50,8 +50,8 @@ if mode == "parallel":
 
 
 build_list = [
-    "daily",
-    # "monthly",
+    # "daily",
+    "monthly",
     # "yearly"
 ]
 
@@ -511,7 +511,7 @@ if "monthly" in build_list:
                 prep_monthly_data(month_qlist[c], dst_base)
             except Exception as e:
                 print "Error processing month: {0} {1}".format(month_qlist[c][0], month_qlist[c][1])
-                raise
+                # raise
                 print e
                 # raise Exception('month processing')
 
@@ -564,7 +564,7 @@ if "yearly" in build_list:
                 prep_yearly_data(year_qlist[c], dst_base)
             except Exception as e:
                 print "Error processing year: {0}".format(year_qlist[c][0])
-                raise
+                # raise
                 print e
                 # raise Exception('year processing')
 
