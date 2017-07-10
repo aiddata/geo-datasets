@@ -51,8 +51,8 @@ if mode == "parallel":
 
 build_list = [
     # "daily",
-    "monthly",
-    # "yearly"
+    # "monthly",
+    "yearly"
 ]
 
 
