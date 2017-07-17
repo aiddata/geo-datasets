@@ -24,7 +24,8 @@ with rasterio.open(src_path) as src:
     profile = src.profile
     profile.update(count=1)
 
-    for i in range(1, 25):
+    # 24 years/bands
+    for i in range(24):
 
         year = start_year + i
         band = i + 1
