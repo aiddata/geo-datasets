@@ -13,8 +13,8 @@ python ~/active/master/asdf-datasets/data_prep/esa_landcover/build_layers.py
 import rasterio
 
 
-src_path = "/sciclone/aiddata/REU/geo/raw/esa_landcover_v207/ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7.tif"
-dst_dir_path = "/sciclone/aiddata/REU/geo/data/rasters/esa_landcover_v207"
+src_path = "/sciclone/aiddata10/REU/geo/raw/esa_landcover_v207/ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7.tif"
+dst_dir_path = "/sciclone/aiddata10/REU/geo/data/rasters/esa_landcover_v207"
 
 
 start_year = 1992
