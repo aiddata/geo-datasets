@@ -13,8 +13,6 @@ import math
 
 from distancerasters import rasterize, export_raster
 
-# testtesttesttesttesttesttesttesttesttesttesttest
-
 # -----------------------------------------------------------------------------
 
 shp_path = r"/Users/miranda/Documents/AidData/sciclone/datasets/UCDP_GED_conflict/ucdp-ged-poly-v-1-1-shape/UCDPGEDpolyyear.shp"
