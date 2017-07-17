@@ -3,9 +3,9 @@
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "ucdp_fatality_Non-state_YYYY.tif",
-    "title": "UCDP Non-state Conflict Events deaths",
-    "description": "Number of total fatalities per 0.01 decimal degree grid cell resulting from non-state conflict event using UCDP Georeferenced Event Dataset (GED) global version 17.1. Definition of ucdp violence type can be found: http://www.pcr.uu.se/research/ucdp/definitions/",
+    "name": "ucdp_fatality_YYYY.tif",
+    "title": "UCDP Conflict Deaths",
+    "description": "Number of total fatalities per 0.01 decimal degree grid cell resulting from conflict event using UCDP Georeferenced Event Dataset (GED) global version 17.1. ",
     "version": 1,
     "options": {
         "resolution": 0.01,
@@ -18,14 +18,14 @@
             "min": "minimum fatalities per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "the best estimate of total fatalities resulting from an oon-state conflict event",
-        "mini_name": "und"
+        "variable_description": "the best estimate of total fatalities resulting from conflict events",
+        "mini_name": "ucd"
     },
     "extras": {
         "citation": "Sundberg, Ralph, and Erik Melander, 2013, “Introducing the UCDP Georeferenced Event Dataset”, Journal of Peace Research, vol.50, no.4, 523-532 \n Croicu, Mihai and Ralph Sundberg, 2017, “UCDP GED Codebook version 17.1”, Department of Peace and Conflict Research, Uppsala University",
         "sources_web": "http://ucdp.uu.se/downloads/",
         "sources_name": "UCDP",
-        "tags": ["ucdp", "conflict", "non-state", "fatality"]
+        "tags": ["ucdp", "conflict", "fatality", "global"]
     },
     "active": 1
 }

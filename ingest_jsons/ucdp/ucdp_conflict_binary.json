@@ -2,10 +2,10 @@
     "base": "",
     "type": "raster",
     "file_extension": ".tif",
-    "file_mask": "udcp_One-sided_YYYY.tif",
-    "name": "udcp_One-sided_binary",
-    "title": "UDCP One-sided Conflict Events",
-    "description": "Number of one-sided conflict event counts per 0.01 decimal degree grid cell using UCDP GED polygon 1.1. Definition of ucdp violence type can be found: http://www.pcr.uu.se/research/ucdp/definitions/",
+    "file_mask": "ucdp_conflict_YYYY.tif",
+    "name": "ucdp_conflict_binary",
+    "title": "UCDP Conflict Events",
+    "description": "Number of conflict event counts per 0.01 decimal degree grid cell using UCDP GED polygon 1.1. Definition of ucdp violence type can be found: http://www.pcr.uu.se/research/ucdp/definitions/",
     "version": 1,
     "options": {
         "resolution": 0.01,
@@ -17,13 +17,13 @@
         },
         "factor": 1,
         "variable_description": "count of conflict events",
-        "mini_name": "uob"
+        "mini_name": "uce"
     },
     "extras": {
         "citation": "Croicu, Mihai and Ralph Sundberg, 2012, “UCDP GED Conflict Polygons Dataset”, Department of Peace and Conflict Research, Uppsala University",
         "sources_web": "http://ucdp.uu.se/downloads/",
-        "sources_name": "UDCP",
-        "tags": ["udcp", "conflict", "africa", "one-sided"]
+        "sources_name": "UCDP",
+        "tags": ["ucdp", "conflict", "africa"]
     },
     "active": 1
 }
