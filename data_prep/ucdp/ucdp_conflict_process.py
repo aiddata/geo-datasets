@@ -16,17 +16,17 @@ from distancerasters import rasterize, export_raster
 
 # -----------------------------------------------------------------------------
 
-# shp_path = r"/Users/miranda/Documents/AidData/sciclone/datasets/UCDP_GED_conflict/ucdp-ged-poly-v-1-1-shape/UCDPGEDpolyyear.shp"
+shp_path = r"/Users/miranda/Documents/AidData/sciclone/datasets/UCDP_GED_conflict/ucdp-ged-poly-v-1-1-shape/UCDPGEDpolyyear.shp"
 
-shp_path = "/sciclone/home10/zlv/datasets/ucdp/ucdp-ged-poly-v-1-1-shape/UCDPGEDpolyyear.shp"
+# shp_path = "/sciclone/home10/zlv/datasets/ucdp/ucdp-ged-poly-v-1-1-shape/UCDPGEDpolyyear.shp"
 
 pixel_size = 0.01
 
-field_name = "type_of_vi"
-field_values = {1: "State-based", 2: "Non-state", 3: "One-sided"}
+# field_name = "type_of_vi"
+# field_values = {1: "State-based", 2: "Non-state", 3: "One-sided"}
 
-final_output = "/sciclone/data20/zlv/ucdp/output_africa"
-# final_output = "/Users/miranda/Documents/AidData/sciclone/datasets/UCDP_GED_conflict/output_africa"
+# final_output = "/sciclone/data20/zlv/ucdp/output_africa"
+final_output = "/Users/miranda/Documents/AidData/sciclone/datasets/UCDP_GED_conflict/output_africa"
 
 # -----------------------------------------------------------------------------
 
@@ -56,31 +56,27 @@ affine = Affine(pixel_size, 0, minx,
 t1 = time.time()
 
 
-for cat in field_values.keys():
+for year in range(1989, 2011):
+    features_filtered = [f for f in features_input
+                        if (f["properties"]["year"] == year)]
 
-    for year in range(1989, 2011):
-        features_filtered = [f for f in features_input
-                             if (f["properties"][field_name] == cat) and (f["properties"]["year"] == year)]
+    print "selected {0} features for year: {1}".format(
+            len(features_filtered), year)
 
-        # build intermediary rasters for individual categories/years
-
-        print "selected {0} features for field: {1}, and year: {2}".format(
-            len(features_filtered), cat, year)
-
-        if len(features_filtered) == 0:
-            print "\tno feature selected for violence type {0} and year {1}".format(cat, year)
-            pass
+    if len(features_filtered) == 0:
+        print "\tno feature selected for year {1}".format(year)
+        pass
 
 
-        else:
+    else:
 
-            cat_raster, _ = rasterize(features_filtered, affine=affine, shape=out_shape)
+        cat_raster, _ = rasterize(features_filtered, affine=affine, shape=out_shape)
 
 
-        output_file = "ucdp_" + field_values[cat] + "_" + str(year) + ".tif"
-        output_path = os.path.join(final_output, output_file)
+    output_file = "ucdp_conflict_" + str(year) + ".tif"
+    output_path = os.path.join(final_output, output_file)
 
-        export_raster(cat_raster, affine=affine, path=output_path, out_dtype='float64', nodata=None)
+    export_raster(cat_raster, affine=affine, path=output_path, out_dtype='float64', nodata=None)
 
 t2 = time.time()
 
