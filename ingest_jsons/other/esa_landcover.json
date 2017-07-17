@@ -3,11 +3,11 @@
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "esa_lc_YYYY.tif",
-    "name": "esa_landcover_v2.0.7",
+    "name": "esa_landcover_v207",
     "title": "ESA Land Cover (version 2.0.7)",
     "description": "ESA land cover class data product defined based on the UN Land Cover Classification System (LCCS).",
-    "detail": "The ESA land cover column names in export file are shorten to fit aiddata geoquery data schema. The full name of each class can be found from land cover map user guide: http://maps.elie.ucl.ac.be/CCI/viewer/download.php",
-    "version": 2.0.7,
+    "details": "The ESA land cover column names in export file are modified for readability and ease of use. The full name of each class can be found from land cover map user guide: http://maps.elie.ucl.ac.be/CCI/viewer/download.php",
+    "version": "2.0.7",
     "options": {
         "resolution": 0.0027027,
         "extract_types": ["categorical", "count"],
@@ -17,7 +17,6 @@
         },
         "factor": 1,
         "variable_description": "UN Land Cover Classification System (LCCS)",
-        "mini_name": "esalc"
     },
     "extras": {
         "citation": "Defourny, P. (2017): ESA Land Cover Climate Change Initiative (Land_Cover_cci): Land Cover Maps, v2.0.7. Centre for Environmental Data Analysis, 7/2017",
