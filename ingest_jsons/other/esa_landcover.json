@@ -1,5 +1,5 @@
 {
-    "base": "",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/esa_landcover_v207",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "esa_lc_YYYY.tif",
