@@ -18,7 +18,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
 	    "factor": 1,
-        "variable_description": "Radiance (nW cm^-2 sr^-1)",
+        "variable_description": "Radiance (nW cm^-2 sr^-1)"
 	},
 	"extras": {
 	    "citation": "Elvidge, Christopher & Baugh, Kimberly & Zhizhin, Mikhail & Chi Hsu, Feng & Tilottama, Ghosh. (2017). VIIRS night-time lights. International Journal of Remote Sensing. 1-20. 10.1080/01431161.2017.1342050.",
