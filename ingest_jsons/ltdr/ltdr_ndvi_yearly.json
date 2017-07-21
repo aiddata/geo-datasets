@@ -10,7 +10,7 @@
 	"version": 4,
 	"options": {
 	    "resolution": 0.05,
-        "extract_types": ["max", "mean", "min"],
+        "extract_types": ["max", "mean", "min", "count"],
         "extract_types_info" : {
             "max" : "maximum NDVI value per unit of analysis",
             "mean" : "average NDVI value per unit of analysis",
