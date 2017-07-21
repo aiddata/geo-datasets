@@ -16,7 +16,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "UN Land Cover Classification System (LCCS)",
+        "variable_description": "UN Land Cover Classification System (LCCS)"
     },
     "extras": {
         "citation": "Defourny, P. (2017): ESA Land Cover Climate Change Initiative (Land_Cover_cci): Land Cover Maps, v2.0.7. Centre for Environmental Data Analysis, 7/2017",
