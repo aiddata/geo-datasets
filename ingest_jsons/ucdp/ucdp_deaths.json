@@ -1,0 +1,29 @@
+{
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/ucdp/ged_global_171",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "ucdp_deaths_YYYY.tif",
+    "title": "UCDP Conflict Deaths",
+    "description": "Number of total fatalities per 0.01 decimal degree grid cell resulting from conflict event using UCDP Georeferenced Event Dataset (GED) global version 17.1. ",
+    "details": "",
+    "version": 17.1,
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["sum", "count"],
+        "extract_types_info" : {
+            "sum": "sum of fatalities per unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "the best estimate of total fatalities resulting from conflict events"
+    },
+    "extras": {
+        "citation": "Sundberg, Ralph, and Erik Melander, 2013, 'Introducing the UCDP Georeferenced Event Dataset', Journal of Peace Research, vol.50, no.4, 523-532 \n Croicu, Mihai and Ralph Sundberg, 2017, “UCDP GED Codebook version 17.1”, Department of Peace and Conflict Research, Uppsala University",
+        "sources_web": "http://ucdp.uu.se/downloads/",
+        "sources_name": "UCDP",
+        "tags": ["ucdp", "conflict", "deaths"]
+    },
+    "active": 1
+}
+
