@@ -19,7 +19,7 @@
         "variable_description": "the best estimate of total fatalities resulting from conflict events"
     },
     "extras": {
-        "citation": "Sundberg, Ralph, and Erik Melander, 2013, “Introducing the UCDP Georeferenced Event Dataset”, Journal of Peace Research, vol.50, no.4, 523-532 \n Croicu, Mihai and Ralph Sundberg, 2017, “UCDP GED Codebook version 17.1”, Department of Peace and Conflict Research, Uppsala University",
+        "citation": "Sundberg, Ralph, and Erik Melander, 2013, 'Introducing the UCDP Georeferenced Event Dataset', Journal of Peace Research, vol.50, no.4, 523-532 \n Croicu, Mihai and Ralph Sundberg, 2017, “UCDP GED Codebook version 17.1”, Department of Peace and Conflict Research, Uppsala University",
         "sources_web": "http://ucdp.uu.se/downloads/",
         "sources_name": "UCDP",
         "tags": ["ucdp", "conflict", "deaths"]

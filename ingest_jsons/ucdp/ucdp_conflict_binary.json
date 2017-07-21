@@ -19,7 +19,7 @@
         "variable_description": "binary indicating conflict events"
     },
     "extras": {
-        "citation": "Croicu, Mihai and Ralph Sundberg, 2012, “UCDP GED Conflict Polygons Dataset”, Department of Peace and Conflict Research, Uppsala University",
+        "citation": "Croicu, Mihai and Ralph Sundberg, 2012, 'UCDP GED Conflict Polygons Dataset', Department of Peace and Conflict Research, Uppsala University",
         "sources_web": "http://ucdp.uu.se/downloads/",
         "sources_name": "UCDP",
         "tags": ["ucdp", "conflict", "africa"]

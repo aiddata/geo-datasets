@@ -22,7 +22,7 @@
         "citation": "Defourny, P. (2017): ESA Land Cover Climate Change Initiative (Land_Cover_cci): Land Cover Maps, v2.0.7. Centre for Environmental Data Analysis, 7/2017",
         "sources_web": "https://www.esa-landcover-cci.org",
         "sources_name": "European Space Agency",
-        "tags": [ "esa", "land cover", "environment"],
+        "tags": [ "esa", "landcover", "environment"],
         "category_map": {
             "no_data": 0,
             "cropland_rainfed": 10,
