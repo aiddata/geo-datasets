@@ -1,23 +1,22 @@
 {
-    "base": "",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/ucdp/ged_polygons_v-1-1",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "ucdp_conflict_YYYY.tif",
     "name": "ucdp_conflict_binary",
-    "title": "UCDP Conflict Events",
-    "description": "Number of conflict event counts per 0.01 decimal degree grid cell using UCDP GED polygon 1.1. Definition of ucdp violence type can be found: http://www.pcr.uu.se/research/ucdp/definitions/",
+    "title": "UCDP Conflict Events (in Africa)",
+    "description": "Binary indicating areas of conflict event based on UCDP GED Polygons v1.1.",
+    "details": "Definition of ucdp violence type can be found: http://www.pcr.uu.se/research/ucdp/definitions/",
     "version": 1,
     "options": {
         "resolution": 0.01,
-        "extract_types": ["sum", "mean", "count"],
+        "extract_types": ["sum", "count"],
         "extract_types_info" : {
-            "sum": "count of conflict events per unit of analysis",
-            "mean" : "ratio of count of conflict events to pixel count within each unit of analysis",
+            "sum": "count of pixels where conflict occured per unit of analysis",
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "count of conflict events",
-        "mini_name": "uce"
+        "variable_description": "binary indicating conflict events"
     },
     "extras": {
         "citation": "Croicu, Mihai and Ralph Sundberg, 2012, “UCDP GED Conflict Polygons Dataset”, Department of Peace and Conflict Research, Uppsala University",
