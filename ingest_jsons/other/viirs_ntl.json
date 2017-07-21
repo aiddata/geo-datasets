@@ -1,0 +1,31 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/viirs/vcmcfg_dnb_composites_v10/yearly/max/",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "YYYY_max.tif",
+	"name": "viirs_vcmcfg_dnb_composites_v10_yearly_max",
+    "title": "VIIRS Nighttime Lights",
+	"description": "",
+	"version": 1,
+	"options": {
+	    "resolution": 0.0041666667,
+        "extract_types": ["max", "mean", "min", "sum", "count"],
+        "extract_types_info" : {
+            "max" : "maximum value measured within each unit of analysis",
+            "mean" : "average value measured  within each unit of analysis",
+            "min" : "minimum value measured  within each unit of analysis",
+            "sum": "sum of values measured within each unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "Radiance (nW cm^-2 sr^-1)",
+	},
+	"extras": {
+	    "citation": "Elvidge, Christopher & Baugh, Kimberly & Zhizhin, Mikhail & Chi Hsu, Feng & Tilottama, Ghosh. (2017). VIIRS night-time lights. International Journal of Remote Sensing. 1-20. 10.1080/01431161.2017.1342050.",
+	    "sources_web": "https://ngdc.noaa.gov/eog/viirs/download_dnb_composites.html",
+	    "sources_name": "VIIRS Day/Night Band Nighttime Lights",
+	    "tags": ["nighttimelights", "viirs", "economics", "welfare"]
+	},
+	"active": 1
+}
+
