@@ -2,7 +2,7 @@
     "base": "/sciclone/aiddata10/REU/geo/data/rasters/ucdp/ged_global_171",
     "type": "raster",
     "file_extension": ".tif",
-    "file_mask": "None",
+    "file_mask": "ucdp_deaths_YYYY.tif",
     "name": "ucdp_deaths_YYYY.tif",
     "title": "UCDP Conflict Deaths",
     "description": "Number of total fatalities per 0.01 decimal degree grid cell resulting from conflict event using UCDP Georeferenced Event Dataset (GED) global version 17.1. ",
