@@ -1,9 +1,9 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/ltdr_yearly/ndvi_max",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/ltdr/avhrr_ndvi_v4/yearly",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "YYYY.tif",
-	"name": "ltdr_yearly",
+	"name": "ltdr_avhrr_ndvi_v4_yearly",
 	"title": "Normalized Difference Vegetation Index - NDVI (LTDR v4 - AVHRR)",
 	"description": "Yearly value for Normalized Difference Vegetation Index (NDVI). Created using the NASA Long Term Data Record (v4) AVHRR data.",
     "details": "Created by aggregating daily data to monthly by taking the maximum value, then averaging the monthly data to get yearly values. All negative NDVI values were truncated to 0 and saturated pixels were adjusted to the max of the normal NDVI range (10000).",
