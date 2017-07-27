@@ -3,7 +3,7 @@
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "ucdp_conflict_YYYY.tif",
-    "name": "ucdp_conflict_binary",
+    "name": "ucdp_conflict_binary_11",
     "title": "UCDP Conflict Events (in Africa)",
     "description": "Binary indicating areas of conflict event based on UCDP GED Polygons v1.1.",
     "details": "Definition of ucdp violence type can be found: http://www.pcr.uu.se/research/ucdp/definitions/",

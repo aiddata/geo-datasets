@@ -3,7 +3,7 @@
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "ucdp_deaths_YYYY.tif",
-    "name": "ucdp_deaths",
+    "name": "ucdp_deaths_171",
     "title": "UCDP Conflict Deaths",
     "description": "Number of total fatalities per 0.01 decimal degree grid cell resulting from conflict event using UCDP Georeferenced Event Dataset (GED) global version 17.1. ",
     "details": "",
