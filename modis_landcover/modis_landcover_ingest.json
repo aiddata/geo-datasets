@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/glcf/modis_landcover_5.1",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/glcf/modis_landcover_5.1",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "YYYY.xx.xx.tif",

@@ -1,5 +1,5 @@
 {
-	"base": "/sciclone/aiddata10/REU/data/rasters/external/global/udel_climate/precip_2014_v4.01/yearly/max",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/udel_climate/precip_2014_v4.01/yearly/max",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "precip_YYYY_max.tif",

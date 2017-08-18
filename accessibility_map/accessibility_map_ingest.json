@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/accessibility_map",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/external/global/accessibility_map",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/gadm28_borders",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/gadm28_borders",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

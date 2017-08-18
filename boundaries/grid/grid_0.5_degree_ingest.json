@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/data/boundaries/grid/grid_0.5_degree",
+    "base": "/sciclone/aiddata10/REU/geo/data/boundaries/grid/grid_0.5_degree",
     "type": "boundary",
     "file_extension": ".geojson",
     "file_mask": "None",

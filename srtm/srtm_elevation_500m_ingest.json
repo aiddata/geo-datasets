@@ -1,5 +1,5 @@
 {
-	"base": "/sciclone/aiddata10/REU/data/rasters/external/global/srtm/srtm_elevation_500m",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/srtm/srtm_elevation_500m",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "None",

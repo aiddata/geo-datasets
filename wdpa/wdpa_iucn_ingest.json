@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/data/rasters/external/global/wdpa/iucn_cat_201704",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/wdpa/iucn_cat_201704",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
