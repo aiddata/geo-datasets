@@ -6,6 +6,7 @@
 	"name": "v4composites_calibrated",
     "title": "DMSP-OLS Nighttime Lights",
 	"description": "Version 4 DMSP-OLS Nighttime Lights. The lights from cities, towns, and other sites with persistent lighting, including gas flares. Ephemeral events, such as fires have been discarded. Calibrated across sensors and years using Elvidge 2014 coeficients.",
+    "details": "",
 	"version": 4,
 	"options": {
 	    "resolution": 0.008333333333333,

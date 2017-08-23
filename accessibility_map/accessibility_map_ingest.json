@@ -6,6 +6,7 @@
     "name": "access_50k",
     "title": "Travel time to major cities",
     "description": "Estimated travel time (in minutes) to the nearest city of 50,000 or more people in year 2000.",
+    "details": "",
     "version": 1,
     "options": {
         "resolution": 0.008333333333333,
@@ -17,8 +18,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "time in minutes",
-        "mini_name": "a50k"
+        "variable_description": "time in minutes"
     },
     "extras": {
         "citation": "Nelson, A. (2008) Estimated travel time to the nearest city of 50,000 or more people in year 2000. Global Environment Monitoring Unit - Joint Research Centre of the European Commission, Ispra Italy. Available at http://forobs.jrc.ec.europa.eu/products/gam/",

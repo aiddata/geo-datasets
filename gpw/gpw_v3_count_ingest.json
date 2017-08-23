@@ -6,6 +6,7 @@
 	"name": "gpw_v3_count",
 	"title": "Population (GPW V3, UN Adjusted)",
 	"description": "Population count (UN Adjusted values) from the Gridded Population of the World v3. GPWv3 depicts the distribution of human population across the globe. Source data provided in 2.5 arc-minute grid cells.",
+    "details": "",
 	"version": 3,
 	"options": {
 	    "resolution": 0.041667,
@@ -15,8 +16,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
 	    "factor": 1,
-	    "variable_description": "persons per grid cell",
-	    "mini_name": "g3cu"
+	    "variable_description": "persons per grid cell"
 	},
 	"extras": {
 	    "citation": "Center for International Earth Science Information Network - CIESIN - Columbia University, United Nations Food and Agriculture Programme - FAO, and Centro Internacional de Agricultura Tropical - CIAT. 2005. Gridded Population of the World, Version 3 (GPWv3): Population Count Grid. Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). http://dx.doi.org/10.7927/H4639MPP.",

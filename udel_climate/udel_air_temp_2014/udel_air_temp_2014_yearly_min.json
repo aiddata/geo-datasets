@@ -6,13 +6,13 @@
 	"name": "udel_air_temp_v401_min",
     "title": "Air Temperature (Yearly Minimum)",
     "description": "Minimum air temperature per year. Created using UDel Air Temperature dataset (v4.01)",
+    "details": "",
 	"version": 4.01,
 	"options": {
 	    "resolution": 0.5,
         "extract_types": ["max", "mean", "min"],
 	    "factor": 1,
-        "variable_description": "degrees Celsius",
-	    "mini_name": "uaym"
+        "variable_description": "degrees Celsius"
 	},
 	"extras": {
 	    "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",

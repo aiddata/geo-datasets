@@ -6,13 +6,13 @@
 	"name": "udel_precip_v401_min",
     "title": "Precipitation (Yearly Minimum)",
     "description": "Minimum precipitation per year. Created using UDel Precipitation dataset (v4.01)",
+    "details": "",
 	"version": 4.01,
 	"options": {
 	    "resolution": 0.5,
         "extract_types": ["max", "mean", "min"],
 	    "factor": 1,
-        "variable_description": "millimeters",
-	    "mini_name": "upym"
+        "variable_description": "millimeters"
 	},
 	"extras": {
 	    "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",

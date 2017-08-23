@@ -6,6 +6,7 @@
     "name": "modis_landcover_51",
     "title": "MODIS Land Cover (GLCF, Version 5.1)",
     "description": "Standard MODIS land cover type data product (MCD12Q1) in the IGBP Land Cover Type Classification.",
+    "details": "",
     "version": 5.1,
     "options": {
         "resolution": 0.00416667,
@@ -15,8 +16,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "IGBP Land Cover Type Classification",
-        "mini_name": "gmlc"
+        "variable_description": "IGBP Land Cover Type Classification"
     },
     "extras": {
         "citation": "Friedl, M.A., D. Sulla-Menashe, B. Tan, A. Schneider, N. Ramankutty, A. Sibley and X. Huang (2010), MODIS Collection 5 global land cover: Algorithm refinements and characterization of new datasets, 2001-2012, Collection 5.1 IGBP Land Cover, Boston University, Boston, MA, USA.",

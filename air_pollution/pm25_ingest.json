@@ -6,6 +6,7 @@
     "name": "ambient_air_pollution_2013_fus_calibrated",
     "title": "Particulate Matter (PM2.5) Concentration",
     "description": "Particulate matter (PM2.5) estimate, based on prediction model using combination of satellite-based estimate and TM5-FASST simulation.",
+    "details": "",
     "version": 2013,
     "options": {
         "resolution": 0.1,
@@ -17,8 +18,7 @@
             "min": "minimum PM2.5 concentration per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "PM2.5 concentration (ug/m3)",
-        "mini_name": "apfc"
+        "variable_description": "PM2.5 concentration (ug/m3)"
     },
     "extras": {
         "citation": "Brauer M, Freedman G, Frostad J, van Donkelaar A, Martin RV, Dentener F, Van Dingenen R, Estep K, Amini H, Apte JS, Balakrishnan K, Barregard L, Broday DM, Feigin V, Ghosh S, Hopke PK, Knibbs LD, Kokubo Y, Liu Y, Ma S, Morawska L, Sangrador JLT, Shaddick G, Anderson HR, Vos T, Forouzanfar MH, Burnett RT, Cohen A. Ambient air pollution exposure estimation for the Global Burden of Disease 2013. Environmental Science & Technology. 2015 Nov 23. doi: 10.1021/acs.est.5b03709.",

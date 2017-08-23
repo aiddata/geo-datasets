@@ -6,6 +6,7 @@
     "name": "acled_v3_count",
     "title": "ACLED Conflict Events",
     "description": "Number of conflict event counts per 0.1 decimal degree grid cell using ACLED (Armed Conflict Location & Event Data Project) v3. For subsets or other permutations of ACLED, please contact us at geo@aiddata.org.",
+    "details": "",
     "version": 3,
     "options": {
         "resolution": 0.1,
@@ -16,8 +17,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "count of conflict events",
-        "mini_name": "a3cd"
+        "variable_description": "count of conflict events"
     },
     "extras": {
         "citation": "Raleigh, Clionadh, Andrew Linke, Håvard Hegre and Joakim Karlsen. 2010. Introducing ACLED-Armed Conflict Location and Event Data. Journal of Peace Research 47(5) 651-660.",

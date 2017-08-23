@@ -6,13 +6,13 @@
 	"name": "udel_air_temp_v401",
 	"title": "Monthly Air Temperature",
 	"description": "Monthly air temperature from UDel v4.01.",
+    "details": "",
 	"version": 4.01,
 	"options": {
 	    "resolution": 0.5,
         "extract_types": ["max", "mean", "min"],
 	    "factor": 1,
-	    "variable_description": "degrees Celsius",
-	    "mini_name": "uamm"
+	    "variable_description": "degrees Celsius"
 	},
 	"extras": {
 	    "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",

@@ -6,6 +6,7 @@
     "name": "dist_to_gadm28_borders",
     "title": "Distance to Country Borders (GADM 2.8)",
     "description": "Distance to country borders, measured in meters. Derived using GADM 2.8 ADM0 (Country) boundaries.",
+    "details": "",
     "version": 1,
     "options": {
         "resolution": 0.01,
@@ -17,8 +18,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "distance in meters",
-        "mini_name": "dgcb"
+        "variable_description": "distance in meters"
     },
     "extras": {
         "citation": "Global Administrative Areas (GADM) http://www.gadm.org.",

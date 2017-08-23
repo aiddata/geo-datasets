@@ -6,6 +6,7 @@
     "name": "ambient_air_pollution_2013_o3",
     "title": "Ozone Concentration",
     "description": "Ozone concentration (ug/m3) from TM5 FASST simulation. Since the ozone (summer) season varies throughout the globe, it was calculated using a running 3-month average (of daily 1 hour max values) for each grid cell over a full year and the maximum of these values was selected.",
+    "details": "",
     "version": 2013,
     "options": {
         "resolution": 0.1,
@@ -17,8 +18,7 @@
             "min": "minimum ozone concentration per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "Ozone concentration (ug/m3)",
-        "mini_name": "apo3"
+        "variable_description": "Ozone concentration (ug/m3)"
     },
     "extras": {
         "citation": "Brauer M, Freedman G, Frostad J, van Donkelaar A, Martin RV, Dentener F, Van Dingenen R, Estep K, Amini H, Apte JS, Balakrishnan K, Barregard L, Broday DM, Feigin V, Ghosh S, Hopke PK, Knibbs LD, Kokubo Y, Liu Y, Ma S, Morawska L, Sangrador JLT, Shaddick G, Anderson HR, Vos T, Forouzanfar MH, Burnett RT, Cohen A. Ambient air pollution exposure estimation for the Global Burden of Disease 2013. Environmental Science & Technology. 2015 Nov 23. doi: 10.1021/acs.est.5b03709.",

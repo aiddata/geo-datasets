@@ -6,6 +6,7 @@
 	"name": "srtm_elevation_500m",
 	"title": "Physical Elevation",
 	"description": "Global elevation (in meters) from Shuttle Radar Topography Mission (SRTM) dataset (v4.1) at 500m resolution.",
+    "details": "",
 	"version": 1,
 	"options": {
         "resolution": 0.004166,
@@ -17,8 +18,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
 	    "factor": 1,
-	    "variable_description": "meters",
-	    "mini_name": "se5h"
+	    "variable_description": "meters"
 	},
 	"extras": {
 	    "citation": "Jarvis A., H.I. Reuter, A. Nelson, E. Guevara, 2008, Hole-filled seamless SRTM data V4, International Centre for Tropical Agriculture (CIAT), available from http://srtm.csi.cgiar.org.",

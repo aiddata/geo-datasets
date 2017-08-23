@@ -6,6 +6,7 @@
 	"name": "gdp_grid",
     "title": "Gross Domestic Product",
 	"description": "Map of total economic activity, including both formal and informal economic activity for ~2006; created from nighttime lights and LandScan population grid.",
+    "details": "",
 	"version": 1,
 	"options": {
 	    "resolution": 0.00833333,
@@ -18,8 +19,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
 	    "factor": 1,
-        "variable_description": "millions of dollars",
-	    "mini_name": "gdpg"
+        "variable_description": "millions of dollars"
 	},
 	"extras": {
 	    "citation": "Ghosh, T., Powell, R.L., Elvidge, C.D., Baugh, K.E., Sutton, P.C., Anderson, S.: Shedding light on the global distribution of economic activity. The Open Geography Journal 3, 148-161 (2010)",

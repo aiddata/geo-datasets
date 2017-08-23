@@ -6,6 +6,7 @@
     "name": "dist_to_water",
     "title": "Distance to Water",
     "description": "Distance to water, measured in meters. Derived using World Vector Shorelines combined with rivers and lakes from World Data Bank 2 (via Natural Earth).",
+    "details": "",
     "version": 1,
     "options": {
         "resolution": 0.01,
@@ -17,8 +18,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "distance in meters",
-        "mini_name": "dwat"
+        "variable_description": "distance in meters"
     },
     "extras": {
         "citation": "Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical, High-resolution Shoreline Database, J. Geophys. Res., 101, #B4, pp. 8741-8743, 1996.",

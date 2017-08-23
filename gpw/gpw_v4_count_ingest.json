@@ -6,6 +6,7 @@
 	"name": "gpw_v4_count",
 	"title": "Population (GPW V4, UN Adjusted)",
 	"description": "Population count (UN Adjusted values) from Gridded Population of the World v4. GPWv4 depicts the distribution of human population across the globe. Source data provided in 30 arc-second (~1 km) grid cells.",
+    "details": "",
 	"version": 3,
 	"options": {
 	    "resolution": 0.00833,
@@ -15,8 +16,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
 	    "factor": 1,
-	    "variable_description": "persons per grid cell",
-	    "mini_name": "g4cu"
+	    "variable_description": "persons per grid cell"
 	},
 	"extras": {
 	    "citation": "Center for International Earth Science Information Network - CIESIN - Columbia University. 2016. Gridded Population of the World, Version 4 (GPWv4): Population Count Adjusted to Match 2015 Revision of UN WPP Country Totals. Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). http://dx.doi.org/10.7927/H4SF2T42. ",

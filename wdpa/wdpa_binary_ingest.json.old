@@ -6,6 +6,7 @@
     "name": "wdpa_binary_201609",
     "title": "Protected Areas",
     "description": "The World Database on Protected Areas (WDPA) is the most comprehensive global database of marine and terrestrial protected areas. Dataset downloaded September 2016. This is a rasterized (binary) indicating protected areas. For more refined subsets of this data (i.e., different classes of protected areas), please contact us at geo@aiddata.org.",
+    "details": "",
     "version": 201609,
     "options": {
         "resolution": 0.01,
@@ -16,8 +17,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "binary indicating protected area",
-        "mini_name": "wdpa"
+        "variable_description": "binary indicating protected area"
     },
     "extras": {
         "citation": "IUCN and UNEP-WCMC (2016), The World Database on Protected Areas (WDPA) [On-line], [September 2016], Cambridge, UK: UNEP-WCMC. Available at: www.protectedplanet.net.",
