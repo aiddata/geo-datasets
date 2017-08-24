@@ -14,7 +14,7 @@ from distancerasters import rasterize, export_raster
 # -----------------------------------------------------------------------------
 
 
-shp_path = "/sciclone/aiddata10/REU/raw/wdpa/WDPA_Apr2017_Public/WDPA_Apr2017_Public.gdb"
+shp_path = "/sciclone/aiddata10/REU/raw/geo/wdpa/WDPA_Apr2017_Public/WDPA_Apr2017_Public.gdb"
 
 pixel_size = 0.01
 
@@ -24,7 +24,7 @@ field_values = [
     "Not Applicable", "Not Assigned", "Not Reported"
 ]
 
-final_output = "/sciclone/aiddata10/REU/data/rasters/external/global/wdpa/iucn_cat_201704/wdpa_iucn_cat_201704.tif"
+final_output = "/sciclone/aiddata10/REU/geo/data/rasters/wdpa/iucn_cat_201704/wdpa_iucn_cat_201704.tif"
 
 
 # -----------------------------------------------------------------------------

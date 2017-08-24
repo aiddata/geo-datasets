@@ -10,9 +10,9 @@ dataset <- args[1]
 # dataset <- 'precip_2014'
 # dataset <- 'air_temp_2014'
 
-base_dir <- '/sciclone/aiddata10/REU'
+base_dir <- '/sciclone/aiddata10/REU/geo'
 raw_dir <- sprintf('%s/raw/udel_climate/%s', base_dir, dataset)
-data_dir <- sprintf('%s/data/rasters/external/global/udel_climate/%s',
+data_dir <- sprintf('%s/data/rasters/udel_climate/%s',
                     base_dir, dataset)
 
 # base_dir <- '/home/userz/Desktop'
