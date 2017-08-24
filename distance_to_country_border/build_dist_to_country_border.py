@@ -9,7 +9,7 @@ from affine import Affine
 import numpy as np
 
 
-borders_path = "/sciclone/aiddata10/REU/raw/gadm28_country_borders/gadm28_adm0_lines.shp"
+borders_path = "/sciclone/aiddata10/REU/geo/raw/gadm28_country_borders/gadm28_adm0_lines.shp"
 
 
 pixel_size = 0.01
@@ -29,7 +29,7 @@ borders, _ = rasterize(borders_path, affine=affine, shape=shape)
 
 
 
-borders_output_raster_path = "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/gadm28_borders/binary/gadm28_borders_binary.tif"
+borders_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/gadm28_borders/binary/gadm28_borders_binary.tif"
 
 export_raster(borders, affine, borders_output_raster_path)
 
@@ -41,7 +41,7 @@ export_raster(borders, affine, borders_output_raster_path)
 # borders = borders_src.read()[0]
 # affine = borders_src.affine
 
-distance_output_raster_path = "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/gadm28_borders/gadm28_borders_distance.tif"
+distance_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/gadm28_borders/gadm28_borders_distance.tif"
 
 
 def raster_conditional(rarray):

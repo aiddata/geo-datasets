@@ -9,9 +9,9 @@ from affine import Affine
 import numpy as np
 
 
-shorelines_path = "/sciclone/aiddata10/REU/raw/gshhg/gshhg-shp-2.3.6/GSHHS_shp/f/GSHHS_f_L1.shp"
-lakes_path = "/sciclone/aiddata10/REU/raw/natural-earth-vector/d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_lakes.shp"
-rivers_path = "/sciclone/aiddata10/REU/raw/natural-earth-vector/d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_rivers_lake_centerlines.shp"
+shorelines_path = "/sciclone/aiddata10/REU/geo/raw/gshhg/gshhg-shp-2.3.6/GSHHS_shp/f/GSHHS_f_L1.shp"
+lakes_path = "/sciclone/aiddata10/REU/geo/raw/natural-earth-vector/d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_lakes.shp"
+rivers_path = "/sciclone/aiddata10/REU/geo/raw/natural-earth-vector/d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_rivers_lake_centerlines.shp"
 
 
 pixel_size = 0.01
@@ -37,7 +37,7 @@ rivers, _ = rasterize(rivers_path, affine=affine, shape=shape)
 water = shorelines + lakes + rivers
 
 
-water_output_raster_path = "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/water/binary/water_binary.tif"
+water_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/water/binary/water_binary.tif"
 
 export_raster(water, affine, water_output_raster_path)
 
@@ -49,7 +49,7 @@ export_raster(water, affine, water_output_raster_path)
 # water = water_src.read()[0]
 # affine = water_src.affine
 
-distance_output_raster_path = "/sciclone/aiddata10/REU/data/rasters/external/global/distance_to/water/water_distance.tif"
+distance_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/water/water_distance.tif"
 
 
 def raster_conditional(rarray):

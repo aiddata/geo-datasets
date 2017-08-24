@@ -17,7 +17,7 @@ from intercalibration_coefficients import COEFFICIENTS
 coef = COEFFICIENTS['ELVIDGE2014']
 
 
-data_path = '/sciclone/aiddata10/REU/data/rasters/external/global/dmsp_ntl/v4composites'
+data_path = '/sciclone/aiddata10/REU/geo/data/rasters//dmsp_ntl/v4composites'
 
 qlist = [name for name in os.listdir(data_path)
          if not os.path.isdir(os.path.join(data_path, name))
@@ -92,7 +92,7 @@ for i in qlist:
 
 
 
-    out_base = '/sciclone/aiddata10/REU/data/rasters/external/global/dmsp_ntl/v4composites_calibrated'
+    out_base = '/sciclone/aiddata10/REU/geo/data/rasters/dmsp_ntl/v4composites_calibrated'
 
     make_dir(out_base)
 

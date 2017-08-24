@@ -8,9 +8,9 @@
 # -------------------------
 # init
 
-# raw_dir=/sciclone/aiddata10/REU/raw/v4avg_lights_x_pct
+# raw_dir=/sciclone/aiddata10/REU/geo/raw/v4avg_lights_x_pct
 
-raw_dir=/sciclone/aiddata10/REU/raw/dmsp_ntl/v4composites
+raw_dir=/sciclone/aiddata10/REU/geo/raw/dmsp_ntl/v4composites
 mkdir -p ${raw_dir}
 
 cd ${raw_dir}
@@ -39,7 +39,7 @@ done
 # downloaded files must be unpacked with tar
 # the unpackage tif files must then be decompressed with gunzip
 
-data_dir=/sciclone/aiddata10/REU/data/rasters/external/global/dmsp_ntl/v4composites
+data_dir=/sciclone/aiddata10/REU/geo/data/rasters/dmsp_ntl/v4composites
 mkdir -p ${data_dir}
 
 for i in *; do

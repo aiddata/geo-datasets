@@ -1,0 +1,30 @@
+{
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "dist_to_coast",
+    "title": "Distance to Coast",
+    "description": "Distance to coast, measured in meters. Derived using World Vector Shorelines.",
+    "details": "",
+    "version": 1,
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["mean", "max", "min", "count"],
+        "extract_types_info" : {
+            "mean" : "average distance per unit of analysis",
+            "max" : "maximum distance per unit of analysis",
+            "min" : "minimum distance per unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "distance in meters"
+    },
+    "extras": {
+        "citation": "Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical, High-resolution Shoreline Database, J. Geophys. Res., 101, #B4, pp. 8741-8743, 1996.",
+        "sources_web": "http://www.soest.hawaii.edu/pwessel/gshhg/",
+        "sources_name": "GSHHG: A Global Self-consistent, Hierarchical, High-resolution Geography Database",
+        "tags": ["accessibility", "other"]
+    },
+    "active": 1
+}

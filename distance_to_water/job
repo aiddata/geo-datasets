@@ -4,4 +4,4 @@
 #PBS -l walltime=24:00:00
 #PBS -j oe
 
-python ~/active/master/asdf-datasets/data_prep/distance_to_water/build_dist_to_water.py
+python /sciclone/aiddata10/geo/master/source/geo-datasets/distance_to_water/build_dist_to_water.py

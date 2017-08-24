@@ -11,7 +11,7 @@
 version="2.3.6"
 src="ftp://ftp.soest.hawaii.edu/gshhg/gshhg-shp-"${version}".zip"
 
-dst="/sciclone/aiddata10/REU/raw/gshhg"
+dst="/sciclone/aiddata10/REU/geo/raw/gshhg"
 
 wget -cNv -P ${dst} ${src}
 
@@ -26,7 +26,7 @@ unzip ${dst}/$(basename ${src}) -d ${dst}/$(basename ${src} .zip)
 
 commit=d4533efe3715c55b51f49bc2bde9694bff2bf7b1
 src2="https://github.com/nvkelso/natural-earth-vector/archive/"${commit}".zip"
-dst2="/sciclone/aiddata10/REU/raw/natural-earth-vector"
+dst2="/sciclone/aiddata10/REU/geo/raw/natural-earth-vector"
 
 wget -cNv -P ${dst2} ${src2}
 mv ${dst2}/${commit} ${dst2}/${commit}.zip
