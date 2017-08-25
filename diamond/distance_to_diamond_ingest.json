@@ -1,0 +1,30 @@
+{
+    "base": "",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "dist_to_diamond",
+    "title": "Distance to Diamond",
+    "description": "Distance to diamond deposits, measured in meters. Derived from PRIO diamond deposits dataset August 2017",
+    "version": 201708,
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["mean", "max", "min", "count"],
+        "extract_types_info" : {
+            "mean" : "average distance per unit of analysis",
+            "max" : "maximum distance per unit of analysis",
+            "min" : "minimum distance per unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "distance in meters",
+        "mini_name": "dtd"
+    },
+    "extras": {
+        "citation": "Gilmore, Elisabeth; Nils Petter Gleditsch, Päivi Lujala & Jan Ketil Rød, 2005. ‘Conflict Diamonds: A New Dataset’, Conflict Management and Peace Science 22(3): 257–292",
+        "sources_web": "https://www.prio.org",
+        "sources_name": "Peace Research Institute Oslo (PRIO)",
+        "tags": ["global", "diamond"]
+    },
+    "active": 1
+}
