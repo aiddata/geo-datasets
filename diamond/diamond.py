@@ -2,25 +2,28 @@
 
 # points
 
-# import os
+import os
 import fiona
 # from shapely.geometry import Point
 from distancerasters import rasterize, build_distance_array
 from affine import Affine
 
 
-indir = r"/sciclone/home10/zlv/datasets/data_process/natural_resource/diamond/GIS filene/DIADATA.shp"
+indir = r"/sciclone/aiddata10/REU/pre_geo/raw/prio/diamond/GIS filene/DIADATA.shp"
 
-outdir = r"/sciclone/data20/zlv/data_process/natural_resource/diamond/diamond_prio.tif"
+outdir = r"/sciclone/aiddata10/REU/pre_geo/data"
+
+if not os.path.exists(os.path.join(outdir,"diamond")):
+    os.makedirs("diamond")
+
+outfile = os.path.join(outdir, "diamond", "diamond.tif")
+distance_output_raster_path = os.path.join(outdir, "diamond", "diamond_distance.tif")
 
 
 pixel_size = 0.01
-#files = [os.path.join(indir, f) for f in os.listdir(indir) if f.endswith(".shp") and os.path.isfile(os.path.join(indir, f))]
-
 
 features = fiona.open(indir)
 
-# probably no need to buffer, since the resolution is 0.01, and there is no meaning for buffer distance 0.01
 """
 shapes = [Point(feat['geometry']['coordinates'][0], feat['geometry']['coordinates'][1]).buffer(0.1) for feat in features]
 
@@ -39,17 +42,11 @@ shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
 affine = Affine(pixel_size, 0, xmin,
                 0, -pixel_size, ymax)
 
-diamond, _ = rasterize(features, output=outdir, pixel_size=pixel_size,affine=affine, shape=shape)
-
-rasterize(features, output=outdir, pixel_size=pixel_size,affine=affine, shape=shape)
-
+diamond, _ = rasterize(features, output=outfile, pixel_size=pixel_size,affine=affine, shape=shape)
 
 
 # ------------------------
 # distance to diamond
-
-distance_output_raster_path = "/sciclone/data20/zlv/data_process/natural_resource/diamond/diamond_distance.tif"
-
 
 def raster_conditional(rarray):
     return (rarray == 1)
