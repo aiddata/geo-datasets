@@ -1,0 +1,29 @@
+{
+    "base": "",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "diamond",
+    "title": "Diamond",
+    "description": "The diamonds dataset contains a list of all known diamond deposits throughout the world. Dataset downloaded August 2017",
+    "version": 201708,
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["count", "mean"],
+        "extract_types_info" : {
+            "count" : "total count of pixels per unit of analysis",
+            "mean" : "average diamond deposits cover for each unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "diamond deposits",
+        "mini_name": "diamond"
+    },
+    "extras": {
+        "citation": "Gilmore, Elisabeth; Nils Petter Gleditsch, Päivi Lujala & Jan Ketil Rød, 2005. ‘Conflict Diamonds: A New Dataset’, Conflict Management and Peace Science 22(3): 257–292",
+        "sources_web": "https://www.prio.org",
+        "sources_name": "Peace Research Institute Oslo (PRIO)",
+        "tags": ["global", "diamond", "prio"]
+    },
+    "active": 1
+}
+

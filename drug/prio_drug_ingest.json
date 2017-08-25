@@ -1,0 +1,35 @@
+{
+    "base": "",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "drug_cat",
+    "title": "Drug",
+    "description": "The drug cultivation dataset contains information on coca bush, opium poppy, and cannabis cultivation through the world. Dataset downloaded August 2017. This is a categorical raster dataset indicating drug type covering each pixel.",
+    "version": 201708,
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["categorical", "count"],
+        "extract_types_info" : {
+            "categorical" : "Drug type. Note: "mix" is an additional category that contains more than one resource.",
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "Drug category information",
+        "mini_name": "drug"
+    },
+    "extras": {
+        "citation": "Buhaug, Halvard & Päivi Lujala 2005. Accounting for Scale: Measuring Geography in Quantitative Studies of Civil War. Political Geography 24: 399-418.",
+        "sources_web": "http://www.paivilujala.com",
+        "sources_name": "",
+        "tags": ["drug", "coca bush", "opium poppy", "cannabis"],
+        "category_map": {
+            "cannabis": 1,
+            "coca_bush": 2,
+            "opium": 3,
+            "mix": 4
+        }
+    },
+    "active": 1
+}
+

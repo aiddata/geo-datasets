@@ -1,0 +1,29 @@
+{
+    "base": "",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "petroleum_prio",
+    "title": "Petroleum",
+    "description": "The petroleum dataset from PRIO contains information on all known on-shore oil and gas deposits throughout the world",
+    "version": "V1.2",
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["count", "mean"],
+        "extract_types_info" : {
+            "count" : "total count of pixels per unit of analysis",
+            "mean" : "average on-shore petroleum cover for each unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "on-shore petroleum",
+        "mini_name": "petroleum"
+    },
+    "extras": {
+        "citation": "Lujala, Päivi; Jan Ketil Rød & Nadia Thieme, 2007. ‘Fighting over Oil: Introducing A New Dataset’, Conflict Management and Peace Science 24(3), 239-256.",
+        "sources_web": "https://www.prio.org",
+        "sources_name": "Peace Research Institute Oslo (PRIO)",
+        "tags": ["global", "on-shore", "prio", "petroleum"]
+    },
+    "active": 1
+}
+
