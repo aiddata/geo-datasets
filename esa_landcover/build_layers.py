@@ -4,7 +4,7 @@ import os
 import errno
 
 import rasterio
-
+import numpy as np
 
 def make_dir(path):
     try:
