@@ -7,8 +7,8 @@
 # export GDAL_CACHEMAX=22527
 
 
-src_root="/sciclone/aiddata10/REU/raw/ftp.glcf.umd.edu/glcf/Global_LNDCVR/UMD_TILES/Version_5.1"
-dst_root="/sciclone/aiddata10/REU/data/rasters/external/global/glcf/modis_landcover_5.1"
+src_root="/sciclone/aiddata10/REU/geo/raw/ftp.glcf.umd.edu/glcf/Global_LNDCVR/UMD_TILES/Version_5.1"
+dst_root="/sciclone/aiddata10/REU/geo/data/rasters/glcf/modis_landcover_5.1"
 
 mkdir -p ${dst_root}
 

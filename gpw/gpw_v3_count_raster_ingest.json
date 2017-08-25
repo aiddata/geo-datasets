@@ -6,7 +6,7 @@
 	"name": "gpw_v3_count",
 	"title": "Population (GPW V3, UN Adjusted)",
 	"description": "Population count (UN Adjusted values) from the Gridded Population of the World v3. GPWv3 depicts the distribution of human population across the globe. Source data provided in 2.5 arc-minute grid cells.",
-    "details": "",
+    "details": "No additional processing of raw data.",
 	"version": 3,
 	"options": {
 	    "resolution": 0.041667,

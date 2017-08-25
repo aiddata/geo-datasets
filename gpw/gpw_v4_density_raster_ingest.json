@@ -6,7 +6,7 @@
 	"name": "gpw_v4_density",
 	"title": "GPW V4 Population Density (UN Adjusted)",
 	"description": "Population density (UN Adjusted values) from Gridded Population of the World v4. GPWv4 depicts the density of human population across the globe. Source data provided in 30 arc-second (~1 km) grid cells.",
-    "details": "",
+    "details": "No additional processing of raw data.",
 	"version": 4,
 	"options": {
 	    "resolution": 0.00833,

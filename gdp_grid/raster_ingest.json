@@ -6,7 +6,7 @@
 	"name": "gdp_grid",
     "title": "Gross Domestic Product",
 	"description": "Map of total economic activity, including both formal and informal economic activity for ~2006; created from nighttime lights and LandScan population grid.",
-    "details": "",
+    "details": "No additional processing of raw data.",
 	"version": 1,
 	"options": {
 	    "resolution": 0.00833333,

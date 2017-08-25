@@ -6,7 +6,7 @@
     "name": "modis_landcover_51",
     "title": "MODIS Land Cover (GLCF, Version 5.1)",
     "description": "Standard MODIS land cover type data product (MCD12Q1) in the IGBP Land Cover Type Classification.",
-    "details": "",
+    "details": "No additional processing of raw data.",
     "version": 5.1,
     "options": {
         "resolution": 0.00416667,

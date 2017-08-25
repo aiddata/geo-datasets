@@ -6,7 +6,7 @@
     "name": "wdpa_iucn_cat_201704",
     "title": "Protected Areas (IUCN Categories)",
     "description": "The World Database on Protected Areas (WDPA) is the most comprehensive global database of marine and terrestrial protected areas. Dataset downloaded April 2017. This is a categorical raster indicating the IUCN category (or relevant information when no category exists) of the protected area covering each pixel. ",
-    "details": "",
+    "details": "Features which had different IUCN categories and overlapped with each other were assigned a new category (represented by 'mix') during the rasterization process.",
     "version": 201704,
     "options": {
         "resolution": 0.01,

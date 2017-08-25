@@ -6,7 +6,7 @@
     "name": "srtm_slope_500m",
     "title": "Ground Slope",
     "description": "Global slope (in degrees) derived from Shuttle Radar Topography Mission (SRTM) dataset (v4.1) at 500m resolution.",
-    "details": "",
+    "details": "Created using SRTM elevation data and generating slope in QGIS (which uses gdaldem tool)",
     "version": 1,
     "options": {
         "resolution": 0.004166,

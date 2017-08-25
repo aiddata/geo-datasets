@@ -5,9 +5,8 @@
 	"file_mask": "YYYY_max.tif",
 	"name": "viirs_vcmcfg_dnb_composites_v10_yearly_max",
     "title": "VIIRS Nighttime Lights",
-    "description": "Yearly value for Normalized Difference Vegetation Index (NDVI). Created using the NASA Long Term Data Record (v4) AVHRR data.",
-    "details": "",
-	"description": "",
+    "description": "Yearly VIIRS day night band nighttime lights data (without stray light correction).",
+    "details": "Aggregated to yearly from monthly data by taking maximum value. Pixels in monthly data without at least 3 cloud free observations were omitted.",
 	"version": 1,
 	"options": {
 	    "resolution": 0.0041666667,
