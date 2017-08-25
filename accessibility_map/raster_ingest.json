@@ -6,7 +6,7 @@
     "name": "access_50k",
     "title": "Travel time to major cities",
     "description": "Estimated travel time (in minutes) to the nearest city of 50,000 or more people in year 2000.",
-    "details": "",
+    "details": "No additional processing of raw data.",
     "version": 1,
     "options": {
         "resolution": 0.008333333333333,

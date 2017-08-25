@@ -5,18 +5,18 @@
     "file_mask": "esa_lc_YYYY.tif",
     "name": "esa_landcover_v207",
     "title": "ESA Land Cover (version 2.0.7)",
-    "description": "ESA land cover class data product defined based on the UN Land Cover Classification System (LCCS).",
-    "details": "The ESA land cover column names in export file are modified for readability and ease of use. The full name of each class can be found from land cover map user guide: http://maps.elie.ucl.ac.be/CCI/viewer/download.php",
+    "description": "ESA land cover class data product. Categories used are cropland (rainfed, irrigated, mosaic), forest, grassland, shrubland, sparse vegetation, wetland, urband, bare areas, water bodies, and snow ice.",
+    "details": "UN Land Cover Classification System (LCCS) categories were grouped according to their IPCC classes, except for agriculture which was broken into 3 different types of cropland. The original land cover class names are modified in export file for readability and ease of use. The full name of each class can be found from land cover map user guide: http://maps.elie.ucl.ac.be/CCI/viewer/",
     "version": "2.0.7",
     "options": {
         "resolution": 0.0027027,
         "extract_types": ["categorical", "count"],
         "extract_types_info" : {
-            "categorical" : "categories based on the UN Land Cover Classification System (LCCS). Warning: provides 23 category columns for each year selected",
+            "categorical" : "categories based on the IPCC / LCCS classification schemes. Warning: provides 13 category columns for each year selected",
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "UN Land Cover Classification System (LCCS)"
+        "variable_description": "land cover class"
     },
     "extras": {
         "citation": "Defourny, P. (2017): ESA Land Cover Climate Change Initiative (Land_Cover_cci): Land Cover Maps, v2.0.7. Centre for Environmental Data Analysis, 7/2017",
