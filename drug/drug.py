@@ -9,11 +9,19 @@ import numpy as np
 
 
 
+indir = r"/sciclone/aiddata10/REU/pre_geo/raw/prio/drug/drugdata"
+outdir = r"/sciclone/aiddata10/REU/pre_geo/data"
 
-#indir = r"/Users/miranda/Documents/AidData/sciclone/datasets/natural_resource/drug/drugdata/DRUGDATA ArcGIS files"
-indir = r"/sciclone/home10/zlv/datasets/data_process/natural_resource/drug/DRUGDATA ArcGIS files"
-#out_cat = r"/Users/miranda/Documents/AidData/sciclone/datasets/natural_resource/drug/test_delete.tif"
-out_cat = r"/sciclone/data20/zlv/data_process/natural_resource/drug/drug_prio.tif"
+
+if not os.path.exists(os.path.join(outdir,"drug")):
+
+    os.makedirs(os.path.join(outdir,"drug"))
+    outfile = os.path.join(outdir, "drug", "drug.tif")
+
+else:
+
+    outfile = os.path.join(outdir, "drug", "drug.tif")
+
 
 pixel_size = 0.01
 
@@ -53,7 +61,7 @@ else:
     raise("More than 3 drug layers")
 
 
-export_raster(ini_image, affine=affine, nodata=0, path=out_cat)
+export_raster(ini_image, affine=affine, nodata=0, path=outfile)
 
 
 
