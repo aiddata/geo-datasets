@@ -5,8 +5,9 @@
     "file_mask": "None",
     "name": "dist_to_petroleum",
     "title": "Distance to On-shore Petroleum",
-    "description": "Distance to on-shore petroleum, measured in meters. Derived from PRIO global on-shore petroleum dataset August 2017",
-    "version": V1.2,
+    "description": "Distance to on-shore petroleum, measured in meters. Derived from PRIO global on-shore petroleum dataset.",
+    "details": "Dataset downloaded August 2017.",
+    "version": "1.2",
     "options": {
         "resolution": 0.01,
         "extract_types": ["mean", "max", "min", "count"],
@@ -17,14 +18,13 @@
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "distance in meters",
-        "mini_name": "dtp"
+        "variable_description": "distance in meters"
     },
     "extras": {
         "citation": "Lujala, Päivi; Jan Ketil Rød & Nadia Thieme, 2007. ‘Fighting over Oil: Introducing A New Dataset’, Conflict Management and Peace Science 24(3), 239-256.",
-        "sources_web": "https://www.prio.org",
+        "sources_web": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Petroleum-Dataset/",
         "sources_name": "Peace Research Institute Oslo (PRIO)",
-        "tags": ["global", "on-shore", "prio", "petroleum"]
+        "tags": ["resources", "onshore", "petroleum"]
     },
     "active": 1
 }

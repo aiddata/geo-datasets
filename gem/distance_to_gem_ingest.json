@@ -6,7 +6,8 @@
     "name": "dist_to_gem",
     "title": "Distance to Gemstone Deposits",
     "description": "Distance to gemstone deposits, measured in meters. Derived from PRIO gemstone deposits dataset August 2017",
-    "version": 201708,
+    "details": "Dataset downloaded August 2017.",
+    "version": "201708",
     "options": {
         "resolution": 0.01,
         "extract_types": ["mean", "max", "min", "count"],
@@ -17,14 +18,13 @@
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "distance in meters",
-        "mini_name": "dtgem"
+        "variable_description": "distance in meters"
     },
     "extras": {
         "citation": "Lujala, Päivi 2009. Deadly Combat over Natural Resources: Gems, Petroleum, Drugs, and the Severity of Armed Civil Conflict. Journal of Conflict Resolution 53(1): 50-71.",
-        "sources_web": "https://www.prio.org",
-        "sources_name": "Peace Research Institute Oslo (PRIO)",
-        "tags": ["distance", "geomstone"]
+        "sources_web": "http://www.paivilujala.com/gemdata.html",
+        "sources_name": "GEMDATA",
+        "tags": ["environment", "resources", "gemstone"]
     },
     "active": 1
 }
