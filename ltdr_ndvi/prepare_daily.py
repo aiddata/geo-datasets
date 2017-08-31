@@ -185,7 +185,7 @@ def process_daily_data(input_path, output_dir):
 
     Unpack NDVI subdataset from a HDF container
     Reproject to EPSG:4326
-    Set values <0 to nodata
+    Set values <0 (other than nodata) to 0
     Write to GeoTiff
 
     Parts of code pulled from:
