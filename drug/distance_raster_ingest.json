@@ -1,0 +1,31 @@
+{
+    "base": "/sciclone/aiddata10/REU/pre_geo/data/rasters/drugdata_201708/drug_distance",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "distance_to_drugdata_201708",
+    "title": "Distance to Drug Cultivation Sites",
+    "description": "Distance to drug cultivation sites (any drug type). The drug cultivation dataset contains information on coca bush, opium poppy, and cannabis cultivation through the world. ",
+    "details": "Dataset downloaded August 2017.",
+    "version": "201708",
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["mean", "max", "min", "count"],
+        "extract_types_info" : {
+            "mean" : "average distance per unit of analysis",
+            "max" : "maximum distance per unit of analysis",
+            "min" : "minimum distance per unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "distance in meters"
+    },
+    "extras": {
+        "citation": "Buhaug, Halvard & Päivi Lujala 2005. Accounting for Scale: Measuring Geography in Quantitative Studies of Civil War. Political Geography 24: 399-418.",
+        "sources_web": "http://www.paivilujala.com/drugdata.html",
+        "sources_name": "DRUGDATA",
+        "tags": ["environment", "distance", "resources", "drug", "coca bush", "opium poppy", "cannabis"]
+    },
+    "active": 1
+}
+

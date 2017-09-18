@@ -4,13 +4,19 @@
 	"file_extension": ".tif",
 	"file_mask": "gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals_YYYY.tif",
 	"name": "gpw_v4_density",
-	"title": "GPW V4 Population Density (UN Adjusted)",
+    "title": "Population Density (GPW V4, UN Adjusted)",
 	"description": "Population density (UN Adjusted values) from Gridded Population of the World v4. GPWv4 depicts the density of human population across the globe. Source data provided in 30 arc-second (~1 km) grid cells.",
     "details": "No additional processing of raw data.",
 	"version": 4,
 	"options": {
 	    "resolution": 0.00833,
-	    "extract_types": ["mean", "max", "min"],
+        "extract_types": ["count", "mean", "max", "min"],
+        "extract_types_info": {
+            "count" : "total count of pixels per unit of analysis",
+            "mean": "average population density per unit of analysis",
+            "mean": "maximum population density per unit of analysis",
+            "mean": "minimum population density per unit of analysis"
+        },
 	    "factor": 1,
 	    "variable_description": "persons per square kilometer"
 	},

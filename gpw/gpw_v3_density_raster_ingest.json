@@ -4,13 +4,19 @@
 	"file_extension": ".asc",
 	"file_mask": "gldsyyag_YYYY.asc",
 	"name": "gpw_v3_density",
-	"title": "GPW V3 Population Density (UN Adjusted)",
+    "title": "Population Density (GPW V3, UN Adjusted)",
 	"description": "Population density (UN Adjusted values) from Gridded Population of the World v3. GPWv3 depicts the density of human population across the globe. Source data provided in 2.5 arc-minute grid cells.",
     "details": "No additional processing of raw data.",
 	"version": 3,
 	"options": {
 	    "resolution": 0.041667,
-	    "extract_types": ["mean", "max", "min"],
+	    "extract_types": ["count", "mean", "max", "min"],
+        "extract_types_info": {
+            "count" : "total count of pixels per unit of analysis",
+            "mean": "average population density per unit of analysis",
+            "mean": "maximum population density per unit of analysis",
+            "mean": "minimum population density per unit of analysis"
+        },
 	    "factor": 1,
 	    "variable_description": "persons per square kilometer"
 	},

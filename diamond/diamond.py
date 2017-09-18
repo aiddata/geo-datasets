@@ -44,7 +44,7 @@ diamond, _ = rasterize(features, output=binary_output_raster_path, pixel_size=pi
 
 
 # ------------------------
-# distance to diamond
+# distance raster
 
 def raster_conditional(rarray):
     return (rarray == 1)

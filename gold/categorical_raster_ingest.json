@@ -1,0 +1,35 @@
+{
+    "base": "/sciclone/aiddata10/REU/pre_geo/data/rasters/goldata_201709/gold_categorical.tif",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "distance_to_gold_v12",
+    "title": "Gold Deposits",
+    "description": "Categorical layer where cells are defined as lootable, surface, or non-lootable gold deposits (or mix). Derived from GOLDATA dataset which consists of 2969 entries for gold occurrences in 108 countries.",
+    "details": "Dataset downloaded September 2017.",
+    "version": "1.2",
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["count", "categorical"],
+        "extract_types_info" : {
+            "categorical" : "Gold deposit type. Note: 'mix' is an additional category for cells that contain more than one deposit type.",
+
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "gold deposit type"
+    },
+    "extras": {
+        "citation": "Balestri Sara & Mario A. Maggioni, 2014. ‘Blood diamonds, dirty gold and spatial spill-overs: Measuring conflict dynamics in Western Africa’, in Peace Economics, Peace science and Public Policy, Vol. 20 (4): 551-564.",
+        "sources_web": "https://www.researchgate.net/publication/281849073_GOLDATA_12_v",
+        "sources_name": "GOLDATA",
+        "tags": ["environment", "resources", "gold", "conflict"],
+        "category_map": {
+            "lootable": 1,
+            "surface": 2,
+            "nonlootable": 3,
+            "mix": 4
+        }
+    },
+    "active": 1
+}

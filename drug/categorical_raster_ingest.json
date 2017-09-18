@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/pre_geo/data/rasters/drugdata_201708",
+    "base": "/sciclone/aiddata10/REU/pre_geo/data/rasters/drugdata_201708/drug_categorical.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
@@ -12,7 +12,7 @@
         "resolution": 0.01,
         "extract_types": ["categorical", "count"],
         "extract_types_info" : {
-            "categorical" : "Drug type. Note: 'mix' is an additional category that contains more than one resource.",
+            "categorical" : "Drug type. Note: 'mix' is an additional category for cells that contain more than one drug type.",
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
