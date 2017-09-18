@@ -29,7 +29,7 @@ shorelines, _ = rasterize(shorelines_path, affine=affine, shape=shape)
 shorelines = np.logical_not(shorelines).astype(int)
 
 
-water_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast/coast_binary.tif"
+water_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast_236/binary/coast_binary.tif"
 
 export_raster(shorelines, affine, water_output_raster_path)
 
@@ -41,7 +41,7 @@ export_raster(shorelines, affine, water_output_raster_path)
 # water = water_src.read()[0]
 # affine = water_src.affine
 
-distance_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast/coast_distance.tif"
+distance_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast_236/coast_distance.tif"
 
 
 def raster_conditional(rarray):

@@ -8,19 +8,14 @@ from affine import Affine
 import numpy as np
 
 
+src_dir = r"/sciclone/aiddata10/REU/pre_geo/raw/drug/drugdata/DRUGDATA ArcGIS files"
+src_names = [r"CANNABIS", r"COCA BUSH", r"OPIUM POPPY"]
+src_files = [os.path.join(src_dir, name + ".shp",) for name in src_names]
 
-indir = r"/sciclone/aiddata10/REU/pre_geo/raw/prio/drug/drugdata"
-outdir = r"/sciclone/aiddata10/REU/pre_geo/data"
+dst_dir = r"/sciclone/aiddata10/REU/pre_geo/data/rasters/drug_201708"
 
 
-if not os.path.exists(os.path.join(outdir,"drug")):
-
-    os.makedirs(os.path.join(outdir,"drug"))
-    outfile = os.path.join(outdir, "drug", "drug.tif")
-
-else:
-
-    outfile = os.path.join(outdir, "drug", "drug.tif")
+output_raster_path = os.path.join(dst_dir, "drug.tif")
 
 
 pixel_size = 0.01
@@ -36,32 +31,28 @@ affine = Affine(pixel_size, 0, xmin,
                 0, -pixel_size, ymax)
 
 
+# initialize output array
+output = np.zeros(shape=(shape[0], shape[1]))
 
-files = [os.path.join(indir, f) for f in os.listdir(indir) if f.endswith(".shp") and os.path.isfile(os.path.join(indir, f))]
+mixed_val = 4
 
-ini_image = np.zeros(shape=(shape[0], shape[1]))
+i = 0
+for f in src_files:
+    i += 1
+    print "Processing: ", f
 
+    features = fiona.open(f)
 
-if len(files) < 4:
+    rv_array, _ = rasterize(vectors=features, pixel_size=pixel_size,
+                            affine=affine, shape=shape)
 
-    for i in range(len(files)):
+    output += rv_array * i
 
-        print "working on, ", files[i]
-
-        features = fiona.open(files[i])
-
-        rst, _ = rasterize(vectors=features, pixel_size=pixel_size, affine=affine, shape=shape)
-
-        sum_image = rst * (i+1) + ini_image
-        sum_image = np.where(sum_image > (i+1), 4, sum_image)
-        ini_image = sum_image
-
-else:
-
-    raise("More than 3 drug layers")
+    # any cell with value > i must have multiple features
+    output = np.where(output > i, mixed_val, output)
 
 
-export_raster(ini_image, affine=affine, nodata=0, path=outfile)
+export_raster(output, affine=affine, nodata=255, path=output_raster_path)
 
 
 

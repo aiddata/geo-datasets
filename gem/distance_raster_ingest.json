@@ -1,12 +1,12 @@
 {
-    "base": "",
+    "base": "/sciclone/aiddata10/REU/pre_geo/data/rasters/gemdata_201708/gemstone_distance.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "dist_to_gem",
+    "name": "distance_to_gemdata_201708",
     "title": "Distance to Gemstone Deposits",
-    "description": "Distance to gemstone deposits, measured in meters. Derived from PRIO gemstone deposits dataset August 2017",
-    "details": "Dataset downloaded August 2017.",
+    "description": "Distance to gemstone deposits, measured in meters.",
+    "details": "Consists of 1022 gemstone sites in 61 countries. It include ruby, sapphire, emerald, aquamarine, heliodor, moganite, goshenite, nephrite, jadeite, lapis lazuli, opal, tourmaline, periodit, topaz, pearl, garnet, zircon, spinel, amber, and quartz. It excludes diamonds, which are included in the diamond deposit dataset. Dataset downloaded August 2017.",
     "version": "201708",
     "options": {
         "resolution": 0.01,

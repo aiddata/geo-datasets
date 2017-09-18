@@ -1,13 +1,13 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast_236",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "dist_to_coast",
+    "name": "distance_to_coast_236",
     "title": "Distance to Coast",
-    "description": "Distance to coast, measured in meters. Derived using World Vector Shorelines.",
-    "details": "",
-    "version": 1,
+    "description": "Distance to coast (on land only), measured in meters. Derived using World Vector Shorelines.",
+    "details": "Distance is only measured for land. Pixels in the ocean will always have a distance of zero.",
+    "version": "2.3.6",
     "options": {
         "resolution": 0.01,
         "extract_types": ["mean", "max", "min", "count"],

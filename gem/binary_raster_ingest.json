@@ -1,0 +1,29 @@
+{
+    "base": "/sciclone/aiddata10/REU/pre_geo/data/rasters/gemdata_201708/gemstone_binary.tif",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "gemdata_201708",
+    "title": "Gemstone Deposits",
+    "description": "The gemstone dataset contains information on gemstone deposits throughout the world. Layer is a binary indicating areas with gemstone deposits.",
+    "details": "Consists of 1022 gemstone sites in 61 countries. It include ruby, sapphire, emerald, aquamarine, heliodor, moganite, goshenite, nephrite, jadeite, lapis lazuli, opal, tourmaline, periodit, topaz, pearl, garnet, zircon, spinel, amber, and quartz. It excludes diamonds, which are included in the diamond deposit dataset. Dataset downloaded August 2017.",
+    "version": "201708",
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["count", "sum"],
+        "extract_types_info" : {
+            "count" : "total count of pixels per unit of analysis",
+            "sum" : "number of pixels containing gemstone deposits for each unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "binary"
+    },
+    "extras": {
+        "citation": "Lujala, Päivi 2009. Deadly Combat over Natural Resources: Gems, Petroleum, Drugs, and the Severity of Armed Civil Conflict. Journal of Conflict Resolution 53(1): 50-71.",
+        "sources_web": "http://www.paivilujala.com/gemdata.html",
+        "sources_name": "GEMDATA",
+        "tags": ["environment",  "geomstone", "resources"]
+    },
+    "active": 1
+}
+

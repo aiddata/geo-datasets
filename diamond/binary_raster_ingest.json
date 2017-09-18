@@ -1,0 +1,29 @@
+{
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/diamond_201708/diamond_binary.tif",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "diamond_binary_201708",
+    "title": "Diamond Deposits",
+    "description": "The diamonds dataset contains a list of all known diamond deposits throughout the world. Layer is a binary indicating areas with diamond deposits.",
+    "details": "Dataset downloaded August 2017.",
+    "version": "201708",
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["count", "sum"],
+        "extract_types_info" : {
+            "count" : "total count of pixels per unit of analysis",
+            "sum" : "number of pixels containing diamond deposits for each unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "binary"
+    },
+    "extras": {
+        "citation": "Gilmore, Elisabeth; Nils Petter Gleditsch, Päivi Lujala & Jan Ketil Rød, 2005. ‘Conflict Diamonds: A New Dataset’, Conflict Management and Peace Science 22(3): 257–292",
+        "sources_web": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Diamond-Resources/",
+        "sources_name": "Peace Research Institute Oslo (PRIO)",
+        "tags": ["environment", "resources", "diamond"]
+    },
+    "active": 1
+}
+

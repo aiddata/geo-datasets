@@ -1,23 +1,24 @@
 {
-    "base": "",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/diamond_201708/diamond_distance.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "diamond_deposits",
-    "title": "Diamond Deposits",
-    "description": "The diamonds dataset contains a list of all known diamond deposits throughout the world. Dataset downloaded August 2017",
+    "name": "diamond_distance_201708",
+    "title": "Distance to Diamond Deposits",
+    "description": "Distance to known diamond deposits, measured in meters.",
     "details": "Dataset downloaded August 2017.",
     "version": "201708",
     "options": {
         "resolution": 0.01,
-        "extract_types": ["count", "mean"],
+        "extract_types": ["mean", "max", "min", "count"],
         "extract_types_info" : {
-            "count" : "total count of pixels per unit of analysis",
-            "mean" : "average diamond deposits cover for each unit of analysis"
+            "mean" : "average distance per unit of analysis",
+            "max" : "maximum distance per unit of analysis",
+            "min" : "minimum distance per unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "diamond deposits",
-        "mini_name": "diamond"
+        "variable_description": "distance in meters"
     },
     "extras": {
         "citation": "Gilmore, Elisabeth; Nils Petter Gleditsch, Päivi Lujala & Jan Ketil Rød, 2005. ‘Conflict Diamonds: A New Dataset’, Conflict Management and Peace Science 22(3): 257–292",
@@ -27,4 +28,3 @@
     },
     "active": 1
 }
-

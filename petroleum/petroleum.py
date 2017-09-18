@@ -1,28 +1,25 @@
+# rasterize polygons as binary and generate distance raster
 
-
-# polygons
 import os
 import fiona
 from distancerasters import rasterize, export_raster, build_distance_array
 
-indir = r"/sciclone/aiddata10/REU/pre_geo/raw/prio/petroleum/PETRODATA V1.2/Petrodata_Onshore_V1.2.shp"
-outdir = r"/sciclone/aiddata10/REU/pre_geo/data"
+
+src_path = r"/sciclone/aiddata10/REU/pre_geo/raw/prio/petroleum/PETRODATA V1.2/Petrodata_Onshore_V1.2.shp"
+dst_dir = r"/sciclone/aiddata10/REU/pre_geo/data/rasters/onshore_petroleum_v12"
 
 
-if not os.path.exists(os.path.join(outdir,"petroleum")):
-    os.makedirs(os.path.join(outdir,"petroleum"))
-
-outfile = os.path.join(outdir, "petroleum", "petroleum.tif")
-distance_output_raster_path = os.path.join(outdir, "petroleum", "petroleum_distance.tif")
+binary_output_raster_path = os.path.join(dst_dir, "petroleum_binary.tif")
+distance_output_raster_path = os.path.join(dst_dir, "petroleum_distance.tif")
 
 
 pixel_size = 0.01
 
-features = fiona.open(indir)
+features = fiona.open(src_path)
 
 bound = features.bounds
 
-petroleum, aff = rasterize(vectors=features, pixel_size=pixel_size, bounds=bound, output=outfile)
+petroleum, aff = rasterize(vectors=features, pixel_size=pixel_size, bounds=bound, output=distance_output_raster_path)
 
 
 # --------------------------------------

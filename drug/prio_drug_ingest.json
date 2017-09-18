@@ -1,5 +1,5 @@
 {
-    "base": "",
+    "base": "/sciclone/aiddata10/REU/pre_geo/data/rasters/drug_201708",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
@@ -16,7 +16,7 @@
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "drug cateogory (cannabis, coca bush, opium, mix)"
+        "variable_description": "drug category (cannabis, coca bush, opium, mix)"
     },
     "extras": {
         "citation": "Buhaug, Halvard & Päivi Lujala 2005. Accounting for Scale: Measuring Geography in Quantitative Studies of Civil War. Political Geography 24: 399-418.",
