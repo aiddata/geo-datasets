@@ -13,7 +13,6 @@
         "extract_types": ["count", "categorical"],
         "extract_types_info" : {
             "categorical" : "Gold deposit type. Note: 'mix' is an additional category for cells that contain more than one deposit type.",
-
             "count" : "total count of pixels per unit of analysis"
         },
         "factor": 1,
