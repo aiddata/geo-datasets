@@ -1,9 +1,9 @@
 {
-    "base": "/sciclone/aiddata10/REU/pre_geo/data/rasters/drug_201708",
+    "base": "/sciclone/aiddata10/REU/pre_geo/data/rasters/drugdata_201708",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "drug_cat",
+    "name": "drugdata_categorical_201708",
     "title": "Drug Cultivation Sites",
     "description": "The drug cultivation dataset contains information on coca bush, opium poppy, and cannabis cultivation through the world. ",
     "details": "Dataset downloaded August 2017. This is a categorical raster dataset indicating drug type covering each pixel.",

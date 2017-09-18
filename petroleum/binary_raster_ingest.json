@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/pre_geo/data/rasters/onshore_petroleum_v12/petroleum_binary.tif",
+    "base": "/sciclone/aiddata10/REU/pre_geo/data/rasters/petroleum_v12/onshore/petroleum_binary.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

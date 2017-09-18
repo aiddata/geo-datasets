@@ -7,12 +7,15 @@ from distancerasters import rasterize, export_raster, build_distance_array
 from affine import Affine
 import numpy as np
 
+# geo_dir = "pre_geo"
+geo_dir = "geo"
 
-src_dir = r"/sciclone/aiddata10/REU/pre_geo/raw/drug/drugdata/DRUGDATA ArcGIS files"
+
+src_dir = r"/sciclone/aiddata10/REU/{0}/raw/drugdata_201708/drugdata/DRUGDATA ArcGIS files".format(geo_dir)
 src_names = [r"CANNABIS", r"COCA BUSH", r"OPIUM POPPY"]
 src_files = [os.path.join(src_dir, name + ".shp",) for name in src_names]
 
-dst_dir = r"/sciclone/aiddata10/REU/pre_geo/data/rasters/drug_201708"
+dst_dir = r"/sciclone/aiddata10/REU/{0}/data/rasters/drugdata_201708".format(geo_dir)
 
 
 output_raster_path = os.path.join(dst_dir, "drug.tif")

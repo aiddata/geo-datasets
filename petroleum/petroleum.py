@@ -4,9 +4,11 @@ import os
 import fiona
 from distancerasters import rasterize, export_raster, build_distance_array
 
+# geo_dir = "pre_geo"
+geo_dir = "geo"
 
-src_path = r"/sciclone/aiddata10/REU/pre_geo/raw/prio/petroleum/PETRODATA V1.2/Petrodata_Onshore_V1.2.shp"
-dst_dir = r"/sciclone/aiddata10/REU/pre_geo/data/rasters/onshore_petroleum_v12"
+src_path = r"/sciclone/aiddata10/REU/{0}/raw/petroleum_v12/PETRODATA V1.2/Petrodata_Onshore_V1.2.shp".format(geo_dir)
+dst_dir = r"/sciclone/aiddata10/REU/{0}/data/rasters/petroleum_v12/onshore".format(geo_dir)
 
 
 binary_output_raster_path = os.path.join(dst_dir, "petroleum_binary.tif")
