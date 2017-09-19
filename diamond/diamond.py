@@ -18,12 +18,14 @@ binary_output_raster_path = os.path.join(dst_dir, "diamond_binary.tif")
 distance_output_raster_path = os.path.join(dst_dir, "diamond_distance.tif")
 
 
-pixel_size = 0.01
 
 features = fiona.open(src_path)
 
 """
-shapes = [Point(feat['geometry']['coordinates'][0], feat['geometry']['coordinates'][1]).buffer(0.1) for feat in features]
+shapes = [
+    Point(feat['geometry']['coordinates'][0], feat['geometry']['coordinates'][1]).buffer(0.1)
+    for feat in features
+]
 
 minx = [shape.bounds[0] for shape in shapes]
 miny = [shape.bounds[1] for shape in shapes]
@@ -33,16 +35,23 @@ maxy = [shape.bounds[3] for shape in shapes]
 bound = (min(minx), min(miny), max(maxx), max(maxy))
 """
 
-(xmin, ymin, xmax, ymax) = features.bounds
+pixel_size = 0.01
+
+xmin = -180
+xmax = 180
+ymin = -90
+ymax = 90
 
 shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
 
 affine = Affine(pixel_size, 0, xmin,
                 0, -pixel_size, ymax)
 
+
 print "Rasterizing"
 
-diamond, _ = rasterize(features, output=binary_output_raster_path, pixel_size=pixel_size,affine=affine, shape=shape)
+diamond, _ = rasterize(features, output=binary_output_raster_path,
+                       pixel_size=pixel_size, affine=affine, shape=shape)
 
 
 # ------------------------

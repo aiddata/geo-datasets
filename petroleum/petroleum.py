@@ -15,15 +15,28 @@ binary_output_raster_path = os.path.join(dst_dir, "petroleum_binary.tif")
 distance_output_raster_path = os.path.join(dst_dir, "petroleum_distance.tif")
 
 
-pixel_size = 0.01
 
 features = fiona.open(src_path)
 
-bound = features.bounds
+
+pixel_size = 0.01
+
+xmin = -180
+xmax = 180
+ymin = -90
+ymax = 90
+
+shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
+
+affine = Affine(pixel_size, 0, xmin,
+                0, -pixel_size, ymax)
+
+
 
 print "Rasterizing"
 
-petroleum, aff = rasterize(vectors=features, pixel_size=pixel_size, bounds=bound, output=distance_output_raster_path)
+petroleum, aff = rasterize(vectors=features, output=binary_output_raster_path,
+                           pixel_size=pixel_size, affine=affine, shape=shape)
 
 
 # --------------------------------------

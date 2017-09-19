@@ -19,17 +19,21 @@ distance_output_raster_path = os.path.join(dst_dir, "gemstone_distance.tif")
 
 
 
-pixel_size = 0.01
-
 features = fiona.open(src_path)
 
 
-(xmin, ymin, xmax, ymax) = features.bounds
+pixel_size = 0.01
+
+xmin = -180
+xmax = 180
+ymin = -90
+ymax = 90
 
 shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
 
 affine = Affine(pixel_size, 0, xmin,
                 0, -pixel_size, ymax)
+
 
 print "Rasterizing"
 
