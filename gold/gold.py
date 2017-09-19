@@ -12,7 +12,7 @@ geo_dir = "geo"
 
 
 src_dir = r"/sciclone/aiddata10/REU/{0}/raw/goldata_v12/GOLDATA 1.2 v".format(geo_dir)
-src_names = ["dGold_L", "dGold_S"]
+src_names = ["dGOLD_L", "dGOLD_S"]
 src_files = [os.path.join(src_dir, name , name + ".shp",) for name in src_names]
 
 dst_dir = r"/sciclone/aiddata10/REU/{0}/data/rasters/goldata_v12".format(geo_dir)
@@ -77,7 +77,7 @@ dist = build_distance_array(output, affine=affine,
 
 print "Finishing categorical (adding non-lootable layer)"
 
-name = "dGold_NL"
+name = "dGOLD_NL"
 f = os.path.join(src_dir, name , name + ".shp",)
 features = fiona.open(f)
 

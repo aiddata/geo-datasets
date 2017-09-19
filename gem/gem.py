@@ -9,9 +9,9 @@ from affine import Affine
 # geo_dir = "pre_geo"
 geo_dir = "geo"
 
-src_path = r"/sciclone/aiddata10/REU/{0}}/raw/gemdata_201708/gemdata/GEMDATA.shp".format(geo_dir)
+src_path = r"/sciclone/aiddata10/REU/{0}/raw/gemdata_201708/gemdata/GEMDATA.shp".format(geo_dir)
 
-dst_dir = r"/sciclone/aiddata10/REU/{0}}/data/rasters/gemdata_201708".format(geo_dir)
+dst_dir = r"/sciclone/aiddata10/REU/{0}/data/rasters/gemdata_201708".format(geo_dir)
 
 
 binary_output_raster_path = os.path.join(dst_dir, "gemstone_binary.tif")
