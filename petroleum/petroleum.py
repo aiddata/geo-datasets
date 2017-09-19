@@ -2,6 +2,7 @@
 
 import os
 import fiona
+from affine import Affine
 from distancerasters import rasterize, export_raster, build_distance_array
 
 # geo_dir = "pre_geo"
