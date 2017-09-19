@@ -31,11 +31,15 @@ shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
 affine = Affine(pixel_size, 0, xmin,
                 0, -pixel_size, ymax)
 
+print "Rasterizing"
+
 gem, _ = rasterize(features, output=binary_output_raster_path, pixel_size=pixel_size,affine=affine, shape=shape)
 
 
 # --------------------------------------
 # distance to gem
+
+print "Generating distance raster"
 
 def raster_conditional(rarray):
     return (rarray == 1)

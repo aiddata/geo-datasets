@@ -25,6 +25,7 @@ affine = Affine(pixel_size, 0, xmin,
 
 shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
 
+print "Rasterizing"
 shorelines, _ = rasterize(shorelines_path, affine=affine, shape=shape)
 shorelines = np.logical_not(shorelines).astype(int)
 
@@ -43,6 +44,7 @@ export_raster(shorelines, affine, water_output_raster_path)
 
 distance_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast_236/coast_distance.tif"
 
+print "Generating distance raster"
 
 def raster_conditional(rarray):
     return (rarray == 1)

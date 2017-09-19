@@ -34,6 +34,7 @@ shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
 affine = Affine(pixel_size, 0, xmin,
                 0, -pixel_size, ymax)
 
+print "Rasterizing"
 
 # initialize output array
 output = np.zeros(shape=(shape[0], shape[1]))
@@ -59,6 +60,8 @@ for f in src_files:
 # ------------------------
 # distance raster
 # (run before adding nonlootable layer to categorical output)
+
+print "Generating distance raster"
 
 def raster_conditional(rarray):
     return (rarray > 0)

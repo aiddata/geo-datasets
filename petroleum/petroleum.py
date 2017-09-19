@@ -21,11 +21,15 @@ features = fiona.open(src_path)
 
 bound = features.bounds
 
+print "Rasterizing"
+
 petroleum, aff = rasterize(vectors=features, pixel_size=pixel_size, bounds=bound, output=distance_output_raster_path)
 
 
 # --------------------------------------
 # distance to gem
+
+print "Generating distance raster"
 
 def raster_conditional(rarray):
     return (rarray == 1)
