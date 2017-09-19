@@ -35,8 +35,8 @@ affine = Affine(pixel_size, 0, xmin,
 
 print "Rasterizing"
 
-petroleum, aff = rasterize(vectors=features, output=binary_output_raster_path,
-                           pixel_size=pixel_size, affine=affine, shape=shape)
+petroleum, _ = rasterize(vectors=features, output=binary_output_raster_path,
+                         pixel_size=pixel_size, affine=affine, shape=shape)
 
 
 # --------------------------------------
@@ -47,7 +47,7 @@ print "Generating distance raster"
 def raster_conditional(rarray):
     return (rarray == 1)
 
-dist = build_distance_array(petroleum, affine=aff,
+dist = build_distance_array(petroleum, affine=affine,
                             output=distance_output_raster_path,
                             conditional=raster_conditional)
 
