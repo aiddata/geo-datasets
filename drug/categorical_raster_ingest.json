@@ -22,7 +22,7 @@
         "citation": "Buhaug, Halvard & Päivi Lujala 2005. Accounting for Scale: Measuring Geography in Quantitative Studies of Civil War. Political Geography 24: 399-418.",
         "sources_web": "http://www.paivilujala.com/drugdata.html",
         "sources_name": "DRUGDATA",
-        "tags": ["environment", "resources", "drug", "coca bush", "opium poppy", "cannabis"],
+        "tags": ["environment", "resources", "drug"],
         "category_map": {
             "cannabis": 1,
             "coca_bush": 2,

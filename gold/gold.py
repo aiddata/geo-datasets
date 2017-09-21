@@ -78,12 +78,14 @@ dist = build_distance_array(output, affine=affine,
 print "Finishing categorical (adding non-lootable layer)"
 
 name = "dGOLD_NL"
+
 f = os.path.join(src_dir, name , name + ".shp",)
 features = fiona.open(f)
 
 rv_array, _ = rasterize(vectors=features, pixel_size=pixel_size,
                         affine=affine, shape=shape)
 
+i += 1
 output += rv_array * i
 
 # any cell with value > i must have multiple features
