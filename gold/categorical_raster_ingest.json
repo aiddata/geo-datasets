@@ -3,7 +3,7 @@
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "distance_to_gold_v12",
+    "name": "categorical_gold_v12",
     "title": "Gold Deposits",
     "description": "Categorical layer where cells are defined as lootable, surface, or non-lootable gold deposits (or mix). Derived from GOLDATA dataset which consists of 2969 entries for gold occurrences in 108 countries.",
     "details": "Dataset downloaded September 2017.",
