@@ -3,10 +3,10 @@
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "FxxYYYY.v4x_web.stable_lights.avg_vis_calibrated.tif",
-	"name": "v4composites_calibrated",
+	"name": "v4composites_calibrated_201709",
     "title": "DMSP-OLS Nighttime Lights",
 	"description": "Version 4 DMSP-OLS Nighttime Lights composites. The lights from cities, towns, and other sites with persistent lighting, including gas flares. Ephemeral events, such as fires have been discarded. Calibrated across sensors and years using Elvidge 2014 coeficients.",
-    "details": "Values greater than 63 after calibration were truncated to 63",
+    "details": "Values greater than 63 after calibration were truncated to 63. Calibration formula fixed from previous processing of raw v4composites dataset.",
 	"version": 4,
 	"options": {
 	    "resolution": 0.008333333333333,

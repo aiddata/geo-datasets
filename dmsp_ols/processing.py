@@ -14,13 +14,15 @@ from osgeo import osr
 from intercalibration_coefficients import COEFFICIENTS
 
 
+
+src_dir = '/sciclone/aiddata10/REU/geo/data/rasters/dmsp_ntl/v4composites'
+dst_dir = '/sciclone/aiddata10/REU/geo/data/rasters/dmsp_ntl/v4composites_calibrated_201709'
+
 coef = COEFFICIENTS['ELVIDGE2014']
 
 
-data_path = '/sciclone/aiddata10/REU/geo/data/rasters//dmsp_ntl/v4composites'
-
-qlist = [name for name in os.listdir(data_path)
-         if not os.path.isdir(os.path.join(data_path, name))
+qlist = [name for name in os.listdir(src_dir)
+         if not os.path.isdir(os.path.join(src_dir, name))
          and name.endswith('.tif')]
 
 
@@ -54,7 +56,7 @@ for i in qlist:
     c2 = tmp_coefs[2]
 
 
-    file_path = os.path.join(data_path, i)
+    file_path = os.path.join(src_dir, i)
 
 
     tmp_file = gdal.Open(file_path)
@@ -92,11 +94,10 @@ for i in qlist:
 
 
 
-    out_base = '/sciclone/aiddata10/REU/geo/data/rasters/dmsp_ntl/v4composites_calibrated'
 
-    make_dir(out_base)
+    make_dir(dst_dir)
 
-    output_path = out_base +"/"+ i[0:-4] + '_calibrated.tif'
+    output_path = dst_dir +"/"+ i[0:-4] + '_calibrated.tif'
 
 
     output_raster = gdal.GetDriverByName('GTiff').Create(output_path, ncols, nrows, 1 , gdal.GDT_Byte )
