@@ -1,5 +1,5 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/dmsp_ntl/v4composites_calibrated",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/dmsp_ntl/v4composites_calibrated_201709",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "FxxYYYY.v4x_web.stable_lights.avg_vis_calibrated.tif",
