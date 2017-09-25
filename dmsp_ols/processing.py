@@ -71,7 +71,7 @@ for i in qlist:
     # tmp_array = input_array
     # tmp_array[np.where(input_array == 0)] = 1
 
-    # output_array = c0 + (tmp_array * c1) + (tmp_array ** c2)
+    # output_array = c0 + (c1 * tmp_array) + (c2 * tmp_array ** 2)
 
     # output_array = np.int8(np.round(output_array))
     # output_array[np.where(input_array == 0)] = 0
@@ -81,7 +81,7 @@ for i in qlist:
 
     tmp_array = np.ma.MaskedArray(input_array, mask=input_array==0)
 
-    output_array = c0 + (tmp_array * c1) + (tmp_array ** c2)
+    output_array = c0 + (c1 * tmp_array) + (c2 * tmp_array ** 2)
 
     output_array[np.where(output_array > 63)] = 63
     output_array = np.uint8(np.round(output_array))
