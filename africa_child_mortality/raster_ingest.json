@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/africa_child_mortality/",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/africa_child_mortality",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "africa_child_mortality_YYYY.tif",
