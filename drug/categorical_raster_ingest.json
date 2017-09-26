@@ -24,6 +24,7 @@
         "sources_name": "DRUGDATA",
         "tags": ["environment", "resources", "drug"],
         "category_map": {
+            "none": 0,
             "cannabis": 1,
             "coca_bush": 2,
             "opium": 3,

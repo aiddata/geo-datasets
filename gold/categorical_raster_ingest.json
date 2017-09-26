@@ -24,6 +24,7 @@
         "sources_name": "GOLDATA",
         "tags": ["environment", "resources", "gold", "conflict"],
         "category_map": {
+            "none": 0,
             "lootable": 1,
             "surface": 2,
             "nonlootable": 3,
