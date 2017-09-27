@@ -78,6 +78,9 @@ qlist = [os.path.join(data_dir, i) for i in os.listdir(data_dir)
 qlist.sort()
 
 
+print 'GADM boundaries found: {0}'.format(len(qlist))
+
+
 ###
 # active_iso3_list = config.release_gadm.values() + config.other_gadm
 # print "Active iso3 list: {0}".format(active_iso3_list)
