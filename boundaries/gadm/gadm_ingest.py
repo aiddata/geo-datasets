@@ -2,25 +2,28 @@
 import sys
 import os
 
-branch = sys.argv[1]
 
-branch_dir = os.path.join(os.path.expanduser('~'), 'active', branch)
+main_dir = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))))), 'geo-hpc')
 
-if not os.path.isdir(branch_dir):
-    raise Exception('Branch directory does not exist')
+sys.path.insert(0, os.path.join(main_dir, 'utils'))
+sys.path.insert(0, os.path.join(main_dir, 'ingest'))
 
-
-config_dir = os.path.join(branch_dir, 'asdf', 'src', 'utils')
-sys.path.insert(0, config_dir)
 
 from config_utility import BranchConfig
+import add_gadm
 
-config_attempts = 0
-while True:
-    config = BranchConfig(branch=branch)
-    config_attempts += 1
-    if config.connection_status == 0 or config_attempts > 5:
-        break
+
+branch = sys.argv[1]
+
+config = BranchConfig(branch=branch)
+
+# check mongodb connection
+if config.connection_status != 0:
+    raise Exception("connection status error: {0}".format(
+        config.connection_error))
+
 
 # -------------------------------------------------------------------------
 
@@ -41,9 +44,6 @@ if not os.path.isdir(data_dir):
     raise Exception(msg)
 
 
-ingest_dir = os.path.join(branch_dir, 'asdf', 'src', 'ingest')
-sys.path.insert(0, ingest_dir)
-import add_gadm
 
 method = sys.argv[3]
 
@@ -95,7 +95,6 @@ if method == "serial":
 
 elif method == "parallel":
 
-    sys.path.insert(0, os.path.dirname(ingest_dir))
     import mpi_utility
     job = mpi_utility.NewParallel()
 
@@ -131,7 +130,7 @@ elif method == "parallel":
         try:
             with mpi_utility.Capturing() as output:
                 add_gadm.run(path=path, config=config,
-                         update=update, dry_run=dry_run)
+                             update=update, dry_run=dry_run)
             print '\n'.join(output)
         except:
             print "Error with {0}".format(path)
