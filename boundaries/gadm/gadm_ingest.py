@@ -136,9 +136,8 @@ elif method == "parallel":
         print '\n\n'
 
 
-    def tmp_worker_job(self, task):
+    def tmp_worker_job(self, task_index, task_data):
 
-        task_index, task_data = task
         path = task_data
 
         try:
