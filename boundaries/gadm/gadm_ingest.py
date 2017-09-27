@@ -49,7 +49,7 @@ version = sys.argv[2]
 
 version_dir = 'gadm{0}'.format(version)
 
-data_dir = os.path.join(config.data_root, 'data/boundaries', version_dir)
+data_dir = os.path.join(config.data_root, 'geo/data/boundaries', version_dir)
 
 
 if not os.path.isdir(data_dir):
