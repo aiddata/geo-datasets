@@ -4,4 +4,5 @@
 #PBS -l walltime=48:00:00
 #PBS -j oe
 
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 32 python-mpi //sciclone/aiddata10/geo/master/source/geo-datasets/boundaries/gadm/gadm_ingest.py
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 32 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/boundaries/gadm/gadm_ingest.py master 2.8 parallel missing True
+

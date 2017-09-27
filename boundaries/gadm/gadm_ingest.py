@@ -9,7 +9,7 @@ Note: when using parallel mode, be sure to spin up job first (manually or use jo
       and use appropriate mpi command to run script
 
 qsub -I -l nodes=2:c18c:ppn=16 -l walltime=48:00:00
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 32 python-mpi /path/to/geo-datasets/boundaries/gadm/gadm_ingest.py
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 32 python-mpi /path/to/geo-datasets/boundaries/gadm/gadm_ingest.py master 2.8 parallel missing True
 
 """
 
