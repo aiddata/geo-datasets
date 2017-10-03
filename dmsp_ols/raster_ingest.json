@@ -6,7 +6,7 @@
 	"name": "v4composites_calibrated_201709",
     "title": "DMSP-OLS Nighttime Lights",
 	"description": "Version 4 DMSP-OLS Nighttime Lights composites. The lights from cities, towns, and other sites with persistent lighting, including gas flares. Ephemeral events, such as fires have been discarded. Calibrated across sensors and years using Elvidge 2014 coeficients.",
-    "details": "Values greater than 63 after calibration were truncated to 63. Calibration formula fixed from previous processing of raw v4composites dataset.",
+    "details": "Calibrated across sensors and years using Elvidge 2014 coeficients (coefficients for 2014 acquired via communications with Elvidge, 2016). Values greater than 63 after calibration were truncated to 63. Calibration formula fixed from previous processing of raw v4composites dataset. Calibration citation: Elvidge, Christopher D., Feng-Chi Hsu, Kimberly E. Baugh, and Tilottama Ghosh. 'National trends in satellite-observed lighting.' Global urban monitoring and assessment through earth observation 23 (2014): 97-118.",
 	"version": 4,
 	"options": {
 	    "resolution": 0.008333333333333,
