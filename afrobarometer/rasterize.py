@@ -15,16 +15,13 @@ file = r"/Users/miranda/Documents/AidData/datasets/AFB/rasterization/Merged Stac
 # r"/sciclone/home10/zlv/datasets/data_process/afb/afb_data_merged.dta"
 dirc = os.path.dirname(file)
 
-for rd in range(1,7,1):
+for rd in range(1, 7):
 
     folder = "round_" + str(rd)
 
     fpath = os.path.join(dirc, folder)
 
-    if os.path.isdir(fpath):
-        pass
-
-    else:
+    if not os.path.isdir(fpath):
         os.mkdir(fpath)
 
 
@@ -38,11 +35,6 @@ questions = ["trust_pres"]#, "trust_police", "trust_court", "trust_electcom",
 
 pixel_size = 0.01
 
-try:
-    pixel_size = float(pixel_size)
-except:
-    raise Exception("Invalid pixel size (could not be converted to float)")
-
 out_shape = (int(180 / pixel_size), int(360 / pixel_size))
 
 affine = Affine(pixel_size, 0, -180,
@@ -50,7 +42,7 @@ affine = Affine(pixel_size, 0, -180,
 
 
 
-for rd in range(1,2,1):
+for rd in range(1, 2):
 
     # set path
     folder = "round_" + str(rd)
@@ -58,20 +50,21 @@ for rd in range(1,2,1):
 
     dta = df[df['round'] == rd]
 
-    dta_asub = dta.loc[((dta["location_class"] == 2) | (dta["location_class"] == 3) | (
-    (dta["location_class"] == 1) & (dta["location_type_code"].isin(["ADM3", "ADM4", "ADM4H", "ADM5"]))))]
+    # get A
+    dta_asub = dta.loc[(
+        dta["location_class"] == 2 |
+        dta["location_class"] == 3 |
+        (dta["location_class"] == 1 & dta["location_type_code"].isin(["ADM3", "ADM4", "ADM4H", "ADM5"]))
+    )]
 
-
-    lista = list()
     lista = ["A" for i in range(len(dta_asub))]
-
     dta_asub["category"] = lista
+
     respna = list(dta_asub["respno"])
 
 
     # get B
     dta_bsub = dta.loc[~dta["respno"].isin(respna)]
-    listb = list()
     listb = ["B" for i in range(len(dta_bsub))]
     dta_bsub["category"] = listb
 
@@ -84,11 +77,7 @@ for rd in range(1,2,1):
 
     for question in questions:
 
-        if gdf[question].isnull().all():
-
-            pass
-
-        else:
+        if not gdf[question].isnull().all():
 
             """
 
@@ -123,15 +112,13 @@ for rd in range(1,2,1):
 
             # rasterize
 
-            rasterdf = gdf[gdf["category"] == "A"]
+            rasterdf = gdf.loc[gdf["category"] == "A"]
 
             output1 = r"/Users/miranda/Desktop/delete.csv"
             rasterdf.to_csv(output1, encoding='utf-8', sep=',')
 
-            name = "round_" + str(rd) + "_" + question + ".tif"
+            name = "round_{0}_{1}.tif".format(rd, question)
             output = os.path.join(fpath, name)
-
-            raster_layer = list()
 
             print question
 
@@ -142,6 +129,7 @@ for rd in range(1,2,1):
 
 
             """
+            raster_layer = list()
 
             for value in values:
 
