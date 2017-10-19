@@ -14,8 +14,8 @@
         "extract_types_info": {
             "count" : "total count of pixels per unit of analysis",
             "mean": "average population density per unit of analysis",
-            "mean": "maximum population density per unit of analysis",
-            "mean": "minimum population density per unit of analysis"
+            "max": "maximum population density per unit of analysis",
+            "min": "minimum population density per unit of analysis"
         },
 	    "factor": 1,
 	    "variable_description": "persons per square kilometer"
