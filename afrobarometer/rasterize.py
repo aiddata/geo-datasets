@@ -10,17 +10,17 @@ from affine import Affine
 from distancerasters import rasterize, export_raster
 
 # cd Desktop first
-file = r"Merged Stacked Datasets_v3.dta"
+file = "Merged_Stacked_Datasets_v3.dta"
 
 # r"/Users/miranda/Documents/AidData/datasets/AFB/rasterization/Merged Stacked Datasets_v3.dta"
 # r"/sciclone/home10/zlv/datasets/data_process/afb/afb_data_merged.dta"
 dirc = os.path.dirname(file)
 
-for rd in range(1, 7):
-    folder = "round_" + str(rd)
-    fpath = os.path.join(dirc, folder)
-    if not os.path.isdir(fpath):
-        os.mkdir(fpath)
+# for rd in range(1, 7):
+#     folder = "round_" + str(rd)
+#     fpath = os.path.join(dirc, folder)
+#     if not os.path.isdir(fpath):
+#         os.mkdir(fpath)
 
 
 df = pd.read_stata(file)
@@ -46,8 +46,8 @@ rd = 1
 folder = "round_" + str(rd)
 fpath = os.path.join(dirc, folder)
 
-dta = df.loc[df['round'] == rd]
-dta['category'] = None
+dta = df.loc[df['round'] == rd].copy(deep=True)
+dta.loc['category'] = None
 
 
 
