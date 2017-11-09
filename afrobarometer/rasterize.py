@@ -1,145 +1,165 @@
+
 import os
 import pandas as pd
-import matplotlib.pyplot as plt
-# import seaborn as sns
 import geopandas as gpd
 from shapely.geometry import Point
 import numpy as np
-
 from affine import Affine
-from distancerasters import rasterize, export_raster
+from distancerasters import rasterize
 
-# cd Desktop first
-file = "Merged_Stacked_Datasets_v3.dta"
+# -*- coding: utf-8 -*-
 
-# r"/Users/miranda/Documents/AidData/datasets/AFB/rasterization/Merged Stacked Datasets_v3.dta"
-# r"/sciclone/home10/zlv/datasets/data_process/afb/afb_data_merged.dta"
+file = r"/Users/miranda/Documents/AidData/datasets/AFB/rasterization/Merged Stacked Datasets_v3.dta"
+# file = r"/sciclone/home10/zlv/datasets/data_process/afb/afb_data_merged.csv"
+
+# ------------------------------------
+# create output directory
+
 dirc = os.path.dirname(file)
 
-# for rd in range(1, 7):
-#     folder = "round_" + str(rd)
-#     fpath = os.path.join(dirc, folder)
-#     if not os.path.isdir(fpath):
-#         os.mkdir(fpath)
+for rd in range(1, 7):
+    folder = "round_" + str(rd)
+    fpath = os.path.join(dirc, folder)
+    if not os.path.isdir(fpath):
+        os.mkdir(fpath)
 
+# ----------------------
 
-df = pd.read_stata(file)
+def list2matrix(lst, n):
+    """
+    :param lst: a list of values
+    :param n: output matrix length
+    :return: a matrix of n*n with list values
+    """
 
-questions = ["trust_pres"]#, "trust_police", "trust_court", "trust_electcom",
-             #"trust_party", "trust_oppart"]
+    mx = (n,n)
+    mx = np.ones(mx) * 255
 
+    rows = len(lst)/n
+    last_col = len(lst) % n
+
+    for row in range(0,rows):
+        start = row*n
+        end = (row + 1)*n
+        mx[row,:] = lst[start:end]
+
+    mx[rows,0:last_col] = lst[(len(lst)-last_col):]
+
+    return mx
+
+# ------------------------------------------
+dta = pd.read_stata(file)
+
+# Set filters: each questions per round
+questions = ["trust_pres", "trust_police", "trust_court", "trust_electcom",
+             "trust_party", "trust_oppart"]
 
 # ------ rasterization setting ---------
 
-pixel_size = 0.01
+n = 5
+initial_pixel = 0.05
+pixel_size = initial_pixel/n
 
 out_shape = (int(180 / pixel_size), int(360 / pixel_size))
 
 affine = Affine(pixel_size, 0, -180,
                 0, -pixel_size, 90)
 
+nan_val = 255
 
-rd = 1
-# for rd in range(1, 2):
+# --------------------------------------------
+# define precision categories
 
-# set path
-folder = "round_" + str(rd)
-fpath = os.path.join(dirc, folder)
+is_precise = ((dta["location_class"] == 2) | (dta["location_class"] == 3) | (
+(dta["location_class"] == 1) & (dta["location_type_code"].isin(["ADM3", "ADM4", "ADM4H", "ADM5"]))))
+dta['category'] = None
 
-dta = df.loc[df['round'] == rd].copy(deep=True)
-dta.loc['category'] = None
+dta.loc[is_precise, 'category'] = 'fine'
+dta.loc[~is_precise, 'category'] = 'coarse'
 
+# -------------------------------------
 
+for rd in range(1, 7, 1):
 
-# get A
-dta.loc[((dta["location_class"] == 2) | (dta["location_class"] == 3) | ((dta["location_class"] == 1) & (dta["location_type_code"].isin(["ADM3", "ADM4", "ADM4H", "ADM5"])))), 'category'] = 'A'
-dta_asub = dta.loc[dta['category'] == 'A']
+    print "Start working on Round: ", str(rd)
 
-respno_a = list(dta_asub["respno"])
+    # set path
+    folder = "round_" + str(rd)
+    fpath = os.path.join(dirc, folder)
 
+    dta_gdf = dta.loc[dta['round'] == rd]
+    rasterdf = dta_gdf.loc[dta_gdf["category"] == "fine"].copy()
 
-# get B
-dta.loc[(~dta["respno"].isin(respno_a)), 'category'] = 'B'
-dta_bsub = dta.loc[dta['category'] == 'B']
+    for question in questions:
 
+        if not rasterdf[question].isnull().all():
+            print "Working on Round " + str(rd) + " Question " + question
+            print "---------------------------------------------------"
 
-dta_sum = pd.concat([dta_asub, dta_bsub])
-#print dta_sum.shape
+        # ----------------------------------Start rasterize----------------------------------
 
-dta_sum['geometry'] = dta_sum.apply(lambda z: Point(z['longitude'], z['latitude']), axis=1)
-gdf = gpd.GeoDataFrame(dta_sum)
+            # assign null value
+            rasterdf.loc[rasterdf[question].isnull(),question] = nan_val
 
-question = questions[0]
-# for question in questions:
+            # get response list
+            responses = sorted(list(rasterdf[question].unique()))
 
-# if not gdf[question].isnull().all():
+            # round coordinates
+            rasterdf['latitude'] = rasterdf['latitude'].apply(lambda x: round(x*20)/20)
+            rasterdf['longitude'] = rasterdf['longitude'].apply(lambda x: round(x*20)/20)
 
-"""
+            rastergp = rasterdf.groupby(['longitude', 'latitude'])
 
-# categorical plot
-plot = sns.countplot(x=question, hue="category", data=gdf)
+            outdict = dict()
+            outdict['longitude'] = list()
+            outdict['latitude'] = list()
+            outdict[question] = list()
 
-fig = plot.get_figure()
-name = "category_" + question + ".png"
-fig.savefig(os.path.join(fpath, name))
-plt.clf()
+            for name, group in rastergp:
 
+                responselist = list()
 
-# scatterplot of coordinates
+                for response in responses:
 
-plt.clf()
-num = "N = " + str(len(dta_asub))
-plt.plot(dta_asub["longitude"], dta_asub["latitude"], 'r.', markersize=2)
-name = "Category_A: " + question + "_" + str(rd)
-plt.title(name)
-name = "r_" + str(rd) + "_scattorplot_a_" + question
-plt.savefig(os.path.join(os.path.join(fpath, name)))
+                    if not response== nan_val:
 
-plt.clf()
-num = "N = " + str(len(dta_bsub))
-plt.plot(dta_bsub["longitude"], dta_bsub["latitude"], 'X', markersize=2)
-name = "Category_B: " + question + "_" + str(rd)
-plt.title(name)
-name = "r_" + str(rd) + "_scattorplot_b_" + question
-plt.savefig(os.path.join(fpath, name))
-plt.clf()
-"""
+                        respcount = group[group[question]==response][question].count()
+                        responselist.append(str(int(response)+100)+str(respcount))
 
-# rasterize
+                # create n*n matrix and assign values
+                minimatrix = list2matrix(responselist, n)
 
-rasterdf = gdf.loc[gdf["category"] == "A"]
+                mx = (n, n)
+                mx = np.ones(mx) * 255
 
-output1 = "delete.csv"
-rasterdf.to_csv(output1, encoding='utf-8', sep=',')
+                # initial point is at the top left cornor
+                # longitude moves n/2 pixels left (2 pixels)
+                # latitude moves n/2 pixels above (2 pixels)
 
-name = "round_{0}_{1}.tif".format(rd, question)
-output = os.path.join(fpath, name)
+                lon_init = name[0] - pixel_size * (n/2)
+                lat_init = name[1] + pixel_size * (n/2)
 
-print question
+                count = 0
 
-cat_raster, _ = rasterize(rasterdf, affine=affine, shape=out_shape, attribute=question, nodata=0, fill=-999)
+                # assign coordinates to the matrix that holds response values (minimatrix)
+                for i in range(0, n, 1):
 
-output = "delete.tif"
-export_raster(cat_raster, affine=affine, path=output)
+                    for j in range(0, n, 1):
 
+                        if count >= len(responselist):
+                            break
+                        else:
+                            outdict['latitude'].append((lat_init + i * pixel_size))
+                            outdict['longitude'].append((lon_init + j * pixel_size))
+                            outdict[question].append(minimatrix[i, j])
+                            count = count + 1
 
-"""
-raster_layer = list()
+            newdf = pd.DataFrame.from_dict(outdict)
 
-for value in values:
+            newdf["geometry"] = newdf.apply(lambda x: Point(x["longitude"], x["latitude"]), axis=1)
+            newgdf = gpd.GeoDataFrame(newdf)
 
-    rasterdata = rasterdf[rasterdf[question] == value]
+            name = "round_{0}_{1}.tif".format(rd, question)
+            output = os.path.join(fpath, name)
 
-    print rasterdata.shape
-    #cat_raster, _ = rasterize(rasterdata, affine=affine, shape=out_shape, nodata=-99)
-    #raster_layer.append(cat_raster)
-
-#output_raster = np.zeros(shape=(out_shape[0], out_shape[1]))
-
-#for index in range(len(raster_layer)):
-
-    #output_raster = output_raster + raster_layer[index] * (index + 1)
-
-#export_raster(output_raster, affine=affine, path=output)
-"""
-
+            cat_raster, _ = rasterize(newgdf, affine=affine, shape=out_shape, attribute=question, nodata=nan_val, fill=255, output=output)
