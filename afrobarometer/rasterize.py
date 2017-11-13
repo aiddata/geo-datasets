@@ -51,13 +51,13 @@ def list2matrix(lst, n):
 dta = pd.read_stata(file)
 
 # Set filters: each questions per round
-questions = ["trust_pres", "trust_police", "trust_court", "trust_electcom",
-             "trust_party", "trust_oppart"]
+questions = ["trust_pres"]#, "trust_police", "trust_court", "trust_electcom",
+             #"trust_party", "trust_oppart"]
 
 # ------ rasterization setting ---------
 
 n = 5
-initial_pixel = 0.05
+initial_pixel = 0.025
 pixel_size = initial_pixel/n
 
 out_shape = (int(180 / pixel_size), int(360 / pixel_size))
@@ -79,7 +79,7 @@ dta.loc[~is_precise, 'category'] = 'coarse'
 
 # -------------------------------------
 
-for rd in range(1, 7, 1):
+for rd in range(6, 7, 1):
 
     print "Start working on Round: ", str(rd)
 
