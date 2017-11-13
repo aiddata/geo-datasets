@@ -6,6 +6,10 @@ import time
 from adjustText import adjust_text, repel_text
 import plotly.graph_objs as go
 import plotly.plotly as py
+from affine import Affine
+from distancerasters import rasterize
+import geopandas as gpd
+from shapely.geometry import Point
 
 # -*- coding: utf-8 -*-
 
@@ -27,8 +31,19 @@ dta = pd.read_stata(file)
 
 # ------------------------------------------
 # Set filters: each questions per round
-questions = ["trust_pres", "trust_police", "trust_court", "trust_electcom",
-            "trust_party", "trust_oppart"]
+questions = ["trust_pres"]#, "trust_police", "trust_court", "trust_electcom",
+            #"trust_party", "trust_oppart"]
+
+# ------ rasterization setting ---------
+
+pixel_size = 1
+
+out_shape = (int(180 / pixel_size), int(360 / pixel_size))
+
+affine = Affine(pixel_size, 0, -180,
+                0, -pixel_size, 90)
+
+nan_val = 255
 
 # ---------------------------------
 # calculate percentage rate of fine locations within a given round
@@ -159,7 +174,7 @@ dta.loc[~is_precise, 'category'] = 'coarse'
 
 gdf = dta.copy(deep=True)
 
-for rd in range(1, 7, 1):
+for rd in range(6, 7, 1):
 
     print "Start working on Round: ", str(rd)
 
@@ -198,6 +213,37 @@ for rd in range(1, 7, 1):
             plt.clf()
 
             summary_df = percentage_fine(dta_gdf, question)
+
+            # visualize the fine level survey counts
+
+            dta_asub.to_csv('delete.csv')
+            round_accuracy = int(1/pixel_size)
+            dta_asub['latitude'] = dta_asub['latitude'].apply(lambda x: round(x*round_accuracy)/round_accuracy)
+            dta_asub['longitude'] = dta_asub['longitude'].apply(lambda x: round(x*round_accuracy)/round_accuracy)
+
+
+            dta_gp = dta_asub.groupby(('longitude','latitude'))
+            dta_dict = dict()
+            dta_dict['latitude'] = list()
+            dta_dict['longitude'] = list()
+            dta_dict['count'] = list()
+
+            for name, group in dta_gp:
+                count = group[question].count()
+                dta_dict['latitude'].append(name[1])
+                dta_dict['longitude'].append(name[0])
+                dta_dict['count'].append(count)
+
+            newdf = pd.DataFrame.from_dict(dta_dict)
+            newdf["geometry"] = newdf.apply(lambda x: Point(x["longitude"], x["latitude"]), axis=1)
+            newgdf = gpd.GeoDataFrame(newdf)
+            newgdf.to_csv('delete_count.csv')
+
+            output = 'test.tif'
+
+            cat_raster, _ = rasterize(newgdf, affine=affine, shape=out_shape, attribute='count', nodata=nan_val,
+                                      fill=255, output=output)
+
 
             # map 1: percentage of fine locations (this is identical for different question
             # Only one plot each round)
@@ -243,6 +289,3 @@ for rd in range(1, 7, 1):
             mapvar4 = 'Round ' + str(rd) + ' plot.png'
             #if not os.path.exists(os.path.join(fpath, mapvar4)):
             scatter_label(summary_df, os.path.join(fpath, mapvar4), rd)
-            
-
-
