@@ -95,6 +95,15 @@ def percentage_fine(gdf, question):
 
 
 def plot_map(dta, mapvar, maptitle, legendtitle, outfile):
+
+    """
+    :param dta: dataframe that summarizes mean/count of question response at fine level
+    :param mapvar: the attribute to map, eg: fine_count_percent (percentage of fine locations)
+    :param maptitle: image title
+    :param legendtitle: legend title
+    :param outfile: output directory
+    :return: an image saved
+    """
     try:
         py.sign_in('mirandalv', 'TMvHv1KBIfeambeSCXwt')
     except:
@@ -212,8 +221,6 @@ for rd in range(6, 7, 1):
             plt.savefig(os.path.join(fpath, name))
             plt.clf()
 
-            summary_df = percentage_fine(dta_gdf, question)
-
             # visualize the fine level survey counts
 
             dta_asub.to_csv('delete.csv')
@@ -244,6 +251,8 @@ for rd in range(6, 7, 1):
             cat_raster, _ = rasterize(newgdf, affine=affine, shape=out_shape, attribute='count', nodata=nan_val,
                                       fill=255, output=output)
 
+
+            summary_df = percentage_fine(dta_gdf, question)
 
             # map 1: percentage of fine locations (this is identical for different question
             # Only one plot each round)
@@ -287,5 +296,5 @@ for rd in range(6, 7, 1):
             print "Working on scatterplots..........."
             plt.clf()
             mapvar4 = 'Round ' + str(rd) + ' plot.png'
-            #if not os.path.exists(os.path.join(fpath, mapvar4)):
-            scatter_label(summary_df, os.path.join(fpath, mapvar4), rd)
+            if not os.path.exists(os.path.join(fpath, mapvar4)):
+                scatter_label(summary_df, os.path.join(fpath, mapvar4), rd)
