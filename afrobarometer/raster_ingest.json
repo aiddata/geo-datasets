@@ -1,0 +1,27 @@
+{
+    "base": "",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "afb_r6_categorical",
+    "title": "Afrobarometer Round 6 Trust President",
+    "description": "The Afrobarometer dataset contains African's views on democracy, governance, and other issues. Round 6 surveys were collected in 36 countries",
+    "details": "This is an aggregated dataset indicating count of each response option per pixel",
+    "version": "",
+    "options": {
+        "resolution": 0.005,
+        "extract_types": ["encoded"],
+        "extract_types_info" : {
+            "encoded":"total count of each response option per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "Afb r6 response to trust president"
+    },
+    "extras": {
+        "citation": "BenYishay, A., Rotberg, R., Wells, J., Lv, Z., Goodman, S., Kovacevic, L., Runfola, D. 2017. Geocoding Afrobarometer Rounds 1 - 6: Methodology & Data Quality. AidData. Available online at http://geo.aiddata.org.",
+        "sources_web": "http://afrobarometer.org/data/geocoded-data",
+        "sources_name": "AfbR6",
+        "tags": [ "afrobarometer", "round 6", "trust president"]
+    },
+    "active": 1
+}
