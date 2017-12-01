@@ -7,7 +7,7 @@
     "title": "Afrobarometer Round 6 Q52a - Trust President",
     "description": "Afrobarometer Round 6 - trust in the country's president. Responses include: 0=Not at all, 1=Just a little, 2=Somewhat, 3=A lot",
     "details": "This is an aggregated dataset indicating count of each response option per pixel. The Afrobarometer dataset contains African's views on democracy, governance, and other issues. Round 6 surveys were collected in 36 countries",
-    "version": "",
+    "version": "20171201",
     "options": {
         "resolution": 0.005,
         "extract_types": ["encoded"],
