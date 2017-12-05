@@ -21,7 +21,16 @@
         "citation": "BenYishay, A., Rotberg, R., Wells, J., Lv, Z., Goodman, S., Kovacevic, L., Runfola, D. 2017. Geocoding Afrobarometer Rounds 1 - 6: Methodology & Data Quality. AidData. Available online at http://geo.aiddata.org.",
         "sources_web": "http://afrobarometer.org/data/geocoded-data",
         "sources_name": "Afrobarometer",
-        "tags": ["afrobarometer", "survey"]
+        "tags": ["afrobarometer", "survey"],
+        "category_map": {
+            "(0) Not at all": 100,
+            "(1) Just a little": 101,
+            "(2) Somewhat": 102,
+            "(3) A lot": 103,
+            "(9) Don’t know/Haven’t heard enough": 104,
+            "(98) Refused to answer": 105,
+            "(-1) Missing": 106
+        }
     },
     "active": 1
 }
