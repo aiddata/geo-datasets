@@ -1,0 +1,39 @@
+{
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/GHS_BUILT_LDS2014_GLOBE_R2016A_54009_1k_v1_0/GHS_BUILT_LDS2014_GLOBE_R2016A_54009_1k_v1_0_bin.tif",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "GHS_BUILT_LDS2014_GLOBE_R2016A_54009_1k_v1_0_bin",
+    "title": "Human Settlement Agglomeration Units",
+    "description": "Human Settlement Agglomeration Units at 1km resolution",
+    "details": "Derived using multi-level classification algorithm to identify human settlement agglomeration units",
+    "version": 1.0,
+    "options": {
+        "resolution": 0.00833333,
+        "extract_types": ["categorical"],
+        "extract_types_info" : {
+            "categorical" : "bin unit values",
+        },
+        "factor": 1,
+        "variable_description": "bin values from 0 to 9 (larger values for urban centers)"
+    },
+    "extras": {
+        "citation": "",
+        "sources_web": "",
+        "sources_name": "",
+        "tags": ["pollution", "air", "environment", "disease", "ozone"],
+        "category_map": {
+            "bin_0": 0,
+            "bin_1": 1,
+            "bin_2": 2,
+            "bin_3": 3,
+            "bin_4": 4,
+            "bin_5": 5,
+            "bin_6": 6,
+            "bin_7": 7,
+            "bin_8": 8,
+            "bin_9": 9
+        }
+    },
+    "active": 1
+}
