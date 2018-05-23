@@ -12,7 +12,7 @@
         "resolution": 0.00833333,
         "extract_types": ["categorical"],
         "extract_types_info" : {
-            "categorical" : "bin unit values",
+            "categorical" : "bin unit values"
         },
         "factor": 1,
         "variable_description": "bin values from 0 to 9 (larger values for urban centers)"
