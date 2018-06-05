@@ -1,4 +1,9 @@
 # MODIS/Terra land surface temperature and emissivity daily products
+
+Next step:
+	- scale factors
+	- projection
+
 Downloaded from:https://lpdaac.usgs.gov/dataset_discovery/modis/modis_products_table/mod11c1_v006
 
 - Register an account, and use the account information to access data from data pool
