@@ -8,6 +8,7 @@ Downloaded from:https://lpdaac.usgs.gov/dataset_discovery/modis/modis_products_t
     -  The raw hdf data file will be downloaded in the destination directory;
 - Data extraction:
     - run data_processing.R to extract "Monthly daytime 3min CMG Land-surface Temperature" and "Monthly nighttime 3min CMG Land-surface Temperature"
+    - Convert the number of day in a year to dates: https://www.epochconverter.com/days/2010
     - See the hdf layer descriptions from: https://icess.eri.ucsb.edu/modis/LstUsrGuide/usrguide_month_cmg.html
     - Local attributes can be found in Table 4: https://icess.eri.ucsb.edu/modis/LstUsrGuide/usrguide_mod11.html#Table_4
     - Spatial unit: 0.05 degree latitude/longitude grids
