@@ -8,6 +8,7 @@ Downloaded from:https://lpdaac.usgs.gov/dataset_discovery/modis/modis_products_t
     -  Run data_download.py to create a filelist.txt which saves each file directory on the server;
     -  wget -L --user=youraccountemail --password=yourpassword --load-cookies ~/.cookies --save-cookies ~/.cookies -i filelist.txt (the password has to be set in the command line);
     -  The raw hdf data file will be downloaded in the destination directory;
+    -  Raw data projection: Sinusoidal (SIN) projection
 - Data extraction in R:
     - run data_processing.R to extract "Monthly daytime 3min CMG Land-surface Temperature" and "Monthly nighttime 3min CMG Land-surface Temperature"
     - Convert the number of day in a year to dates: https://www.epochconverter.com/days/2010
@@ -32,3 +33,5 @@ Process sample: http://www.glennklockwood.com/data-intensive/r/on-hpc.html
 Data Products:
 - Raw data products are in: /sciclone/aiddata10/REU/pre_geo/modis_temp/rawdata
 - The final products are saved in: /sciclone/aiddata10/REU/pre_geo/modis_temp/temp
+- HDF manual: https://support.hdfgroup.org/release4/doc/UG_PDF.pdf
+- projection: http://spatialreference.org/ref/sr-org/modis-sinusoidal-3/
