@@ -2,7 +2,7 @@
 	"base": "/sciclone/aiddata10/REU/pre_geo/modis_temp/temp",
 	"type": "raster",
 	"file_extension": ".tif",
-	"file_mask": "modis_lst_day_cmg_YYYY_mm.tif",
+	"file_mask": "modis_lst_day_cmg_YYYY_xx.tif",
 	"name": "modis_lst_day_monthly",
 	"title": "Daytime Land surface temperature - MODIS",
 	"description": "Monthly daytime land surface temperature. Created using MOD11C3 Monthly CMG LST",
