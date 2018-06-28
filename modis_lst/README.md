@@ -35,3 +35,4 @@ Data Products:
 - The final products are saved in: /sciclone/aiddata10/REU/pre_geo/modis_temp/temp
 - HDF manual: https://support.hdfgroup.org/release4/doc/UG_PDF.pdf
 - projection: http://spatialreference.org/ref/sr-org/modis-sinusoidal-3/
+- modis sinusoidal: https://modis-land.gsfc.nasa.gov/MODLAND_grid.html
