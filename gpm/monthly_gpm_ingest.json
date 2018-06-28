@@ -2,7 +2,7 @@
 	"base": "/sciclone/aiddata10/REU/pre_geo/GPM/processed",
 	"type": "raster",
 	"file_extension": ".tif",
-	"file_mask": "gpm_precipitation_YYYY_mm.tif",
+	"file_mask": "gpm_precipitation_YYYY_xx.tif",
 	"name": "monthly_gpm_precipitation",
 	"title": "Monthly GPM precipitation",
 	"description": "Monthly IMERG GPM precipitation - research version",
