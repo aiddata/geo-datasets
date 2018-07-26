@@ -1,8 +1,15 @@
 # CRU dataset version 4.01
 
-download: https://crudata.uea.ac.uk/cru/data/hrg/cru_ts_4.01/cruts.1709081022.v4.01/
+download:
 
-- run extract_data.R to get 13 different monthly variable dataset ranging from 1901 to 2016
+- main page: https://crudata.uea.ac.uk/cru/data/hrg/cru_ts_4.01/cruts.1709081022.v4.01/
+
+for each variable (dir at above link) go into dir and download file of format "cru_ts4.01.1901.2016.{var}.dat.nc.gz"
+- example url for precipitation (var = pre): https://crudata.uea.ac.uk/cru/data/hrg/cru_ts_4.01/cruts.1709081022.v4.01/pre/cru_ts4.01.1901.2016.pre.dat.nc.gz
+
+- gunzip all the downloaded .gz files (gunzip --keep input_regex output_dir)
+
+- run extract_data.R to get 10 different monthly variable dataset ranging from 1901 to 2016
 - have to install R package 'cruts'
 - the export dataset directory: /sciclone/aiddata10/REU/pre_geo/CRU (precipication/pre_extract/output)
 
