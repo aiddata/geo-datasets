@@ -12,9 +12,9 @@
 	    "resolution": 0.1,
         "extract_types": ["max", "mean", "min", "count"],
         "extract_types_info" : {
-            "max" : "maximum NDVI value per unit of analysis",
-            "mean" : "average NDVI value per unit of analysis",
-            "min" : "minimum NDVI value per unit of analysis",
+            "max" : "maximum precipitation value per unit of analysis",
+            "mean" : "average precipitation value per unit of analysis",
+            "min" : "minimum precipitation value per unit of analysis",
             "count" : "total count of pixels per unit of analysis"
         },
 	    "factor": 1,
