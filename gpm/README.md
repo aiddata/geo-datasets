@@ -5,11 +5,13 @@ Data process:
 - Run data_processing.py to rename the monthly data
 
 Notes:
-- The GPM was launched in Feb 2014, and the montly data starts at March 2014.
+- The GPM was launched in Feb 2014, and the montly imerg data starts at March 2014.
 - Data information: https://pmm.nasa.gov/data-access/downloads/gpm
+- Data Readme: https://pps.gsfc.nasa.gov/Documents/README.GIS.pdf
 - Data download:ftp://arthurhou.pps.eosdis.nasa.gov/gpmdata/
 - Montly unit is 0.001 millimeters per hour(monthly average precipitation rate were scaled up by 1000), 30 minutes and 1 day unit are 0.1 millimeters per hour.
-
+- WARNING: as of 2018-07-26 download, the data (up to 2018-01-01 data) the data still uses a nodata value of 9999 even though documentation states they switched to
+           nodata value of 29999 after 2017.
 
 There are two types of monthly precipitation data:
 - gis version: this includes .tif .tfw and .zip of monthly. The .tif is montly total precipitation.
