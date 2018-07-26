@@ -1,5 +1,5 @@
 {
-	"base": "/sciclone/aiddata10/REU/pre_geo/GPM/processed",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/gpm/monthly",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "gpm_precipitation_YYYY_MM.tif",

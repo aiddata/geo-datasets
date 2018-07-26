@@ -1,5 +1,5 @@
 {
-	"base": "/sciclone/aiddata10/REU/pre_geo/CRU/precipitation/pre_extract/output",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/monthly/pre",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "cru.pre.YYYY.MM.tif",
