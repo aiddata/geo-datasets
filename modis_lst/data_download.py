@@ -2,7 +2,7 @@
 
 Then run below to download (with earthdata user/pass login info)
 
-wget -L --user=youraccountemail --password=yourpassword --load-cookies ~/.cookies --save-cookies ~/.cookies -i filelist.txt
+wget -nc -L --user=youraccountemail --password=yourpassword --load-cookies ~/.cookies --save-cookies ~/.cookies -P /sciclone/aiddata10/REU/geo/raw/modis_lst/MOD11C3/ -i /path/to/filelist.txt
 
 """
 

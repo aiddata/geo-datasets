@@ -108,7 +108,7 @@ affine = Affine(pixel_size, 0, -180,
                 0, -pixel_size, 90)
 
 
-input_dir = "/sciclone/aiddata10/REU/geo/raw/modis_lst"
+input_dir = "/sciclone/aiddata10/REU/geo/raw/modis_lst/MOD11C3"
 
 output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily"
 
