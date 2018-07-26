@@ -1,109 +1,61 @@
+"""Create list of files to download (see example_file_list.txt)
 
+Then run below to download (with earthdata user/pass login info)
 
+wget -L --user=youraccountemail --password=yourpassword --load-cookies ~/.cookies --save-cookies ~/.cookies -i filelist.txt
 
-from bs4 import BeautifulSoup
-import requests
+"""
+
 import os
-import urllib2
-import urllib
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+import errno
+import requests
+from bs4 import BeautifulSoup
+import time
+import datetime
 
-import urlparse
+
+root_url = "https://e4ftl01.cr.usgs.gov"
+
+data_url = os.path.join(root_url, "MOLT/MOD11C3.006")
 
 
-root = r"https://e4ftl01.cr.usgs.gov"
-rooturl = r"https://e4ftl01.cr.usgs.gov/MOLT/MOD11C3.006"
-outfolder = r'/Users/miranda/Documents/AidData/projects/datasets/MODIS_temp'
-#outfolder = r'/sciclone/aiddata10/REU/pre_geo/modis_temp/rawdata'
+timestamp = datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y_%m_%d')
 
-#username = "zlv@aiddata.wm.edu"
-#password = mypassword, 3 Cap with 3 #
+output_dir = "/sciclone/aiddata10/REU/geo/raw/modis_lst"
 
+output_file = os.path.join(output_dir, "file_list_{}.txt".format(timestamp))
+
+
+
+def make_dir(path):
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
 
 
 def listFD(url, ext=''):
     page = requests.get(url).text
     soup = BeautifulSoup(page, 'html.parser')
     urllist = [url + '/' + node.get('href') for node in soup.find_all('a') if node.get('href').endswith(ext)]
-
     return urllist
 
 
-
-def retrieve_data(urls, username, password, outf):
-
-    r = requests.get(urls, auth=HTTPDigestAuth(username, password)) #HTTPDigestAuth(username, password)
-    page = r.content
-
-    print page
+make_dir(output_dir)
 
 
-    #response = urllib2.urlopen(urls)
-    #html = response.read()
-
-    """
-    p = urllib2.HTTPPasswordMgrWithDefaultRealm()
-    p.add_password(None, urls, usr, pswd)
-    handler = urllib2.HTTPBasicAuthHandler(p)
-    opener = urllib2.build_opener(handler)
-    opener.open(urls)
-    urllib2.install_opener(opener)
-
-    req = urllib2.Request(urls)
-    response = urllib2.urlopen(req)
-    """
-
-
-    ##lf = open(outf, 'wb')
-    #lf.write(page)
-    #lf.close()
-
-
-
-filelist = list()
-
-for file in listFD(rooturl):
+output_str = ""
+for file in listFD(data_url):
 
     hdfurl = listFD(file, 'hdf')
 
-    if len(hdfurl) != 0:
+    if len(hdfurl) == 0:
+        print "Cannot download: \n{}".format(file)
+        continue
 
-        print "start working on", hdfurl[0]
-        foldername = hdfurl[0].split('/')[-3]
-        filename = hdfurl[0].split('/')[-1]
-
-        filelist.append(hdfurl[0])
+    output_str += hdfurl[0] + '\n'
 
 
-        if os.path.exists(foldername):
-            os.chdir(os.path.join(outfolder, foldername))
-
-            retrieve_data(hdfurl[0], username, password, filename)
-            #retrieve_data(hdfurl[0], filename)
-
-
-        else:
-            f = os.path.join(outfolder, foldername)
-            os.mkdir(f)
-            os.chdir(os.path.join(outfolder, foldername))
-
-            retrieve_data(hdfurl[0], username, password, filename)
-            #retrieve_data(hdfurl[0], filename)
-
-
-    else:
-        print "not downloadable"
-
-
-
-with open(outtxt, 'wb') as txt:
-
-    for f in filelist:
-
-        txt.write(f + '\n')
-
-
-
-
-
-
+with open(output_file, 'wb') as dst:
+    dst.write(output_str)
