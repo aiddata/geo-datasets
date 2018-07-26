@@ -5,26 +5,26 @@
 	"file_mask": "cru.pre.YYYY.MM.tif",
 	"name": "cru_precipitation_monthly",
 	"title": "Precipication - CRU",
-	"description": "Monthly daytime land surface temperature. Created using MOD11C3 Monthly CMG LST",
-    "details": "Created by extracting monthly daytime land surface temperature data from hdf",
-	"version": "MOD11C3",
+	"description": "Montly precipitation from Climate Research Unit (CRU)",
+    "details": "Created by extracting monthly precipitation data from CRU",
+	"version": "4.01",
 	"options": {
-	    "resolution": 0.05,
+	    "resolution": 0.5,
         "extract_types": ["max", "mean", "min", "count"],
         "extract_types_info" : {
-            "max" : "maximum NDVI value per unit of analysis",
-            "mean" : "average NDVI value per unit of analysis",
-            "min" : "minimum NDVI value per unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+            "max" : "maximum precipitation value per unit of analysis",
+            "mean" : "average precipitation value per unit of analysis",
+            "min" : "minimum precipitation value per unit of analysis",
+            "count" : "total precipitation of pixels per unit of analysis"
         },
 	    "factor": 1,
-        "variable_description": "temperature in Kelvins"
+        "variable_description": "precipitation in millimeters"
 	},
 	"extras": {
-        "citation": "Wan, Z., Hook, S., Hulley, G. (2015). MOD11C3 MODIS/Terra Land Surface Temperature/Emissivity Monthly L3 Global 0.05Deg CMG V006 [Data set]. NASA EOSDIS LP DAAC. doi: 10.5067/MODIS/MOD11C3.006",
-	    "sources_web": "https://lpdaac.usgs.gov/dataset_discovery/modis/modis_products_table/mod11c3_v006",
-	    "sources_name": "Land Processes Distributed Active Archive Center",
-	    "tags": ["nasa","earthdata", "modis", "lst", "land surface temperature", "environment"]
+        "citation": "Harris et al.(2014) Updated high‐resolution grids of monthly climatic observations – the CRU TS3.10 Dataset. doi:10.1002/joc.3711",
+	    "sources_web": "https://crudata.uea.ac.uk/cru/data/hrg/#info",
+	    "sources_name": "Climate Research Unit",
+	    "tags": ["cru", "precipitation", "environment", "monthly"]
 	},
 	"active": 1
 }
