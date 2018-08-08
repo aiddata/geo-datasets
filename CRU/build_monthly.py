@@ -69,7 +69,7 @@ for dmonth in monthlist:
         year_months[dyear].append(os.path.join(src_base, dmonth))
 
 
-year_qlist = [(year, month_path) for year, month_path in year_months.iteritems()]
+year_qlist = [(year, month_path) for year, month_path in year_months.iteritems() if len(month_path) == 12]
 
 
 
