@@ -1,0 +1,8 @@
+#!/bin/tcsh
+#PBS -N asg:cru_precipitation
+#PBS -l nodes=7:c18c:ppn=16
+#PBS -l walltime=48:00:00
+#PBS -j oe
+
+
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 112 python-mpi /sciclone/data10/zlv/data_process/cru/build_monthly.py
