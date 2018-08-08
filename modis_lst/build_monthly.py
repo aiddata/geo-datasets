@@ -53,7 +53,7 @@ print "building year list..."
 
 year_months = {}
 
-monthlist = [i for i in os.listdir(src_base) if i.endswith('.tif')]
+monthlist = [i for i in os.listdir(src_base) if (i.endswith('.tif') and "day" in i)]
 
 for dmonth in monthlist:
 
