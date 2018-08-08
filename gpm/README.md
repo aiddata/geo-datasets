@@ -4,6 +4,10 @@ Data process:
 - Run data_download.py to download gpm monthly data
 - Run data_processing.py to rename the monthly data
 
+to get yearly aggregation dataset:
+- run build_monthly.py
+
+
 Notes:
 - The GPM was launched in Feb 2014, and the montly imerg data starts at March 2014.
 - Data information: https://pmm.nasa.gov/data-access/downloads/gpm

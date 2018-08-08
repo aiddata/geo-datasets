@@ -22,6 +22,10 @@ Data Products:
 - The final products are saved in: /sciclone/aiddata10/REU/geo/data/rasters/modis_lst
 - HDF manual: https://support.hdfgroup.org/release4/doc/UG_PDF.pdf
 
+Data Aggregation to annual level:
+- run build_monthly.py
+
+
 
 
 =======================================

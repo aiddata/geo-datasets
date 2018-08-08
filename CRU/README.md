@@ -13,6 +13,8 @@ for each variable (dir at above link) go into dir and download file of format "c
 - have to install R package 'cruts'
 - the export dataset directory: /sciclone/aiddata10/REU/pre_geo/CRU (precipication/pre_extract/output)
 
+to get yearly aggregation dataset:
+- run build_monthly.py
 
 data information: https://crudata.uea.ac.uk/cru/data/hrg/#info
 
