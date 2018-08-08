@@ -1,9 +1,6 @@
 
 
-import os, sys
-
-sys.path.append('../CRU')
-
+import os
 from prepare_monthly import DataAggregation
 from datetime import datetime
 
@@ -31,11 +28,11 @@ filter_options = {
     'use_year_accept': False,
     'year_accept': ['1987'],
     'use_year_deny': True,
-    'year_deny': ['2017']
+    'year_deny': ['2018']
 }
 
-src_base = r"/sciclone/aiddata10/REU/pre_geo/modis_temp/temp"
-dst_base = r"/sciclone/aiddata10/REU/pre_geo/modis_temp/temp/yearly"
+src_base = r"/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily"
+dst_base = r"/sciclone/aiddata10/REU/pre_geo/modis_temp/temp"
 dataname = "modis_lst"
 
 builder = DataAggregation(src_base = src_base,
@@ -72,8 +69,7 @@ for dmonth in monthlist:
         year_months[dyear].append(os.path.join(src_base, dmonth))
 
 
-year_qlist = [(year, month_path) for year, month_path in year_months.iteritems()]
-
+year_qlist = [(year, month_path) for year, month_path in year_months.iteritems() if len(month_path) == 12]
 
 
 # -------------------------------------
