@@ -81,8 +81,8 @@ def get_hdf(infile, output_dir):
     newtime = get_time(datestring)
 
     # get new data export name
-    dayout = os.path.join(output_dir, "modis_lst_day_cmg_" + newtime + ".tif")
-    nightout = os.path.join(output_dir, "modis_lst_night_cmg_" + newtime + ".tif")
+    dayout = os.path.join(output_dir, "day/modis_lst_day_cmg_" + newtime + ".tif")
+    nightout = os.path.join(output_dir, "night/modis_lst_night_cmg_" + newtime + ".tif")
 
     # read hdf data files
     file = SD(infile, SDC.READ)
