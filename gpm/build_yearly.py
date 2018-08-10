@@ -1,7 +1,6 @@
 
 
 import os
-import sys
 import errno
 import rasterio
 import numpy as np
@@ -37,16 +36,17 @@ month_files = [i for i in os.listdir(src_base) if i.endswith('.tif')]
 
 for mfile in month_files:
 
-    year = mfile.split(year_sep)[year_loc]
+    # year associated with month
+    myear = mfile.split(year_sep)[year_loc]
 
-    if year not in year_months:
-        year_months[year] = list()
+    if myear not in year_months:
+        year_months[myear] = list()
 
-    year_months[year].append(os.path.join(src_base, mfile))
+    year_months[myear].append(os.path.join(src_base, mfile))
 
 
 year_qlist = [
-    (year, month_paths) for year, month_paths in year_months.iteritems()
+    (year_group, month_paths) for year_group, month_paths in year_months.iteritems()
     if len(month_paths) == 12
 ]
 
@@ -68,66 +68,66 @@ def write_raster(path, data, meta):
 
 
 def aggregate_rasters(file_list, method="mean"):
-        """Aggregate multiple rasters
+    """Aggregate multiple rasters
 
-        Aggregates multiple rasters with same features (dimensions, transform,
-        pixel size, etc.) and creates single layer using aggregation method
-        specified.
+    Aggregates multiple rasters with same features (dimensions, transform,
+    pixel size, etc.) and creates single layer using aggregation method
+    specified.
 
-        Supported methods: mean (default), max, min, sum
+    Supported methods: mean (default), max, min, sum
 
-        Arguments
-            file_list (list): list of file paths for rasters to be aggregated
-            method (str): method used for aggregation
+    Arguments
+        file_list (list): list of file paths for rasters to be aggregated
+        method (str): method used for aggregation
 
-        Return
-            result: rasterio Raster instance
-        """
+    Return
+        result: rasterio Raster instance
+    """
 
-        store = None
-        for ix, file_path in enumerate(file_list):
+    store = None
+    for ix, file_path in enumerate(file_list):
 
-            try:
-                raster = rasterio.open(file_path)
-            except:
-                print "Could not include file in aggregation ({0})".format(file_path)
-                continue
+        try:
+            raster = rasterio.open(file_path)
+        except:
+            print "Could not include file in aggregation ({0})".format(file_path)
+            continue
 
-            active = raster.read(masked=True)
+        active = raster.read(masked=True)
 
-            if store is None:
-                store = active.copy()
+        if store is None:
+            store = active.copy()
+
+        else:
+            # make sure dimensions match
+            if active.shape != store.shape:
+                raise Exception("Dimensions of rasters do not match")
+
+            if method == "max":
+                store = np.ma.array((store, active)).max(axis=0)
+
+                # non masked array alternatives
+                # store = np.maximum.reduce([store, active])
+                # store = np.vstack([store, active]).max(axis=0)
+
+            elif method == "mean":
+                if ix == 1:
+                    weights = (~store.mask).astype(int)
+
+                store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
+                weights += (~active.mask).astype(int)
+
+            elif method == "min":
+                store = np.ma.array((store, active)).min(axis=0)
+
+            elif method == "sum":
+                store = np.ma.array((store, active)).sum(axis=0)
 
             else:
-                # make sure dimensions match
-                if active.shape != store.shape:
-                    raise Exception("Dimensions of rasters do not match")
+                raise Exception("Invalid method")
 
-                if method == "max":
-                    store = np.ma.array((store, active)).max(axis=0)
-
-                    # non masked array alternatives
-                    # store = np.maximum.reduce([store, active])
-                    # store = np.vstack([store, active]).max(axis=0)
-
-                elif method == "mean":
-                    if ix == 1:
-                        weights = (~store.mask).astype(int)
-
-                    store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
-                    weights += (~active.mask).astype(int)
-
-                elif method == "min":
-                    store = np.ma.array((store, active)).min(axis=0)
-
-                elif method == "sum":
-                    store = np.ma.array((store, active)).sum(axis=0)
-
-                else:
-                    raise Exception("Invalid method")
-
-        store = store.filled(raster.nodata)
-        return store, raster.profile
+    store = store.filled(raster.nodata)
+    return store, raster.profile
 
 
 def run_yearly_data(task):
@@ -152,14 +152,13 @@ if mode == "parallel":
             print e
             # raise Exception('year processing')
 
-
         c += size
 
     comm.Barrier()
 
 elif mode == "serial":
 
-    for c in range(len(year_qlist)):
+    for c, _ in enumerate(year_qlist):
         run_yearly_data(year_qlist[c])
 
 else:

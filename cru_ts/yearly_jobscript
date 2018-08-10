@@ -5,4 +5,4 @@
 #PBS -j oe
 
 
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 112 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/cru_ts/build_yearly.py
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 32 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/cru_ts/build_yearly.py
