@@ -1,13 +1,19 @@
 
 Data source: https://earthenginepartners.appspot.com/science-2013-global-forest/download_v1.5.html
 
+
 Data Download:
 - download a list of .txt files that include a list of tiles (loss, first, etc)
 - run download_all_global_hansen.sh to download all tiles for each layer
+- data path: /sciclone/aiddata10/REU/pre_geo/hansen_2017
 
-Image mosaic
+Image Mosaic
+- Run bash mosaic_hansen.sh "layer name" to mosaic images
 
 
+
+
+Data Layers
 - Tree canopy cover for year 2000 (treecover2000):
 Tree cover in the year 2000, defined as canopy closure for all vegetation taller than 5m in height. Encoded as a percentage per output grid cell, in the range 0–100.
 
