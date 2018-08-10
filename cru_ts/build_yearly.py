@@ -17,10 +17,13 @@ if mode == "parallel":
     rank = comm.Get_rank()
 
 
-src_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/monthly/pre"
-dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/yearly/pre"
+data_classs = "pre"
+# data_classs = "tmp"
 
-year_mask = "cru.pre.YYYY.tif"
+src_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/monthly/{}".format(data_class)
+dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/yearly/{}".format(data_class)
+
+year_mask = "cru.{}.YYYY.tif".format(data_class)
 year_sep = "."
 year_loc = 2
 

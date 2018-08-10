@@ -21,7 +21,7 @@ day_night = "day"
 # day_night = "night"
 
 src_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily/{}".format(day_night)
-dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily/{}".format(day_night)
+dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/yearly/{}".format(day_night)
 
 year_mask = "modis_lst_{}_cmg_YYYY.tif".format(day_night)
 year_sep = "_"
