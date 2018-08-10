@@ -105,70 +105,71 @@ def run_yearly_data(task):
 
 # -----------------------------------------------------------------------------
 
-day_night = "day"
-# day_night = "night"
+data_class_list = ["day", "night"]
 
-src_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily/{}".format(day_night)
-dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/yearly/{}".format(day_night)
+for data_class in data_class_list:
 
-year_mask = "modis_lst_{}_cmg_YYYY.tif".format(day_night)
-year_sep = "_"
-year_loc = 4
+    src_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily/{}".format(data_class)
+    dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/yearly/{}".format(data_class)
 
-
-# -------------------------------------
+    year_mask = "modis_lst_{}_cmg_YYYY.tif".format(data_class)
+    year_sep = "_"
+    year_loc = 4
 
 
-if mode == "serial" or rank == 0:
-    print "building year list..."
-
-year_months = {}
-
-month_files = [i for i in os.listdir(src_base) if i.endswith('.tif')]
-
-for mfile in month_files:
-
-    # year associated with month
-    myear = mfile.split(year_sep)[year_loc]
-
-    if myear not in year_months:
-        year_months[myear] = list()
-
-    year_months[myear].append(os.path.join(src_base, mfile))
+    # -------------------------------------
 
 
-year_qlist = [
-    (year_group, month_paths) for year_group, month_paths in year_months.iteritems()
-    if len(month_paths) == 12
-]
+    if mode == "serial" or rank == 0:
+        print "building year list..."
 
-# -------------------------------------
+    year_months = {}
+
+    month_files = [i for i in os.listdir(src_base) if i.endswith('.tif')]
+
+    for mfile in month_files:
+
+        # year associated with month
+        myear = mfile.split(year_sep)[year_loc]
+
+        if myear not in year_months:
+            year_months[myear] = list()
+
+        year_months[myear].append(os.path.join(src_base, mfile))
 
 
-if mode == "serial" or rank == 0:
-    print "running yearly data..."
+    year_qlist = [
+        (year_group, month_paths) for year_group, month_paths in year_months.iteritems()
+        if len(month_paths) == 12
+    ]
 
-if mode == "parallel":
+    # -------------------------------------
 
-    c = rank
-    while c < len(year_qlist):
 
-        try:
+    if mode == "serial" or rank == 0:
+        print "running yearly data..."
+
+    if mode == "parallel":
+
+        c = rank
+        while c < len(year_qlist):
+
+            try:
+                run_yearly_data(year_qlist[c])
+            except Exception as e:
+                print "Error processing year: {0}".format(year_qlist[c][0])
+                # raise
+                print e
+                # raise Exception('year processing')
+
+            c += size
+
+        comm.Barrier()
+
+    elif mode == "serial":
+
+        for c, _ in enumerate(year_qlist):
             run_yearly_data(year_qlist[c])
-        except Exception as e:
-            print "Error processing year: {0}".format(year_qlist[c][0])
-            # raise
-            print e
-            # raise Exception('year processing')
 
-        c += size
-
-    comm.Barrier()
-
-elif mode == "serial":
-
-    for c, _ in enumerate(year_qlist):
-        run_yearly_data(year_qlist[c])
-
-else:
-    raise Exception("Invalid `mode` value for script.")
+    else:
+        raise Exception("Invalid `mode` value for script.")
