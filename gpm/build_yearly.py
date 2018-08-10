@@ -109,7 +109,7 @@ def run_yearly_data(task, method="mean"):
 method = "mean"
 
 src_base = "/sciclone/aiddata10/REU/geo/data/rasters/gpm/monthly"
-dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/gpm/yearly/{}".format{method}
+dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/gpm/yearly/{}".format(method)
 
 year_mask = "gpm_precipitation_YYYY.tif"
 year_sep = "_"
