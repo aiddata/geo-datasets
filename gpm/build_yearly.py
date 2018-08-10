@@ -17,41 +17,7 @@ if mode == "parallel":
     rank = comm.Get_rank()
 
 
-src_base = "/sciclone/aiddata10/REU/geo/data/rasters/gpm/monthly"
-dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/gpm/yearly"
-
-year_mask = "gpm_precipitation_YYYY.tif"
-year_sep = "_"
-year_loc = 2
-
-
-# -------------------------------------
-
-
-print "building year list..."
-
-year_months = {}
-
-month_files = [i for i in os.listdir(src_base) if i.endswith('.tif')]
-
-for mfile in month_files:
-
-    # year associated with month
-    myear = mfile.split(year_sep)[year_loc]
-
-    if myear not in year_months:
-        year_months[myear] = list()
-
-    year_months[myear].append(os.path.join(src_base, mfile))
-
-
-year_qlist = [
-    (year_group, month_paths) for year_group, month_paths in year_months.iteritems()
-    if len(month_paths) == 12
-]
-
-
-# -------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def write_raster(path, data, meta):
@@ -137,7 +103,48 @@ def run_yearly_data(task):
     write_raster(year_path, data, meta)
 
 
-print "running yearly data..."
+# -----------------------------------------------------------------------------
+
+
+src_base = "/sciclone/aiddata10/REU/geo/data/rasters/gpm/monthly"
+dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/gpm/yearly"
+
+year_mask = "gpm_precipitation_YYYY.tif"
+year_sep = "_"
+year_loc = 2
+
+
+# -------------------------------------
+
+if mode == "serial" or rank == 0:
+    print "building year list..."
+
+year_months = {}
+
+month_files = [i for i in os.listdir(src_base) if i.endswith('.tif')]
+
+for mfile in month_files:
+
+    # year associated with month
+    myear = mfile.split(year_sep)[year_loc]
+
+    if myear not in year_months:
+        year_months[myear] = list()
+
+    year_months[myear].append(os.path.join(src_base, mfile))
+
+
+year_qlist = [
+    (year_group, month_paths) for year_group, month_paths in year_months.iteritems()
+    if len(month_paths) == 12
+]
+
+
+# -------------------------------------
+
+
+if mode == "serial" or rank == 0:
+    print "running yearly data..."
 
 if mode == "parallel":
 
