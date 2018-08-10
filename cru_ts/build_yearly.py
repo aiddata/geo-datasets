@@ -17,8 +17,8 @@ if mode == "parallel":
     rank = comm.Get_rank()
 
 
-data_classs = "pre"
-# data_classs = "tmp"
+data_class = "pre"
+# data_class = "tmp"
 
 src_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/monthly/{}".format(data_class)
 dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/yearly/{}".format(data_class)
