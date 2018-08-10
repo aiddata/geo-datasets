@@ -96,9 +96,9 @@ def aggregate_rasters(file_list, method="mean"):
     return store, raster.profile
 
 
-def run_yearly_data(task):
+def run_yearly_data(task, method="mean"):
     year, year_files = task
-    data, meta = aggregate_rasters(file_list=year_files, method="mean")
+    data, meta = aggregate_rasters(file_list=year_files, method=method)
     year_path = os.path.join(dst_base, year_mask.replace("YYYY", str(year)))
     write_raster(year_path, data, meta)
 
@@ -110,9 +110,10 @@ data_class_list = ["cld", "dtr", "frs", "pet", "pre", "tmp", "tmn", "tmx", "vap"
 
 for data_class in data_class_list:
 
+    method = "mean"
 
     src_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/monthly/{}".format(data_class)
-    dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/yearly/{}".format(data_class)
+    dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/yearly/{}/{}".format(data_class, method)
 
     year_mask = "cru.{}.YYYY.tif".format(data_class)
     year_sep = "."
@@ -158,7 +159,7 @@ for data_class in data_class_list:
         while c < len(year_qlist):
 
             try:
-                run_yearly_data(year_qlist[c])
+                run_yearly_data(year_qlist[c], method)
             except Exception as e:
                 print "Error processing year: {0}".format(year_qlist[c][0])
                 # raise
@@ -172,7 +173,7 @@ for data_class in data_class_list:
     elif mode == "serial":
 
         for c, _ in enumerate(year_qlist):
-            run_yearly_data(year_qlist[c])
+            run_yearly_data(year_qlist[c], method)
 
     else:
         raise Exception("Invalid `mode` value for script.")
