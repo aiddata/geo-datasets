@@ -106,69 +106,77 @@ def run_yearly_data(task, method="mean"):
 # -----------------------------------------------------------------------------
 
 
-method = "mean"
+data_class_list = ["cld", "dtr", "frs", "pet", "pre", "tmp", "tmn", "tmx", "vap", "wet"]
 
-src_base = "/sciclone/aiddata10/REU/geo/data/rasters/gpm/monthly"
-dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/gpm/yearly/{}".format(method)
+for data_class in data_class_list:
 
-year_mask = "gpm_precipitation_YYYY.tif"
-year_sep = "_"
-year_loc = 2
+    if mode == "serial" or rank == 0:
+        print "Running {}".format(data_class)
 
+    method = "mean"
 
-# -------------------------------------
+    src_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/monthly/{}".format(data_class)
+    dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/yearly/{}/{}".format(data_class, method)
 
-if mode == "serial" or rank == 0:
-    print "building year list..."
-
-year_months = {}
-
-month_files = [i for i in os.listdir(src_base) if i.endswith('.tif')]
-
-for mfile in month_files:
-
-    # year associated with month
-    myear = mfile.split(year_sep)[year_loc]
-
-    if myear not in year_months:
-        year_months[myear] = list()
-
-    year_months[myear].append(os.path.join(src_base, mfile))
+    year_mask = "cru.{}.YYYY.tif".format(data_class)
+    year_sep = "."
+    year_loc = 2
 
 
-year_qlist = [
-    (year_group, month_paths) for year_group, month_paths in year_months.iteritems()
-    if len(month_paths) == 12
-]
+    # -------------------------------------
 
 
-# -------------------------------------
+    if mode == "serial" or rank == 0:
+        print "building year list..."
+
+    year_months = {}
+
+    month_files = [i for i in os.listdir(src_base) if i.endswith('.tif')]
+
+    for mfile in month_files:
+
+        # year associated with month
+        myear = mfile.split(year_sep)[year_loc]
+
+        if myear not in year_months:
+            year_months[myear] = list()
+
+        year_months[myear].append(os.path.join(src_base, mfile))
 
 
-if mode == "serial" or rank == 0:
-    print "running yearly data..."
+    year_qlist = [
+        (year_group, month_paths) for year_group, month_paths in year_months.iteritems()
+        if len(month_paths) == 12
+    ]
 
-if mode == "parallel":
 
-    c = rank
-    while c < len(year_qlist):
+    # -------------------------------------
 
-        try:
+
+    if mode == "serial" or rank == 0:
+        print "running yearly data..."
+
+    if mode == "parallel":
+
+        c = rank
+        while c < len(year_qlist):
+
+            try:
+                run_yearly_data(year_qlist[c], method)
+            except Exception as e:
+                print "Error processing year: {0}".format(year_qlist[c][0])
+                # raise
+                print e
+                # raise Exception('year processing')
+
+            c += size
+
+        comm.Barrier()
+
+    elif mode == "serial":
+
+        for c, _ in enumerate(year_qlist):
             run_yearly_data(year_qlist[c], method)
-        except Exception as e:
-            print "Error processing year: {0}".format(year_qlist[c][0])
-            # raise
-            print e
-            # raise Exception('year processing')
 
-        c += size
-
-    comm.Barrier()
-
-elif mode == "serial":
-
-    for c, _ in enumerate(year_qlist):
-        run_yearly_data(year_qlist[c], method)
-
-else:
-    raise Exception("Invalid `mode` value for script.")
+    else:
+        raise Exception("Invalid `mode` value for script.")

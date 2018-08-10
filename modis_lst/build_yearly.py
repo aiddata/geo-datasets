@@ -1,7 +1,6 @@
 
 
 import os
-import sys
 import errno
 import rasterio
 import numpy as np
@@ -18,43 +17,7 @@ if mode == "parallel":
     rank = comm.Get_rank()
 
 
-day_night = "day"
-# day_night = "night"
-
-src_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily/{}".format(day_night)
-dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily/{}".format(day_night)
-
-year_mask = "modis_lst_{}_cmg_YYYY.tif".format(day_night)
-year_sep = "_"
-year_loc = 4
-
-
-# -------------------------------------
-
-
-print "building year list..."
-
-year_months = {}
-
-month_files = [i for i in os.listdir(src_base) if i.endswith('.tif')]
-
-for mfile in month_files:
-
-    year = mfile.split(year_sep)[year_loc]
-
-    if year not in year_months:
-        year_months[year] = list()
-
-    year_months[year].append(os.path.join(src_base, mfile))
-
-
-year_qlist = [
-    (year, month_paths) for year, month_paths in year_months.iteritems()
-    if len(month_paths) == 12
-]
-
-
-# -------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def write_raster(path, data, meta):
@@ -71,99 +34,147 @@ def write_raster(path, data, meta):
 
 
 def aggregate_rasters(file_list, method="mean"):
-        """Aggregate multiple rasters
+    """Aggregate multiple rasters
 
-        Aggregates multiple rasters with same features (dimensions, transform,
-        pixel size, etc.) and creates single layer using aggregation method
-        specified.
+    Aggregates multiple rasters with same features (dimensions, transform,
+    pixel size, etc.) and creates single layer using aggregation method
+    specified.
 
-        Supported methods: mean (default), max, min, sum
+    Supported methods: mean (default), max, min, sum
 
-        Arguments
-            file_list (list): list of file paths for rasters to be aggregated
-            method (str): method used for aggregation
+    Arguments
+        file_list (list): list of file paths for rasters to be aggregated
+        method (str): method used for aggregation
 
-        Return
-            result: rasterio Raster instance
-        """
+    Return
+        result: rasterio Raster instance
+    """
 
-        store = None
-        for ix, file_path in enumerate(file_list):
+    store = None
+    for ix, file_path in enumerate(file_list):
 
-            try:
-                raster = rasterio.open(file_path)
-            except:
-                print "Could not include file in aggregation ({0})".format(file_path)
-                continue
+        try:
+            raster = rasterio.open(file_path)
+        except:
+            print "Could not include file in aggregation ({0})".format(file_path)
+            continue
 
-            active = raster.read(masked=True)
+        active = raster.read(masked=True)
 
-            if store is None:
-                store = active.copy()
+        if store is None:
+            store = active.copy()
+
+        else:
+            # make sure dimensions match
+            if active.shape != store.shape:
+                raise Exception("Dimensions of rasters do not match")
+
+            if method == "max":
+                store = np.ma.array((store, active)).max(axis=0)
+
+                # non masked array alternatives
+                # store = np.maximum.reduce([store, active])
+                # store = np.vstack([store, active]).max(axis=0)
+
+            elif method == "mean":
+                if ix == 1:
+                    weights = (~store.mask).astype(int)
+
+                store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
+                weights += (~active.mask).astype(int)
+
+            elif method == "min":
+                store = np.ma.array((store, active)).min(axis=0)
+
+            elif method == "sum":
+                store = np.ma.array((store, active)).sum(axis=0)
 
             else:
-                # make sure dimensions match
-                if active.shape != store.shape:
-                    raise Exception("Dimensions of rasters do not match")
+                raise Exception("Invalid method")
 
-                if method == "max":
-                    store = np.ma.array((store, active)).max(axis=0)
-
-                    # non masked array alternatives
-                    # store = np.maximum.reduce([store, active])
-                    # store = np.vstack([store, active]).max(axis=0)
-
-                elif method == "mean":
-                    if ix == 1:
-                        weights = (~store.mask).astype(int)
-
-                    store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
-                    weights += (~active.mask).astype(int)
-
-                elif method == "min":
-                    store = np.ma.array((store, active)).min(axis=0)
-
-                elif method == "sum":
-                    store = np.ma.array((store, active)).sum(axis=0)
-
-                else:
-                    raise Exception("Invalid method")
-
-        store = store.filled(raster.nodata)
-        return store, raster.profile
+    store = store.filled(raster.nodata)
+    return store, raster.profile
 
 
-def run_yearly_data(task):
+def run_yearly_data(task, method="mean"):
     year, year_files = task
-    data, meta = aggregate_rasters(file_list=year_files, method="mean")
+    data, meta = aggregate_rasters(file_list=year_files, method=method)
     year_path = os.path.join(dst_base, year_mask.replace("YYYY", str(year)))
     write_raster(year_path, data, meta)
 
 
-print "running yearly data..."
+# -----------------------------------------------------------------------------
 
-if mode == "parallel":
+data_class_list = ["day", "night"]
 
-    c = rank
-    while c < len(year_qlist):
+for data_class in data_class_list:
 
-        try:
-            run_yearly_data(year_qlist[c])
-        except Exception as e:
-            print "Error processing year: {0}".format(year_qlist[c][0])
-            # raise
-            print e
-            # raise Exception('year processing')
+    if mode == "serial" or rank == 0:
+        print "Running {}".format(data_class)
+
+    method = "mean"
+
+    src_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily/{}".format(data_class)
+    dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/yearly/{}/{}".format(data_class, method)
+
+    year_mask = "modis_lst_{}_cmg_YYYY.tif".format(data_class)
+    year_sep = "_"
+    year_loc = 4
 
 
-        c += size
+    # -------------------------------------
 
-    comm.Barrier()
 
-elif mode == "serial":
+    if mode == "serial" or rank == 0:
+        print "building year list..."
 
-    for c in range(len(year_qlist)):
-        run_yearly_data(year_qlist[c])
+    year_months = {}
 
-else:
-    raise Exception("Invalid `mode` value for script.")
+    month_files = [i for i in os.listdir(src_base) if i.endswith('.tif')]
+
+    for mfile in month_files:
+
+        # year associated with month
+        myear = mfile.split(year_sep)[year_loc]
+
+        if myear not in year_months:
+            year_months[myear] = list()
+
+        year_months[myear].append(os.path.join(src_base, mfile))
+
+
+    year_qlist = [
+        (year_group, month_paths) for year_group, month_paths in year_months.iteritems()
+        if len(month_paths) == 12
+    ]
+
+    # -------------------------------------
+
+
+    if mode == "serial" or rank == 0:
+        print "running yearly data..."
+
+    if mode == "parallel":
+
+        c = rank
+        while c < len(year_qlist):
+
+            try:
+                run_yearly_data(year_qlist[c], method)
+            except Exception as e:
+                print "Error processing year: {0}".format(year_qlist[c][0])
+                # raise
+                print e
+                # raise Exception('year processing')
+
+            c += size
+
+        comm.Barrier()
+
+    elif mode == "serial":
+
+        for c, _ in enumerate(year_qlist):
+            run_yearly_data(year_qlist[c], method)
+
+    else:
+        raise Exception("Invalid `mode` value for script.")

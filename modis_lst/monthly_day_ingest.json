@@ -1,13 +1,13 @@
 {
-	"base": "/sciclone/aiddata10/REU/pre_geo/modis_temp/temp",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily",
 	"type": "raster",
 	"file_extension": ".tif",
-	"file_mask": "modis_lst_day_cmg_YYYY.tif",
-	"name": "modis_lst_day_yearly",
-	"title": "Yearly Daytime Land surface temperature - MODIS",
-	"description": "Yearly daytime land surface temperature. Created by averaging MOD11C3 Monthly CMG LST",
-    "details": "Created by averaging monthly daytime land surface temperature data from hdf",
-	"version": "MOD11C3",
+	"file_mask": "modis_lst_day_cmg_YYYY_MM.tif",
+	"name": "modis_lst_day_monthly",
+	"title": "Daytime Land surface temperature - MODIS",
+	"description": "Monthly daytime land surface temperature. Created using MOD11C3 v6 Monthly CMG LST",
+    "details": "",
+	"version": "MOD11C3.006",
 	"options": {
 	    "resolution": 0.05,
         "extract_types": ["max", "mean", "min", "count"],
@@ -24,7 +24,7 @@
         "citation": "Wan, Z., Hook, S., Hulley, G. (2015). MOD11C3 MODIS/Terra Land Surface Temperature/Emissivity Monthly L3 Global 0.05Deg CMG V006 [Data set]. NASA EOSDIS LP DAAC. doi: 10.5067/MODIS/MOD11C3.006",
 	    "sources_web": "https://lpdaac.usgs.gov/dataset_discovery/modis/modis_products_table/mod11c3_v006",
 	    "sources_name": "Land Processes Distributed Active Archive Center",
-	    "tags": ["nasa","earthdata", "modis", "lst", "land surface temperature", "environment", "yearly"]
+	    "tags": ["nasa","earthdata", "modis", "lst", "land surface temperature", "environment"]
 	},
 	"active": 1
 }
