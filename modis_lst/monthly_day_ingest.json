@@ -6,7 +6,7 @@
 	"name": "modis_lst_day_monthly",
 	"title": "Daytime Land surface temperature - MODIS",
 	"description": "Monthly daytime land surface temperature. Created using MOD11C3 v6 Monthly CMG LST",
-    "details": "Created by extracting monthly daytime land surface temperature data from hdf",
+    "details": "",
 	"version": "MOD11C3.006",
 	"options": {
 	    "resolution": 0.05,

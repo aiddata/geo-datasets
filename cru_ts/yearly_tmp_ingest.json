@@ -1,0 +1,32 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/yearly/tmp/mean",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "cru.tmp.YYYY.tif",
+	"name": "cru_tmp_yearly_mean",
+	"title": "Yearly Mean Temperature - CRU TS",
+	"description": "Yearly temperature from Climate Research Unit (CRU)",
+    "details": "Created by aggregating (mean) monthly mean daily temperature data from CRU TS",
+	"version": "4.01",
+	"options": {
+	    "resolution": 0.5,
+        "extract_types": ["max", "mean", "min", "count"],
+        "extract_types_info" : {
+            "max" : "maximum temperature value per unit of analysis",
+            "mean" : "average temperature value per unit of analysis",
+            "min" : "minimum temperature value per unit of analysis",
+            "count" : "total temperature of pixels per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "degrees Celsius"
+	},
+	"extras": {
+        "citation": "Harris et al.(2014) Updated high‐resolution grids of monthly climatic observations – the CRU TS3.10 Dataset. doi:10.1002/joc.3711",
+	    "sources_web": "https://crudata.uea.ac.uk/cru/data/hrg/#info",
+	    "sources_name": "Climate Research Unit",
+	    "tags": ["cru", "temperature", "environment", "yearly"]
+	},
+	"active": 1
+}
+
+
