@@ -109,6 +109,9 @@ data_class_list = ["day", "night"]
 
 for data_class in data_class_list:
 
+    if mode == "serial" or rank == 0:
+        print "Running {}".format(data_class)
+
     method = "mean"
 
     src_base = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily/{}".format(data_class)

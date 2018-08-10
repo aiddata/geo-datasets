@@ -105,6 +105,7 @@ def run_yearly_data(task, method="mean"):
 
 # -----------------------------------------------------------------------------
 
+
 method = "mean"
 
 src_base = "/sciclone/aiddata10/REU/geo/data/rasters/gpm/monthly"

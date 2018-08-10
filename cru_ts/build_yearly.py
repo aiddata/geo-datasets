@@ -110,6 +110,9 @@ data_class_list = ["cld", "dtr", "frs", "pet", "pre", "tmp", "tmn", "tmx", "vap"
 
 for data_class in data_class_list:
 
+    if mode == "serial" or rank == 0:
+        print "Running {}".format(data_class)
+
     method = "mean"
 
     src_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/monthly/{}".format(data_class)
