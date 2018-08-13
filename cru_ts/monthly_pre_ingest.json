@@ -10,12 +10,11 @@
 	"version": "4.01",
 	"options": {
 	    "resolution": 0.5,
-        "extract_types": ["max", "mean", "min", "count"],
+        "extract_types": ["max", "mean", "min"],
         "extract_types_info" : {
             "max" : "maximum precipitation value per unit of analysis",
             "mean" : "average precipitation value per unit of analysis",
-            "min" : "minimum precipitation value per unit of analysis",
-            "count" : "total precipitation of pixels per unit of analysis"
+            "min" : "minimum precipitation value per unit of analysis"
         },
 	    "factor": 1,
         "variable_description": "precipitation in millimeters"

@@ -10,12 +10,11 @@
 	"version": "MOD11C3.006",
 	"options": {
 	    "resolution": 0.05,
-        "extract_types": ["max", "mean", "min", "count"],
+        "extract_types": ["max", "mean", "min"],
         "extract_types_info" : {
             "max" : "maximum land surface temperature value per unit of analysis",
             "mean" : "average land surface temperature value per unit of analysis",
-            "min" : "minimum land surface temperature value per unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+            "min" : "minimum land surface temperature value per unit of analysis"
         },
 	    "factor": 1,
         "variable_description": "temperature in Kelvins"

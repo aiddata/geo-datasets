@@ -10,12 +10,11 @@
 	"version": "4.01",
 	"options": {
 	    "resolution": 0.5,
-        "extract_types": ["max", "mean", "min", "count"],
+        "extract_types": ["max", "mean", "min"],
         "extract_types_info" : {
             "max" : "maximum temperature value per unit of analysis",
             "mean" : "average temperature value per unit of analysis",
-            "min" : "minimum temperature value per unit of analysis",
-            "count" : "total temperature of pixels per unit of analysis"
+            "min" : "minimum temperature value per unit of analysis"
         },
 	    "factor": 1,
         "variable_description": "degrees Celsius"
