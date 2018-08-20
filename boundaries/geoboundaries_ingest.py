@@ -48,7 +48,7 @@ import time
 # format: 1_3_3
 version = sys.argv[2]
 
-data_dir = os.path.join(config.data_root, 'geo/data/boundaries/geoboundaries', version)
+data_dir = os.path.join(config.data_root, 'data/boundaries/geoboundaries', version)
 
 
 if not os.path.isdir(data_dir):
