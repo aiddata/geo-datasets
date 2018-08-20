@@ -113,7 +113,8 @@ def tmp_worker_job(self, task_index, task_data):
 
     try:
         with mpi_utility.Capturing() as output:
-            add_gb.run(path=path, config=config, update=update, dry_run=dry_run)
+            add_gb.run(path=path, version=version, config=config,
+                       update=update, dry_run=dry_run)
         print '\n'.join(output)
     except:
         print "Error with {0}".format(path)
