@@ -8,8 +8,8 @@ Where args are: branch, version, method, update mode, dry run
 Note: when using parallel mode, be sure to spin up job first (manually or use job script)
       and use appropriate mpi command to run script
 
-qsub -I -l nodes=2:c18c:ppn=16 -l walltime=48:00:00
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 32 python-mpi /path/to/geo-datasets/boundaries/geoboundaries_ingest.py master 1_3_3 parallel missing True
+qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclone/aiddata10/geo/develop/source/geo-datasets/boundaries/geoboundaries_ingest.py develop 1_3_3 parallel missing True
 
 """
 
