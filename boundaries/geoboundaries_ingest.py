@@ -53,8 +53,8 @@ data_dir = os.path.join(config.data_root, 'data/boundaries/geoboundaries', versi
 
 
 if not os.path.isdir(data_dir):
-    msg = 'Could not find directory for GeoBoundaries version ({0})'.format(
-        version)
+    msg = 'Could not find directory for GeoBoundaries version ({}): \n\t {}'.format(
+        version, data_dir)
     raise Exception(msg)
 
 
