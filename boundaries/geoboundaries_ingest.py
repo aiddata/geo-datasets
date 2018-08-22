@@ -18,8 +18,9 @@ import os
 
 
 main_dir = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
-        os.path.abspath(__file__))))), 'geo-hpc')
+    os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__)))),
+    'geo-hpc')
 
 sys.path.insert(0, os.path.join(main_dir, 'utils'))
 sys.path.insert(0, os.path.join(main_dir, 'ingest'))
