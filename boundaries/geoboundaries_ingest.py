@@ -10,6 +10,7 @@ Note: when using parallel mode, be sure to spin up job first (manually or use jo
 
 qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
 mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclone/aiddata10/geo/develop/source/geo-datasets/boundaries/geoboundaries_ingest.py develop 1_3_3 parallel missing True
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/boundaries/geoboundaries_ingest.py master 1_3_3 parallel missing True
 
 """
 
