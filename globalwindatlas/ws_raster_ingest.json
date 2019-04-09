@@ -1,0 +1,29 @@
+{
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/globalwindatlas/GWA2.1/wind_speed/gwa2_250_ws_DEFLATE_50m.tif",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "globalwindatlas_windspeed",
+    "title": "Wind Speed Potential ",
+    "description": "Wind speed potential at 50m",
+    "details": "",
+    "version": "2",
+    "options": {
+        "resolution": 0.0025,
+        "extract_types": ["mean", "max", "min"],
+        "extract_types_info" : {
+            "mean" : "average wind speed per unit of analysis",
+            "max" : "maximum wind speed per unit of analysis",
+            "min" : "minimum wind speed per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "wind speed in meters per second"
+    },
+    "extras": {
+        "citation": "Wind data obtained from the “Global Wind Atlas 2.0, a free, web-based application developed, owned and operated by the Technical University of Denmark (DTU) in partnership with the World Bank Group, utilizing data provided by Vortex, with funding provided by the Energy Sector Management Assistance Program (ESMAP). https://globalsolaratlas.info. Accessed online 2019-03-05.",
+        "sources_web": "https://globalwindatlas.info/about/",
+        "sources_name": "Global Wind Atlas",
+        "tags": ["resources", "environment", "energy", "wind"]
+    },
+    "active": 1
+}

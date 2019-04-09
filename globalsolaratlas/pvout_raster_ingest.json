@@ -20,7 +20,7 @@
         "variable_description": "potential photovoltaic electricity production in kWh/kWp"
     },
     "extras": {
-        "citation": "Global Solar Atlas. The World Bank Group, 2017, https://globalsolaratlas.info. Accessed 2019-03-04.",
+        "citation": "Solar resource data obtained from the Global Solar Atlas, owned by the World Bank Group and provided by Solargis. https://globalsolaratlas.info. Accessed online 2019-03-04.",
         "sources_web": "https://globalsolaratlas.info/about/",
         "sources_name": "Global Solar Atlas",
         "tags": ["resources", "environment", "energy", "solar"]
