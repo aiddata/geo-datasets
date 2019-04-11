@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/globalwindatlas/GWA2.1/power_density/gwa2_250_pd_DEFLATE_50m.tif",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/globalwindatlas/GWA2.1/power_density/gwa2_250_pd_NONE_50m.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
