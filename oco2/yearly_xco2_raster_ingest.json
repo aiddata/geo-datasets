@@ -1,0 +1,29 @@
+{
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/jpl/oco2/xco2/yearly",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "xco2_YYYY.tif",
+    "name": "oco2_xco2_yearly",
+    "title": "CO2 Concentration (yearly)",
+    "description": "The average concentration of carbon dioxide in a column of dry air extending from Earth’s surface to the top of the atmosphere.",
+    "details": "The raster used is the result of aggregating one year of data to a 1km grid and then using a linear interpolation to fill gaps. The underlying data were produced by the OCO-2 project at the Jet Propulsion Laboratory, California Institute of Technology, and obtained from the OCO-2 data archive maintained at the NASA Goddard Earth Science Data and Information Services Center.",
+    "version": "9",
+    "options": {
+        "resolution": 0.01,
+        "extract_types": ["mean", "max", "min"],
+        "extract_types_info" : {
+            "mean" : "average co2 concentration per unit of analysis",
+            "max" : "maximum co2 concentration per unit of analysis",
+            "min" : "minimum co2 concentration per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "co2 in "
+    },
+    "extras": {
+        "citation": "O'Dell, C. W., Connor, B., Bösch, H., O'Brien, D., Frankenberg, C., Castano, R., Christi, M., Eldering, D., Fisher, B., Gunson, M., McDuffie, J., Miller, C. E., Natraj, V., Oyafuso, F., Polonsky, I., Smyth, M., Taylor, T., Toon, G. C., Wennberg, P. O., and Wunch, D.: The ACOS CO2 retrieval algorithm – Part 1: Description and validation against synthetic observations, Atmos. Meas. Tech., 5, 99-121, https://doi.org/10.5194/amt-5-99-2012, 2012.",
+        "sources_web": "https://co2.jpl.nasa.gov/#mission=OCO-2",
+        "sources_name": "NASA Jet Propulsion Laboratory",
+        "tags": ["environment", "co2"]
+    },
+    "active": 1
+}
