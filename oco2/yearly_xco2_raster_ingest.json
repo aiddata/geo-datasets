@@ -6,10 +6,10 @@
     "name": "oco2_xco2_yearly",
     "title": "CO2 Concentration (yearly)",
     "description": "The average concentration of carbon dioxide in a column of dry air extending from Earth’s surface to the top of the atmosphere.",
-    "details": "The raster used is the result of aggregating one year of data to a 1km grid and then using a linear interpolation to fill gaps. The underlying data were produced by the OCO-2 project at the Jet Propulsion Laboratory, California Institute of Technology, and obtained from the OCO-2 data archive maintained at the NASA Goddard Earth Science Data and Information Services Center.",
+    "details": "The raster used is the result of aggregating one year of data to a 10km grid and then using a linear interpolation to fill gaps. The underlying data were produced by the OCO-2 project at the Jet Propulsion Laboratory, California Institute of Technology, and obtained from the OCO-2 data archive maintained at the NASA Goddard Earth Science Data and Information Services Center.",
     "version": "9",
     "options": {
-        "resolution": 0.01,
+        "resolution": 0.1,
         "extract_types": ["mean", "max", "min"],
         "extract_types_info" : {
             "mean" : "average co2 concentration (ppm) per unit of analysis",
