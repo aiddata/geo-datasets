@@ -26,6 +26,7 @@ decimal_places = len(str(rnd_interval).split(".")[1])
 # methods for aggregating raw data to regular grid
 agg_ops = {
     'xco2': "mean",
+    'xco2_quality_flag': "count",
     'longitude': "first",
     'latitude': 'first'
 }
@@ -34,7 +35,7 @@ agg_ops = {
 interp_method = "linear"
 
 
-run_a = False
+run_a = True
 run_b = False
 run_c = False
 run_d = False
@@ -62,11 +63,13 @@ def convert_daily(f):
     data = h5py.File(f)
     point_list = []
     for i, xco2 in enumerate(data["xco2"]):
+        xco2_quality_flag = data["xco2_quality_flag"][i]
         lon, lat = data["longitude"][i], data["latitude"][i]
         point_list.append({
             "longitude": lon,
             "latitude": lat,
-            "xco2": xco2
+            "xco2": xco2,
+            "xco2_quality_flag": xco2_quality_flag
         })
     df = pd.DataFrame(point_list)
     df_path = os.path.join(day_dir, "xco2_{}.csv".format(id_string))
@@ -117,10 +120,12 @@ def agg_to_grid(f, agg_path):
     """aggregate coordinates to regular grid points
     """
     df = read_csv(f)
+    df = df.loc[df["xco2_quality_flag"] == 0].copy(deep=True)
     df["longitude"] = df["longitude"].apply(lambda z: round_to(z, rnd_interval))
     df["latitude"] = df["latitude"].apply(lambda z: round_to(z, rnd_interval))
     df["lonlat"] = df.apply(lambda z: lonlat(z["longitude"], z["latitude"], decimal_places), axis=1)
     agg_df = df.groupby('lonlat', as_index=False).agg(agg_ops)
+    agg_df.columns = [i.replace("xco2_quality_flag", "count") for i in agg_df.columns]
     agg_df.to_csv(agg_path, index=False, encoding='utf-8')
 
 
@@ -300,7 +305,7 @@ if run_d:
 # -----------------------------------------------------------------------------
 # interpolate month grid data to fill gaps
 
-make_dir(year_interp_dir)
+make_dir(month_interp_dir)
 
 qlist_e = glob.glob(os.path.join(month_grid_dir, 'xco2_*.csv'))
 
