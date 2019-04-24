@@ -4,7 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "globalwindatlas_windspeed",
-    "title": "Wind Speed Potential ",
+    "title": "Wind Speed Potential",
     "description": "Wind speed potential at 50m",
     "details": "",
     "version": "2",

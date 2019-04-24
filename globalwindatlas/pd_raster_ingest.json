@@ -4,7 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "globalwindatlas_powerdensity",
-    "title": "Wind Power Density Potential ",
+    "title": "Wind Power Density Potential",
     "description": "Wind power density potential at 50m",
     "details": "The mean wind power density is a measure of the wind resource. Higher mean wind power densities indicate better wind resource.",
     "version": "2",
