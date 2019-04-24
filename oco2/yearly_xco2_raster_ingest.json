@@ -12,12 +12,12 @@
         "resolution": 0.01,
         "extract_types": ["mean", "max", "min"],
         "extract_types_info" : {
-            "mean" : "average co2 concentration per unit of analysis",
-            "max" : "maximum co2 concentration per unit of analysis",
-            "min" : "minimum co2 concentration per unit of analysis"
+            "mean" : "average co2 concentration (ppm) per unit of analysis",
+            "max" : "maximum co2 concentration (ppm) per unit of analysis",
+            "min" : "minimum co2 concentration (ppm) per unit of analysis"
         },
         "factor": 1,
-        "variable_description": "co2 in "
+        "variable_description": "co2 concentration in parts per million (ppm)"
     },
     "extras": {
         "citation": "O'Dell, C. W., Connor, B., Bösch, H., O'Brien, D., Frankenberg, C., Castano, R., Christi, M., Eldering, D., Fisher, B., Gunson, M., McDuffie, J., Miller, C. E., Natraj, V., Oyafuso, F., Polonsky, I., Smyth, M., Taylor, T., Toon, G. C., Wennberg, P. O., and Wunch, D.: The ACOS CO2 retrieval algorithm – Part 1: Description and validation against synthetic observations, Atmos. Meas. Tech., 5, 99-121, https://doi.org/10.5194/amt-5-99-2012, 2012.",
