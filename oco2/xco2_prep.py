@@ -8,6 +8,7 @@ https://docserver.gesdisc.eosdis.nasa.gov/public/project/OCO/OCO2_DUG.V9.pdf
 import os
 import errno
 import glob
+import copy
 import h5py
 import rasterio
 import pandas as pd
@@ -35,13 +36,13 @@ agg_ops = {
 interp_method = "linear"
 
 
-run_a = True
-run_b = False
-run_c = False
-run_d = False
-run_e = False
-run_f = False
-run_g = False
+run_a = False
+run_b = True
+run_c = True
+run_d = True
+run_e = True
+run_f = True
+run_g = True
 
 raw_dir = "/sciclone/aiddata10/REU/geo/raw/jpl/oco2"
 day_dir = "/sciclone/aiddata10/REU/scr/xco2/data/day"
@@ -60,18 +61,19 @@ def convert_daily(f):
     """
     id_string = os.path.basename(f).split("_")[2]
     print "Converting {}".format(id_string)
-    data = h5py.File(f)
+    with h5py.File(f, 'r') as hdf_data:
+        xco2 = copy.deepcopy(list(hdf_data["xco2"]))
+        lon = copy.deepcopy(list(hdf_data["longitude"]))
+        lat = copy.deepcopy(list(hdf_data["latitude"]))
+        xco2_quality_flag = copy.deepcopy(list(hdf_data["xco2_quality_flag"]))
     point_list = []
-    for i, xco2 in enumerate(data["xco2"]):
-        xco2_quality_flag = data["xco2_quality_flag"][i]
-        lon, lat = data["longitude"][i], data["latitude"][i]
+    for i in range(len(xco2)):
         point_list.append({
-            "longitude": lon,
-            "latitude": lat,
-            "xco2": xco2,
-            "xco2_quality_flag": xco2_quality_flag
+            "longitude": lon[i],
+            "latitude": lat[i],
+            "xco2": xco2[i],
+            "xco2_quality_flag": xco2_quality_flag[i]
         })
-    data.close()
     df = pd.DataFrame(point_list)
     df_path = os.path.join(day_dir, "xco2_{}.csv".format(id_string))
     df.to_csv(df_path, index=False, encoding='utf-8')
