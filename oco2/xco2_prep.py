@@ -71,6 +71,7 @@ def convert_daily(f):
             "xco2": xco2,
             "xco2_quality_flag": xco2_quality_flag
         })
+    data.close()
     df = pd.DataFrame(point_list)
     df_path = os.path.join(day_dir, "xco2_{}.csv".format(id_string))
     df.to_csv(df_path, index=False, encoding='utf-8')
@@ -229,7 +230,7 @@ def run(tasks, func):
             func(tasks[c])
         except Exception as e:
             print "Error processing: {0}".format(tasks[c])
-            raise
+            # raise
             print e
         c += size
     if parallel:
