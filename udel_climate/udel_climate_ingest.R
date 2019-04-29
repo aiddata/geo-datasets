@@ -7,8 +7,8 @@ library(raster)
 args <- commandArgs(trailingOnly = TRUE)
 
 dataset <- args[1]
-# dataset <- 'precip_2014'
-# dataset <- 'air_temp_2014'
+# dataset <- 'precip_2017'
+# dataset <- 'air_temp_2017'
 
 base_dir <- '/sciclone/aiddata10/REU/geo'
 raw_dir <- sprintf('%s/raw/udel_climate/%s', base_dir, dataset)
@@ -33,8 +33,8 @@ if (length(flist) == 0) {
   stop(msg)
 }
 
-
-default_methods <- c('monthly', 'mean', 'min', 'max', 'var', 'sd')
+default_methods <- c('mean', 'min', 'max', 'sum', 'var', 'sd')
+default_methods <- c(c('monthly'), default_methods)
 
 if (length(args) > 1) {
   raw_methods <- unlist(strsplit(args[2], ','))
@@ -87,7 +87,7 @@ for (fname in flist) {
     cat(sprintf('\tbuilding yearly %s...\n', j))
     dir.create(sprintf('%s/yearly/%s', data_dir, j), recursive=TRUE)
 
-    data[[j]] <- apply(data@data[,as.character(c(1:12))], 1, j)
+    data[[j]] <- apply(data@data[,sprintf("%02.0f", 1:12)], 1, j)
     data_trim <- data[, j]
     gridded(data_trim) = TRUE
     r <- raster(data_trim)
@@ -101,4 +101,3 @@ for (fname in flist) {
 }
 
 warnings()
-
