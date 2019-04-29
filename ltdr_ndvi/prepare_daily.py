@@ -56,9 +56,9 @@ build_list = [
 ]
 
 
-src_base = "/sciclone/aiddata10/REU/geo/raw/ltdr/ltdr.nascom.nasa.gov/allData/Ver4"
+src_base = "/sciclone/aiddata10/REU/geo/raw/ltdr/LAADS/465"
 
-dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/ltdr/avhrr_ndvi_v4"
+dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/ltdr/avhrr_ndvi_v5"
 
 
 
@@ -75,7 +75,7 @@ filter_options = {
     'use_year_accept': False,
     'year_accept': ['1987'],
     'use_year_deny': True,
-    'year_deny': ['2017']
+    'year_deny': ['2019']
 }
 
 
@@ -580,4 +580,3 @@ if "yearly" in build_list:
 
     else:
         raise Exception("Invalid `mode` value for script.")
-
