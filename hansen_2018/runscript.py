@@ -4,7 +4,7 @@ from mpi4py import MPI
 import subprocess as sp
 
 
-runscript = './mosaic_hansen.sh'
+runscript = '/sciclone/aiddata10/geo/master/source/geo-datasets/hansen_2018/mosaic.sh'
 
 
 comm = MPI.COMM_WORLD
