@@ -45,13 +45,17 @@ run_f = True
 run_g = True
 
 raw_dir = "/sciclone/aiddata10/REU/geo/raw/jpl/oco2"
-day_dir = "/sciclone/aiddata10/REU/scr/xco2/data/day"
-month_dir = "/sciclone/aiddata10/REU/scr/xco2/data/month"
-month_grid_dir = "/sciclone/aiddata10/REU/scr/xco2/data/month_grid"
-month_interp_dir = "/sciclone/aiddata10/REU/scr/xco2/data/month_interp"
-year_dir = "/sciclone/aiddata10/REU/scr/xco2/data/year"
-year_grid_dir = "/sciclone/aiddata10/REU/scr/xco2/data/year_grid"
-year_interp_dir = "/sciclone/aiddata10/REU/scr/xco2/data/year_interp"
+
+data_dir = "/sciclone/aiddata10/REU/geo/data/rasters/jpl/xco2"
+
+day_dir = os.path.join(data_dir, "day")
+month_dir = os.path.join(data_dir, "month")
+month_grid_dir = os.path.join(data_dir, "month_grid")
+month_interp_dir = os.path.join(data_dir, "month_interp")
+year_dir = os.path.join(data_dir, "year")
+year_grid_dir = os.path.join(data_dir, "year_grid")
+year_interp_dir = os.path.join(data_dir, "year_interp")
+
 
 # -----------------------------------------------------------------------------
 
@@ -339,3 +343,4 @@ qlist_g = glob.glob(os.path.join(year_grid_dir, 'xco2_*.csv'))
 
 if run_g:
     run(qlist_g, interpolate_year)
+
