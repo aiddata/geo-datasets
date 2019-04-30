@@ -1,0 +1,30 @@
+{
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/accessibility_to_cities_2015_v1.0/accessibility_to_cities_2015_v1.0.tif",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "accessibility_to_cities_2015_v1.0",
+    "title": "Accessibility to Cities (2015)",
+    "description": "Estimated travel time (in minutes) to cities for the year 2015.",
+    "details": "Incorporates data from Open Street Map (OSM) data and the Google roads database. Not suited for time series analysis using earlier travel time estimates for the year 2000. ",
+    "version": 1,
+    "options": {
+        "resolution": 0.008333333333333,
+        "extract_types": ["mean", "max", "min"],
+        "extract_types_info" : {
+            "mean" : "average travel time per unit of analysis",
+            "max" : "maximum travel time per unit of analysis",
+            "min" : "minimum travel time per unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "time in minutes"
+    },
+    "extras": {
+        "citation": "D.J. Weiss, A. Nelson, H.S. Gibson, W. Temperley, S. Peedell, A. Lieber, M. Hancher, E. Poyart, S. Belchior, N. Fullman, B. Mappin, U. Dalrymple, J. Rozier, T.C.D. Lucas, R.E. Howes, L.S. Tusting, S.Y. Kang, E. Cameron, D. Bisanzio, K.E. Battle, S. Bhatt, and P.W. Gething. A global map of travel time to cities to assess inequalities in accessibility in 2015. (2018). Nature. doi:10.1038/nature25181.",
+        "sources_web": "https://map.ox.ac.uk/research-project/accessibility_to_cities/",
+        "sources_name": "The Malaria Atlas Project",
+        "tags": ["accessibility", "economics"]
+    },
+    "active": 1
+}
