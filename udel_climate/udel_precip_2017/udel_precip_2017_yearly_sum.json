@@ -1,0 +1,30 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/udel_climate/precip_2017/yearly/sum",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "precip_YYYY_sum.tif",
+	"name": "udel_precip_v501_sum",
+    "title": "Precipitation (Yearly Total)",
+    "description": "Total precipitation per year. Created using UDel Precipitation dataset (v5.01)",
+    "details": "",
+	"version": 5.01,
+	"options": {
+	    "resolution": 0.5,
+        "extract_types": ["max", "mean", "min", "sum"],
+        "extract_types_info": {
+            "max": "maximum precipitation per unit of analysis",
+            "mean": "average precipitation per unit of analysis",
+            "min": "minimum precipitation per unit of analysis",
+            "sum": "total precipitation per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "millimeters"
+	},
+	"extras": {
+	    "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
+	    "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html",
+	    "sources_name": "University of Delaware",
+	    "tags": ["precipitation", "udel", "climate", "environment"]
+	},
+	"active": 1
+}
