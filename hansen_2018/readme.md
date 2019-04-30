@@ -16,7 +16,7 @@ gain
 
 lossyear
 - Year of gross forest cover loss event (lossyear)
-- A disaggregation of total forest loss to annual time scales. Encoded as either 0 (no loss) or else a value in the range 1–17, representing loss detected primarily in the year 2001–2018, respectively.
+- A disaggregation of total forest loss to annual time scales. Encoded as either 0 (no loss) or else a value in the range 1–18, representing loss detected primarily in the year 2001–2018, respectively.
 
 datamask
 - Data mask (datamask)
