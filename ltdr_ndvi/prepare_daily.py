@@ -126,20 +126,20 @@ def prep_daily_data(task):
     year = os.path.basename(src).split(".")[1][1:5]
     day = os.path.basename(src).split(".")[1][5:8]
     sensor = os.path.basename(src).split(".")[2]
-    print "Processing Day {} {} {}".format(rank, sensor, year, day)
+    print "Processing Day {} {} {}".format(sensor, year, day)
     process_daily_data(src, dst)
 
 
 def prep_monthly_data(task):
     year_month, month_files, month_path = task
-    print "Processing Month {}".format(rank, year_month)
+    print "Processing Month {}".format(year_month)
     data, meta = aggregate_rasters(file_list=month_files, method="max")
     write_raster(month_path, data, meta)
 
 
 def prep_yearly_data(task):
     year, year_files, year_path = task
-    print "Processing Year {}".format(rank, year)
+    print "Processing Year {}".format(year)
     data, meta = aggregate_rasters(file_list=year_files, method="mean")
     write_raster(year_path, data, meta)
 
