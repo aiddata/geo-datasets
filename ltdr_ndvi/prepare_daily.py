@@ -126,20 +126,20 @@ def prep_daily_data(task):
     year = os.path.basename(src).split(".")[1][1:5]
     day = os.path.basename(src).split(".")[1][5:8]
     sensor = os.path.basename(src).split(".")[2]
-    print "Rank {} - Processing Day {} {} {}".format(rank, sensor, year, day)
+    print "Processing Day {} {} {}".format(rank, sensor, year, day)
     process_daily_data(src, dst)
 
 
 def prep_monthly_data(task):
     year_month, month_files, month_path = task
-    print "Rank {} - Processing Month {}".format(rank, year_month)
+    print "Processing Month {}".format(rank, year_month)
     data, meta = aggregate_rasters(file_list=month_files, method="max")
     write_raster(month_path, data, meta)
 
 
 def prep_yearly_data(task):
     year, year_files, year_path = task
-    print "Rank {} - Processing Year {}".format(rank, year)
+    print "Processing Year {}".format(rank, year)
     data, meta = aggregate_rasters(file_list=year_files, method="mean")
     write_raster(year_path, data, meta)
 
@@ -342,21 +342,20 @@ def make_dir(path):
 
 def run(tasks, func, mode="auto"):
     parallel = False
+    size = 1
+    rank = 0
     if mode in ["auto", "parallel"]:
         try:
             from mpi4py import MPI
             parallel = True
+            comm = MPI.COMM_WORLD
+            size = comm.Get_size()
+            rank = comm.Get_rank()
         except:
-            parallel = False
+            if mode == "parallel":
+                raise Exception("Failed to run job in parallel")
     elif mode != "serial":
         raise Exception("Invalid `mode` value for script.")
-    if parallel:
-        comm = MPI.COMM_WORLD
-        size = comm.Get_size()
-        rank = comm.Get_rank()
-    else:
-        size = 1
-        rank = 0
     c = rank
     while c < len(tasks):
         try:
