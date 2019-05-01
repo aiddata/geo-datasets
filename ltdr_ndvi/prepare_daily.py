@@ -40,13 +40,6 @@ from osgeo import gdal, osr
 
 mode = "auto"
 
-try:
-    from mpi4py import MPI
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-except:
-    rank = 0
-
 
 build_list = [
     "daily",
@@ -280,7 +273,6 @@ def aggregate_rasters(file_list, method="mean"):
     Return
         result: rasterio Raster instance
     """
-
     store = None
     for ix, file_path in enumerate(file_list):
 
@@ -412,15 +404,15 @@ year_df["path"] = year_df["year"].apply(
 
 
 day_qlist = []
-for _, row in day_df.iteritems():
+for _, row in day_df.iterrows():
     day_qlist.append([row["path"], row["output_path"]])
 
 month_qlist = []
-for _, row in month_df.iteritems():
+for _, row in month_df.iterrows():
     month_qlist.append([row["year_month"], row["day_path_list"], row["path"]])
 
 year_qlist = []
-for _, row in year_df.iteritems():
+for _, row in year_df.iterrows():
     year_qlist.append([row["year"], row["month_path_list"], row["path"]])
 
 
