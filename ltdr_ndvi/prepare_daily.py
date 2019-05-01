@@ -43,8 +43,8 @@ mode = "auto"
 
 build_list = [
     "daily",
-    # "monthly",
-    # "yearly"
+    "monthly",
+    "yearly"
 ]
 
 
@@ -87,7 +87,7 @@ def build_data_list(input_base, output_base, ops):
         month = "{0:02d}".format(
             datetime.strptime("{0}+{1}".format(year, day), "%Y+%j").month)
         output_path = os.path.join(
-            output_base, "daily/avhrr_ndvi_v5_{}_{}.tif".format(year, day)
+            output_base, "daily/avhrr_ndvi_v5_{}_{}_{}.tif".format(sensor, year, day)
         )
         df_dict_list.append({
             "path": path,
