@@ -213,7 +213,7 @@ def read_csv(path):
     return df
 
 
-def run(tasks, func):
+def run(tasks, func, mode="auto"):
     parallel = False
     if mode in ["auto", "parallel"]:
         try:
@@ -252,7 +252,7 @@ search_regex = os.path.join(raw_dir, "oco2_LtCO2_*.nc4")
 qlist_a = glob.glob(search_regex)
 
 if run_a:
-    run(qlist_a, convert_daily)
+    run(qlist_a, convert_daily, mode=mode)
 
 
 # -----------------------------------------------------------------------------
@@ -272,7 +272,7 @@ for i in dlist:
 qlist_b = qlist_dict.items()
 
 if run_b:
-    run(qlist_b, concat_month)
+    run(qlist_b, concat_month, mode=mode)
 
 
 # -----------------------------------------------------------------------------
@@ -292,7 +292,7 @@ for i in mlist:
 qlist_c = qlist_dict.items()
 
 if run_c:
-    run(qlist_c, concat_year)
+    run(qlist_c, concat_year, mode=mode)
 
 
 # -----------------------------------------------------------------------------
@@ -306,7 +306,7 @@ make_dir(month_grid_dir)
 qlist_d = glob.glob(os.path.join(month_dir, 'xco2_*.csv'))
 
 if run_d:
-    run(qlist_d, agg_to_grid_month)
+    run(qlist_d, agg_to_grid_month, mode=mode)
 
 
 # -----------------------------------------------------------------------------
@@ -317,7 +317,7 @@ make_dir(month_interp_dir)
 qlist_e = glob.glob(os.path.join(month_grid_dir, 'xco2_*.csv'))
 
 if run_e:
-    run(qlist_e, interpolate_month)
+    run(qlist_e, interpolate_month, mode=mode)
 
 
 # -----------------------------------------------------------------------------
@@ -331,7 +331,7 @@ make_dir(year_grid_dir)
 qlist_f = glob.glob(os.path.join(year_dir, 'xco2_*.csv'))
 
 if run_f:
-    run(qlist_f, agg_to_grid_year)
+    run(qlist_f, agg_to_grid_year, mode=mode)
 
 
 # -----------------------------------------------------------------------------
@@ -342,5 +342,5 @@ make_dir(year_interp_dir)
 qlist_g = glob.glob(os.path.join(year_grid_dir, 'xco2_*.csv'))
 
 if run_g:
-    run(qlist_g, interpolate_year)
+    run(qlist_g, interpolate_year, mode=mode)
 
