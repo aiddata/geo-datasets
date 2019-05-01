@@ -42,7 +42,7 @@ mode = "auto"
 
 
 build_list = [
-    "daily",
+    # "daily",
     "monthly",
     "yearly"
 ]
@@ -79,8 +79,8 @@ def build_data_list(input_base, output_base, ops):
             if file.endswith(".hdf"):
                 f.append(os.path.join(root, file))
     df_dict_list = []
-    for path in f:
-        items = os.path.basename(path).split(".")
+    for input_path in f:
+        items = os.path.basename(input_path).split(".")
         year = items[1][1:5]
         day = items[1][5:8]
         sensor = items[2]
@@ -90,7 +90,7 @@ def build_data_list(input_base, output_base, ops):
             output_base, "daily/avhrr_ndvi_v5_{}_{}_{}.tif".format(sensor, year, day)
         )
         df_dict_list.append({
-            "path": path,
+            "input_path": input_path,
             "sensor": sensor,
             "year": year,
             "month": month,
@@ -100,7 +100,7 @@ def build_data_list(input_base, output_base, ops):
             "output_path": output_path
         })
     df = pd.DataFrame(df_dict_list)
-    df = df.sort(["path"])
+    df = df.sort(["input_path"])
     # df = df.drop_duplicates(subset="year_day", take_last=True)
     sensors = sorted(list(set(df["sensor"])))
     years = sorted(list(set(df["year"])))
@@ -377,8 +377,8 @@ day_df = build_data_list(src_base, dst_base, filter_options)
 
 
 # build month dataframe
-month_df = day_df[["path", "year", "year_month"]].groupby("year_month", as_index=False).aggregate({
-    "path": [lambda x: tuple(x), "count"],
+month_df = day_df[["output_path", "year", "year_month"]].groupby("year_month", as_index=False).aggregate({
+    "output_path": [lambda x: tuple(x), "count"],
     "year": "last"
 })
 month_df.columns = ["year_month", "day_path_list", "count", "year"]
@@ -386,33 +386,33 @@ month_df.columns = ["year_month", "day_path_list", "count", "year"]
 minimum_days_in_month = 20
 month_df = month_df.loc[month_df["count"] >= minimum_days_in_month]
 
-month_df["path"] = month_df.apply(
+month_df["output_path"] = month_df.apply(
     lambda x: os.path.join(dst_base, "monthly/avhrr_ndvi_v5_{}.tif".format(x["year_month"])), axis=1
 )
 
 
 # build year dataframe
-year_df = month_df[["path", "year"]].groupby("year", as_index=False).aggregate({
-    "path": [lambda x: tuple(x), "count"]
+year_df = month_df[["output_path", "year"]].groupby("year", as_index=False).aggregate({
+    "output_path": [lambda x: tuple(x), "count"]
 })
 year_df.columns = ["year", "month_path_list", "count"]
 
-year_df["path"] = year_df["year"].apply(
+year_df["output_path"] = year_df["year"].apply(
     lambda x: os.path.join(dst_base, "yearly/avhrr_ndvi_v5_{}.tif".format(x))
 )
 
 
 day_qlist = []
 for _, row in day_df.iterrows():
-    day_qlist.append([row["path"], row["output_path"]])
+    day_qlist.append([row["input_path"], row["output_path"]])
 
 month_qlist = []
 for _, row in month_df.iterrows():
-    month_qlist.append([row["year_month"], row["day_path_list"], row["path"]])
+    month_qlist.append([row["year_month"], row["day_path_list"], row["output_path"]])
 
 year_qlist = []
 for _, row in year_df.iterrows():
-    year_qlist.append([row["year"], row["month_path_list"], row["path"]])
+    year_qlist.append([row["year"], row["month_path_list"], row["output_path"]])
 
 
 if "daily" in build_list:
