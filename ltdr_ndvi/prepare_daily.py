@@ -36,17 +36,14 @@ from osgeo import gdal, osr
 from datetime import datetime
 import rasterio
 
+mode = "auto"
 
-# mode = "serial"
-mode = "parallel"
-
-# NOTE: use `qsub jobscript` for running parallel
-if mode == "parallel":
+try:
     from mpi4py import MPI
     comm = MPI.COMM_WORLD
-    size = comm.Get_size()
     rank = comm.Get_rank()
-
+except:
+    rank = 0
 
 
 build_list = [
@@ -59,8 +56,6 @@ build_list = [
 src_base = "/sciclone/aiddata10/REU/geo/raw/ltdr/LAADS/465"
 
 dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/ltdr/avhrr_ndvi_v5"
-
-
 
 
 # filter options to accept/deny based on sensor, year
@@ -98,10 +93,11 @@ def build_data_list(input_base, ops):
 
     # get sensors
     sensors = [
-        name for name in os.listdir(input_base)
+        name.split("_")[0] for name in os.listdir(input_base)
         if os.path.isdir(os.path.join(input_base, name))
             and name.startswith("N")
-            and len(name) == 3
+            and len(name.split("_")[0]) == 3
+            and name.endswith("_AVH13C1")
     ]
 
     if ops['use_sensor_accept']:
@@ -115,7 +111,7 @@ def build_data_list(input_base, ops):
     for sensor in sensors:
 
         # get years for sensors
-        path_sensor = input_base +"/"+ sensor
+        path_sensor = input_base +"/"+ sensor+"_AVH13C1"
 
         years = [
             name for name in os.listdir(path_sensor)
@@ -160,22 +156,12 @@ def build_data_list(input_base, ops):
     return ref
 
 
-def prep_daily_data(task, input_base, output_base):
-
-    year, day, filename = task
-
+def prep_daily_data(task):
+    year, day, filename, input_base, output_base = task
     sensor = filename.split('.')[2]
-
     src_file = os.path.join(input_base, sensor, year, filename + ".hdf")
-
     dst_dir = os.path.join(output_base, 'daily', year)
-
-    try:
-        os.makedirs(dst_dir)
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
-
+    make_dir(dst_dir)
     print "{0} {1} {2}".format(sensor, year, day)
     process_daily_data(src_file, dst_dir)
 
@@ -220,7 +206,6 @@ def process_daily_data(input_path, output_dir):
 
     band_array[np.where((band_array < 0) & (band_array > -9999))] = 0
     band_array[np.where(band_array > 10000)] = 10000
-
 
 
     # prep projections and transformations
@@ -299,17 +284,16 @@ def process_daily_data(input_path, output_dir):
     out_ds = None
 
 
-
-def prep_monthly_data(task, output_base):
-    year, month, month_files = task
+def prep_monthly_data(task):
+    year, month, month_files, output_base = task
 
     data, meta = aggregate_rasters(file_list=month_files, method="max")
     month_path = os.path.join(output_base, 'monthly', year, "avhrr_ndvi_{0}_{1}.tif".format(year, month))
     write_raster(month_path, data, meta)
 
 
-def prep_yearly_data(task, output_base):
-    year, year_files = task
+def prep_yearly_data(task):
+    year, year_files, output_base = task
 
     data, meta = aggregate_rasters(file_list=year_files, method="mean")
     year_path = os.path.join(output_base, 'yearly', "avhrr_ndvi_{0}.tif".format(year))
@@ -380,11 +364,7 @@ def aggregate_rasters(file_list, method="mean"):
 
 
 def write_raster(path, data, meta):
-    try:
-        os.makedirs(os.path.dirname(path))
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
+    make_dir(os.path.dirname(path))
 
     meta['dtype'] = data.dtype
 
@@ -397,55 +377,65 @@ def write_raster(path, data, meta):
             print data.shape
             raise
 
+
+def make_dir(path):
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+
+
+def run(tasks, func, mode="auto"):
+    parallel = False
+    if mode in ["auto", "parallel"]:
+        try:
+            from mpi4py import MPI
+            parallel = True
+        except:
+            parallel = False
+    elif mode != "serial":
+        raise Exception("Invalid `mode` value for script.")
+    if parallel:
+        comm = MPI.COMM_WORLD
+        size = comm.Get_size()
+        rank = comm.Get_rank()
+    else:
+        size = 1
+        rank = 0
+    c = rank
+    while c < len(tasks):
+        try:
+            func(tasks[c])
+        except Exception as e:
+            print "Error processing: {0}".format(tasks[c])
+            # raise
+            print e
+        c += size
+    if parallel:
+        comm.Barrier()
+
+
 # -----------------------------------------------------------------------------
 
-print "generating initial data list..."
+if rank == 0: print "generating initial data list..."
 
 ref = build_data_list(src_base, filter_options)
 
 # -------------------------------------
 
-print "building day list..."
+if rank == 0: print "building day list..."
 
 # day_qlist item format = [year, day, filename]
 day_qlist = []
 for year in ref:
     for day, filename in ref[year].iteritems():
-        day_qlist.append([year, day, filename])
+        day_qlist.append([year, day, filename, src_base, dst_base])
+
 
 # -------------------------------------
 
-print "running daily data..."
-
-if "daily" in build_list:
-
-    if mode == "parallel":
-
-        c = rank
-        while c < len(day_qlist):
-
-            try:
-                prep_daily_data(day_qlist[c], src_base, dst_base)
-            except Exception as e:
-                print "Error processing day: {0} {1} ({2})".format(*day_qlist[c])
-                print e
-                # raise Exception('day processing')
-
-            c += size
-
-        comm.Barrier()
-
-    elif mode == "serial":
-
-        for c in range(len(day_qlist)):
-            prep_daily_data(day_qlist[c], src_base, dst_base)
-
-    else:
-        raise Exception("Invalid `mode` value for script.")
-
-# -------------------------------------
-
-print "building month list..."
+if rank == 0: print "building month list..."
 
 month_qlist = []
 
@@ -487,9 +477,9 @@ for year in ref:
 
 
 # make sure to add final month of final year
-month_qlist.append((year, month, month_files))
+month_qlist.append((year, month, month_files, dst_base))
 
-if mode == "serial" or rank == 0:
+if rank == 0:
     for i in month_qlist: print "{0} {1} {2}".format(i[0], i[1], len(i[2]))
 
 # filter out months with insufficient data
@@ -498,38 +488,7 @@ month_qlist = [i for i in month_qlist if len(i[2]) > minimum_days_in_month]
 
 # -------------------------------------
 
-print "running monthly data..."
-
-if "monthly" in build_list:
-
-    if mode == "parallel":
-
-        c = rank
-        while c < len(month_qlist):
-
-            try:
-                prep_monthly_data(month_qlist[c], dst_base)
-            except Exception as e:
-                print "Error processing month: {0} {1}".format(month_qlist[c][0], month_qlist[c][1])
-                # raise
-                print e
-                # raise Exception('month processing')
-
-            c += size
-
-        comm.Barrier()
-
-    elif mode == "serial":
-
-        for c in range(len(month_qlist)):
-            prep_monthly_data(month_qlist[c], dst_base)
-
-    else:
-        raise Exception("Invalid `mode` value for script.")
-
-# -------------------------------------
-
-print "building year list..."
+if rank == 0: print "building year list..."
 
 year_months = {}
 for year, month, _ in month_qlist:
@@ -546,37 +505,22 @@ for year, month, _ in month_qlist:
     year_months[year].append(month_path)
 
 
-year_qlist = [(year, month_path) for year, month_path in year_months.iteritems()]
+year_qlist = [(year, month_path, dst_base) for year, month_path in year_months.iteritems()]
 
 
 # -------------------------------------
 
-print "running yearly data..."
+if rank == 0: print "running daily data..."
+
+if "daily" in build_list:
+    run(day_qlist, prep_daily_data, mode=mode)
+
+if rank == 0: print "running monthly data..."
+
+if "monthly" in build_list:
+    run(month_qlist, prep_monthly_data, mode=mode)
+
+if rank == 0: print "running yearly data..."
 
 if "yearly" in build_list:
-
-    if mode == "parallel":
-
-        c = rank
-        while c < len(year_qlist):
-
-            try:
-                prep_yearly_data(year_qlist[c], dst_base)
-            except Exception as e:
-                print "Error processing year: {0}".format(year_qlist[c][0])
-                # raise
-                print e
-                # raise Exception('year processing')
-
-
-            c += size
-
-        comm.Barrier()
-
-    elif mode == "serial":
-
-        for c in range(len(year_qlist)):
-            prep_yearly_data(year_qlist[c], dst_base)
-
-    else:
-        raise Exception("Invalid `mode` value for script.")
+    run(year_qlist, prep_yearly_data, mode=mode)
