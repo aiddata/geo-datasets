@@ -30,11 +30,13 @@ full file name - "AVH13C1.A1981181.N07.004.2013227210959.hdf"
 import os
 import errno
 from collections import OrderedDict
+from datetime import datetime
+
+import rasterio
 import numpy as np
+import pandas as pd
 from osgeo import gdal, osr
 
-from datetime import datetime
-import rasterio
 
 mode = "auto"
 
@@ -47,9 +49,9 @@ except:
 
 
 build_list = [
-    # "daily",
+    "daily",
     # "monthly",
-    "yearly"
+    # "yearly"
 ]
 
 
@@ -77,96 +79,79 @@ filter_options = {
 # -----------------------------------------------------------------------------
 
 
-def build_data_list(input_base, ops):
-
-    # reference object used to eliminate duplicate year / day combos
-    # when overlaps between sensors exists, always use data from newer sensor
-
-    if ops['use_sensor_accept'] and ops['use_sensor_deny']:
-        raise Exception('Cannot use accept and deny options for sensors')
-
-    if ops['use_year_accept'] and ops['use_year_deny']:
-        raise Exception('Cannot use accept and deny options for years')
-
-
-    ref = OrderedDict()
-
-    # get sensors
-    sensors = [
-        name.split("_")[0] for name in os.listdir(input_base)
-        if os.path.isdir(os.path.join(input_base, name))
-            and name.startswith("N")
-            and len(name.split("_")[0]) == 3
-            and name.endswith("_AVH13C1")
-    ]
-
+def build_data_list(input_base, output_base, ops):
+    f = []
+    for root, dirs, files in os.walk(input_base):
+        for file in files:
+            if file.endswith(".hdf"):
+                f.append(os.path.join(root, file))
+    df_dict_list = []
+    for path in f:
+        items = os.path.basename(path).split(".")
+        year = items[1][1:5]
+        day = items[1][5:8]
+        sensor = items[2]
+        month = "{0:02d}".format(
+            datetime.strptime("{0}+{1}".format(year, day), "%Y+%j").month)
+        output_path = os.path.join(
+            output_base, "daily/avhrr_ndvi_v5_{}_{}.tif".format(year, day)
+        )
+        df_dict_list.append({
+            "path": path,
+            "sensor": sensor,
+            "year": year,
+            "month": month,
+            "day": day,
+            "year_month": year+"_"+month,
+            "year_day": year+"_"+day,
+            "output_path": output_path
+        })
+    df = pd.DataFrame(df_dict_list)
+    df = df.sort(["path"])
+    # df = df.drop_duplicates(subset="year_day", take_last=True)
+    sensors = sorted(list(set(df["sensor"])))
+    years = sorted(list(set(df["year"])))
+    filter_sensors = None
     if ops['use_sensor_accept']:
-        sensors = [i for i in sensors if i in ops['sensor_accept']]
+        filter_sensors = [i for i in sensors if i in ops['sensor_accept']]
     elif ops['use_sensor_deny']:
-        sensors = [i for i in sensors if i not in ops['sensor_deny']]
-
-    sensors.sort()
-
-
-    for sensor in sensors:
-
-        # get years for sensors
-        path_sensor = input_base +"/"+ sensor+"_AVH13C1"
-
-        years = [
-            name for name in os.listdir(path_sensor)
-            if os.path.isdir(os.path.join(path_sensor, name))
-        ]
-
-        if ops['use_year_accept']:
-            years = [i for i in years if i in ops['year_accept']]
-        elif ops['use_year_deny']:
-            years = [i for i in years if i not in ops['year_deny']]
-
-        years.sort()
-
-        for year in years:
-
-            if not year in ref:
-                ref[year] = {}
-
-            # get days for year
-            path_year = path_sensor +"/"+ year
-            filenames = [
-                name for name in os.listdir(path_year)
-                if not os.path.isdir(os.path.join(path_year, name))
-                    and name.endswith(".hdf")
-                    and name.split(".")[0] == "AVH13C1"
-            ]
-            filenames.sort()
-
-            for filename in filenames:
-
-                filename = filename[:-4]
-                day = filename.split(".")[1][5:]
-
-                # sensor list is sorted so duplicate day will always be newer
-                ref[year][day] = filename
-
-
-            # sort filenames after year finishes
-            ref[year] = OrderedDict(
-                sorted(ref[year].iteritems(), key=lambda (k,v): v))
-
-    return ref
+        filter_sensors = [i for i in sensors if i not in ops['sensor_deny']]
+    if filter_sensors:
+        df = df.loc[df["sensor"].isin(filter_sensors)]
+    filter_years = None
+    if ops['use_year_accept']:
+        filter_years = [i for i in years if i in ops['year_accept']]
+    elif ops['use_year_deny']:
+        filter_years = [i for i in years if i not in ops['year_deny']]
+    if filter_years:
+        df = df.loc[df["year"].isin(filter_years)]
+    return df
 
 
 def prep_daily_data(task):
-    year, day, filename, input_base, output_base = task
-    sensor = filename.split('.')[2]
-    src_file = os.path.join(input_base, sensor, year, filename + ".hdf")
-    dst_dir = os.path.join(output_base, 'daily', year)
-    make_dir(dst_dir)
-    print "{0} {1} {2}".format(sensor, year, day)
-    process_daily_data(src_file, dst_dir)
+    src, dst = task
+    year = os.path.basename(src).split(".")[1][1:5]
+    day = os.path.basename(src).split(".")[1][5:8]
+    sensor = os.path.basename(src).split(".")[2]
+    print "Rank {} - Processing Day {} {} {}".format(rank, sensor, year, day)
+    process_daily_data(src, dst)
 
 
-def process_daily_data(input_path, output_dir):
+def prep_monthly_data(task):
+    year_month, month_files, month_path = task
+    print "Rank {} - Processing Month {}".format(rank, year_month)
+    data, meta = aggregate_rasters(file_list=month_files, method="max")
+    write_raster(month_path, data, meta)
+
+
+def prep_yearly_data(task):
+    year, year_files, year_path = task
+    print "Rank {} - Processing Year {}".format(rank, year)
+    data, meta = aggregate_rasters(file_list=year_files, method="mean")
+    write_raster(year_path, data, meta)
+
+
+def process_daily_data(input_path, output_path):
     """Process input raster and create output in output directory
 
     Unpack NDVI subdataset from a HDF container
@@ -187,11 +172,6 @@ def process_daily_data(input_path, output_dir):
     be useful for future data prep scripts that can use this as startng point.
 
     """
-    output_path = "{0}/{1}.tif".format(
-        output_dir,
-        os.path.basename(os.path.splitext(input_path)[0])
-    )
-
     # open the dataset and subdataset
     hdf_ds = gdal.Open(input_path, gdal.GA_ReadOnly)
 
@@ -284,22 +264,6 @@ def process_daily_data(input_path, output_dir):
     out_ds = None
 
 
-def prep_monthly_data(task):
-    year, month, month_files, output_base = task
-
-    data, meta = aggregate_rasters(file_list=month_files, method="max")
-    month_path = os.path.join(output_base, 'monthly', year, "avhrr_ndvi_{0}_{1}.tif".format(year, month))
-    write_raster(month_path, data, meta)
-
-
-def prep_yearly_data(task):
-    year, year_files, output_base = task
-
-    data, meta = aggregate_rasters(file_list=year_files, method="mean")
-    year_path = os.path.join(output_base, 'yearly', "avhrr_ndvi_{0}.tif".format(year))
-    write_raster(year_path, data, meta)
-
-
 def aggregate_rasters(file_list, method="mean"):
     """Aggregate multiple rasters
 
@@ -365,9 +329,7 @@ def aggregate_rasters(file_list, method="mean"):
 
 def write_raster(path, data, meta):
     make_dir(os.path.dirname(path))
-
     meta['dtype'] = data.dtype
-
     with rasterio.open(path, 'w', **meta) as result:
         try:
             result.write(data)
@@ -418,109 +380,58 @@ def run(tasks, func, mode="auto"):
 
 # -----------------------------------------------------------------------------
 
-if rank == 0: print "generating initial data list..."
 
-ref = build_data_list(src_base, filter_options)
+# build day dataframe
+day_df = build_data_list(src_base, dst_base, filter_options)
 
-# -------------------------------------
 
-if rank == 0: print "building day list..."
+# build month dataframe
+month_df = day_df[["path", "year", "year_month"]].groupby("year_month", as_index=False).aggregate({
+    "path": [lambda x: tuple(x), "count"],
+    "year": "last"
+})
+month_df.columns = ["year_month", "day_path_list", "count", "year"]
 
-# day_qlist item format = [year, day, filename]
+minimum_days_in_month = 20
+month_df = month_df.loc[month_df["count"] >= minimum_days_in_month]
+
+month_df["path"] = month_df.apply(
+    lambda x: os.path.join(dst_base, "monthly/avhrr_ndvi_v5_{}.tif".format(x["year_month"])), axis=1
+)
+
+
+# build year dataframe
+year_df = month_df[["path", "year"]].groupby("year", as_index=False).aggregate({
+    "path": [lambda x: tuple(x), "count"]
+})
+year_df.columns = ["year", "month_path_list", "count"]
+
+year_df["path"] = year_df["year"].apply(
+    lambda x: os.path.join(dst_base, "yearly/avhrr_ndvi_v5_{}.tif".format(x))
+)
+
+
 day_qlist = []
-for year in ref:
-    for day, filename in ref[year].iteritems():
-        day_qlist.append([year, day, filename, src_base, dst_base])
-
-
-# -------------------------------------
-
-if rank == 0: print "building month list..."
+for _, row in day_df.iteritems():
+    day_qlist.append([row["path"], row["output_path"]])
 
 month_qlist = []
+for _, row in month_df.iteritems():
+    month_qlist.append([row["year_month"], row["day_path_list"], row["path"]])
 
-month = None
-month_files = []
-for year in ref:
+year_qlist = []
+for _, row in year_df.iteritems():
+    year_qlist.append([row["year"], row["month_path_list"], row["path"]])
 
-    for day, filename in ref[year].iteritems():
-
-        day_path = os.path.join(dst_base, 'daily', year, filename + ".tif")
-
-        cur_month = "{0:02d}".format(
-            datetime.strptime("{0}+{1}".format(year, day), "%Y+%j").month)
-
-        # print "{0} {1} {2}".format(year, day, cur_month)
-        # print filename
-
-        if month is None:
-            month = cur_month
-
-        elif cur_month != month:
-
-            # filenames are sorted, so when month does not match
-            # it mean you hit end of month
-
-            list_year = str(int(year) - 1) if month == '12' else year
-            month_qlist.append((list_year, month, month_files))
-
-            # print "{0} {1}".format(list_year, month)
-            # for i in month_files: print i
-
-            # init next month
-            month = cur_month
-            month_files = []
-
-
-        # add day to month list
-        month_files.append(day_path)
-
-
-# make sure to add final month of final year
-month_qlist.append((year, month, month_files, dst_base))
-
-if rank == 0:
-    for i in month_qlist: print "{0} {1} {2}".format(i[0], i[1], len(i[2]))
-
-# filter out months with insufficient data
-minimum_days_in_month = 20
-month_qlist = [i for i in month_qlist if len(i[2]) > minimum_days_in_month]
-
-# -------------------------------------
-
-if rank == 0: print "building year list..."
-
-year_months = {}
-for year, month, _ in month_qlist:
-
-    # first year of data, not enough months
-    if year == '1981':
-        pass
-
-    if not year in year_months:
-        year_months[year] = []
-
-    month_path = os.path.join(dst_base, 'monthly', year, "avhrr_ndvi_{0}_{1}.tif".format(year, month))
-
-    year_months[year].append(month_path)
-
-
-year_qlist = [(year, month_path, dst_base) for year, month_path in year_months.iteritems()]
-
-
-# -------------------------------------
-
-if rank == 0: print "running daily data..."
 
 if "daily" in build_list:
+    make_dir(os.path.join(dst_base, "daily"))
     run(day_qlist, prep_daily_data, mode=mode)
 
-if rank == 0: print "running monthly data..."
-
 if "monthly" in build_list:
+    make_dir(os.path.join(dst_base, "monthly"))
     run(month_qlist, prep_monthly_data, mode=mode)
 
-if rank == 0: print "running yearly data..."
-
 if "yearly" in build_list:
+    make_dir(os.path.join(dst_base, "yearly"))
     run(year_qlist, prep_yearly_data, mode=mode)
