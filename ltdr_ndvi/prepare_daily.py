@@ -168,29 +168,77 @@ def process_daily_data(input_path, output_path):
     # open the dataset and subdataset
     hdf_ds = gdal.Open(input_path, gdal.GA_ReadOnly)
 
-    subdataset = 0
-    band_ds = gdal.Open(
-        hdf_ds.GetSubDatasets()[subdataset][0], gdal.GA_ReadOnly)
+    layers = hdf_ds.GetSubDatasets()
+
+    # ndvi
+    ndvi_ds = gdal.Open(layers[0][0], gdal.GA_ReadOnly)
+    # qa
+    qa_ds = gdal.Open(layers[1][0], gdal.GA_ReadOnly)
 
     # clean data
-    band_array = band_ds.ReadAsArray().astype(np.int16)
+    ndvi_array = ndvi_ds.ReadAsArray().astype(np.int16)
 
-    # band_array[np.where(band_array < 0)] = -9999
+    qa_array = qa_ds.ReadAsArray().astype(np.int16)
 
-    band_array[np.where((band_array < 0) & (band_array > -9999))] = 0
-    band_array[np.where(band_array > 10000)] = 10000
 
+    binary_repr_v = np.vectorize(np.binary_repr)
+
+
+    flag = lambda i: bool(int(max(np.array(list(i))[qa_mask_vals])))
+    flag_v = np.vectorize(flag)
+
+
+    # list of qa fields and bit numbers
+    # https://ltdr.modaps.eosdis.nasa.gov/ltdr/docs/AVHRR_LTDR_V5_Document.pdf
+    # MSB first (invert for Python list lookip)
+
+    qa_bits = {
+        15: "Polar flag: latitude > 60deg (land) or > 50deg (ocean)",
+        14: "BRDF-correction issues",
+        13: "RHO3 value is invalid",
+        12: "Channel 5 value is invalid",
+        11: "Channel 4 value is invalid",
+        10: "Channel 3 value is invalid",
+        9: "Channel 2 (NIR) value is invalid",
+        8: "Channel 1 (visible) value is invalid",
+        7: "Channel 1-5 are invalid",
+        6: "Pixel is at night (high solar zenith angle)",
+        5: "Pixel is over dense dark vegetation",
+        4: "Pixel is over sun glint",
+        3: "Pixel is over water",
+        2: "Pixel contains cloud shadow",
+        1: "Pixel is cloudy",
+        0: "Unused"
+    }
+
+    qa_bin_array = binary_repr_v(qa_array, width=16)
+
+    # qa_mask_vals = [15, 9, 8, 6, 4, 3, 2, 1]
+    qa_mask_vals = [15, 9, 8, 1]
+
+    # convert bit number to array index
+    qa_mask_vals = [abs(x - 15) for x in qa_mask_vals]
+
+
+    qa_mask = flag_v(qa_bin_array)
+
+    ndvi_array[qa_mask] = -9999
+
+    ndvi_array[np.where((ndvi_array < 0) & (ndvi_array > -9999))] = 0
+    ndvi_array[np.where(ndvi_array > 10000)] = 10000
+
+    # -----------------
 
     # prep projections and transformations
     src_proj = osr.SpatialReference()
-    src_proj.ImportFromWkt(band_ds.GetProjection())
+    src_proj.ImportFromWkt(ndvi_ds.GetProjection())
 
     dst_proj = osr.SpatialReference()
     dst_proj.ImportFromEPSG(4326)
 
     tx = osr.CoordinateTransformation(src_proj, dst_proj)
 
-    src_gt = band_ds.GetGeoTransform()
+    src_gt = ndvi_ds.GetGeoTransform()
     pixel_xsize = src_gt[1]
     pixel_ysize = abs(src_gt[5])
 
@@ -198,12 +246,14 @@ def process_daily_data(input_path, output_path):
     (ulx, uly, ulz ) = tx.TransformPoint(src_gt[0], src_gt[3])
 
     (lrx, lry, lrz ) = tx.TransformPoint(
-        src_gt[0] + src_gt[1]*band_ds.RasterXSize,
-        src_gt[3] + src_gt[5]*band_ds.RasterYSize)
+        src_gt[0] + src_gt[1]*ndvi_ds.RasterXSize,
+        src_gt[3] + src_gt[5]*ndvi_ds.RasterYSize)
 
     # new geotransform
     dst_gt = (ulx, pixel_xsize, src_gt[2],
-               uly, src_gt[4], -pixel_ysize)
+                uly, src_gt[4], -pixel_ysize)
+
+    # -----------------
 
     # create new raster
     driver = gdal.GetDriverByName('GTiff')
@@ -220,41 +270,16 @@ def process_daily_data(input_path, output_path):
     out_ds.SetProjection(dst_proj.ExportToWkt())
 
     out_band = out_ds.GetRasterBand(1)
-    out_band.WriteArray(band_array)
+    out_band.WriteArray(ndvi_array)
     out_band.SetNoDataValue(-9999)
 
-    # ***
-    # reproject is converting all nodata to zero
-    # https://gis.stackexchange.com/questions/158503/9999-no-data-value-becomes-0-when-writing-array-to-gdal-memory-file
-    # (issue may have been resolve in gdal 2.0, currently
-    # have older version on sciclone)
-    #
-    # since out data isn't actually changing shape due to the reproj
-    # from epsg 4008, just another geographic datum proj
-    # we don't really need to reproject, just reassign the proj
-    # and fill in the data. hacky and not ideal, but we rarely use
-    # python gdal bindings anymore and i don't want to dig into
-    # an issue that was probably fixed in a newer version.
-    #
-    # will look into updating gdal at some point on sciclone,
-    # or readdress when/if we need python gdal bindings in future
-    # ***
-    #
-    # # reproject
-    # # need to test different resampling methods
-    # # (nearest is default, probably used by gdal_translate)
-    # # do not actually  think it matters for this case though
-    # # as there does not seem to be much if any need for r
-    # # resampling when reprojecting between these projections
-    # gdal.ReprojectImage(band_ds, out_ds,
-    #                     src_proj.ExportToWkt(), dst_proj.ExportToWkt(),
-    #                     gdal.GRA_Bilinear)
-    #                     # gdal.GRA_NearestNeighbour)
+    # complete write
+    out_ds = None
 
     # close out datasets
     hdf_ds = None
-    band_ds = None
-    out_ds = None
+    ndvi_ds = None
+
 
 
 def aggregate_rasters(file_list, method="mean"):
