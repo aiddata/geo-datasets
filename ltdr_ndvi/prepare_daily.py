@@ -42,7 +42,7 @@ mode = "auto"
 
 
 build_list = [
-    # "daily",
+    "daily",
     "monthly",
     "yearly"
 ]
