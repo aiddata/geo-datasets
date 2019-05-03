@@ -1,0 +1,23 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/boundaries/atlasofurbanexpansion/2016/urban_edge_t2",
+	"type": "boundary",
+	"file_extension": ".geojson",
+	"file_mask": "None",
+	"name": "atlasofurbanexpansion2016_urban_edge_t2",
+	"title": "Global Sample of 200 Cities - Urban Extents 2000",
+	"description": "",
+    "details": "",
+	"version": 2016,
+	"options": {
+        "group": "atlasofurbanexpansion2016",
+        "group_title": "Atlas of Urban Expansion",
+        "group_class": "sub"
+	},
+	"extras": {
+        "citation": "Angel et al., Atlas of Urban Expansion-2016 Edition, New York: New York University, Nairobi: UN-Habitat, and Cambridge, MA: Lincoln Institute of Land Policy, 2016.",
+	    "sources_web": "http://www.atlasofurbanexpansion.org",
+	    "sources_name": "Atlas of Urban Expansion (NYU, UN-Habitat, Lincoln Institute of Land Policy)",
+	    "tags": ["atlasofurbanexpansion", "cities", "city", "urban"]
+	},
+	"active": 1
+}
