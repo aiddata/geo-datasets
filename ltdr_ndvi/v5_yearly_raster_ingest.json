@@ -2,7 +2,7 @@
 	"base": "/sciclone/aiddata10/REU/geo/data/rasters/ltdr/avhrr_ndvi_v5/yearly",
 	"type": "raster",
 	"file_extension": ".tif",
-	"file_mask": "avhrr_ndvi_YYYY.tif",
+	"file_mask": "avhrr_ndvi_v5_YYYY.tif",
 	"name": "ltdr_avhrr_ndvi_v5_yearly",
 	"title": "Normalized Difference Vegetation Index - NDVI (LTDR v5 - AVHRR)",
 	"description": "Yearly value for Normalized Difference Vegetation Index (NDVI). Created using the NASA Long Term Data Record (v5) AVHRR data.",
@@ -28,5 +28,3 @@
 	},
 	"active": 1
 }
-
-
