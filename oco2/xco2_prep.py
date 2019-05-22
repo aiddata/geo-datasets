@@ -46,7 +46,7 @@ run_g = True
 
 raw_dir = "/sciclone/aiddata10/REU/geo/raw/jpl/oco2"
 
-data_dir = "/sciclone/aiddata10/REU/geo/data/rasters/jpl/xco2"
+data_dir = "/sciclone/aiddata10/REU/geo/data/rasters/jpl/oco2/xco2"
 
 day_dir = os.path.join(data_dir, "day")
 month_dir = os.path.join(data_dir, "month")
@@ -343,4 +343,3 @@ qlist_g = glob.glob(os.path.join(year_grid_dir, 'xco2_*.csv'))
 
 if run_g:
     run(qlist_g, interpolate_year, mode=mode)
-
