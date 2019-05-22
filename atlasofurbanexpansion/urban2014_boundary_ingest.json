@@ -1,5 +1,5 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/boundaries/atlasofurbanexpansion/2016/urban_edge_t3",
+	"base": "/sciclone/aiddata10/REU/geo/data/boundaries/atlasofurbanexpansion/2016/urban_edge_t3/urban_edge_t3/urban_edge_t3.geojson",
 	"type": "boundary",
 	"file_extension": ".geojson",
 	"file_mask": "None",

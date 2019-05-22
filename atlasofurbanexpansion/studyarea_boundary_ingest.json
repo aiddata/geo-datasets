@@ -1,5 +1,5 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/boundaries/atlasofurbanexpansion/2016/studyArea",
+	"base": "/sciclone/aiddata10/REU/geo/data/boundaries/atlasofurbanexpansion/2016/studyArea/studyArea.geojson",
 	"type": "boundary",
 	"file_extension": ".geojson",
 	"file_mask": "None",
