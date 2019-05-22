@@ -211,14 +211,15 @@ for level in levels:
         shp = fiona.open(shp_path, "r")
         if len(shp) > 1:
             print "\tCombining {} features for {}".format(len(shp), city_name)
-            geom = mapping(cascaded_union([shape(i["geometry"]) for i in shp]))
+            geom_shape = cascaded_union([shape(i["geometry"]) for i in shp]).buffer(0)
         else:
-            geom = shp[0]["geometry"]
+            geom_shape = shape(shp[0]["geometry"]).buffer(0)
         # if "coordinates" in geom:
         #     geom = {
         #         "type": "Feature",
         #         "geometry": geom,
         #     }
+        geom = mapping(geom_shape)
         if shp.crs["init"] != 'epsg:4326':
             geom = reproject(geom, shp.crs["init"])
         if geom["type"] == "Polygon":
