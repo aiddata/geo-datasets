@@ -10,6 +10,8 @@ import copy
 import urllib2
 import zipfile
 import json
+import collections
+import math
 
 import fiona
 import pandas as pd
@@ -29,7 +31,7 @@ def make_dir(path):
             raise
 
 
-base_dir = "/sciclone/aiddata10/REU/scr/atlasofurbanexpansion"
+base_dir = "/sciclone/aiddata10/REU/geo/raw/atlasofurbanexpansion"
 
 
 metadata_path = os.path.join(base_dir, "metadata.csv")
@@ -165,7 +167,15 @@ if extract:
 # merge data
 
 
-
+def convert_unicode(data):
+    if isinstance(data, basestring):
+        return str(data)
+    elif isinstance(data, collections.Mapping):
+        return dict(map(convert_unicode, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(convert_unicode, data))
+    else:
+        return data
 
 def reproject(geom, src_crs, dst_crs='epsg:4326'):
     project = partial(
@@ -178,10 +188,11 @@ def reproject(geom, src_crs, dst_crs='epsg:4326'):
 
 # merge each level
 levels = [
-    # "studyArea",
-    # "urban_edge_t3",
+    "studyArea",
+    "urban_edge_t3",
     "urban_edge_t2",
-    "urban_edge_t1"]
+    "urban_edge_t1"
+]
 
 
 
@@ -212,11 +223,15 @@ for level in levels:
             geom = reproject(geom, shp.crs["init"])
         if geom["type"] == "Polygon":
             geom = mapping(MultiPolygon([shape(geom)]))
+        props = convert_unicode(row.to_dict())
+        for i in props:
+            if isinstance(props[i], float) and math.isnan(props[i]):
+                props[i] = ""
         feature = {
             "id": ix,
             "type": "Feature",
             "geometry": geom,
-            "properties": row.to_dict()
+            "properties": props
         }
         feature_list.append(feature)
         shp.close()
