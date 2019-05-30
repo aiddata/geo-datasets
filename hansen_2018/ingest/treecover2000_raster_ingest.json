@@ -1,11 +1,11 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/hansen/GFC-2018-v1.6/treecover200/treecover200.tif",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/hansen/GFC-2018-v1.6/treecover2000/treecover2000.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "hansen2018_v16_treecover2000",
     "title": "Tree canopy cover for year 2000 (GFC 2018, v1.6)",
-    "description": "Tree cover in the year 2000, defined as canopy closure for all vegetation taller than 5m in height. In the range 0–100.",
+    "description": "Tree cover in the year 2000, defined as canopy closure for all vegetation taller than 5m in height. In the range 0-100.",
     "details": "",
     "version": "1.6",
     "options": {
