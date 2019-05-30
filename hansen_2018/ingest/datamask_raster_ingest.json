@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/hansen/GCF2018/lossyear/lossyear.tif",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/hansen/GFC-2018-v1.6/lossyear/lossyear.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
@@ -7,7 +7,7 @@
     "title": "Year of gross forest cover loss event",
     "description": "Forest loss during the period 2000–2018, defined as a stand-replacement disturbance, or a change from a forest to non-forest state.",
     "details": "Output format is a column for every year, where rows in column are the number of pixels of forest loss associated with that year and unit of analysis. Forest loss is only associated with the first year it is detected and no subsequent years.",
-    "version": "2018",
+    "version": "1.6",
     "options": {
         "resolution": 0.00025,
         "extract_types": ["categorical"],

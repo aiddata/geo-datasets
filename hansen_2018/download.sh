@@ -9,7 +9,7 @@ group_list=(
 )
 
 link_base_url="https://storage.googleapis.com/earthenginepartners-hansen/GFC-2018-v1.6"
-raw_dir='/sciclone/aiddata10/REU/geo/raw/hansen/GFC2018/tiles'
+raw_dir='/sciclone/aiddata10/REU/geo/raw/hansen/GFC-2018-v1.6/tiles'
 
 for i in ${group_list[*]}; do
     echo $i
