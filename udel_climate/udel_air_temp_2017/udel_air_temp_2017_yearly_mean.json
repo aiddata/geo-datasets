@@ -4,7 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "air_temp_YYYY_mean.tif",
 	"name": "udel_air_temp_v501_mean",
-    "title": "Air Temperature (Yearly Average)",
+    "title": "Air Temperature (Yearly Average) - UDel",
     "description": "Average monthly air temperature per year. Created using UDel Air Temperature dataset (v5.01)",
     "details": "",
 	"version": 5.01,

@@ -4,8 +4,8 @@
 	"file_extension": ".tif",
 	"file_mask": "cru.pre.YYYY.tif",
 	"name": "cru_pre_yearly_mean",
-	"title": "Yearly Precipication - CRU TS",
-	"description": "Yearly precipitation from Climate Research Unit (CRU)",
+	"title": "Yearly Mean Precipication - CRU TS",
+	"description": "Yearly mean precipitation from Climate Research Unit (CRU) in millimeters. Version 4.01",
     "details": "Created by aggregating (mean) monthly precipitation data from CRU TS",
 	"version": "4.01",
 	"options": {
@@ -20,12 +20,10 @@
         "variable_description": "precipitation in millimeters"
 	},
 	"extras": {
-        "citation": "Harris et al.(2014) Updated high‐resolution grids of monthly climatic observations – the CRU TS3.10 Dataset. doi:10.1002/joc.3711",
+        "citation": "Harris, I. , Jones, P. , Osborn, T. and Lister, D. (2014), Updated high‐resolution grids of monthly climatic observations – the CRU TS3.10 Dataset. Int. J. Climatol., 34: 623-642. doi:10.1002/joc.3711",
 	    "sources_web": "https://crudata.uea.ac.uk/cru/data/hrg/#info",
 	    "sources_name": "Climate Research Unit",
 	    "tags": ["cru", "precipitation", "environment", "yearly"]
 	},
 	"active": 1
 }
-
-
