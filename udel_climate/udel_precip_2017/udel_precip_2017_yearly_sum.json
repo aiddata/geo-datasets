@@ -5,7 +5,7 @@
 	"file_mask": "precip_YYYY_sum.tif",
 	"name": "udel_precip_v501_sum",
     "title": "Precipitation (Yearly Total) - UDel",
-    "description": "Total precipitation per year in millimeter. Created using UDel Precipitation dataset (v5.01)",
+    "description": "Total precipitation per year in millimeters. Created using UDel Precipitation dataset (v5.01)",
     "details": "",
 	"version": 5.01,
 	"options": {
