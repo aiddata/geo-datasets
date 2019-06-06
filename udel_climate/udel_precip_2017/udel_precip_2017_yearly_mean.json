@@ -5,7 +5,7 @@
 	"file_mask": "precip_YYYY_mean.tif",
 	"name": "udel_precip_v501_mean",
     "title": "Precipitation (Yearly Average) - UDel",
-    "description": "Average monthly precipitation per year. Created using UDel Precipitation dataset (v5.01)",
+    "description": "Average monthly precipitation per year in millimeters. Created using UDel Precipitation dataset (v5.01)",
     "details": "",
 	"version": 5.01,
 	"options": {
