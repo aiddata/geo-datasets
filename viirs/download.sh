@@ -9,7 +9,7 @@ dst_base="/sciclone/aiddata10/REU/geo/raw/viirs/source/dnb_composites/v10"
 src_base="https://data.ngdc.noaa.gov/instruments/remote-sensing/passive/spectrometers-radiometers/imaging/viirs/dnb_composites/v10"
 
 start_year=2017
-end_year=2018
+end_year=2019
 for y in $(seq $start_year $end_year); do
 
     for m in $(seq 1 12); do
