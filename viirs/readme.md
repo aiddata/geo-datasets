@@ -1,16 +1,45 @@
 
-Files:
+Info:
 
+viirs = Visible Infrared Imaging Radiometer Suite
+dnb = Day/Night Band
+vcm = viirs cloud mask
+sl = stray light
+cfg = cloud free grids
 
-download.sh - download all raw data from source (compressed)
+vcmcfg - excludes any data contaminated by stray light
+vcmslcfg - data impacted by stray light are corrected but not removed
 
-extract.sh - unzip desired files from raw data
+---------------------------------------
 
-viirs_data_filter.py - filter/prepare raw monthly data tiles
-jobscript_mosaic - used to run viirs_data_filter.py (parallel job on sciclone)
+Instructions:
 
-viirs_mosaic.py - mosaic filtered monthly tiles (result of viirs_data_filter.py)
-jobscript_mosaic - used to run viirs_mosaic.py (parallel job on sciclone)
+Step 1)
+- Script: download.sh
+- Description: Downloads all raw data from source (compressed) for specified years. Downloads both vcmcfg and vcmslcfg
+    + set start and end year in script
+    + run script
 
-viirs_yearly.py - creates yearly aggregates from filter monthly data (result of viirs_data_filter.py) and mosaics
-jobscript_yearly - used to run viirs_yearly.py (parallel job on sciclone)
+Step 2)
+- Script: extract.sh
+- Description: unzip desired files from raw data
+    + set start and end year in script
+    + run script
+
+Step 3)
+- Script: viirs_data_filter.py
+- Description: filter/prepare raw monthly data tiles
+    +
+    + Run jobscript_mosaic (qsub jobscript_data_filter)
+
+Step 4)
+- Script: viirs_mosaic.py
+- Description: mosaic filtered monthly tiles (result of viirs_data_filter.py)
+    +
+    + Run jobscript_mosaic (qsub jobscript_mosaic)
+
+Step 5)
+- Script: viirs_yearly.py
+- Description: creates yearly aggregates from filter monthly data (result of viirs_data_filter.py) and mosaics
+    +
+    + Run jobscript_mosaic (qsub jobscript_yearly)
