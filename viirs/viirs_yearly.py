@@ -255,7 +255,7 @@ tile_qlist = [(year, tile_id) for year in year_month_dict.keys() for tile_id in 
 tile_qlist.sort()
 
 def run_yearly_tile_agg(year, tile_id):
-    tile_files =  glob.glob(monthly_tiles + "/{0}*/*{1}*.avg_rade9.tif".format(year, tile_id))
+    tile_files =  glob.glob(monthly_tiles + "/{0}*/*{1}*.avg_rade*.tif".format(year, tile_id))
     year_dir = os.path.join(yearly_tiles, year)
     for method in aggregation_methods:
         print "Running {0} {1} {2}".format(year, tile_id, method)

@@ -28,6 +28,10 @@ cf_minimum = 2
 
 years = [2017, 2018]
 
+mode = "parallel"
+# mode = "serial"
+
+
 # -----------------------------------------------------------------------------
 
 """
@@ -42,14 +46,15 @@ cloud count for a single tile at a time
 
 year_months = [i for i in os.listdir(data_path) if i.startswith(tuple(map(str, years)))]
 
-print "Processing year-months: {}".format(year_months)
 tile_files = {}
 
 for ym in year_months:
+    print(ym)
     for pth, dirs, files in os.walk(os.path.join(data_path, ym)):
         for f in files:
-
-            if f.endswith('.avg_rade9.tif'):
+            print(f)
+            if f.endswith(('.avg_rade9.tif', '.avg_rade9h.tif')):
+                print(f)
 
                 tile_id = os.path.basename(f).split("_")[3]
 
@@ -66,8 +71,6 @@ for ym in year_months:
 
                 tile_files[tile_id].append((lights_file, cloud_file))
 
-print "\nFiles:"
-print(tile_files)
 
 # -----------------------------------------------------------------------------
 
@@ -183,37 +186,38 @@ def prepare_tiles(tile_id, file_tuples):
 
 
 
-mode = "parallel"
-# mode = "serial"
+
 
 if mode == "parallel":
     from mpi4py import MPI
     comm = MPI.COMM_WORLD
     size = comm.Get_size()
     rank = comm.Get_rank()
+else:
+    size = 1
+    rank = 0
+c = rank
 
-    c = rank
-    while c < len(tile_files):
+if rank == 0:
+    print "Processing year-months: {}".format(year_months)
+    print "\nFiles:"
+    print(tile_files)
 
-        try:
-            tile_id = tile_files.keys()[c]
-            prepare_tiles(tile_id, tile_files[tile_id])
-        except Exception as e:
-            print "Error processing tile section: {0}".format(c)
-            raise
+while c < len(tile_files):
 
-        c += size
-
-    comm.Barrier()
-
-elif mode == "serial":
-
-    for c in range(len(tile_files)):
+    try:
         tile_id = tile_files.keys()[c]
         prepare_tiles(tile_id, tile_files[tile_id])
+    except Exception as e:
+        print "Error processing tile section: {0}".format(c)
+        raise
 
-else:
-    raise Exception("Invalid `mode` value for script.")
+    c += size
+
+if mode == "parallel":
+    comm.Barrier()
+
+
 
 
 

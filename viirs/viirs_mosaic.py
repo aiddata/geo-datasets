@@ -30,7 +30,7 @@ def run_mosaic(datestr):
     print "Running {0}".format(datestr)
 
     tile_dir = os.path.join(tile_data, datestr)
-    tile_list = glob.glob(tile_dir + "/*.avg_rade9.tif")
+    tile_list = glob.glob(tile_dir + "/*.avg_rade*.tif")
 
     if len(tile_list) != 6:
         raise Exception("Bad tile count ({0})".format(len(tile_list)))
