@@ -49,12 +49,9 @@ year_months = [i for i in os.listdir(data_path) if i.startswith(tuple(map(str, y
 tile_files = {}
 
 for ym in year_months:
-    print(ym)
     for pth, dirs, files in os.walk(os.path.join(data_path, ym)):
         for f in files:
-            print(f)
             if f.endswith(('.avg_rade9.tif', '.avg_rade9h.tif')):
-                print(f)
 
                 tile_id = os.path.basename(f).split("_")[3]
 
@@ -136,7 +133,7 @@ def prepare_tiles(tile_id, file_tuples):
             raise Exception('Cloud/ntl different shapes ', cloud_path)
 
         # generate mask
-        mask = (array_cloud <= cf_minimum).astype('uint16')
+        mask = (array_cloud <= cf_minimum).astype('uint8')
 
         # ---------------------------------
 
