@@ -126,7 +126,7 @@ def prepare_tiles(tile_id, file_tuples):
         # set profile for tile using first layer
         if tile_profile is None:
             tile_profile = profile_cloud.copy()
-        print tile_profile
+        tile_profile["dtype"] = "uint16"
 
         # check if cloud and ntl has same dimension
         # raise error if not same dimension
