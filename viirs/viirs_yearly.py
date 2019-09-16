@@ -39,9 +39,9 @@ def write_raster(path, data, meta):
         try:
             result.write(data)
         except:
-            print path
-            print meta
-            print data.shape
+            print(path)
+            print(meta)
+            print(data.shape)
             raise
 
 
@@ -90,8 +90,8 @@ def aggregate_rasters(file_list, method="mean", custom_fun=None):
 
     resolution_list = [i['affine'][0] for i in meta_list]
     if len(set(resolution_list)) != 1:
-        for i in meta_list: print i
-        print set(resolution_list)
+        for i in meta_list: print(i)
+        print(set(resolution_list))
         raise Exception('Resolution of files are different')
 
     res = resolution_list[0]
@@ -225,6 +225,8 @@ tile_id_list = ["00N060E", "00N060W", "00N180W", "75N060E", "75N060W", "75N180W"
 # aggregation_methods = ["max", "mean", "var", "std"]
 aggregation_methods = ["max"]
 
+years = [2017, 2018]
+
 
 # -----------------------------------------------------------------------------
 
@@ -234,14 +236,15 @@ year_month_list = os.listdir(monthly_tiles)
 year_month_dict = {}
 for i in year_month_list:
     year, month = i[:4], i[4:]
-    if year not in year_month_dict:
-        year_month_dict[year] = []
-    year_month_dict[year].append(month)
+    if int(year) in years:
+        if year not in year_month_dict:
+            year_month_dict[year] = []
+        year_month_dict[year].append(month)
 
 for year in year_month_dict.keys():
     month_list = year_month_dict[year]
     if '12' not in month_list:
-        print "Removing year: {0} with insufficient months ({1})".format(year, month_list)
+        print("Removing year: {0} with insufficient months ({1})".format(year, month_list))
         del year_month_dict[year]
 
 
@@ -350,5 +353,3 @@ if run_mosaic:
 
     else:
         raise Exception("Invalid `mode` value for script.")
-
-

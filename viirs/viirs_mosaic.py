@@ -73,7 +73,11 @@ mode = "parallel"
 # mode = "serial"
 
 
-qlist = os.listdir(tile_data)
+years = [2017, 2018]
+
+# year_months
+qlist = [i for i in os.listdir(tile_data) if i.startswith(tuple(map(str, years)))]
+
 
 
 if mode == "parallel":
@@ -102,7 +106,3 @@ elif mode == "serial":
 
 else:
     raise Exception("Invalid `mode` value for script.")
-
-
-
-

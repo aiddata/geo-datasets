@@ -29,17 +29,26 @@ Step 2)
 Step 3)
 - Script: viirs_data_filter.py
 - Description: filter/prepare raw monthly data tiles
-    +
+    + Set list of all years to process (can be int or str)
+    + Set value for minimum cloud free day threshold
+    + Set mode (serial or parallel)
+    + Edit jobscript_mosaic based on resources needed
     + Run jobscript_mosaic (qsub jobscript_data_filter)
 
 Step 4)
 - Script: viirs_mosaic.py
 - Description: mosaic filtered monthly tiles (result of viirs_data_filter.py)
-    +
+    + Set years (must be list of integers)
+    + Set mode (serial or parallel)
+    + Edit jobscript_mosaic based on resources needed
     + Run jobscript_mosaic (qsub jobscript_mosaic)
 
 Step 5)
 - Script: viirs_yearly.py
-- Description: creates yearly aggregates from filter monthly data (result of viirs_data_filter.py) and mosaics
-    +
-    + Run jobscript_mosaic (qsub jobscript_yearly)
+- Description: creates yearly aggregates from filter monthly data (result of viirs_data_filter.py) and then mosaics
+    + Set years (must be list of integers)
+    + Set aggregation method (default: max)
+    + Set run_agg and run_mosaic boolean variables
+    + Set mode (serial or parallel)
+    + Edit jobscript_mosaic based on resources needed
+    + Run jobscript_yearly (qsub jobscript_yearly)

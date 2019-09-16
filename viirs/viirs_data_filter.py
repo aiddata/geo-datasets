@@ -26,6 +26,7 @@ cloud_count_path = "/sciclone/aiddata10/REU/geo/raw/viirs/vcmcfg_dnb_composites_
 # minimum cloud free day threshold
 cf_minimum = 2
 
+years = [2017, 2018]
 
 # -----------------------------------------------------------------------------
 
@@ -38,28 +39,31 @@ moving on to a different tile, so that we only have to store the cumulative
 cloud count for a single tile at a time
 """
 
+
+year_months = [i for i in os.listdir(data_path) if i.startswith(tuple(map(str, years)))]
+
 tile_files = {}
 
+for ym in year_months:
+    for pth, dirs, files in os.walk(os.path.join(data_path, ym)):
+        for f in files:
 
-for pth, dirs, files in os.walk(data_path):
-    for f in files:
+            if f.endswith('.avg_rade9.tif'):
 
-        if f.endswith('.avg_rade9.tif'):
+                tile_id = os.path.basename(f).split("_")[3]
 
-            tile_id = os.path.basename(f).split("_")[3]
+                lights_file = os.path.join(pth, f)
 
-            lights_file = os.path.join(pth, f)
+                cloud_name = os.path.basename(lights_file).split('.')[0] + '.cf_cvg.tif'
+                cloud_file = os.path.join(os.path.dirname(lights_file), cloud_name)
 
-            cloud_name = os.path.basename(lights_file).split('.')[0] + '.cf_cvg.tif'
-            cloud_file = os.path.join(os.path.dirname(lights_file), cloud_name)
+                if not os.path.isfile(cloud_file):
+                    raise Exception("File does not exist ({0})".format(cloud_file))
 
-            if not os.path.isfile(cloud_file):
-                raise Exception("File does not exist ({0})".format(cloud_file))
+                if not tile_id in tile_files:
+                    tile_files[tile_id] = []
 
-            if not tile_id in tile_files:
-                tile_files[tile_id] = []
-
-            tile_files[tile_id].append((lights_file, cloud_file))
+                tile_files[tile_id].append((lights_file, cloud_file))
 
 
 
@@ -94,7 +98,7 @@ def prepare_tiles(tile_id, file_tuples):
 
     for lights_path, cloud_path in file_tuples:
 
-        print lights_path
+        print(lights_path)
 
         lights_basename = os.path.basename(lights_path)[:-4]
 
@@ -132,10 +136,10 @@ def prepare_tiles(tile_id, file_tuples):
         # ---------------------------------
 
         # build output path for mask
-        out_mask = os.path.join(
-            dst_dir, lights_basename.split('.')[0]) + ".mask.tif"
+        out_mask = os.path.join(dst_dir, lights_basename.split('.')[0]) + ".mask.tif"
 
-	make_dir(os.path.dirname(out_mask))
+        make_dir(os.path.dirname(out_mask))
+
         with rasterio.open(out_mask, 'w', **profile_cloud) as export_img:
             export_img.write(mask, 1)
 
@@ -247,8 +251,3 @@ if mode == "serial" or rank == 0:
     make_dir(os.path.dirname(cm_mosaic_path))
     with rasterio.open(cm_mosaic_path, 'w', **cm_profile) as cm_dst:
         cm_dst.write(cm_array)
-
-
-
-
-
