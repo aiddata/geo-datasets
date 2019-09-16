@@ -126,6 +126,7 @@ def prepare_tiles(tile_id, file_tuples):
         # set profile for tile using first layer
         if tile_profile is None:
             tile_profile = profile_cloud.copy()
+        print tile_profile
 
         # check if cloud and ntl has same dimension
         # raise error if not same dimension
@@ -133,7 +134,7 @@ def prepare_tiles(tile_id, file_tuples):
             raise Exception('Cloud/ntl different shapes ', cloud_path)
 
         # generate mask
-        mask = (array_cloud <= cf_minimum).astype('uint8')
+        mask = (array_cloud <= cf_minimum).astype('uint16')
 
         # ---------------------------------
 
@@ -142,7 +143,7 @@ def prepare_tiles(tile_id, file_tuples):
 
         make_dir(os.path.dirname(out_mask))
 
-        with rasterio.open(out_mask, 'w', **profile_cloud) as export_img:
+        with rasterio.open(out_mask, 'w', **tile_profile) as export_img:
             export_img.write(mask, 1)
 
         # ---------------------------------
@@ -197,8 +198,6 @@ c = rank
 
 if rank == 0:
     print "Processing year-months: {}".format(year_months)
-    print "\nFiles:"
-    print(tile_files)
 
 while c < len(tile_files):
 
