@@ -4,4 +4,4 @@
 #PBS -l walltime=48:00:00
 #PBS -j oe
 
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 8 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/viirs//viirs_yearly.py
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 4 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/viirs//viirs_yearly.py
