@@ -66,7 +66,7 @@ def run_mosaic(datestr):
 
 tile_data = "/sciclone/aiddata10/REU/geo/raw/viirs/vcmcfg_dnb_composites_v10/filtered_monthly"
 
-mosaic_data = "/sciclone/aiddata10/REU/geo/data/rasters/external/global/viirs/vcmcfg_dnb_composites_v10/monthly"
+mosaic_data = "/sciclone/aiddata10/REU/geo/data/rasters/viirs/vcmcfg_dnb_composites_v10/monthly"
 
 
 mode = "parallel"

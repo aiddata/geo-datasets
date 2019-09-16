@@ -218,7 +218,7 @@ monthly_tiles = "/sciclone/aiddata10/REU/geo/raw/viirs/vcmcfg_dnb_composites_v10
 
 yearly_tiles = "/sciclone/aiddata10/REU/geo/raw/viirs/vcmcfg_dnb_composites_v10/filtered_yearly"
 
-yearly_mosaics = "/sciclone/aiddata10/REU/geo/data/rasters/external/global/viirs/vcmcfg_dnb_composites_v10/yearly"
+yearly_mosaics = "/sciclone/aiddata10/REU/geo/data/rasters/viirs/vcmcfg_dnb_composites_v10/yearly"
 
 tile_id_list = ["00N060E", "00N060W", "00N180W", "75N060E", "75N060W", "75N180W"]
 
