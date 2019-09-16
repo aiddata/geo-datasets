@@ -42,6 +42,7 @@ cloud count for a single tile at a time
 
 year_months = [i for i in os.listdir(data_path) if i.startswith(tuple(map(str, years)))]
 
+print "Processing year-months: {}".format(year_months)
 tile_files = {}
 
 for ym in year_months:
@@ -65,7 +66,8 @@ for ym in year_months:
 
                 tile_files[tile_id].append((lights_file, cloud_file))
 
-
+print "\nFiles:"
+print(tile_files)
 
 # -----------------------------------------------------------------------------
 
