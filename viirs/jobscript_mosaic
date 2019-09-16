@@ -1,7 +1,7 @@
 #!/bin/tcsh
 #PBS -N asg:viirs_mosaic
-#PBS -l nodes=8:c18c:ppn=16
+#PBS -l nodes=1:c18c:ppn=16
 #PBS -l walltime=24:00:00
 #PBS -j oe
 
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 32 python-mpi ~/active/master/asdf-datasets/data_prep/viirs/viirs_mosaic.py
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 16 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/viirs//viirs_mosaic.py
