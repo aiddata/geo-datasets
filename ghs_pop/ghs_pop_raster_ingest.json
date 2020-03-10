@@ -10,7 +10,7 @@
 	"version": "R2019A",
 	"options": {
 	    "resolution": 0.0025,
-	    "extract_types": ["sum", "count"],
+	    "extract_types": ["sum"],
         "extract_types_info": {
             "sum": "total population per unit of analysis",
             "count" : "total count of pixels per unit of analysis"
