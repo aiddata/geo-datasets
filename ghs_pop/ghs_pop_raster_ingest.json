@@ -1,0 +1,28 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/GHSL/GHS_POP/R2019A",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "GHS_POP_EYYYY_GLOBE_R2019A_4326_9ss_V1_0.tif",
+	"name": "GHS_POP_MT_GLOBE_R2019A",
+	"title": "GHS Population Grid",
+	"description": "Population count from the Global Human Settlement Layer. Based on population data from Gridded Population of the World v4.10 polygons, distributed across cells using the Global Human Settlement Layer global layer. Source data provided in 9 arc-second (250m) grid cells.",
+    "details": "No additional processing of raw data.",
+	"version": "R2019A",
+	"options": {
+	    "resolution": 0.0025,
+	    "extract_types": ["sum", "count"],
+        "extract_types_info": {
+            "sum": "total population per unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "number of people"
+	},
+	"extras": {
+	    "citation": "Schiavina, Marcello; Freire, Sergio; MacManus, Kytt (2019): GHS population grid multitemporal (1975-1990-2000-2015), R2019A. European Commission, Joint Research Centre (JRC) [Dataset] doi:10.2905/0C6B9751-A71F-4062-830B-43C9F432370F PID: http://data.europa.eu/89h/0c6b9751-a71f-4062-830b-43c9f432370f",
+	    "sources_web": "https://ghsl.jrc.ec.europa.eu/ghs_pop2019.php",
+	    "sources_name": "GHSL",
+	    "tags": ["population", "count", "ghsl", "settlement", "jrc", "ec"]
+	},
+	"active": 1
+}
