@@ -3,8 +3,7 @@
 
 - be sure to update all scripts before running to reflect intended version and corresponding years
 - run download.sh to download and unzip data
-- run extract_data.py to extract variable from netcdf to geotif for each year-month pair
-- run build_yearly.py to producely geotiffs of yearly aggregates
+- run extract_data.py to extract variable from netcdf to geotif for each year-month pair and create yearly aggregates (see file comments for running on sciclone)
 
 
 
