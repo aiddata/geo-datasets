@@ -56,7 +56,7 @@ def aggregate_rasters(file_list, method="mean"):
         try:
             raster = rasterio.open(file_path)
         except:
-            print "Could not include file in aggregation ({0})".format(file_path)
+            print("Could not include file in aggregation ({0})".format(file_path))
             continue
 
         active = raster.read(masked=True)
@@ -106,14 +106,24 @@ def run_yearly_data(task, method="mean"):
 # -----------------------------------------------------------------------------
 
 
-data_class_list = ["cld", "dtr", "frs", "pet", "pre", "tmp", "tmn", "tmx", "vap", "wet"]
+data_class_list = [
+    # ("cld", "mean"),
+    # ("dtr", "mean"),
+    # ("frs", "mean"),
+    # ("pet", "mean"),
+    ("pre", "mean"),
+    ("pre", "sum"),
+    ("tmp", "mean"),
+    # ("tmn", "mean"),
+    # ("tmx", "mean"),
+    # ("vap", "mean"),
+    # ("wet", "mean")
+]
 
-for data_class in data_class_list:
+for data_class, method in data_class_list:
 
     if mode == "serial" or rank == 0:
-        print "Running {}".format(data_class)
-
-    method = "mean"
+        print("Running {}".format(data_class))
 
     src_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/monthly/{}".format(data_class)
     dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts4.01/yearly/{}/{}".format(data_class, method)
@@ -127,7 +137,7 @@ for data_class in data_class_list:
 
 
     if mode == "serial" or rank == 0:
-        print "building year list..."
+        print("building year list...")
 
     year_months = {}
 
@@ -154,7 +164,7 @@ for data_class in data_class_list:
 
 
     if mode == "serial" or rank == 0:
-        print "running yearly data..."
+        print("running yearly data...")
 
     if mode == "parallel":
 
@@ -164,9 +174,9 @@ for data_class in data_class_list:
             try:
                 run_yearly_data(year_qlist[c], method)
             except Exception as e:
-                print "Error processing year: {0}".format(year_qlist[c][0])
+                print("Error processing year: {0}".format(year_qlist[c][0]))
                 # raise
-                print e
+                print(e)
                 # raise Exception('year processing')
 
             c += size
