@@ -52,3 +52,16 @@ Step 5)
     + Set mode (serial or parallel)
     + Edit jobscript_mosaic based on resources needed
     + Run jobscript_yearly (qsub jobscript_yearly)
+
+
+-------------------------------------------------------------------------------
+
+
+Source link:
+https://eogdata.mines.edu/products/vnl/
+
+Monthly Cite:
+C. D. Elvidge, K. E. Baugh, M. Zhizhin, and F.-C. Hsu, “Why VIIRS data are superior to DMSP for mapping nighttime lights,” Asia-Pacific Advanced Network 35, vol. 35, p. 62, 2013.
+
+Annual Cite:
+Elvidge, C.D, Zhizhin, M., Ghosh T., Hsu FC, Taneja J. Annual time series of global VIIRS nighttime lights derived from monthly averages:2012 to 2019. Remote Sensing 2021, 13(5), p.922,

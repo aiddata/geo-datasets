@@ -1,33 +1,36 @@
 #!/bin/bash
 
-# download viirs monthly/yearly dnb composites
-#   https://www.gnu.org/software/wget/manual/wget.html
 
-dst_base="/sciclone/aiddata10/REU/geo/raw/viirs/source/dnb_composites/v10"
+access_token=`python get_token.py`
+
+years=(
+    2012
+    2013
+    2014
+    2015
+    2016
+    2017
+    2018
+    2019
+    2020
+)
+
+out_dir="/sciclone/aiddata10/REU/geo/raw/viirs/eogdata"
+
+# annual
+year_url="https://eogdata.mines.edu/nighttime_light/annual/v20"
+for y in "${years[@]}"; do
+    echo "${year_url}/${y}"
+    wget -c -m -np -nH --cut-dirs=1 --header "Authorization: Bearer ${access_token}" -P ${out_dir} "${base_url}/${y}" -R .html -A .tif.gz
+done
 
 
-src_base="https://data.ngdc.noaa.gov/instruments/remote-sensing/passive/spectrometers-radiometers/imaging/viirs/dnb_composites/v10"
-
-start_year=2017
-end_year=2019
-for y in $(seq $start_year $end_year); do
-
+# monthly
+month_url="https://eogdata.mines.edu/nighttime_light/monthly/v10/"
+for y in "${years[@]}"; do
     for m in $(seq 1 12); do
         m=$(printf %02d $m)
-        echo $y$m
-
-        dst_a=${dst_base}/$y$m/vcmcfg
-        dst_b=${dst_base}/$y$m/vcmslcfg
-
-        src_a=${src_base}/$y$m/vcmcfg/
-        src_b=${src_base}/$y$m/vcmslcfg/
-
-        echo $src_a
-        wget -c --no-check-certificate -nH --cut-dirs=10  -r -np  -P ${dst_a} ${src_a} -A "*.tgz"
-
-        echo $src_b
-        wget -c --no-check-certificate -nH --cut-dirs=10  -r -np  -P ${dst_b} ${src_b} -A "*.tgz"
-
+        echo "${month_url}/${y}/${m}"
+        wget -c -m -np -nH --cut-dirs=1 --header "Authorization: Bearer ${access_token}" -P ${out_dir} "${month_url}/${y}/${y}${m}/vcmcfg" -R .html -A .tif.gz
     done
-
 done
