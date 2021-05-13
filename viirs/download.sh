@@ -26,11 +26,11 @@ done
 
 
 # monthly
-month_url="https://eogdata.mines.edu/nighttime_light/monthly/v10/"
+month_url="https://eogdata.mines.edu/nighttime_light/monthly/v10"
 for y in "${years[@]}"; do
     for m in $(seq 1 12); do
         m=$(printf %02d $m)
-        echo "${month_url}/${y}/${m}"
-        wget -c -m -np -nH --cut-dirs=1 --header "Authorization: Bearer ${access_token}" -P ${out_dir} "${month_url}/${y}/${y}${m}/vcmcfg" -R .html -A .tif.gz
+        echo "${month_url}/${y}/${y}${m}"
+        wget -c -m -np -nH --cut-dirs=1 --header "Authorization: Bearer ${access_token}" -P ${out_dir} "${month_url}/${y}/${y}${m}/vcmcfg" -R .html -A .tgz
     done
 done
