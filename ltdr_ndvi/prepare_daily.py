@@ -40,7 +40,6 @@ from osgeo import gdal, osr
 
 mode = "auto"
 
-
 build_list = [
     "daily",
     "monthly",
@@ -74,11 +73,14 @@ filter_options = {
 
 def build_data_list(input_base, output_base, ops):
     f = []
+    # find all .hdf files under input_base in filesystem
     for root, dirs, files in os.walk(input_base):
         for file in files:
             if file.endswith(".hdf"):
+		# ...and add them to the f array
                 f.append(os.path.join(root, file))
     df_dict_list = []
+
     for input_path in f:
         items = os.path.basename(input_path).split(".")
         year = items[1][1:5]
@@ -100,7 +102,11 @@ def build_data_list(input_base, output_base, ops):
             "output_path": output_path
         })
     df = pd.DataFrame(df_dict_list)
-    df = df.sort(["input_path"])
+
+    ### This was the deprecated function DataFrame.sort()
+    ### Trying to drop-in replace with new sort_values function -Jacob
+    df = df.sort_values(by=["input_path"])
+
     # df = df.drop_duplicates(subset="year_day", take_last=True)
     sensors = sorted(list(set(df["sensor"])))
     years = sorted(list(set(df["year"])))
@@ -126,20 +132,20 @@ def prep_daily_data(task):
     year = os.path.basename(src).split(".")[1][1:5]
     day = os.path.basename(src).split(".")[1][5:8]
     sensor = os.path.basename(src).split(".")[2]
-    print "Processing Day {} {} {}".format(sensor, year, day)
+    print ("Processing Day {} {} {}".format(sensor, year, day))
     process_daily_data(src, dst)
 
 
 def prep_monthly_data(task):
     year_month, month_files, month_path = task
-    print "Processing Month {}".format(year_month)
+    print ("Processing Month {}".format(year_month))
     data, meta = aggregate_rasters(file_list=month_files, method="max")
     write_raster(month_path, data, meta)
 
 
 def prep_yearly_data(task):
     year, year_files, year_path = task
-    print "Processing Year {}".format(year)
+    print ("Processing Year {}".format(year))
     data, meta = aggregate_rasters(file_list=year_files, method="mean")
     write_raster(year_path, data, meta)
 
@@ -304,7 +310,7 @@ def aggregate_rasters(file_list, method="mean"):
         try:
             raster = rasterio.open(file_path)
         except:
-            print "Could not include file in aggregation ({0})".format(file_path)
+            print ("Could not include file in aggregation ({0})".format(file_path))
             continue
 
         active = raster.read(masked=True)
@@ -351,9 +357,9 @@ def write_raster(path, data, meta):
         try:
             result.write(data)
         except:
-            print path
-            print meta
-            print data.shape
+            print (path)
+            print (meta)
+            print (data.shape)
             raise
 
 
@@ -382,39 +388,46 @@ def run(tasks, func, mode="auto"):
     elif mode != "serial":
         raise Exception("Invalid `mode` value for script.")
     c = rank
+    # For each task in tasks, run the passed function (func) on the task
+    # Increment step sizes are defined by size above
     while c < len(tasks):
         try:
             func(tasks[c])
         except Exception as e:
-            print "Error processing: {0}".format(tasks[c])
+            print ("Error processing: {0}".format(tasks[c]))
             # raise
-            print e
+            print (e)
         c += size
     if parallel:
         comm.Barrier()
 
 
 # -----------------------------------------------------------------------------
-
+# Build day, month, year dataframes
+# 
 
 # build day dataframe
 day_df = build_data_list(src_base, dst_base, filter_options)
 
-
 # build month dataframe
-month_df = day_df[["output_path", "year", "year_month"]].groupby("year_month", as_index=False).aggregate({
-    "output_path": [lambda x: tuple(x), "count"],
-    "year": "last"
-})
-month_df.columns = ["year_month", "day_path_list", "count", "year"]
+
+# Using pandas "named aggregation" to make ensure predictable column names in output.
+# See bottom of this page:
+# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.core.groupby.DataFrameGroupBy.aggregate.html
+# see also https://pandas.pydata.org/pandas-docs/stable/user_guide/groupby.html#groupby-aggregate-named
+month_df = day_df[["output_path", "year", "year_month"]].groupby("year_month", as_index=False).aggregate(
+    day_path_list = pd.NamedAgg(column="output_path",   aggfunc=lambda x: tuple(x)),
+    count =         pd.NamedAgg(column="output_path",   aggfunc="count"),
+    year =          pd.NamedAgg(column="year",          aggfunc="last")
+)
 
 minimum_days_in_month = 20
+
 month_df = month_df.loc[month_df["count"] >= minimum_days_in_month]
 
 month_df["output_path"] = month_df.apply(
     lambda x: os.path.join(dst_base, "monthly/avhrr_ndvi_v5_{}.tif".format(x["year_month"])), axis=1
 )
-
 
 # build year dataframe
 year_df = month_df[["output_path", "year"]].groupby("year", as_index=False).aggregate({
@@ -422,10 +435,12 @@ year_df = month_df[["output_path", "year"]].groupby("year", as_index=False).aggr
 })
 year_df.columns = ["year", "month_path_list", "count"]
 
+
 year_df["output_path"] = year_df["year"].apply(
     lambda x: os.path.join(dst_base, "yearly/avhrr_ndvi_v5_{}.tif".format(x))
 )
 
+# Make _qlist arrays, which are handled by prep_xxx_data functions as lists of tasks
 
 day_qlist = []
 for _, row in day_df.iterrows():
