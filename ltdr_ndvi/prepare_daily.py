@@ -400,66 +400,66 @@ def run(tasks, func, mode="auto"):
 
 
 # -----------------------------------------------------------------------------
-# Build day, month, year dataframes
-# 
+if __name__ == '__main__':
+    # Build day, month, year dataframes
 
-# build day dataframe
-day_df = build_data_list(src_base, dst_base, filter_options)
+    # build day dataframe
+    day_df = build_data_list(src_base, dst_base, filter_options)
 
-# build month dataframe
+    # build month dataframe
 
-# Using pandas "named aggregation" to make ensure predictable column names in output.
-# See bottom of this page:
-# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.core.groupby.DataFrameGroupBy.aggregate.html
-# see also https://pandas.pydata.org/pandas-docs/stable/user_guide/groupby.html#groupby-aggregate-named
-month_df = day_df[["output_path", "year", "year_month"]].groupby("year_month", as_index=False).aggregate(
-    day_path_list = pd.NamedAgg(column="output_path",   aggfunc=lambda x: tuple(x)),
-    count =         pd.NamedAgg(column="output_path",   aggfunc="count"),
-    year =          pd.NamedAgg(column="year",          aggfunc="last")
-)
+    # Using pandas "named aggregation" to make ensure predictable column names in output.
+    # See bottom of this page:
+    # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.core.groupby.DataFrameGroupBy.aggregate.html
+    # see also https://pandas.pydata.org/pandas-docs/stable/user_guide/groupby.html#groupby-aggregate-named
+    month_df = day_df[["output_path", "year", "year_month"]].groupby("year_month", as_index=False).aggregate(
+        day_path_list = pd.NamedAgg(column="output_path",   aggfunc=lambda x: tuple(x)),
+        count =         pd.NamedAgg(column="output_path",   aggfunc="count"),
+        year =          pd.NamedAgg(column="year",          aggfunc="last")
+    )
 
-minimum_days_in_month = 20
+    minimum_days_in_month = 20
 
-month_df = month_df.loc[month_df["count"] >= minimum_days_in_month]
+    month_df = month_df.loc[month_df["count"] >= minimum_days_in_month]
 
-month_df["output_path"] = month_df.apply(
-    lambda x: os.path.join(dst_base, "monthly/avhrr_ndvi_v5_{}.tif".format(x["year_month"])), axis=1
-)
+    month_df["output_path"] = month_df.apply(
+        lambda x: os.path.join(dst_base, "monthly/avhrr_ndvi_v5_{}.tif".format(x["year_month"])), axis=1
+    )
 
-# build year dataframe
-year_df = month_df[["output_path", "year"]].groupby("year", as_index=False).aggregate({
-    "output_path": [lambda x: tuple(x), "count"]
-})
-year_df.columns = ["year", "month_path_list", "count"]
-
-
-year_df["output_path"] = year_df["year"].apply(
-    lambda x: os.path.join(dst_base, "yearly/avhrr_ndvi_v5_{}.tif".format(x))
-)
-
-# Make _qlist arrays, which are handled by prep_xxx_data functions as lists of tasks
-
-day_qlist = []
-for _, row in day_df.iterrows():
-    day_qlist.append([row["input_path"], row["output_path"]])
-
-month_qlist = []
-for _, row in month_df.iterrows():
-    month_qlist.append([row["year_month"], row["day_path_list"], row["output_path"]])
-
-year_qlist = []
-for _, row in year_df.iterrows():
-    year_qlist.append([row["year"], row["month_path_list"], row["output_path"]])
+    # build year dataframe
+    year_df = month_df[["output_path", "year"]].groupby("year", as_index=False).aggregate({
+        "output_path": [lambda x: tuple(x), "count"]
+    })
+    year_df.columns = ["year", "month_path_list", "count"]
 
 
-if "daily" in build_list:
-    make_dir(os.path.join(dst_base, "daily"))
-    run(day_qlist, prep_daily_data, mode=mode)
+    year_df["output_path"] = year_df["year"].apply(
+        lambda x: os.path.join(dst_base, "yearly/avhrr_ndvi_v5_{}.tif".format(x))
+    )
 
-if "monthly" in build_list:
-    make_dir(os.path.join(dst_base, "monthly"))
-    run(month_qlist, prep_monthly_data, mode=mode)
+    # Make _qlist arrays, which are handled by prep_xxx_data functions as lists of tasks
 
-if "yearly" in build_list:
-    make_dir(os.path.join(dst_base, "yearly"))
-    run(year_qlist, prep_yearly_data, mode=mode)
+    day_qlist = []
+    for _, row in day_df.iterrows():
+        day_qlist.append([row["input_path"], row["output_path"]])
+
+    month_qlist = []
+    for _, row in month_df.iterrows():
+        month_qlist.append([row["year_month"], row["day_path_list"], row["output_path"]])
+
+    year_qlist = []
+    for _, row in year_df.iterrows():
+        year_qlist.append([row["year"], row["month_path_list"], row["output_path"]])
+
+
+    if "daily" in build_list:
+        make_dir(os.path.join(dst_base, "daily"))
+        run(day_qlist, prep_daily_data, mode=mode)
+
+    if "monthly" in build_list:
+        make_dir(os.path.join(dst_base, "monthly"))
+        run(month_qlist, prep_monthly_data, mode=mode)
+
+    if "yearly" in build_list:
+        make_dir(os.path.join(dst_base, "yearly"))
+        run(year_qlist, prep_yearly_data, mode=mode)
