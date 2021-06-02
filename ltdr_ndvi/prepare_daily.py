@@ -149,6 +149,17 @@ def prep_yearly_data(task):
     data, meta = aggregate_rasters(file_list=year_files, method="mean")
     write_raster(year_path, data, meta)
 
+def create_mask(qa_array, mask_vals):
+    qa_mask_vals = [abs(x - 15) for x in mask_vals]
+    mask_bin_array = [0] * 16
+    for x in qa_mask_vals:
+        mask_bin_array[x] = 1
+    mask_bin = int(''.join(map(str, mask_bin_array)), 2)
+
+    flag = lambda i: (i & 65535 & mask_bin) != 0
+
+    qa_mask = pd.DataFrame(qa_array).applymap(flag).to_numpy()
+    return qa_mask
 
 def process_daily_data(input_path, output_path):
     """Process input raster and create output in output directory
@@ -186,14 +197,6 @@ def process_daily_data(input_path, output_path):
 
     qa_array = qa_ds.ReadAsArray().astype(np.int16)
 
-
-    binary_repr_v = np.vectorize(np.binary_repr)
-
-
-    flag = lambda i: bool(int(max(np.array(list(i))[qa_mask_vals])))
-    flag_v = np.vectorize(flag)
-
-
     # list of qa fields and bit numbers
     # https://ltdr.modaps.eosdis.nasa.gov/ltdr/docs/AVHRR_LTDR_V5_Document.pdf
     # MSB first (invert for Python list lookip)
@@ -217,16 +220,10 @@ def process_daily_data(input_path, output_path):
         0: "Unused"
     }
 
-    qa_bin_array = binary_repr_v(qa_array, width=16)
-
     # qa_mask_vals = [15, 9, 8, 6, 4, 3, 2, 1]
     qa_mask_vals = [15, 9, 8, 1]
 
-    # convert bit number to array index
-    qa_mask_vals = [abs(x - 15) for x in qa_mask_vals]
-
-
-    qa_mask = flag_v(qa_bin_array)
+    qa_mask = create_mask(qa_array, qa_mask_vals)
 
     ndvi_array[qa_mask] = -9999
 
