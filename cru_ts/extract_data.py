@@ -181,7 +181,7 @@ method_list = ["mean", "min", "max", "sum"]
 qlist = []
 for var in var_list:
     for method in method_list:
-        dst_base = os.path.join(base_path, "/data/rasters", cru_label, "yearly", var, method)
+        dst_base = os.path.join(base_path, "data/rasters", cru_label, "yearly", var, method)
         os.makedirs(dst_base, exist_ok=True)
         for year in years:
             qlist.append([year, method, var, cru_label])
