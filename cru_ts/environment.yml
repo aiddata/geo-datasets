@@ -1,0 +1,37 @@
+name: geodata-cru
+channels:
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=4.5
+  - ca-certificates=2021.5.25
+  - certifi=2021.5.30
+  - ld_impl_linux-64=2.35.1
+  - libffi=3.3
+  - libgcc-ng=9.3.0
+  - libgomp=9.3.0
+  - libstdcxx-ng=9.3.0
+  - ncurses=6.2
+  - openssl=1.1.1k
+  - pip=21.1.2
+  - python=3.8.10
+  - readline=8.1
+  - setuptools=52.0.0
+  - sqlite=3.35.4
+  - tk=8.6.10
+  - wheel=0.36.2
+  - xz=5.2.5
+  - zlib=1.2.11
+  - pip:
+    - affine==2.3.0
+    - attrs==21.2.0
+    - cftime==1.5.0
+    - click==8.0.1
+    - click-plugins==1.1.1
+    - cligj==0.7.2
+    - netcdf4==1.5.6
+    - numpy==1.20.3
+    - pyparsing==2.4.7
+    - rasterio==1.2.4
+    - snuggs==1.4.7
+prefix: /home/jacob/.miniconda3/envs/geodata-cru
