@@ -2,11 +2,15 @@
 Python 3.8
 
 Be sure to create (if needed) and initialize the Conda environment before running this script
+You can do this by running create_env.sh to install the environment defined in environment.yml
+`./create_env.sh`
+`conda activate geodata-cru`
+
+Alternatively, you can define the conda environment yourself. Here is what that might look like:
 `conda create -n geodata-cru python=3.8 rasterio netcdf4`
 `conda activate geodata-cru`
 
 Make sure to review all variables (static file names, years) when using this script for a new version of cru data
-
 
 The netcdf to geotiff conversion part of this script is fairly quick running in serial (<10minutes)
 but would be easy to adapt for basic parellelization.
@@ -15,7 +19,6 @@ but would be easy to adapt for basic parellelization.
     cru var to an instance of the band_temporal_list and combine all of the resulting lists.
     The trios in this list could then each be passed to the extract_layer function using any
     parellization map function.
-
 
 The yearly aggregation is parellized using the multiprocessing package and only requires access
 to multiple cores. This can be run on SciClone's Hima nodes using the following command to start a job:
