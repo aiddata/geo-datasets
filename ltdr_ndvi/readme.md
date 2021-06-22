@@ -17,7 +17,7 @@ https://ladsweb.modaps.eosdis.nasa.gov/tools-and-services/data-download-scripts/
    ```
    bash download.sh
    ```
-5. [Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), and create the conda environment environment.yml
+5. [Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), and create the conda environment defined by environment.yml
    ```
    bash create_env.sh
    ```
@@ -27,7 +27,15 @@ https://ladsweb.modaps.eosdis.nasa.gov/tools-and-services/data-download-scripts/
    ```
    Alternatively, you can install the appropriate Python 3 version and packages yourself.
 
-6. Either run prepare_daily.py serially, or submit a job to run it in parallel (using mpi4py).
+6. If you plan on running prepare_daily.py in parallel using mpi4py, you will need to install mpi4py using pip in the NDVI conda environment
+   ```
+   pip install mpi4py
+   ```
+7. Either run prepare_daily.py serially
    ```
    python prepare_daily.py
+   ```
+   …or in parallel (review jobscript before submitting!)
+   ```
+   qsub jobscript
    ```
