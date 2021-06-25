@@ -1,8 +1,15 @@
 #!/bin/tcsh
 #PBS -N asg:ltdr_ndvi
-#PBS -l nodes=7:c18c:ppn=16
-#PBS -l walltime=48:00:00
+#PBS -l nodes=6:c18a:ppn=12
+#PBS -l walltime=12:00:00
 #PBS -j oe
 
+# init conda within new shell for job
+source "/usr/local/anaconda3-2021.05/etc/profile.d/conda.csh"
 
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 112 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/ltdr_ndvi/prepare_daily.py
+module load anaconda3/2021.05
+module load openmpi/3.1.4/gcc-9.3.0
+unsetenv PYTHONPATH
+conda activate NDVI
+
+mpirun --mca mpi_warn_on_fork 0 --map-by node python /sciclone/aiddata10/geo/master/source/geo-datasets/ltdr_ndvi/prepare_daily.py
