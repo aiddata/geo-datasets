@@ -17,7 +17,7 @@ https://ladsweb.modaps.eosdis.nasa.gov/tools-and-services/data-download-scripts/
    ```
    bash download.sh
    ```
-5. [Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), and create the conda environment defined by environment.yml
+5. [Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), and create the conda environment defined by environment.yml (Note: if you do not plan on running prepare_daily.py in parallel using mpi4py, comment out the `pip install mpi4py` line of `create_env.sh`)
    ```
    bash create_env.sh
    ```
@@ -26,12 +26,7 @@ https://ladsweb.modaps.eosdis.nasa.gov/tools-and-services/data-download-scripts/
    conda activate NDVI
    ```
    Alternatively, you can install the appropriate Python 3 version and packages yourself.
-
-6. If you plan on running prepare_daily.py in parallel using mpi4py, you will need to install mpi4py using pip in the NDVI conda environment
-   ```
-   pip install mpi4py
-   ```
-7. Either run prepare_daily.py serially
+6. Either run prepare_daily.py serially
    ```
    python prepare_daily.py
    ```
