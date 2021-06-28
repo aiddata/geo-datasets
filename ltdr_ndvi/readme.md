@@ -23,9 +23,10 @@ https://ladsweb.modaps.eosdis.nasa.gov/tools-and-services/data-download-scripts/
    ```
    Conda will confirm that the environment was created, and give you the command to activate it:
    ```
-   conda activate NDVI
+   conda activate ltdr_ndvi
    ```
    Alternatively, you can install the appropriate Python 3 version and packages yourself.
+
 6. Either run prepare_daily.py serially
    ```
    python prepare_daily.py
