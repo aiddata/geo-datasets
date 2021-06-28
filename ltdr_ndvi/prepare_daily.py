@@ -61,9 +61,9 @@ filter_options = {
     'sensor_accept': [],
     'use_sensor_deny': False,
     'sensor_deny': [],
-    'use_year_accept': False,
-    'year_accept': ['1987'],
-    'use_year_deny': True,
+    'use_year_accept': True,
+    'year_accept': ['2019', '2020'],
+    'use_year_deny': False,
     'year_deny': ['2019']
 }
 
@@ -77,7 +77,7 @@ def build_data_list(input_base, output_base, ops):
     for root, dirs, files in os.walk(input_base):
         for file in files:
             if file.endswith(".hdf"):
-		# ...and add them to the f array
+		        # ...and add them to the f array
                 f.append(os.path.join(root, file))
     df_dict_list = []
 
