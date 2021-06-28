@@ -1,4 +1,4 @@
-name: NDVI
+name: ltdr_ndvi
 channels:
   - conda-forge
   - defaults
