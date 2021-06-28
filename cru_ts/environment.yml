@@ -1,4 +1,4 @@
-name: geodata-cru
+name: cru_ts_405
 channels:
   - defaults
 dependencies:
