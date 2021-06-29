@@ -25,5 +25,6 @@ conda activate ltdr_ndvi
 setenv src_dir /sciclone/aiddata10/geo/master/source/geo-datasets
 # setenv src_dir /sciclone/home20/smgoodman/geo-datasets
 
+setenv OMPI_MCA_rmaps_base_oversubscribe yes
 
-mpirun --mca mpi_warn_on_fork 0 --map-by node python "${src_dir}"/ltdr_ndvi/prepare_daily.py
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 1 python "${src_dir}"/ltdr_ndvi/prepare_daily.py

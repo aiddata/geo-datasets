@@ -40,6 +40,8 @@ from osgeo import gdal, osr
 
 mode = "auto"
 
+max_workers = 71
+
 build_list = [
     "daily",
     "monthly",
@@ -370,36 +372,31 @@ def make_dir(path):
 
 def run(tasks, func, mode="auto"):
     parallel = False
-    size = 1
-    rank = 0
+
     if mode in ["auto", "parallel"]:
         try:
-            from mpi4py import MPI
+            from mpi4py.futures import MPIPoolExecutor
             parallel = True
-            comm = MPI.COMM_WORLD
-            size = comm.Get_size()
-            rank = comm.Get_rank()
         except:
             if mode == "parallel":
                 raise Exception("Failed to run job in parallel")
     elif mode != "serial":
         raise Exception("Invalid `mode` value for script.")
-    c = rank
-    # For each task in tasks, run the passed function (func) on the task
-    # Increment step sizes are defined by size above
-    while c < len(tasks):
-        try:
-            func(tasks[c])
-        except Exception as e:
-            print ("Error processing: {0}".format(tasks[c]))
-            # raise
-            print (e)
-        c += size
-    if parallel:
-        comm.Barrier()
 
+    if parallel:
+        with MPIPoolExecutor(max_workers=max_workers) as executor:
+            executor.map(func, tasks)
+    else:
+        # For each task in tasks, run the passed function (func) on the task
+        for task in tasks:
+            try:
+                func(tasks[c])
+            except Exception as e:
+                print("Error processing: {0}".format(tasks[c]))
+                print(e)
 
 # -----------------------------------------------------------------------------
+
 if __name__ == '__main__':
     # Build day, month, year dataframes
 
@@ -450,7 +447,6 @@ if __name__ == '__main__':
     year_qlist = []
     for _, row in year_df.iterrows():
         year_qlist.append([row["year"], row["month_path_list"], row["output_path"]])
-
 
     if "daily" in build_list:
         make_dir(os.path.join(dst_base, "daily"))
