@@ -57,10 +57,10 @@ vcmslcfg - data impacted by stray light are corrected but not removed
 5. Process data
 	- Adjust the following settings in process.py:
 		- Set list of all years to process (can be int or str)
-		- Set value for minimum cloud free day threshold
+		- Set `run_monthly` and `run_annual` to True or False based on what you want to run
 		+ Set mode (serial or parallel)
-	+ Edit jobscript_process based on resources needed
-	+ Submit jobscript_process job:
+	- Adjust `jobscript_process` as needed if running in parallel
+	- Submit jobscript if running on HPC:
 		```
 		qsub jobscript_process
 		```
