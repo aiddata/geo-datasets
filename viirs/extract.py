@@ -29,7 +29,7 @@ raw_dir = os.path.join(base_dir, "eogdata")
 extract_dir = os.path.join(base_dir, "eogdata_extract")
 
 # years = [2020]
-years = range(2012,2019)
+years = range(2012,2021)
 
 max_workers = 120
 
@@ -47,51 +47,51 @@ def extract_tgz(data):
         return (1, e, ix)
 
 
-if __name__ == "__main__" and run_monthly:
+# if __name__ == "__main__":
 
-    print("Running monthly (tiled)")
+#     print("Running monthly (tiled)")
 
-    monthly_raw_dir = os.path.join(base_dir, "eogdata/monthly/v10")
+#     monthly_raw_dir = os.path.join(base_dir, "eogdata/monthly/v10")
 
-    monthly_files = []
+#     monthly_files = []
 
-    for year in years:
-        monthly_dir = os.path.join(monthly_raw_dir, str(year), "*/vcmcfg/SVDNB_npp_*.tgz")
-        monthly_files.extend(glob.glob(monthly_dir))
+#     for year in years:
+#         monthly_dir = os.path.join(monthly_raw_dir, str(year), "*/vcmcfg/SVDNB_npp_*.tgz")
+#         monthly_files.extend(glob.glob(monthly_dir))
 
-    monthly_df = pd.DataFrame({"tgz_files": monthly_files})
+#     monthly_df = pd.DataFrame({"tgz_files": monthly_files})
 
-    monthly_df["extract_dir"] = monthly_df.tgz_files.apply(lambda x: os.path.dirname(x).replace("eogdata", "eogdata_extract"))
+#     monthly_df["extract_dir"] = monthly_df.tgz_files.apply(lambda x: os.path.dirname(x).replace("eogdata", "eogdata_extract"))
 
-    for i in set(monthly_df.extract_dir):
-        os.makedirs(i, exist_ok=True)
+#     for i in set(monthly_df.extract_dir):
+#         os.makedirs(i, exist_ok=True)
 
-    monthly_flist = list(zip(monthly_df.index, monthly_df.tgz_files, monthly_df.extract_dir))
-
-
-    if mode == "parallel":
-        # see: https://mpi4py.readthedocs.io/en/stable/mpi4py.futures.html
-        from mpi4py.futures import MPIPoolExecutor
-
-        with MPIPoolExecutor(max_workers=max_workers) as executor:
-            monthly_results_gen = executor.map(extract_tgz, monthly_flist, chunksize=2)
-
-        monthly_results = list(monthly_results_gen)
-
-    elif mode == "serial":
-        monthly_results = []
-        for i in monthly_flist:
-            monthly_results.append(extract_tgz(i))
+#     monthly_flist = list(zip(monthly_df.index, monthly_df.tgz_files, monthly_df.extract_dir))
 
 
-    print("Outputting monthly results")
+#     if mode == "parallel":
+#         # see: https://mpi4py.readthedocs.io/en/stable/mpi4py.futures.html
+#         from mpi4py.futures import MPIPoolExecutor
 
-    monthly_tmp_results_df = pd.DataFrame(monthly_results, columns=['status','message', "ix"]).set_index("ix")
-    monthly_final_results_df = monthly_df.merge(monthly_tmp_results_df, how='left', left_index=True, right_index=True)
-    print(monthly_final_results_df)
+#         with MPIPoolExecutor(max_workers=max_workers) as executor:
+#             monthly_results_gen = executor.map(extract_tgz, monthly_flist, chunksize=2)
 
-    monthly_final_results_path = os.path.join(base_dir, f"monthly_extract_{date_string}.csv")
-    monthly_final_results_df.to_csv(monthly_final_results_path, index=False, encoding="utf-8")
+#         monthly_results = list(monthly_results_gen)
+
+#     elif mode == "serial":
+#         monthly_results = []
+#         for i in monthly_flist:
+#             monthly_results.append(extract_tgz(i))
+
+
+#     print("Outputting monthly results")
+
+#     monthly_tmp_results_df = pd.DataFrame(monthly_results, columns=['status','message', "ix"]).set_index("ix")
+#     monthly_final_results_df = monthly_df.merge(monthly_tmp_results_df, how='left', left_index=True, right_index=True)
+#     print(monthly_final_results_df)
+
+#     monthly_final_results_path = os.path.join(base_dir, f"monthly_extract_{date_string}.csv")
+#     monthly_final_results_df.to_csv(monthly_final_results_path, index=False, encoding="utf-8")
 
 
 
@@ -108,7 +108,7 @@ def extract_gz(data):
         return (1, e, ix)
 
 
-if __name__ == "__main__" and run_annual:
+if __name__ == "__main__":
 
     print("Running annual")
 
