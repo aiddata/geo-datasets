@@ -14,7 +14,6 @@ import gzip
 import shutil
 import pandas as pd
 from datetime import datetime
-from mpi4py import MPI
 
 
 date_string = datetime.now().strftime("%Y-%m-%d-%H%M")
