@@ -1,6 +1,6 @@
 #!/bin/tcsh
 #PBS -N asg:viirs_process
-#PBS -l nodes=10:c18a:ppn=12
+#PBS -l nodes=8:c18a:ppn=12
 #PBS -l walltime=24:00:00
 #PBS -j oe
 
@@ -8,19 +8,19 @@
 
 # vortex [nodespec c18a or c18c for vortex-alpha, ppn up to 12 or 16 for vortex / alpha]
 source "/usr/local/anaconda3-2021.05/etc/profile.d/conda.csh"
-module load anaconda3/2021.05
+module load anaconda3/2020.02
 module load openmpi/3.1.4/gcc-9.3.0
 
 # hima [nodespec: hima:nogpu, ppn up to 32]
-# source "/usr/local/anaconda3-4.4.0/etc/profile.d/conda.csh"
-# module load anaconda3/4.4.0
+# source "/usr/local/anaconda3-2020.02/etc/profile.d/conda.csh"
+# module load anaconda3/2020.02
 # module load openmpi/3.1.4/intel-2017
 
 
 unsetenv PYTHONPATH
 
 
-conda activate viirs
+conda activate viirs_ntl
 
 # setenv src_dir /sciclone/aiddata10/geo/master/source/geo-datasets
 # setenv src_dir /sciclone/home20/smgoodman/geo-datasets

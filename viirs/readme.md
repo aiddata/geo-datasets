@@ -1,28 +1,31 @@
-# VIIRS Nighttime Lights TS
+# VIIRS Nighttime Lights
 
 [The Visible Infrared Imaging Radiometer Suite (VIIRS)](https://ncc.nesdis.noaa.gov/VIIRS/) is an instrument on a National Oceanic and Atmospheric Administation (NOAA) satellite that collects atmospheric imagery.
 The [Earth Observation Group (EOG)](https://payneinstitute.mines.edu/eog/) at Colorado School of Mines produces monthly and annual composites of nighttime lights, using data from VIIRS.
 
-viirs = Visible Infrared Imaging Radiometer Suite
+Product abbreviations:
+	- viirs = Visible Infrared Imaging Radiometer Suite
+	- dnb = Day/Night Band
+	- vcm = viirs cloud mask
+	- sl = stray light
+	- cfg = cloud free grids
+	- vcmcfg = excludes any data contaminated by stray light
+	- vcmslcfg = data impacted by stray light are corrected but not removed
 
-dnb = Day/Night Band
 
-vcm = viirs cloud mask
-
-sl = stray light
-
-cfg = cloud free grids
-
-vcmcfg - excludes any data contaminated by stray light
-vcmslcfg - data impacted by stray light are corrected but not removed
 
 ## Instructions
 
 1. Create Conda environment
+	- First make sure Anaconda and MPI implementation are available. If on W&M HPC's Bora/Hima nodes for example:
+		```
+		module load anaconda3/2020.02
+		module load openmpi/3.1.4/gcc-9.3.0
+		```
 	- To create a new environment:
 		```
 		conda env create -f environment.yml
-		conda activate viirs
+		conda activate viirs_v3
 		pip install mpi4py
 		```
 	- To update your environment (if needed):
@@ -48,6 +51,8 @@ vcmslcfg - data impacted by stray light are corrected but not removed
 	- Edit extract.py to:
 		- Set the `year` variable to be the list of years you wish to download
 		- Set `mode` to parallel or serial
+		- Set `max_workers` [**WARNING: if this is too large your job will likely fail**]
+			- must not be larger than the number of cores / process available to job via MPI
 	- Adjust `jobscript_extract` as needed if running in parallel
 	- Submit jobscript if running on HPC:
 		```
@@ -56,9 +61,11 @@ vcmslcfg - data impacted by stray light are corrected but not removed
 
 5. Process data
 	- Adjust the following settings in process.py:
-		- Set list of all years to process (can be int or str)
+		- Set list of all years to process (must be ints)
 		- Set `run_monthly` and `run_annual` to True or False based on what you want to run
-		+ Set mode (serial or parallel)
+		- Set mode (serial or parallel)
+		- Set `max_workers` [**WARNING: if this is too large your job will likely fail**]
+			- must not be larger than the number of cores / process available to job via MPI
 	- Adjust `jobscript_process` as needed if running in parallel
 	- Submit jobscript if running on HPC:
 		```
