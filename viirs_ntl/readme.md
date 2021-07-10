@@ -25,7 +25,7 @@ Product abbreviations:
 	- To create a new environment:
 		```
 		conda env create -f environment.yml
-		conda activate viirs_v3
+		conda activate viirs_ntl
 		pip install mpi4py
 		```
 	- To update your environment (if needed):
