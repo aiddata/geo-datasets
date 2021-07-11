@@ -22,8 +22,8 @@
 	},
 	"extras": {
         "citation": "Pedelty JA, Devadiga S, Masuoka E et al. (2007) Generating a Long-term Land Data Record from the AVHRR and MODIS Instruments. Proceedings of IGARRS 2007, pp. 1021–1025. Institute of Electrical and Electronics Engineers, NY, USA.",
-	    "sources_web": "http://ltdr.nascom.nasa.gov/ltdr/ltdr.html",
-	    "sources_name": "NASA/Goddard Space Flight Center",
+	    "sources_web": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/applications/ltdr/",
+	    "sources_name": "NASA LAADS DAAC",
 	    "tags": ["nasa", "ltdr", "ndvi", "avhrr", "vegetation", "environment"]
 	},
 	"active": 1
