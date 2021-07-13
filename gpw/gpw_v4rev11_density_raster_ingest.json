@@ -1,0 +1,30 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/gpw/gpw_v4_rev11/density",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "gpw_v4_population_density_adjusted_to_2015_unwpp_country_totals_rev11_YYYY_30_sec.tif",
+	"name": "gpw_v4_rev11_density",
+    "title": "Population Density (GPW V4.11, UN Adjusted)",
+	"description": "Population density (UN Adjusted values) from Gridded Population of the World v4 revision 11. GPWv4 depicts the density of human population across the globe. Source data provided in 30 arc-second (~1 km) grid cells.",
+    "details": "No additional processing of raw data.",
+	"version": 4.11,
+	"options": {
+	    "resolution": 0.00833,
+        "extract_types": ["count", "mean", "max", "min"],
+        "extract_types_info": {
+            "count" : "total count of pixels per unit of analysis",
+            "mean": "average population density per unit of analysis",
+            "max": "maximum population density per unit of analysis",
+            "min": "minimum population density per unit of analysis"
+        },
+	    "factor": 1,
+	    "variable_description": "persons per square kilometer"
+	},
+	"extras": {
+	    "citation": "Center for International Earth Science Information Network - CIESIN - Columbia University. 2018. Gridded Population of the World, Version 4 (GPWv4): Population Density Adjusted to Match 2015 Revision UN WPP Country Totals, Revision 11. Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). https://doi.org/10.7927/H4F47M65. Accessed 13 July 2021",
+	    "sources_web": "https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11",
+	    "sources_name": "CIESIN",
+	    "tags": ["population", "density", "ciesin", "economics", "conflict"]
+	},
+	"active": 1
+}
