@@ -1,0 +1,29 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/viirs/eogdata/annual/v20/cf_cvg",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "YYYY.tif",
+	"name": "viirs_ntl_annual_v20_avg_masked",
+    "title": "VIIRS Nighttime Lights Cloud Free Coverage",
+    "description": "Yearly VIIRS day night band nighttime lights data.",
+    "details": "Annual VIIRS nighttime lights product Version 2. Binary layer indicating whether each pixel had at least one cloud free coverage. Can be used in combination with VIIRS Nighttime Light Average product to  determine if sufficient coverage exists with your boundary featuvalue with background pixels masked. Please use in combination with VIIRS Nighttime Light Cloud-Free Binary product to confirm sufficient cloud free measurements are available within you boundary features.",
+	"version": 2,
+	"options": {
+	    "resolution": 0.0041666667,
+        "extract_types": ["sum", "count"],
+        "extract_types_info" : {
+            "sum": "count of pixels with at least one cloud free measurement within each unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "Binary where 1 indicates at least one cloud free measurement"
+	},
+	"extras": {
+	    "citation": "C. D. Elvidge, M. Zhizhin, T. Ghosh, F-C. Hsu, Annual time series of global VIIRS nighttime lights derived from monthly averages: 2012 to 2019, Remote Sensing",
+	    "sources_web": "https://ngdc.noaa.gov/eog/viirs/download_dnb_composites.html",
+	    "sources_name": "VIIRS Day/Night Band Nighttime Lights",
+	    "tags": ["nighttimelights", "viirs", "economics", "welfare"]
+	},
+	"active": 1
+}
+

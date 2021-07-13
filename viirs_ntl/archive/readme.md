@@ -18,21 +18,43 @@ vcmslcfg - data impacted by stray light are corrected but not removed
 
 ## Instructions
 
-1. Download compressed raw data (both vcmcfg and vcmslcfg) from source
+1. Create Conda environment
+	- To create a new environment:
+		```
+		conda env create -f environment.yml
+		conda activate viirs
+		pip install mpi4py
+		```
+	- To update your environment (if needed):
+		```
+		conda env update --prefix ./env --file environment.yml  --prune
+	- To export your environment (if needed):
+		```
+		conda env export > environment.yml
+		```
+	- If not running on W&M's HPC, please examine the jobscript files for additional environmental configurations. Modifications may be neccesary for running in different environments beyond what is covered in this readme or the files described.
+
+2. Create an account for [https://eogdata.mines.edu/nighttime_light](https://eogdata.mines.edu/nighttime_light)
+	- Add username and password to get_token.py (Do not share your password publicly on GitHub or elsewhere)
+
+3. Download compressed monthly and annual raw data from source
 	- Set start and end year in download.sh
 	- Run download script:
 		```
 		bash download.sh
 		```
 
-2. Unzip desired files from raw data
-	+ Set start and end year in extract.sh
-	+ Run extract script:
+4. Unzip desired files from raw data
+	- Edit extract.py and set the `run_monthly` and `run_annual` variables to True or False based on which data you want to download
+	- Set the `year` variable to be the list of years you wish to download
+	- Set `mode` to parallel or serial
+	- Adjust `jobscript_extract` as needed if running in parallel
+	- Submit jobscript if running on HPC:
 		```
-		bash extract.sh
+		qsub jobscript_extract
 		```
 
-3. Filter/prepare raw monthly data tiles
+5. Filter/prepare raw monthly data tiles
 	- Adjust the following settings in viirs_data_filter.py:
 		- Set list of all years to process (can be int or str)
 		- Set value for minimum cloud free day threshold
@@ -43,7 +65,7 @@ vcmslcfg - data impacted by stray light are corrected but not removed
 		qsub jobscript_data_filter
 		```
 
-4. Mosaic filtered monthly tiles (result of viirs_data_filter.py)
+6. Mosaic filtered monthly tiles (result of viirs_data_filter.py)
 	- Adjust the following settings in viirs_mosaic.py:
 		+ Set years (must be list of integers)
 		+ Set mode (serial or parallel)
@@ -53,7 +75,7 @@ vcmslcfg - data impacted by stray light are corrected but not removed
 		qsub jobscript_mosaic
 		```
 
-5. Create yearly aggregates from filter monthly data (result of viirs_data_filter.py) and then mosaics
+7. Create yearly aggregates from filter monthly data (result of viirs_data_filter.py) and then mosaics
 	- Adjust the following settings in viirs_yearly.py:
 		+ Set years (must be list of integers)
 		+ Set aggregation method (default: max)
@@ -65,7 +87,7 @@ vcmslcfg - data impacted by stray light are corrected but not removed
 		qsub jobscript_yearly
 		```
 
-## References 
+## References
 
 Source link:
 https://eogdata.mines.edu/products/vnl/
