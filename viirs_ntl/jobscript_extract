@@ -20,7 +20,7 @@ module load openmpi/3.1.4/gcc-9.3.0
 unsetenv PYTHONPATH
 
 
-conda activate viirs
+conda activate viirs_ntl
 
 # setenv src_dir /sciclone/aiddata10/geo/master/source/geo-datasets
 # setenv src_dir /sciclone/home20/smgoodman/geo-datasets
