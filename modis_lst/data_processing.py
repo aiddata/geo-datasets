@@ -4,6 +4,7 @@
 import os
 from affine import Affine
 import pandas as pd
+import numpy as np
 
 from utility import export_raster, load_hdf, get_temporal, get_current_timestamp, run_tasks
 
@@ -16,8 +17,9 @@ def process_hdf(input_path, layer, output_path, identifier):
         #   global coverage
         transform = Affine(0.05, 0, -180,
                         0, -0.05, 90)
-        meta = {"transform": transform, "nodata": 0}
-        export_raster(data, output_path, meta, quiet=True)
+        meta = {"transform": transform, "nodata": 0, "height": data.shape[0], "width": data.shape[1]}
+        # need to wrap data in array so it is 3-dimensions to account for raster band
+        export_raster(np.array([data]), output_path, meta, quiet=True)
         return (0, "Success", identifier)
     except Exception as e:
         return (1, repr(e), identifier)

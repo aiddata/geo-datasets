@@ -121,17 +121,12 @@ def export_raster(data, path, meta, **kwargs):
     if not isinstance(meta, dict):
         raise ValueError("meta must be a dictionary")
 
-    meta['height'] = data.shape[0]
-    meta['width'] = data.shape[1]
-
     if 'dtype' in meta:
         if meta["dtype"] != data.dtype:
             warning.warn(f"Dtype specified by meta({meta['dtype']}) does not match data dtype ({data.dtype}). Adjusting data dtype to match meta.")
         data = data.astype(meta["dtype"])
     else:
         meta['dtype'] = data.dtype
-
-    data = np.array([data])
 
     default_meta = {
         'count': 1,
