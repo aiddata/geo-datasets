@@ -1,131 +1,90 @@
 """
-Author: Miranda Lv
-Date: 06/21/2018
-This script is used to:
-    - read hdf data files and extract day/night land surface temperature.
-    - the raw data was in 3600*7200 matrix, and there is no re-projection.
 """
 
 import os
-import errno
-import rasterio
-import numpy as np
 from affine import Affine
-from datetime import datetime
-from pyhdf.SD import SD, SDC
+import pandas as pd
+
+from utility import export_raster, load_hdf, get_temporal, get_current_timestamp, run_tasks
 
 
-
-def make_dir(path):
-    """Make directory.
-
-    Args:
-        path (str): absolute path for directory
-
-    Raise error if error other than directory exists occurs.
-    """
-    if path != '':
-        try:
-            os.makedirs(path)
-        except OSError as exception:
-            if exception.errno != errno.EEXIST:
-                raise
-
-
-def export_raster(raster, affine, path, out_dtype='float64', nodata=None):
-    """Export raster array to geotiff
-    """
-    # affine takes upper left
-    # (writing to asc directly used lower left)
-    meta = {
-        'count': 1,
-        'crs': {'init': 'epsg:4326'},
-        'dtype': out_dtype,
-        'affine': affine,
-        'driver': 'GTiff',
-        'height': raster.shape[0],
-        'width': raster.shape[1],
-        # 'nodata': -1,
-        # 'compress': 'lzw'
-    }
-
-    if nodata is not None:
-        meta['nodata'] = nodata
-
-    raster_out = np.array([raster.astype(out_dtype)])
-
-    make_dir(os.path.dirname(path))
-
-    # write geotif file
-    with rasterio.open(path, "w", **meta) as dst:
-        dst.write(raster_out)
-
-
-
-def get_time(datestring):
-
-    datatime = datetime.strptime(datestring, "%Y%j")
-
-    year = "%d"%datatime.year
-    mon = "%02d"%datatime.month
-
-    newtime = str(year) + "_" + str(mon)
-
-    return newtime
-
-
-def get_hdf(infile, output_dir):
-
-    # get data time stamp
-    datestring = infile.split(".")[1][1:]
-    newtime = get_time(datestring)
-
-    # get new data export name
-    dayout = os.path.join(output_dir, "day/modis_lst_day_cmg_" + newtime + ".tif")
-    nightout = os.path.join(output_dir, "night/modis_lst_night_cmg_" + newtime + ".tif")
-
-    # read hdf data files
-    file = SD(infile, SDC.READ)
-
-    day_img = file.select('LST_Day_CMG')
-    day_dta = day_img.get()
-    day_dta = day_dta * scale_factor
-    export_raster(day_dta, affine, dayout, nodata=0)
-
-    night_img = file.select('LST_Night_CMG')
-    night_dta = night_img.get()
-    night_dta = night_dta * scale_factor
-    export_raster(night_dta, affine, nightout, nodata=0)
+def process_hdf(input_path, layer, output_path, identifier):
+    try:
+        data = load_hdf(input_path, layer)
+        # define the affine transformation
+        #   5600m or 0.05 degree resolution
+        #   global coverage
+        transform = Affine(0.05, 0, -180,
+                        0, -0.05, 90)
+        meta = {"transform": transform, "nodata": 0}
+        export_raster(data, output_path, meta, quiet=True)
+        return (0, "Success", identifier)
+    except Exception as e:
+        return (1, repr(e), identifier)
 
 
 
 
-scale_factor = 0.02
+timestamp = get_current_timestamp('%Y_%m_%d_%H_%M')
 
-pixel_size = 0.05
+input_dir = "/sciclone/aiddata10/REU/geo/raw/MODIS/terra/MOLT/MOD11C3.006"
 
-affine = Affine(pixel_size, 0, -180,
-                0, -pixel_size, 90)
+output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/MODIS/terra/MOLT/MOD11C3.006"
 
+mode = "parallel"
 
-input_dir = "/sciclone/aiddata10/REU/geo/raw/modis_lst/MOD11C3"
-
-output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/daily"
+max_workers = 40
 
 
-file_list = [
-    f for f in os.listdir(input_dir)
-    if f.endswith(".hdf")
-]
+if __name__ == "__main__":
+
+    print("Preparing data processing")
+
+    raw_path_list = [
+        os.path.join(input_dir, f) for f in os.listdir(input_dir)
+        if f.endswith(".hdf")
+    ]
+
+    day_df = pd.DataFrame({"raw_path": raw_path_list})
+    day_df["temporal"] = day_df["raw_path"].apply(lambda x: os.path.basename(x).split("_")[0])
+
+    day_df["output"] = day_df["temporal"].apply(lambda x: os.path.join(output_dir, "monthly", "day", "modis_list_day_cmg_" + x + ".tif"))
+    day_df["layer"] = "LST_Day_CMG"
+
+    night_df = day_df.copy(deep=True)
+
+    night_df["output"] = night_df["temporal"].apply(lambda x: os.path.join(output_dir, "monthly", "night", "modis_list_night_cmg_" + x + ".tif"))
+    night_df["layer"] = "LST_Night_CMG"
+
+    df = pd.concat([day_df, night_df], axis=0)
 
 
-for f in file_list:
-    print "Processing: ", f
-    fpath = os.path.join(input_dir, f)
-    get_hdf(fpath, output_dir)
+    output_dir_list = set([os.path.dirname(i) for i in df["output"]])
+
+    for i in output_dir_list:
+        os.makedirs(i, exist_ok=True)
 
 
+    # generate list of tasks to iterate over
+    flist = list(zip(df["raw_path"], df["layer"], df["output"], df["temporal"]))
+
+    print("Running data processing")
+
+    results = run_tasks(process_hdf, flist, mode, max_workers)
 
 
+    # join download function results back to df
+    results_df = pd.DataFrame(results, columns=["status","message", "temporal"])
+    output_df = df.merge(results_df, on="temporal", how="left")
 
+    print("Results:")
 
+    errors_df = output_df[output_df["status"] != 0]
+    print("{} errors found out of {} tasks".format(len(errors_df), len(output_df)))
+
+    for ix, row in errors_df.iterrows():
+        print(row)
+
+    # output results to csv
+    output_path = os.path.join(input_dir, f"data_processing_{timestamp}.csv")
+    output_df.to_csv(output_path, index=False)
