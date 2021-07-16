@@ -49,7 +49,7 @@ if __name__ == '__main__':
         year_months = {}
         for mfile in month_files:
             # year associated with month
-            myear = mfile.split("_")[-2]
+            myear = mfile.split("_")[-1][:4]
             if myear not in year_months:
                 year_months[myear] = list()
             year_months[myear].append(os.path.join(src_dir, data_class, mfile))
