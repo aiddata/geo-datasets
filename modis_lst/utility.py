@@ -32,7 +32,7 @@ def run_tasks(func, flist, mode, max_workers=None, chunksize=1):
                 raise ValueError("Mode set to parallel but max_workers not specified and OMPI_UNIVERSE_SIZE env var not found")
 
             max_workers = os.environ["OMPI_UNIVERSE_SIZE"]
-            warning.warn(f"Mode set to parallel but max_workers not specified. Defaulting to OMPI_UNIVERSE_SIZE env var value ({max_workers})")
+            warnings.warn(f"Mode set to parallel but max_workers not specified. Defaulting to OMPI_UNIVERSE_SIZE env var value ({max_workers})")
 
         with MPIPoolExecutor(max_workers=max_workers) as executor:
             results_gen = executor.starmap(func, flist, chunksize=chunksize)
@@ -123,7 +123,7 @@ def export_raster(data, path, meta, **kwargs):
 
     if 'dtype' in meta:
         if meta["dtype"] != data.dtype:
-            warning.warn(f"Dtype specified by meta({meta['dtype']}) does not match data dtype ({data.dtype}). Adjusting data dtype to match meta.")
+            warnings.warn(f"Dtype specified by meta({meta['dtype']}) does not match data dtype ({data.dtype}). Adjusting data dtype to match meta.")
         data = data.astype(meta["dtype"])
     else:
         meta['dtype'] = data.dtype
