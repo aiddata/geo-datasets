@@ -38,7 +38,7 @@ def download_file(url, local_filename, identifier):
     """
     overwrite = False
     if file_exists(local_filename) and not overwrite:
-        return (0, "Exists", identifer)
+        return (0, "Exists", identifier)
     with session.get(url, stream=True) as r:
         try:
             r.raise_for_status()
