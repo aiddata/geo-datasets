@@ -17,8 +17,7 @@ from scipy.interpolate import griddata
 from affine import Affine
 
 # mode = "serial"
-# mode = "parallel"
-mode = "auto"
+mode = "parallel"
 
 # resolution of grid points and interpolated raster output
 rnd_interval = 0.1
@@ -57,8 +56,23 @@ year_grid_dir = os.path.join(data_dir, "year_grid")
 year_interp_dir = os.path.join(data_dir, "year_interp")
 
 
-# -----------------------------------------------------------------------------
+def make_dir(path):
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
 
+
+make_dir(day_dir)
+make_dir(month_dir)
+make_dir(year_dir)
+make_dir(month_grid_dir)
+make_dir(month_interp_dir)
+make_dir(year_grid_dir)
+make_dir(year_interp_dir)
+
+# -----------------------------------------------------------------------------
 
 def convert_daily(f):
     """convert daily nc4 files to csv
@@ -197,20 +211,16 @@ def interpolate_year(f):
     interpolate(f, raster_path)
 
 
-def make_dir(path):
-    try:
-        os.makedirs(path)
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
-
-
 def read_csv(path):
     df = pd.read_csv(
         path, quotechar='\"',
         na_values='', keep_default_na=False,
         encoding='utf-8')
     return df
+
+
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def run(tasks, func, mode="auto"):
@@ -246,19 +256,13 @@ def run(tasks, func, mode="auto"):
 # -----------------------------------------------------------------------------
 # prepare daily data
 
-make_dir(day_dir)
+qlist_a = glob.glob(os.path.join(raw_dir, "oco2_LtCO2_*.nc4"))
 
-search_regex = os.path.join(raw_dir, "oco2_LtCO2_*.nc4")
-qlist_a = glob.glob(search_regex)
-
-if run_a:
-    run(qlist_a, convert_daily, mode=mode)
+if run_a: run(qlist_a, convert_daily, mode=mode)
 
 
 # -----------------------------------------------------------------------------
 # concat all daily for each month
-
-make_dir(month_dir)
 
 dlist = glob.glob(os.path.join(day_dir, 'xco2_*.csv'))
 
@@ -271,14 +275,11 @@ for i in dlist:
 
 qlist_b = qlist_dict.items()
 
-if run_b:
-    run(qlist_b, concat_month, mode=mode)
+if run_b: run(qlist_b, concat_month, mode=mode)
 
 
 # -----------------------------------------------------------------------------
 # concat all month for each year
-
-make_dir(year_dir)
 
 mlist = glob.glob(os.path.join(month_dir, 'xco2_*.csv'))
 
@@ -291,55 +292,36 @@ for i in mlist:
 
 qlist_c = qlist_dict.items()
 
-if run_c:
-    run(qlist_c, concat_year, mode=mode)
+if run_c: run(qlist_c, concat_year, mode=mode)
 
 
 # -----------------------------------------------------------------------------
 # agg monthly data to grid
 
-make_dir(month_grid_dir)
-
-# id_list = ["1501"]
-# qlist_d = [os.path.join(month_dir, "xco2_{}.csv".format(id_string)) for id_string in id_list]
-
 qlist_d = glob.glob(os.path.join(month_dir, 'xco2_*.csv'))
 
-if run_d:
-    run(qlist_d, agg_to_grid_month, mode=mode)
+if run_d: run(qlist_d, agg_to_grid_month, mode=mode)
 
 
 # -----------------------------------------------------------------------------
 # interpolate month grid data to fill gaps
 
-make_dir(month_interp_dir)
-
 qlist_e = glob.glob(os.path.join(month_grid_dir, 'xco2_*.csv'))
 
-if run_e:
-    run(qlist_e, interpolate_month, mode=mode)
+if run_e: run(qlist_e, interpolate_month, mode=mode)
 
 
 # -----------------------------------------------------------------------------
 # agg yearly data to grid
 
-make_dir(year_grid_dir)
-
-# id_list = ["1501"]
-# qlist_d = [os.path.join(month_dir, "xco2_{}.csv".format(id_string)) for id_string in id_list]
-
 qlist_f = glob.glob(os.path.join(year_dir, 'xco2_*.csv'))
 
-if run_f:
-    run(qlist_f, agg_to_grid_year, mode=mode)
+if run_f: run(qlist_f, agg_to_grid_year, mode=mode)
 
 
 # -----------------------------------------------------------------------------
 # interpolate year grid data to fill gaps
 
-make_dir(year_interp_dir)
-
 qlist_g = glob.glob(os.path.join(year_grid_dir, 'xco2_*.csv'))
 
-if run_g:
-    run(qlist_g, interpolate_year, mode=mode)
+if run_g: run(qlist_g, interpolate_year, mode=mode)
