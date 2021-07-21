@@ -7,7 +7,7 @@ import os
 import requests
 import pandas as pd
 
-from utility import run_tasks, get_current_timestamp, file_exists, find_files
+from utility import run_tasks, get_current_timestamp, file_exists, find_files, download_file, get_md5sum_from_xml_url, calc_md5sum
 
 
 data_url = "https://oco2.gesdisc.eosdis.nasa.gov/data/OCO2_DATA/OCO2_L2_Lite_FP.10r/"
@@ -19,7 +19,7 @@ timestamp = get_current_timestamp('%Y_%m_%d_%H_%M')
 output_dir = "/sciclone/aiddata10/REU/geo/raw/gesdisc/OCO2_L2_Lite_FP_V10r/"
 
 year_list = range(2015, 2021)
-
+year_list = [2015]
 mode = "parallel"
 # model = "serial"
 
@@ -28,7 +28,7 @@ max_workers = 35
 # -------------------------------------
 
 
-def download_file(url, local_filename):
+def manage_download(url, local_filename):
     """download individual file using session created
 
     this needs to be a standalone function rather than a method
@@ -36,17 +36,23 @@ def download_file(url, local_filename):
     to pass it to our mpi4py map function
     """
     overwrite = False
-    if file_exists(local_filename) and not overwrite:
+    max_attempts = 3
+    md5sum = get_md5sum_from_xml_url(f"{url}.xml", "checksumvalue")
+    if file_exists(local_filename) and not overwrite and calc_md5sum(local_filename) == md5sum:
         return (0, "Exists", url)
-    with requests.get(url, stream=True) as r:
-        try:
-            r.raise_for_status()
-            with open(local_filename, 'wb') as f:
-                for chunk in r.iter_content(chunk_size=1024*1024):
-                    f.write(chunk)
+    try:
+        attempts = 1
+        download_file(url, local_filename)
+        # confirm that file was downloaded correctly
+        while calc_md5sum(local_filename) != md5sum and attempts <= max_attempts:
+            download_file(url, local_filename)
+            attempts += 1
+        if calc_md5sum(local_filename) != md5sum:
+            return (2, "Invalid md5sum", url)
+        else:
             return (0, "Success", url)
-        except Exception as e:
-            return (1, repr(e), url)
+    except Exception as e:
+        return (1, repr(e), url)
 
 
 
@@ -80,7 +86,7 @@ if __name__ == "__main__":
 
     print("Running data download")
 
-    results = run_tasks(download_file, flist, mode, max_workers=max_workers, chunksize=1)
+    results = run_tasks(manage_download, flist, mode, max_workers=max_workers, chunksize=1)
 
     # ---------
     # column name for join field in original df

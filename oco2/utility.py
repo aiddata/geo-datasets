@@ -4,6 +4,8 @@ import time
 import datetime
 import warnings
 import requests
+import hashlib
+
 
 import numpy as np
 import pandas as pd
@@ -12,6 +14,41 @@ import h5py
 import rasterio
 from scipy.interpolate import griddata
 from affine import Affine
+
+
+def download_file(url, local_filename):
+    """Download a file from url to local_filename
+
+    Downloads in chunks
+    """
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024*1024):
+                f.write(chunk)
+
+
+def get_md5sum_from_xml_url(url, field):
+    """Read the md5sum from an xml file
+
+    - XML file provided as url
+    - XML field containing md5sum must be provided
+    """
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, "lxml")
+    md5sum = soup.find(field).text
+    return md5sum
+
+def calc_md5sum(path):
+    """Calculate the md5sum for a file
+    """
+    with open(path, "rb") as f:
+        md5sum = hashlib.md5()
+        chunk = f.read(8192)
+        while chunk:
+            md5sum.update(chunk)
+            chunk = f.read(8192)
+        return md5sum.hexdigest()
 
 
 def find_files(url, ext=''):
