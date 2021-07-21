@@ -61,7 +61,7 @@ https://oco2.gesdisc.eosdis.nasa.gov/data/OCO2_DATA/OCO2_L2_Lite_FP.10r/
     - After the jobscript is edited, start the job:
         - `qsub jobscript`
 
-7. CSV files with the results from each stage can be found in the `raw_dir` variable path
+7. CSV files with the results from each stage can be found in the `results` dir within path specified by the `raw_dir` variable
 
 
 
