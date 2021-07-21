@@ -22,7 +22,7 @@ year_list = range(2015, 2021)
 mode = "parallel"
 # model = "serial"
 
-max_workers = 10
+max_workers = 47
 
 overwrite = False
 
@@ -132,24 +132,22 @@ if __name__ == '__main__':
     qlist_a = drop_existing_files(qlist_a_all, overwrite=overwrite)
 
     if run_a:
-        results_a = run_tasks(convert_daily, qlist_a, mode, max_workers=max_workers, chunksize=1)
+        results_a = run_tasks(convert_daily, qlist_a, "serial", max_workers=max_workers, chunksize=1)
         output_results(qlist_a, results_a, "convert-daily")
 
     # -----------------------------------------------------------------------------
     # concat all daily for each month
 
-
     qlist_b_dict = {}
-    for _,i in qlist_a:
-        yearmonth = os.path.basename(i).split("_")[1][0:4]
+    for _, i in qlist_a_all:
+        yearmonth = os.path.basename(i).split("_")[1][0:6]
         if yearmonth not in qlist_b_dict:
             qlist_b_dict[yearmonth] = []
         qlist_b_dict[yearmonth].append(i)
 
     # list of daily csv paths, monthly csv path
-    qlist_b_all = [(j, os.path.join(month_dir, "xco2_20{}.csv".format(i))) for i, j in list(qlist_b_dict.items())]
+    qlist_b_all = [(j, os.path.join(month_dir, "xco2_{}.csv".format(i))) for i, j in list(qlist_b_dict.items())]
     qlist_b = drop_existing_files(qlist_b_all, overwrite=overwrite)
-
 
     if run_b:
         results_b = run_tasks(concat_month, qlist_b, mode, max_workers=max_workers, chunksize=1)
@@ -159,7 +157,7 @@ if __name__ == '__main__':
     # -----------------------------------------------------------------------------
     # concat all month for each year
 
-    mlist = [i[0] for i in qlist_b]
+    mlist = [i[1] for i in qlist_b_all]
 
     qlist_c_dict = {}
     for i in mlist:
@@ -171,7 +169,6 @@ if __name__ == '__main__':
     # list of monthly csv paths, yearly csv path
     qlist_c_all = [(j, os.path.join(year_dir, "xco2_{}.csv".format(i))) for i, j in list(qlist_c_dict.items())]
     qlist_c = drop_existing_files(qlist_c_all, overwrite=overwrite)
-
 
     if run_c:
         results_c = run_tasks(concat_year, qlist_c, mode, max_workers=max_workers, chunksize=1)
@@ -185,7 +182,6 @@ if __name__ == '__main__':
     qlist_d_all = [(i, i.replace("month", "month_grid")) for i in mlist]
     qlist_d = drop_existing_files(qlist_d_all, overwrite=overwrite)
 
-
     if run_d:
         results_d = run_tasks(agg_to_grid_month, qlist_d, mode, max_workers=max_workers, chunksize=1)
         output_results(qlist_d, results_d, "agg-month")
@@ -195,9 +191,8 @@ if __name__ == '__main__':
     # interpolate month grid data to fill gaps
 
     # monthly grid csv path, monthly interpolation csv path
-    qlist_e_all = [(j, os.path.join(month_interp_dir, "xco2_20{}_{}.tif".format(os.path.basename(j).split("_")[1][0:4], interp_method))) for _, j in qlist_d]
+    qlist_e_all = [(j, os.path.join(month_interp_dir, "xco2_{}_{}.tif".format(os.path.basename(j).split("_")[1][0:6], interp_method))) for _, j in qlist_d_all]
     qlist_e = drop_existing_files(qlist_e_all, overwrite=overwrite)
-
 
     if run_e:
         results_e = run_tasks(interpolate_month, qlist_e, mode, max_workers=max_workers, chunksize=1)
@@ -207,11 +202,9 @@ if __name__ == '__main__':
     # -----------------------------------------------------------------------------
     # agg yearly data to grid
 
-
     # yearly csv path, yearly grid csv path
-    qlist_f_all = [(i[0], i[0].replace("year", "year_grid")) for i in qlist_c]
+    qlist_f_all = [(i[1], i[1].replace("year", "year_grid")) for i in qlist_c_all]
     qlist_f = drop_existing_files(qlist_f_all, overwrite=overwrite)
-
 
     if run_f:
         results_f = run_tasks(agg_to_grid_year, qlist_f, mode, max_workers=max_workers, chunksize=1)
@@ -221,11 +214,9 @@ if __name__ == '__main__':
     # -----------------------------------------------------------------------------
     # interpolate year grid data to fill gaps
 
-
     # year grid csv path, year interpolation csv path
-    qlist_g_all = [(j, os.path.join(year_interp_dir, "xco2_{}_{}.tif".format(os.path.basename(j).split("_")[1][0:4], interp_method))) for _, j in qlist_f]
+    qlist_g_all = [(j, os.path.join(year_interp_dir, "xco2_{}_{}.tif".format(os.path.basename(j).split("_")[1][0:4], interp_method))) for _, j in qlist_f_all]
     qlist_g = drop_existing_files(qlist_g_all, overwrite=overwrite)
-
 
     if run_g:
         results_g = run_tasks(interpolate_year, qlist_g, mode, max_workers=max_workers, chunksize=1)

@@ -1,6 +1,6 @@
 #!/bin/tcsh
 #PBS -N asg:xco2
-#PBS -l nodes=3:c18a:ppn=12
+#PBS -l nodes=4:c18a:ppn=12
 #PBS -l walltime=4:00:00
 #PBS -j oe
 
