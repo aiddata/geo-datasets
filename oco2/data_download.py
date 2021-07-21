@@ -19,7 +19,7 @@ timestamp = get_current_timestamp('%Y_%m_%d_%H_%M')
 output_dir = "/sciclone/aiddata10/REU/geo/raw/gesdisc/OCO2_L2_Lite_FP_V10r/"
 
 year_list = range(2015, 2021)
-year_list = [2015]
+
 mode = "parallel"
 # model = "serial"
 
