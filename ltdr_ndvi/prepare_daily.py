@@ -130,26 +130,38 @@ def build_data_list(input_base, output_base, ops):
 
 
 def prep_daily_data(task):
-    src, dst = task
-    year = os.path.basename(src).split(".")[1][1:5]
-    day = os.path.basename(src).split(".")[1][5:8]
-    sensor = os.path.basename(src).split(".")[2]
-    print ("Processing Day {} {} {}".format(sensor, year, day))
-    process_daily_data(src, dst)
+    try:
+        src, dst = task
+        year = os.path.basename(src).split(".")[1][1:5]
+        day = os.path.basename(src).split(".")[1][5:8]
+        sensor = os.path.basename(src).split(".")[2]
+        print ("Processing Day {} {} {}".format(sensor, year, day))
+        process_daily_data(src, dst)
+    except Exception as e:
+        print("Error processing day {} {} {}:".format(sensor, year, day))
+        print(e)
 
 
 def prep_monthly_data(task):
-    year_month, month_files, month_path = task
-    print ("Processing Month {}".format(year_month))
-    data, meta = aggregate_rasters(file_list=month_files, method="max")
-    write_raster(month_path, data, meta)
+    try:
+        year_month, month_files, month_path = task
+        print ("Processing Month {}".format(year_month))
+        data, meta = aggregate_rasters(file_list=month_files, method="max")
+        write_raster(month_path, data, meta)
+    except Exception as e:
+        print("Error processing month {}:".format(year_month))
+        print(e)
 
 
 def prep_yearly_data(task):
-    year, year_files, year_path = task
-    print ("Processing Year {}".format(year))
-    data, meta = aggregate_rasters(file_list=year_files, method="mean")
-    write_raster(year_path, data, meta)
+    try:
+        year, year_files, year_path = task
+        print ("Processing Year {}".format(year))
+        data, meta = aggregate_rasters(file_list=year_files, method="mean")
+        write_raster(year_path, data, meta)
+    except Exception as e:
+        print("Error processing year {}:".format(year))
+        print(e)
 
 def create_mask(qa_array, mask_vals):
     qa_mask_vals = [abs(x - 15) for x in mask_vals]
