@@ -1,13 +1,13 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/esa_landcover_v207",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/esa_landcover",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "esa_lc_YYYY.tif",
-    "name": "esa_landcover_v207",
-    "title": "ESA Land Cover (version 2.0.7)",
+    "name": "esa_landcover",
+    "title": "ESA Land Cover",
     "description": "ESA land cover class data product. Categories used are cropland (rainfed, irrigated, mosaic), forest, grassland, shrubland, sparse vegetation, wetland, urband, bare areas, water bodies, and snow ice.",
-    "details": "UN Land Cover Classification System (LCCS) categories were grouped according to their IPCC classes, except for agriculture which was broken into 3 different types of cropland. The original land cover class names are modified in export file for readability and ease of use. The full name of each class can be found from land cover map user guide: http://maps.elie.ucl.ac.be/CCI/viewer/",
-    "version": "2.0.7",
+    "details": "UN Land Cover Classification System (LCCS) categories were grouped according to their IPCC classes, except for agriculture which was broken into 3 different types of cropland. The original land cover class names are modified in export file for readability and ease of use. The full name of each class can be found from land cover map user guide: https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-land-cover",
+    "version": "2.x.x",
     "options": {
         "resolution": 0.0027027,
         "extract_types": ["categorical", "count"],
@@ -20,7 +20,7 @@
     },
     "extras": {
         "citation": "Defourny, P. (2017): ESA Land Cover Climate Change Initiative (Land_Cover_cci): Land Cover Maps, v2.0.7. Centre for Environmental Data Analysis, 7/2017",
-        "sources_web": "https://www.esa-landcover-cci.org",
+        "sources_web": "https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-land-cover",
         "sources_name": "European Space Agency",
         "tags": [ "esa", "landcover", "environment"],
         "category_map": {

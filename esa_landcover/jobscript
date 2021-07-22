@@ -1,6 +1,6 @@
 #!/bin/tcsh
-#PBS -N asg:viirs_extract
-#PBS -l nodes=10:c18a:ppn=12
+#PBS -N asg:esa_lc
+#PBS -l nodes=3:c18a:ppn=12
 #PBS -l walltime=2:00:00
 #PBS -j oe
 
@@ -20,14 +20,20 @@ module load openmpi/3.1.4/gcc-9.3.0
 unsetenv PYTHONPATH
 
 
-conda activate viirs_ntl
+conda activate esa_lc
 
 # setenv src_dir /sciclone/aiddata10/geo/master/source/geo-datasets
 # setenv src_dir /sciclone/home20/smgoodman/geo-datasets
-setenv src_dir /sciclone/home20/smgoodman/viirs
+setenv src_dir /sciclone/home20/smgoodman/esa_lc
+
+cd $src_dir
 
 setenv OMPI_MCA_rmaps_base_oversubscribe yes
 
 # np must be set to one when using MPIPoolExecutor
 # number of workers can be set in the MPIPoolExecutor(max_workers=x) call
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 1 python "${src_dir}"/extract.py
+
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 1 python "${src_dir}"/download.py
+
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 1 python "${src_dir}"/prepare.py
+
