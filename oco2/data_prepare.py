@@ -22,7 +22,7 @@ year_list = range(2015, 2021)
 mode = "parallel"
 # model = "serial"
 
-max_workers = 47
+max_workers = 59
 
 overwrite = False
 
@@ -54,8 +54,6 @@ run_f = True
 run_g = True
 
 # -------------------------------------
-
-
 
 
 day_dir = os.path.join(data_dir, "day")
@@ -132,7 +130,7 @@ if __name__ == '__main__':
     qlist_a = drop_existing_files(qlist_a_all, overwrite=overwrite)
 
     if run_a:
-        results_a = run_tasks(convert_daily, qlist_a, "serial", max_workers=max_workers, chunksize=1)
+        results_a = run_tasks(convert_daily, qlist_a, mode, max_workers=max_workers, chunksize=1)
         output_results(qlist_a, results_a, "convert-daily")
 
     # -----------------------------------------------------------------------------

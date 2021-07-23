@@ -39,6 +39,7 @@ def get_md5sum_from_xml_url(url, field):
     md5sum = soup.find(field).text
     return md5sum
 
+
 def calc_md5sum(path):
     """Calculate the md5sum for a file
     """
@@ -101,28 +102,35 @@ def lonlat(lon, lat, dlen):
     return lon_lat
 
 
-def agg_to_grid(f, agg_path):
+def agg_to_grid(input_path, output_path, rnd_interval=0.1):
     """aggregate coordinates to regular grid points
     """
-    df = read_csv(f)
+    decimal_places = len(str(rnd_interval).split(".")[1])
+    df = read_csv(input_path)
     df = df.loc[df["xco2_quality_flag"] == 0].copy(deep=True)
-    df["longitude"] = df["longitude"].apply(lambda z: round_to(z, rnd_interval))
-    df["latitude"] = df["latitude"].apply(lambda z: round_to(z, rnd_interval))
-    df["lonlat"] = df.apply(lambda z: lonlat(z["longitude"], z["latitude"], decimal_places), axis=1)
+    df["lon"] = df["lon"].apply(lambda z: round_to(z, rnd_interval))
+    df["lat"] = df["lat"].apply(lambda z: round_to(z, rnd_interval))
+    df["lonlat"] = df.apply(lambda z: lonlat(z["lon"], z["lat"], decimal_places), axis=1)
+    agg_ops = {
+        'xco2': "mean",
+        'xco2_quality_flag': "count",
+        'lon': "first",
+        'lat': 'first'
+    }
     agg_df = df.groupby('lonlat', as_index=False).agg(agg_ops)
     agg_df.columns = [i.replace("xco2_quality_flag", "count") for i in agg_df.columns]
-    agg_df.to_csv(agg_path, index=False, encoding='utf-8')
+    agg_df.to_csv(output_path, index=False, encoding='utf-8')
 
 
-def interpolate(f, raster_path):
+def interpolate(input_path, output_path, rnd_interval=0.1, interp_method="linear"):
     """interpolate
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html#scipy.interpolate.griddata
     https://earthscience.stackexchange.com/questions/12057/how-to-interpolate-scattered-data-to-a-regular-grid-in-python
     """
-    data = read_csv(f)
+    data = read_csv(input_path)
     # data coordinates and values
-    x = data["longitude"]
-    y = data["latitude"]
+    x = data["lon"]
+    y = data["lat"]
     z = data["xco2"]
     # target grid to interpolate to
     xi = np.arange(-180.0, 180.0+rnd_interval, rnd_interval)
@@ -131,19 +139,19 @@ def interpolate(f, raster_path):
     # interpolate
     zi = griddata((x, y), z, (xi, yi), method=interp_method)
     # prepare raster
-    affine = Affine(rnd_interval, 0, -180.0,
+    transform = Affine(rnd_interval, 0, -180.0,
                     0, -rnd_interval, 90.0)
     meta = {
         'count': 1,
         'crs': {'init': 'epsg:4326'},
         'dtype': str(zi.dtype),
-        'affine': affine,
+        'transform': transform,
         'driver': 'GTiff',
         'height': zi.shape[0],
         'width': zi.shape[1]
     }
     raster_out = np.array([zi])
-    with rasterio.open(raster_path, "w", **meta) as dst:
+    with rasterio.open(output_path, "w", **meta) as dst:
         dst.write(raster_out)
 
 
@@ -160,12 +168,12 @@ def convert_daily(input_path, output_path):
     """
     print("Converting {}".format(output_path))
     with h5py.File(input_path, 'r') as hdf_data:
-        xco2 = list(hdf_data["xco2"])
         lon = list(hdf_data["longitude"])
         lat = list(hdf_data["latitude"])
+        xco2 = list(hdf_data["xco2"])
         xco2_quality_flag = list(hdf_data["xco2_quality_flag"])
-    point_list = list(zip(xco2, lon, lat, xco2_quality_flag))
-    df = pd.DataFrame(point_list)
+    point_list = list(zip(lon, lat, xco2, xco2_quality_flag))
+    df = pd.DataFrame(point_list, columns=["lon", "lat", "xco2", "xco2_quality_flag"])
     df.to_csv(output_path, index=False, encoding='utf-8')
 
 

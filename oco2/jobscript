@@ -24,7 +24,7 @@ conda activate oco2
 
 # setenv src_dir /sciclone/aiddata10/geo/master/source/geo-datasets
 # setenv src_dir /sciclone/home20/smgoodman/geo-datasets
-setenv src_dir /sciclone/home20/smgoodman/oco2
+setenv src_dir /sciclone/home20/smgoodman/geo-datasets-testing/oco2
 cd ${src_dir}
 
 setenv OMPI_MCA_rmaps_base_oversubscribe yes
