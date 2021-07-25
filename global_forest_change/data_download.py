@@ -29,6 +29,7 @@ base_url = os.path.join("https://storage.googleapis.com/earthenginepartners-hans
 
 layers = [
     "treecover2000",
+    "gain",
     "lossyear",
     "datamask",
 ]
@@ -108,8 +109,10 @@ if __name__ == '__main__':
     for ix, row in errors_df.iterrows():
         print(row)
 
-    os.makedirs(os.path.join(output_dir, "results"), exist_ok=True)
+
+    results_dir = os.path.join(input_dir, "results")
+    os.makedirs(results_dir, exist_ok=True)
 
     # output results to csv
-    output_path = os.path.join(output_dir, "results", f"data_download_{timestamp}.csv")
+    output_path = os.path.join(results_dir, f"data_download_{timestamp}.csv")
     output_df.to_csv(output_path, index=False)

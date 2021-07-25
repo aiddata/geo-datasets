@@ -13,7 +13,6 @@ Hansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavi
 ```
 
 
-
 # Steps:
 
 1. Create Conda environment
