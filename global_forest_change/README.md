@@ -27,6 +27,7 @@ Hansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavi
 		conda activate gfc
 		pip install mpi4py
 		```
+	- You may need to install rasterio using pip (`pip install rasterio`) as Conda can have some dependency issues when installing rasterio.
 
 2. If running on W&M HPC, edit jobscript
     - Adjust the resources for the job based on what you would like to request from HPC

@@ -1,13 +1,13 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/hansen/GFC-2018-v1.6/treecover2000/treecover2000.tif",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/global_forest_change/GFC-2020-v1.8/treecover2000/treecover2000.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "hansen2018_v16_treecover2000",
-    "title": "Tree canopy cover for year 2000 (GFC 2018, v1.6)",
+    "name": "gfc_2020_v18_treecover2000",
+    "title": "Tree canopy cover for year 2000 (GFC 2020, v1.8)",
     "description": "Tree cover in the year 2000, defined as canopy closure for all vegetation taller than 5m in height. In the range 0-100.",
     "details": "",
-    "version": "1.6",
+    "version": "1.8",
     "options": {
         "resolution": 0.00025,
         "extract_types": ["mean", "max", "min"],
@@ -21,7 +21,7 @@
     },
     "extras": {
         "citation": "Hansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavina, D. Thau, S. V. Stehman, S. J. Goetz, T. R. Loveland, A. Kommareddy, A. Egorov, L. Chini, C. O. Justice, and J. R. G. Townshend. 2013. “High-Resolution Global Maps of 21st-Century Forest Cover Change.” Science 342 (15 November): 850–53.",
-        "sources_web": "https://earthenginepartners.appspot.com/science-2013-global-forest/download_v1.6.html",
+        "sources_web": "https://storage.googleapis.com/earthenginepartners-hansen/GFC-2020-v1.8/download.html",
         "sources_name": "Hansen/UMD/Google/USGS/NASA",
         "tags": ["enivronment", "forest", "tree", "cover", "forestcover", "treecover", "hansen"]
     },
