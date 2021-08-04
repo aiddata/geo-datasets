@@ -40,6 +40,8 @@ from osgeo import gdal, osr
 
 mode = "auto"
 
+max_workers = 71
+
 build_list = [
     "daily",
     "monthly",
@@ -128,26 +130,38 @@ def build_data_list(input_base, output_base, ops):
 
 
 def prep_daily_data(task):
-    src, dst = task
-    year = os.path.basename(src).split(".")[1][1:5]
-    day = os.path.basename(src).split(".")[1][5:8]
-    sensor = os.path.basename(src).split(".")[2]
-    print ("Processing Day {} {} {}".format(sensor, year, day))
-    process_daily_data(src, dst)
+    try:
+        src, dst = task
+        year = os.path.basename(src).split(".")[1][1:5]
+        day = os.path.basename(src).split(".")[1][5:8]
+        sensor = os.path.basename(src).split(".")[2]
+        print ("Processing Day {} {} {}".format(sensor, year, day))
+        process_daily_data(src, dst)
+    except Exception as e:
+        print("Error processing day {} {} {}:".format(sensor, year, day))
+        print(e)
 
 
 def prep_monthly_data(task):
-    year_month, month_files, month_path = task
-    print ("Processing Month {}".format(year_month))
-    data, meta = aggregate_rasters(file_list=month_files, method="max")
-    write_raster(month_path, data, meta)
+    try:
+        year_month, month_files, month_path = task
+        print ("Processing Month {}".format(year_month))
+        data, meta = aggregate_rasters(file_list=month_files, method="max")
+        write_raster(month_path, data, meta)
+    except Exception as e:
+        print("Error processing month {}:".format(year_month))
+        print(e)
 
 
 def prep_yearly_data(task):
-    year, year_files, year_path = task
-    print ("Processing Year {}".format(year))
-    data, meta = aggregate_rasters(file_list=year_files, method="mean")
-    write_raster(year_path, data, meta)
+    try:
+        year, year_files, year_path = task
+        print ("Processing Year {}".format(year))
+        data, meta = aggregate_rasters(file_list=year_files, method="mean")
+        write_raster(year_path, data, meta)
+    except Exception as e:
+        print("Error processing year {}:".format(year))
+        print(e)
 
 def create_mask(qa_array, mask_vals):
     qa_mask_vals = [abs(x - 15) for x in mask_vals]
@@ -370,36 +384,31 @@ def make_dir(path):
 
 def run(tasks, func, mode="auto"):
     parallel = False
-    size = 1
-    rank = 0
+
     if mode in ["auto", "parallel"]:
         try:
-            from mpi4py import MPI
+            from mpi4py.futures import MPIPoolExecutor
             parallel = True
-            comm = MPI.COMM_WORLD
-            size = comm.Get_size()
-            rank = comm.Get_rank()
         except:
             if mode == "parallel":
                 raise Exception("Failed to run job in parallel")
     elif mode != "serial":
         raise Exception("Invalid `mode` value for script.")
-    c = rank
-    # For each task in tasks, run the passed function (func) on the task
-    # Increment step sizes are defined by size above
-    while c < len(tasks):
-        try:
-            func(tasks[c])
-        except Exception as e:
-            print ("Error processing: {0}".format(tasks[c]))
-            # raise
-            print (e)
-        c += size
-    if parallel:
-        comm.Barrier()
 
+    if parallel:
+        with MPIPoolExecutor(max_workers=max_workers) as executor:
+            executor.map(func, tasks)
+    else:
+        # For each task in tasks, run the passed function (func) on the task
+        for task in tasks:
+            try:
+                func(tasks[c])
+            except Exception as e:
+                print("Error processing: {0}".format(tasks[c]))
+                print(e)
 
 # -----------------------------------------------------------------------------
+
 if __name__ == '__main__':
     # Build day, month, year dataframes
 
@@ -450,7 +459,6 @@ if __name__ == '__main__':
     year_qlist = []
     for _, row in year_df.iterrows():
         year_qlist.append([row["year"], row["month_path_list"], row["output_path"]])
-
 
     if "daily" in build_list:
         make_dir(os.path.join(dst_base, "daily"))
