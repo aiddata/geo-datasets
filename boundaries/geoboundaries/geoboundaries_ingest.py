@@ -10,14 +10,14 @@ Note: when using parallel mode, be sure to spin up job first (manually or use jo
 
 qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
 mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/boundaries/geoboundaries_ingest.py master 1_3_3 parallel missing True
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 16 python geoboundaries_ingest.py master v4 parallel False True
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 16 python geoboundaries_ingest.py master v4 parallel missing False
 
 """
 
 import sys
 import os
 import time
-
+import pandas as pd
 
 # main_dir = os.path.join(
 #     os.path.dirname(os.path.dirname(os.path.dirname(
@@ -80,9 +80,11 @@ qlist_raw = [os.path.join(data_dir, i) for i in os.listdir(data_dir)
          if os.path.isdir(os.path.join(data_dir, i))]
 qlist_raw.sort()
 
-ignore_list = ["JPN"]
+ignore_list = ["JPN", "NOR", "PHL", "NZL"]
 
-qlist = [i for i in qlist_raw if not any([j in i for j in ignore_list])]
+# qlist = [i for i in qlist_raw if not any([j in i for j in ignore_list])]
+qlist = [i for i in qlist_raw if any([j in i for j in ignore_list])]
+
 
 job = mpi_utility.NewParallel(parallel=method)
 
@@ -97,10 +99,11 @@ def tmp_master_init(self):
     self.Ts = int(time.time())
     self.T_start = time.localtime()
     print('Start: ' + time.strftime('%Y-%m-%d  %H:%M:%S', self.T_start))
+    self.results = []
 
 
 def tmp_master_process(self, worker_data):
-    pass
+    self.results.append(worker_data)
 
 
 def tmp_master_final(self):
@@ -113,6 +116,8 @@ def tmp_master_final(self):
     print('End: '+ time.strftime('%Y-%m-%d  %H:%M:%S', T_end))
     print('Runtime: ' + str(T_run//60) +'m '+ str(int(T_run%60)) +'s')
     print('\n\n')
+    self.df = pd.DataFrame(self.results, columns=["task", "status", "error", "path"])
+
 
 
 def tmp_worker_job(self, task_index, task_data):
@@ -121,18 +126,13 @@ def tmp_worker_job(self, task_index, task_data):
 
     try:
         with mpi_utility.Capturing() as output:
-            try:
-                run(path=path, version=version, config=config,
-                       update=update, dry_run=dry_run)
-            except Exception as e:
-                print(e)
-                
+            run(path=path, version=version, config=config,
+                    update=update, dry_run=dry_run)
         print('\n'.join(output))
-    except:
+        return (task_index, "Success", 0, path)
+    except Exception as e:
         print("Error with {0}".format(path))
-        raise
-
-    return 0
+        return (task_index, "Error", e, path)
 
 
 # init / run job
@@ -145,4 +145,5 @@ job.set_worker_job(tmp_worker_job)
 
 job.run()
 
-
+output_path = os.path.join(data_dir, "results_{}.csv".format(time.strftime('%Y-%m-%d  %H:%M:%S', job.T_start)))
+job.df.to_csv(output_path, index=False)
