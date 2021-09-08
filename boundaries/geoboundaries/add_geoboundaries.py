@@ -11,7 +11,6 @@ import os
 import datetime
 import json
 from warnings import warn
-from pprint import pprint
 
 from unidecode import unidecode
 
@@ -288,7 +287,7 @@ def run(path=None, client=None, version=None, config=None,
 
     if update == "partial":
         print("\nProcessed document:")
-        pprint(doc)
+        print(doc)
 
         print("\nUpdating database (dry run = {0})...".format(dry_run))
         if not dry_run:
@@ -354,7 +353,7 @@ def run(path=None, client=None, version=None, config=None,
     # database updates
 
     print("\nProcessed document:")
-    pprint(doc)
+    print(doc)
 
     print("\nUpdating database (dry run = {0})...".format(dry_run))
     if not dry_run:
