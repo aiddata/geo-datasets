@@ -80,11 +80,13 @@ qlist_raw = [os.path.join(data_dir, i) for i in os.listdir(data_dir)
          if os.path.isdir(os.path.join(data_dir, i))]
 qlist_raw.sort()
 
-ignore_list = ["JPN", "NOR", "PHL", "NZL"]
-
+#ignore_list = ["JPN", "NOR", "PHL", "NZL"]
 # qlist = [i for i in qlist_raw if not any([j in i for j in ignore_list])]
-qlist = [i for i in qlist_raw if any([j in i for j in ignore_list])]
 
+# accept_list = []
+# qlist = [i for i in qlist_raw if any([j in i for j in accept_list])]
+
+qlist = qlist_raw
 
 job = mpi_utility.NewParallel(parallel=method)
 
@@ -117,7 +119,8 @@ def tmp_master_final(self):
     print('Runtime: ' + str(T_run//60) +'m '+ str(int(T_run%60)) +'s')
     print('\n\n')
     self.df = pd.DataFrame(self.results, columns=["task", "status", "error", "path"])
-
+    output_path = os.path.join(data_dir, "results_{}.csv".format(time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime())))
+    self.df.to_csv(output_path, index=False)
 
 
 def tmp_worker_job(self, task_index, task_data):
@@ -144,6 +147,3 @@ job.set_master_final(tmp_master_final)
 job.set_worker_job(tmp_worker_job)
 
 job.run()
-
-output_path = os.path.join(data_dir, "results_{}.csv".format(time.strftime('%Y-%m-%d  %H:%M:%S', job.T_start)))
-job.df.to_csv(output_path, index=False)
