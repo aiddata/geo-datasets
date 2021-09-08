@@ -33,7 +33,7 @@ if config.connection_status != 0:
 # -------------------------------------
 
 
-path = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries/v4/JAM_ADM0"
+path = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries/v4/JAM_ADM1"
 
 version = os.path.basename(os.path.dirname(path))
 
