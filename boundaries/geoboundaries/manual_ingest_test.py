@@ -5,8 +5,7 @@ import os
 # import json
 # from warnings import warn
 # from pprint import pprint
-
-from unidecode import unidecode
+# from unidecode import unidecode
 
 utils_dir = "/sciclone/aiddata10/geo/master/source/geo-hpc/utils"
 # utils_dir = os.path.join(
@@ -40,7 +39,7 @@ version = os.path.basename(os.path.dirname(path))
 
 generator = "manual"
 
-update = False
+update = "full"
 
 dry_run = False
 
