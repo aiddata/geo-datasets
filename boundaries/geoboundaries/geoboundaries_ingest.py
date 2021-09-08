@@ -8,8 +8,9 @@ Where args are: branch, version, method, update mode, dry run
 Note: when using parallel mode, be sure to spin up job first (manually or use job script)
       and use appropriate mpi command to run script
 
-qsub -I -l nodes=1:c18c:ppn=16 -l walltime=24:00:00
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 16 python-mpi geoboundaries_ingest.py master v4 parallel False True
+qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/boundaries/geoboundaries_ingest.py master 1_3_3 parallel missing True
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 16 python geoboundaries_ingest.py master v4 parallel False True
 
 """
 
@@ -35,7 +36,6 @@ from config_utility import BranchConfig
 # import add_geoboundaries as add_gb
 from add_geoboundaries import run
 
-
 branch = sys.argv[1]
 
 config = BranchConfig(branch=branch)
@@ -47,6 +47,9 @@ if config.connection_status != 0:
 
 
 # -------------------------------------------------------------------------
+
+branch = "master"
+version = "v4"
 
 
 version = sys.argv[2]
@@ -73,10 +76,13 @@ else:
     dry_run = False
 
 
-qlist = [os.path.join(data_dir, i) for i in os.listdir(data_dir)
+qlist_raw = [os.path.join(data_dir, i) for i in os.listdir(data_dir)
          if os.path.isdir(os.path.join(data_dir, i))]
-qlist.sort()
+qlist_raw.sort()
 
+ignore_list = ["JPN"]
+
+qlist = [i for i in qlist_raw if not any([j in i for j in ignore_list])]
 
 job = mpi_utility.NewParallel(parallel=method)
 
@@ -115,8 +121,12 @@ def tmp_worker_job(self, task_index, task_data):
 
     try:
         with mpi_utility.Capturing() as output:
-            add_gb.run(path=path, version=version, config=config,
+            try:
+                run(path=path, version=version, config=config,
                        update=update, dry_run=dry_run)
+            except Exception as e:
+                print(e)
+                
         print('\n'.join(output))
     except:
         print("Error with {0}".format(path))
