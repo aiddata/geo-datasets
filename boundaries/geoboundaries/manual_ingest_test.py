@@ -33,17 +33,20 @@ if config.connection_status != 0:
 # -------------------------------------
 
 
-path = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries/v4/JAM_ADM1"
+# path = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries/v4/JAM_ADM1"
+# path = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries/v4/JOR_ADM2"
+path = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries/v4/NOR_ADM0"
+path = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries/v4/NZL_ADM0"
+path = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries/v4/PHL_ADM1"
 path = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries/v4/JPN_ADM0"
-path = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries/v4/JOR_ADM2"
 
 version = os.path.basename(os.path.dirname(path))
 
 generator = "manual"
 
-update = "full"
+update = "missing"
 
-dry_run = True
+dry_run = False
 
 run(path=path, version=version, config=config, generator=generator,
     update=update, dry_run=dry_run)

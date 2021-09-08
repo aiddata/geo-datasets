@@ -8,7 +8,6 @@ unsetenv PYTHONPATH
 # conda create -n geoboundaries -c conda-forge pandas requests
 conda activate geoboundaries
 
-unsetenv PYTHONPATH
 
 requests
 pandas
@@ -113,43 +112,43 @@ def process(meta, output_base_dir, version, date_str):
         geoBoundary = requests.get(lfs_dlPath).json()
     # save geojson
     fname = "{}.geojson".format(boundary_basename)
-    geo_file = open(boundary_dir / fname, "w")
-    json.dump(geoBoundary, geo_file)
-    geo_file.close()
+    with open(boundary_dir / fname, "w") as geo_file:
+        json.dump(geoBoundary, geo_file)
+
 
 if __name__ == '__main__':
 
-version = 'v4'
+    version = 'v4'
 
-# format for release data
-base_api_url = "https://www.geoboundaries.org/api/{}/gbOpen/ALL/ALL/".format(version)
+    # format for release data
+    base_api_url = "https://www.geoboundaries.org/api/{}/gbOpen/ALL/ALL/".format(version)
 
-base_dir = Path("/sciclone/aiddata10/REU/geo/data/boundaries")
-
-
-date_str = get_current_timestamp('%Y_%m_%d')
-
-output_base_dir = base_dir / "geoboundaries" / version
-
-r = requests.get(base_api_url)
-
-r_json = r.json()
-
-source_df = pd.DataFrame(r_json)
-source_df["output_base_dir"] = output_base_dir
-source_df["version"] = version
-source_df["date_str"] = date_str
+    base_dir = Path("/sciclone/aiddata10/REU/geo/data/boundaries")
 
 
-flist = [(i, output_base_dir, version, date_str) for i in r_json]
+    date_str = get_current_timestamp('%Y_%m_%d')
 
-results = run_tasks(process, flist, parallel=True)
+    output_base_dir = base_dir / "geoboundaries" / version
 
-results_join_field_name = "boundaryID"
-results_df = pd.DataFrame(results, columns=["status", "message", results_join_field_name, "output"])
-results_df[results_join_field_name] = results_df[results_join_field_name].apply(lambda x: x[0][results_join_field_name])
+    r = requests.get(base_api_url)
+
+    r_json = r.json()
+
+    source_df = pd.DataFrame(r_json)
+    source_df["output_base_dir"] = output_base_dir
+    source_df["version"] = version
+    source_df["date_str"] = date_str
 
 
-output_df = results_df.merge(source_df, on=results_join_field_name)
-output_df_path = base_dir / "geoboundaries" / f"{version}-{date_str}-dl_results.csv"
-output_df.to_csv(output_df_path, index=False)
+    flist = [(i, output_base_dir, version, date_str) for i in r_json]
+
+    results = run_tasks(process, flist, parallel=True)
+
+    results_join_field_name = "boundaryID"
+    results_df = pd.DataFrame(results, columns=["status", "message", results_join_field_name, "output"])
+    results_df[results_join_field_name] = results_df[results_join_field_name].apply(lambda x: x[0][results_join_field_name])
+
+
+    output_df = results_df.merge(source_df, on=results_join_field_name)
+    output_df_path = base_dir / "geoboundaries" / f"{version}-{date_str}-dl_results.csv"
+    output_df.to_csv(output_df_path, index=False)
