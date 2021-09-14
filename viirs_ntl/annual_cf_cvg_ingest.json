@@ -16,7 +16,8 @@
             "count" : "total count of pixels per unit of analysis"
         },
 	    "factor": 1,
-        "variable_description": "Cloud free measurements"
+        "variable_description": "Cloud free measurements",
+		"pixel_check": false
 	},
 	"extras": {
 	    "citation": "C. D. Elvidge, M. Zhizhin, T. Ghosh, F-C. Hsu, Annual time series of global VIIRS nighttime lights derived from monthly averages: 2012 to 2019, Remote Sensing",
