@@ -4,7 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "YYYY.tif",
 	"name": "viirs_ntl_annual_v20_avg_masked",
-    "title": "VIIRS Nighttime Lights Average",
+    "title": "Annual VIIRS Nighttime Lights Average - v2",
     "description": "Yearly VIIRS day night band nighttime lights data.",
     "details": "Annual VIIRS nighttime lights product Version 2. Average value with background pixels masked. Please use in combination with VIIRS Nighttime Light Cloud Free Coverage product to confirm sufficient cloud free measurements are available within your boundary features.",
 	"version": 2,
@@ -23,8 +23,8 @@
 	},
 	"extras": {
 	    "citation": "C. D. Elvidge, M. Zhizhin, T. Ghosh, F-C. Hsu, Annual time series of global VIIRS nighttime lights derived from monthly averages: 2012 to 2019, Remote Sensing",
-	    "sources_web": "https://ngdc.noaa.gov/eog/viirs/download_dnb_composites.html",
-	    "sources_name": "VIIRS Day/Night Band Nighttime Lights",
+	    "sources_web": "https://eogdata.mines.edu/products/vnl/",
+	    "sources_name": "Earth Observation Group - VIIRS Nighttime Lights",
 	    "tags": ["nighttimelights", "viirs", "economics", "welfare"]
 	},
 	"active": 1
