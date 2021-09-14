@@ -4,9 +4,9 @@
 	"file_extension": ".tif",
 	"file_mask": "YYYY.tif",
 	"name": "viirs_ntl_annual_v20_avg_masked",
-    "title": "Annual VIIRS Nighttime Lights Average - v2",
-    "description": "Yearly VIIRS day night band nighttime lights data.",
-    "details": "Annual VIIRS nighttime lights product Version 2. Average value with background pixels masked. Please use in combination with VIIRS Nighttime Light Cloud Free Coverage product to confirm sufficient cloud free measurements are available within your boundary features.",
+    "title": "Annual VIIRS Nighttime Lights v2 - Average Value",
+    "description": "Annual VIIRS nighttime lights product Version 2. Average value with background pixels masked. Please use in combination with VIIRS Nighttime Light Cloud Free Coverage product to confirm sufficient cloud free measurements are available within your boundary features.",
+    "details": "",
 	"version": 2,
 	"options": {
 	    "resolution": 0.0041666667,

@@ -4,9 +4,9 @@
 	"file_extension": ".tif",
 	"file_mask": "YYYY.tif",
 	"name": "viirs_ntl_annual_v20_cf_cvg",
-    "title": "Annual VIIRS Nighttime Lights Cloud Free Coverage - v2",
-    "description": "Yearly VIIRS day night band cloud free coverage.",
-    "details": "Annual VIIRS nighttime lights product Version 2. Binary layer indicating whether each pixel had at least one cloud free coverage. Can be used in combination with VIIRS Nighttime Light Average product to determine if sufficient coverage exists with boundary features.",
+    "title": "Annual VIIRS Nighttime Lights v2 - Count of Cloud Free Coverage",
+    "description": "Annual VIIRS nighttime lights product Version 2. Count of pixels within boundary with at least 1 cloud free observation of nighttime lights. Can be used in combination with VIIRS Nighttime Light Average product to determine if sufficient coverage exists with boundary features.",
+    "details": "",
 	"version": 2,
 	"options": {
 	    "resolution": 0.0041666667,
