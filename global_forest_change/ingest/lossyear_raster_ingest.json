@@ -5,7 +5,7 @@
     "file_mask": "None",
     "name": "gfc_2020_v18_lossyear",
     "title": "Year of gross forest cover loss event (GFC 2020 v1.8)",
-    "description": "Forest loss during the period 2000–2020, defined as a stand-replacement disturbance, or a change from a forest to non-forest state.",
+    "description": "Year of forest loss during the period 2000–2020, where loss is defined as a stand-replacement disturbance, or a change from a forest to non-forest state.",
     "details": "Output format is a column for every year, where rows in column are the number of pixels of forest loss associated with that year and unit of analysis. Forest loss is only associated with the first year it is detected and no subsequent years.",
     "version": "1.8",
     "options": {

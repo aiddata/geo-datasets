@@ -5,8 +5,8 @@
     "file_mask": "None",
     "name": "gfc_2020_v18_datamask",
     "title": "Forest cover data mask",
-    "description": "Three values representing areas of no data (0), mapped land surface (1), and permanent water bodies (2).",
-    "details": "Output format is a column for every year, where rows in column are the number of pixels of forest loss associated with that year and unit of analysis. Forest loss is only associated with the first year it is detected and no subsequent years.",
+    "description": "Three columns are provided which have the count of pixels which are no data, mapped land surface, and permanent water bodies for each unit.",
+    "details": "",
     "version": "1.8",
     "options": {
         "resolution": 0.00025,
