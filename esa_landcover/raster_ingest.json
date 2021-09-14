@@ -3,7 +3,7 @@
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "esa_lc_YYYY.tif",
-    "name": "esa_landcover_v207",
+    "name": "esa_landcover",
     "title": "ESA Land Cover",
     "description": "ESA land cover class data product. Categories used are cropland (rainfed, irrigated, mosaic), forest, grassland, shrubland, sparse vegetation, wetland, urband, bare areas, water bodies, and snow ice.",
     "details": "UN Land Cover Classification System (LCCS) categories were grouped according to their IPCC classes, except for agriculture which was broken into 3 different types of cropland. The original land cover class names are modified in export file for readability and ease of use. The full name of each class can be found from land cover map user guide: https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-land-cover. Version 2.0.7cds provides the LC maps for the years 1992-2015 and version 2.1.1 for the years after 2016 (both versions are produced with the same processing chain).",
