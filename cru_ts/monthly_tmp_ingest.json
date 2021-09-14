@@ -1,5 +1,5 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts_4.05/monthly/tmp/mean",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts_4.05/monthly/tmp",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "cru.tmp.YYYY.tif",
