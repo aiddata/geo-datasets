@@ -1,15 +1,20 @@
 #!/bin/tcsh
 #PBS -N asg:viirs_process
-#PBS -l nodes=8:c18a:ppn=12
+#PBS -l nodes=8:c18c:ppn=12
 #PBS -l walltime=24:00:00
 #PBS -j oe
 
 # init conda within new shell for job
 
-# vortex [nodespec c18a or c18c for vortex-alpha, ppn up to 12 or 16 for vortex / alpha]
-source "/usr/local/anaconda3-2021.05/etc/profile.d/conda.csh"
-module load anaconda3/2020.02
-module load openmpi/3.1.4/gcc-9.3.0
+# vortex-alpha [nodespec c18c, ppn up to 16]
+source "/opt/anaconda3-2021.05/etc/profile.d/conda.csh"
+module unload gcc/4.7.3 python/2.7.8 openmpi-1.10.0-gcc mpi4py-2.0.0-gcc acml/5.3.1 numpy/1.9.2 gdal-nograss/1.11.2 proj/4.7.0 geos/3.5.0
+module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05
+
+# vortex [nodespec c18a, ppn up to 12]
+# source "/usr/local/anaconda3-2021.05/etc/profile.d/conda.csh"
+# module load anaconda3/2020.02
+# module load openmpi/3.1.4/gcc-9.3.0
 
 # hima [nodespec: hima:nogpu, ppn up to 32]
 # source "/usr/local/anaconda3-2020.02/etc/profile.d/conda.csh"

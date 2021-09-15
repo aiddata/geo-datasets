@@ -13,12 +13,22 @@ Two output layers are produced for both monthly and annual data:
 Notes:
 - Any gzipped files have been extracted to GeoTiff format
 - Layers are global so do not require mosaicing of tiles
-- Monthly (notile) has a block shape of (256, 256)
-- Annual has a block of (1, 86401)
+- Raw and processed monthly_notile has a block shape of (256, 256)
+- Raw annual has a block shape of (86401, 1)
+- Processed annual has a block shape of (512, 512)
 - Output files are compressed using LZW compression, and tiled (same as input tiling)
 - I explored using Cloug Optimized GeoTiff (COG) format for the output, but GTiff is the only format in rasterio which allows writing directly to disk
-    + Writing directly to disk is critical when used in combination with windowed read/write to avoid running out of memory during paralell processing
+    + Writing directly to disk is critical when used in combination with windowed read/write to avoid running out of memory during parallel processing
     + Using GeoTiff, each process should not require more than about 1 GB of memory
+
+Concerns:
+- Seems like when they fixed monthly_notile 201805 (was int16 instead of float32) the replacement had a different block shape (86401, 1)
+    + monthly_notile 201804 seems to have been impacted by this block shape change as well
+- When reprocessing the 2018 monthly_notile data for replace data, process.py seemed to be using more memory than it had previously and geotiff output format is different
+    + was using c18c instead of c18a nodes (could gdal version or something have changed when rebuilding env?)
+    + previous outputs seem like they are in COG format, which I thought was tested but failed
+    + new outputs are standard GeoTiff format
+    + may want to rerun all monthly processing to debug this and ensure data is consistently processed
 """
 
 
