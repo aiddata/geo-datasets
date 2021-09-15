@@ -22,7 +22,7 @@ out_dir="/sciclone/aiddata10/REU/geo/raw/viirs/eogdata"
 year_url="https://eogdata.mines.edu/nighttime_light/annual/v20"
 for y in "${years[@]}"; do
     echo "${year_url}/${y}"
-    wget -c -m -np -nH --cut-dirs=1 --header "Authorization: Bearer ${access_token}" -P ${out_dir} "${base_url}/${y}" -R .html -A .tif.gz
+    wget -c -m -np -nH --cut-dirs=1 --header "Authorization: Bearer ${access_token}" -P ${out_dir} "${year_url}/${y}" -R .html -A .tif.gz
 done
 
 

@@ -42,6 +42,9 @@ Product abbreviations:
 
 3. Download compressed monthly and annual raw data from source
 	- Set start and end year in download.sh
+	- Check [this page](https://eogdata.mines.edu/products/register/) to see if the `client secret` changed from what is listed in `get_token.py`
+		- Current `client_secret` will be in the Python tab under "Programmed Access" on [this page](https://eogdata.mines.edu/products/register/)
+		- If necessary, update `client_secret` value in `get_token.py`
 	- Run download script:
 		```
 		bash download.sh

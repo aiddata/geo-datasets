@@ -7,7 +7,7 @@ pw = '<password>'
 # Retrieve access token
 params = {
     'client_id' : 'eogdata_oidc',
-    'client_secret' : '368127b1-1ee0-4f3f-8429-29e9a93daf9a',
+    'client_secret' : '2677ad81-521b-4869-8480-6d05b9e57d48',
     'username' : user,
     'password' : pw,
     'grant_type' : 'password'
