@@ -25,7 +25,9 @@ Concerns:
 - Seems like when they fixed monthly_notile 201805 (was int16 instead of float32) the replacement had a different block shape (86401, 1)
     + monthly_notile 201804 seems to have been impacted by this block shape change as well
 - When reprocessing the 2018 monthly_notile data for replace data, process.py seemed to be using more memory than it had previously and geotiff output format is different
-    + was using c18c instead of c18a nodes (could gdal version or something have changed when rebuilding env?)
+    + was using c18c instead of c18a nodes (gdal/rasterio versions changed)
+        ~ c18a = gdal 3.1.3 and rasterio 1.2.3
+        ~ c18c = gdal 3.3.x and rasterio 1.2.8
     + previous outputs seem like they are in COG format, which I thought was tested but failed
     + new outputs are standard GeoTiff format
     + may want to rerun all monthly processing to debug this and ensure data is consistently processed
@@ -95,16 +97,20 @@ def raster_calc(input_path, output_path, function, **kwargs):
     :param function: function to apply to input raster values
     :param kwargs: additional meta args used to write output raster
     """
-    with rasterio.open(input_path) as src:
-        assert len(set(src.block_shapes)) == 1
-        meta = src.meta.copy()
-        meta.update(**kwargs)
-        with rasterio.open(output_path, "w", **meta) as dst:
-            for ji, window in src.block_windows(1):
-                in_data = src.read(window=window)
-                out_data = function(in_data)
-                out_data = out_data.astype(meta["dtype"])
-                dst.write(out_data, window=window)
+    with rasterio.Env(GDAL_CACHEMAX="100"):
+        # GDAL_CACHEMAX value in MB
+        # https://trac.osgeo.org/gdal/wiki/ConfigOptions#GDAL_CACHEMAX
+        # See: https://github.com/mapbox/rasterio/issues/1281
+        with rasterio.open(input_path) as src:
+            assert len(set(src.block_shapes)) == 1
+            meta = src.meta.copy()
+            meta.update(**kwargs)
+            with rasterio.open(output_path, "w", **meta) as dst:
+                for ji, window in src.block_windows(1):
+                    in_data = src.read(window=window)
+                    out_data = function(in_data)
+                    out_data = out_data.astype(meta["dtype"])
+                    dst.write(out_data, window=window)
 
 
 def remove_negative(x):
