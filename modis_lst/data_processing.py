@@ -50,12 +50,12 @@ if __name__ == "__main__":
     day_df = pd.DataFrame({"raw_path": raw_path_list})
     day_df["temporal"] = day_df["raw_path"].apply(lambda x: os.path.basename(x).split("_")[0])
 
-    day_df["output"] = day_df["temporal"].apply(lambda x: os.path.join(output_dir, "monthly", "day", "modis_list_day_cmg_" + x + ".tif"))
+    day_df["output"] = day_df["temporal"].apply(lambda x: os.path.join(output_dir, "monthly", "day", "modis_lst_day_cmg_" + x + ".tif"))
     day_df["layer"] = "LST_Day_CMG"
 
     night_df = day_df.copy(deep=True)
 
-    night_df["output"] = night_df["temporal"].apply(lambda x: os.path.join(output_dir, "monthly", "night", "modis_list_night_cmg_" + x + ".tif"))
+    night_df["output"] = night_df["temporal"].apply(lambda x: os.path.join(output_dir, "monthly", "night", "modis_lst_night_cmg_" + x + ".tif"))
     night_df["layer"] = "LST_Night_CMG"
 
     df = pd.concat([day_df, night_df], axis=0)
