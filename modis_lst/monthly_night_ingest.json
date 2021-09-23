@@ -1,5 +1,5 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/MODIS/terra/MOLT/MOD11C3.006/annual/night",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/MODIS/terra/MOLT/MOD11C3.006/monthly/night",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "modis_lst_night_cmg_YYYYMM.tif",
