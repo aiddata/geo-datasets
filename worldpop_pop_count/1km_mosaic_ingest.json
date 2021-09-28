@@ -5,7 +5,7 @@
 	"file_mask": "ppp_YYYY_1km_Aggregated.tif",
 	"name": "worldpop_pop_count_1km_mosaic",
 	"title": "WorldPop Population Count",
-	"description": "Population count from WorldPop. Underlying dataset provides number of people per 1km pixel. The mapping approach is Random Forest-based dasymetric redistribution",
+	"description": "Estimated population count from WorldPop. Underlying dataset provides number of people per 1km pixel. The mapping approach is Random Forest-based dasymetric redistribution",
     "details": "No additional processing of raw data.",
 	"version": 2020,
 	"options": {
