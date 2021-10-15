@@ -1,6 +1,6 @@
 Download each year from https://ghsl.jrc.ec.europa.eu/download.php?ds=pop
 
-250m, WGS84
+9 arc second, WGS84
 
 Manually copy files to SciClone and extract zips
 

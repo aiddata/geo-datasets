@@ -61,51 +61,51 @@ test_request.raise_for_status()
 
 if __name__ == "__main__":
 
-print("Preparing data download")
+    print("Preparing data download")
 
-year_file_list = []
-for year in year_list:
-    year_url = template_url.replace("{YEAR}", str(year))
-    year_file_list.append(year_url)
-
-
-df = pd.DataFrame({"raw_url": year_file_list})
+    year_file_list = []
+    for year in year_list:
+        year_url = template_url.replace("{YEAR}", str(year))
+        year_file_list.append(year_url)
 
 
-# use basename from url to create local filename
-df["output"] = df["raw_url"].apply(lambda x: os.path.join(output_dir, os.path.basename(x)))
-
-os.makedirs(output_dir, exist_ok=True)
-
-# generate list of tasks to iterate over
-flist = list(zip(df["raw_url"], df["output"]))
+    df = pd.DataFrame({"raw_url": year_file_list})
 
 
-print("Running data download")
+    # use basename from url to create local filename
+    df["output"] = df["raw_url"].apply(lambda x: os.path.join(output_dir, os.path.basename(x)))
 
-results = run_tasks(manage_download, flist, mode, max_workers=max_workers, chunksize=1)
+    os.makedirs(output_dir, exist_ok=True)
 
-# ---------
-# column name for join field in original df
-results_join_field_name = "raw_url"
-# position of join field in each tuple in task list
-results_join_field_loc = 2
-# ---------
-
-# join download function results back to df
-results_df = pd.DataFrame(results, columns=["status", "message", "args", results_join_field_name])
-results_df[results_join_field_name] = results_df[results_join_field_name].apply(lambda x: x[results_join_field_loc])
-
-output_df = df.merge(results_df, on=results_join_field_name, how="left")
-
-print("Results:")
-
-errors_df = output_df[output_df["status"] != 0]
-print("{} errors found out of {} tasks".format(len(errors_df), len(output_df)))
+    # generate list of tasks to iterate over
+    flist = list(zip(df["raw_url"], df["output"]))
 
 
-os.makedirs(os.path.join(output_dir, "results"), exist_ok=True)
+    print("Running data download")
 
-# output results to csv
-output_path = os.path.join(output_dir, "results", f"data_download_{timestamp}.csv")
-output_df.to_csv(output_path, index=False)
+    results = run_tasks(manage_download, flist, mode, max_workers=max_workers, chunksize=1)
+
+    # ---------
+    # column name for join field in original df
+    results_join_field_name = "raw_url"
+    # position of join field in each tuple in task list
+    results_join_field_loc = 2
+    # ---------
+
+    # join download function results back to df
+    results_df = pd.DataFrame(results, columns=["status", "message", "args", results_join_field_name])
+    results_df[results_join_field_name] = results_df[results_join_field_name].apply(lambda x: x[results_join_field_loc])
+
+    output_df = df.merge(results_df, on=results_join_field_name, how="left")
+
+    print("Results:")
+
+    errors_df = output_df[output_df["status"] != 0]
+    print("{} errors found out of {} tasks".format(len(errors_df), len(output_df)))
+
+
+    os.makedirs(os.path.join(output_dir, "results"), exist_ok=True)
+
+    # output results to csv
+    output_path = os.path.join(output_dir, "results", f"data_download_{timestamp}.csv")
+    output_df.to_csv(output_path, index=False)
