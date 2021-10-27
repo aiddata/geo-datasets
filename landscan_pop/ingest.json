@@ -5,7 +5,7 @@
 	"file_mask": "lspopYYYY.tif",
 	"name": "landscan_global_population",
 	"title": "LandScan Population Count",
-	"description": "Estimated population count from LandScan. Underlying dataset provides number of people per 1km pixel, based on an ambient population (average over 24 hours) distribution.",
+	"description": "Estimated population count from LandScan. Underlying dataset provides number of people per 1km pixel, based on an ambient population (average over 24 hours) distribution. Note: This data should not be used for change detection or migration tool (see https://landscan.ornl.gov/frequently-asked-questions for details).",
     "details": "No additional processing of raw data.",
 	"version": 1,
 	"options": {
