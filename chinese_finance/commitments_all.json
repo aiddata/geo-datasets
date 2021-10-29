@@ -4,8 +4,8 @@
 	"file_extension": ".tif",
 	"file_mask": "None",
     "name": "china_osm_v20_commitments_all",
-    "title": "Commitment value of Chinese development projects",
-    "description": "Commitment value of Chinese development projects from AidData's Global Chinese Development Finance Dataset v2.0. The commitment values are associated with a subset of projects from the dataset for which precise locations were found using OpenStreetMaps.",
+    "title": "Monetary value of Chinese ODA and OOF-financed development projects",
+    "description": "Monetary commitment value of Chinese ODA- and OOF-financed projects from AidData's Global Chinese Development Finance Dataset v2.0. These constant 2017 USD values are associated with projects from the dataset for which precise locations were found using OpenStreetMap (OSM).",
     "details": "",
 	"version": "v20",
 	"options": {
