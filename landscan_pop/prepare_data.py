@@ -40,6 +40,9 @@ years = list(range(2000, 2020))
 raw_dir = "/sciclone/aiddata10/REU/geo/raw/landscan/population"
 data_dir = "/sciclone/aiddata10/REU/geo/data/rasters/landscan/population"
 
+run_download = False
+run_extract = False
+run_conversion = True
 
 parallel = True
 max_workers = 16
@@ -67,123 +70,56 @@ if __name__ == "__main__":
     test_request = utility.session.get("https://landscan.ornl.gov/landscan-datasets")
     test_request.raise_for_status()
 
-
-    print("Running download")
     download_dir = os.path.join(raw_dir, "compressed")
-    os.makedirs(download_dir, exist_ok=True)
+    if run_download:
+        print("Running download")
+        os.makedirs(download_dir, exist_ok=True)
 
-    qlist = [(year, os.path.join(download_dir, f"LandScan_Global_{year}.zip")) for year in years]
-    download_results = utility.run_tasks(utility.download_file, qlist, parallel, max_workers=max_workers, chunksize=1)
+        qlist = [(year, os.path.join(download_dir, f"LandScan_Global_{year}.zip")) for year in years]
+        download_results = utility.run_tasks(utility.download_file, qlist, parallel, max_workers=max_workers, chunksize=1)
 
-    print("Saving download results")
-    download_results_df = pd.DataFrame(download_results, columns=["status", "message", "year", "result"])
-    download_results_df["year"] = download_results_df["year"].apply(lambda x: x[0])
-    download_results_df["downloaded_path"] = download_results_df.year.apply(lambda x: os.path.join(download_dir, f"LandScan_Global_{x}.zip"))
+        print("Saving download results")
+        download_results_df = pd.DataFrame(download_results, columns=["status", "message", "year", "result"])
+        download_results_df["year"] = download_results_df["year"].apply(lambda x: x[0])
+        download_results_df["downloaded_path"] = download_results_df.year.apply(lambda x: os.path.join(download_dir, f"LandScan_Global_{x}.zip"))
 
-    download_results_path = os.path.join(raw_dir, f"download_results_{timestamp}.csv")
-    download_results_df.to_csv(download_results_path, index=False)
+        download_results_path = os.path.join(raw_dir, f"download_results_{timestamp}.csv")
+        download_results_df.to_csv(download_results_path, index=False)
 
 
-    # unzip
-    print("Running extract")
     extract_dir = os.path.join(raw_dir, "uncompressed")
-    os.makedirs(extract_dir, exist_ok=True)
+    if run_extract:
+        # unzip
+        print("Running extract")
+        os.makedirs(extract_dir, exist_ok=True)
 
-    qlist = [ ( os.path.join(download_dir, x), os.path.join(extract_dir, x[:-4]) ) for x in os.listdir(download_dir) ]
-    extract_results = utility.run_tasks(utility.unzip_file, qlist, parallel, max_workers=max_workers, chunksize=1)
+        qlist = [ ( os.path.join(download_dir, x), os.path.join(extract_dir, x[:-4]) ) for x in os.listdir(download_dir) ]
+        extract_results = utility.run_tasks(utility.unzip_file, qlist, parallel, max_workers=max_workers, chunksize=1)
 
-    print("Saving extract results")
-    extract_results_df = pd.DataFrame(extract_results, columns=["status", "message", "args", "drop"])
-    extract_results_df["zip"] = extract_results_df["args"].apply(lambda x: x[0])
-    extract_results_df["extract"] = extract_results_df["args"].apply(lambda x: x[1])
-    extract_results_df.drop(["args", "drop"], axis=1, inplace=True)
+        print("Saving extract results")
+        extract_results_df = pd.DataFrame(extract_results, columns=["status", "message", "args", "drop"])
+        extract_results_df["zip"] = extract_results_df["args"].apply(lambda x: x[0])
+        extract_results_df["extract"] = extract_results_df["args"].apply(lambda x: x[1])
+        extract_results_df.drop(["args", "drop"], axis=1, inplace=True)
 
-    extract_results_path = os.path.join(raw_dir, f"extract_results_{timestamp}.csv")
-    extract_results_df.to_csv(extract_results_path, index=False)
-
-
-    # convert from esri grid format to geotiff
-    print("Running conversion")
-    os.makedirs(data_dir, exist_ok=True)
-
-    qlist = [ ( x, os.path.join(data_dir, os.path.basename(x)+'.tif') ) for x in glob.glob(extract_dir + '/*/lspop*') if os.path.isdir(x)]
-    conversion_results = utility.run_tasks(utility.convert_esri_grid_to_geotiff, qlist, parallel, max_workers=max_workers, chunksize=1)
-
-    print("Saving conversion results")
-    conversion_results_df = pd.DataFrame(conversion_results, columns=["status", "message", "args", "drop"])
-    conversion_results_df["extract"] = conversion_results_df["args"].apply(lambda x: x[0])
-    conversion_results_df["geotiff"] = conversion_results_df["args"].apply(lambda x: x[1])
-    conversion_results_df.drop(["args", "drop"], axis=1, inplace=True)
-
-    conversion_results_path = os.path.join(raw_dir, f"conversion_results_{timestamp}.csv")
-    conversion_results_df.to_csv(conversion_results_path, index=False)
+        extract_results_path = os.path.join(raw_dir, f"extract_results_{timestamp}.csv")
+        extract_results_df.to_csv(extract_results_path, index=False)
 
 
+    if run_conversion:
+        # convert from esri grid format to geotiff
+        print("Running conversion")
+        os.makedirs(data_dir, exist_ok=True)
 
+        qlist = [ ( x, os.path.join(data_dir, os.path.basename(x)+'.tif') ) for x in glob.glob(extract_dir + '/**/lspop*', recursive=True) if os.path.isdir(x)]
+        conversion_results = utility.run_tasks(utility.convert_esri_grid_to_geotiff, qlist, parallel, max_workers=max_workers, chunksize=1)
 
+        print("Saving conversion results")
+        conversion_results_df = pd.DataFrame(conversion_results, columns=["status", "message", "args", "drop"])
+        conversion_results_df["extract"] = conversion_results_df["args"].apply(lambda x: x[0])
+        conversion_results_df["geotiff"] = conversion_results_df["args"].apply(lambda x: x[1])
+        conversion_results_df.drop(["args", "drop"], axis=1, inplace=True)
 
-
-
-
-
-
-
-
-timestamp = get_current_timestamp('%Y_%m_%d_%H_%M')
-
-# test connection
-test_request = session.get("https://landscan.ornl.gov/landscan-datasets")
-test_request.raise_for_status()
-
-
-print("Running download")
-download_dir = os.path.join(raw_dir, "compressed")
-os.makedirs(download_dir, exist_ok=True)
-
-qlist = [(year, os.path.join(download_dir, "compressed", f"LandScan_Global_{year}.zip")) for year in years]
-download_results = run_tasks(download_file, qlist, parallel, max_workers=max_workers, chunksize=1)
-
-print("Saving download results")
-download_results_df = pd.DataFrame(download_results, columns=["status", "message", "year", "result"])
-download_results_df["year"] = download_results_df["year"].apply(lambda x: x[0])
-download_results_df["downloaded_path"] = download_results_df.year.apply(lambda x: os.path.join(download_dir, f"LandScan_Global_{x}.zip"))
-
-download_results_path = os.path.join(raw_dir, f"download_results_{timestamp}.csv")
-download_results_df.to_csv(download_results_path, index=False)
-
-
-# unzip
-print("Running extract")
-extract_dir = os.path.join(raw_dir, "uncompressed")
-os.makedirs(extract_dir, exist_ok=True)
-
-qlist = [ ( os.path.join(download_dir, x), extract_dir ) for x in os.listdir(download_dir) ]
-extract_results = run_tasks(unzip_file, qlist, parallel, max_workers=max_workers, chunksize=1)
-
-print("Saving extract results")
-extract_results_df = pd.DataFrame(extract_results, columns=["status", "message", "args", "drop"])
-extract_results_df["zip"] = extract_results_df["args"].apply(lambda x: x[0])
-extract_results_df["extract"] = extract_results_df["args"].apply(lambda x: x[1])
-extract_results_df.drop(["args", "drop"], axis=1, inplace=True)
-
-extract_results_path = os.path.join(raw_dir, f"extract_results_{timestamp}.csv")
-extract_results_df.to_csv(extract_results_path, index=False)
-
-
-# convert from esri grid format to geotiff
-print("Running conversion")
-os.makedirs(data_dir, exist_ok=True)
-
-qlist = [ ( x, os.path.join(data_dir, os.path.basename(x)+'.tif') ) for x in glob.glob(extract_dir + '/*/lspop*') if os.path.isdir(x)]
-conversion_results = run_tasks(convert_esri_grid_to_geotiff, qlist, parallel, max_workers=max_workers, chunksize=1)
-
-print("Saving conversion results")
-conversion_results_df = pd.DataFrame(conversion_results, columns=["status", "message", "args", "drop"])
-conversion_results_df["extract"] = conversion_results_df["args"].apply(lambda x: x[0])
-conversion_results_df["geotiff"] = conversion_results_df["args"].apply(lambda x: x[1])
-conversion_results_df.drop(["args", "drop"], axis=1, inplace=True)
-
-conversion_results_path = os.path.join(raw_dir, f"conversion_results_{timestamp}.csv")
-conversion_results_df.to_csv(conversion_results_path, index=False)
-
+        conversion_results_path = os.path.join(raw_dir, f"conversion_results_{timestamp}.csv")
+        conversion_results_df.to_csv(conversion_results_path, index=False)
 
