@@ -23,8 +23,8 @@ output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/worldpop/population_count
 
 year_list = range(2000, 2021)
 
-mode = "parallel"
-# model = "serial"
+run_parallel = True
+# set to False if running in serial mode
 
 max_workers = 16
 
@@ -46,7 +46,7 @@ def manage_download(url, local_filename):
     while attempts <= max_attempts:
         try:
             download_file(url, local_filename)
-            return
+            return (0, "Downloaded", url)
         except Exception as e:
             attempts += 1
             if attempts > max_attempts:
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     print("Running data download")
 
-    results = run_tasks(manage_download, flist, mode, max_workers=max_workers, chunksize=1)
+    results = run_tasks(manage_download, flist, run_parallel, max_workers=max_workers, chunksize=1)
 
     # ---------
     # column name for join field in original df
