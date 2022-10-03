@@ -4,7 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "cru.pre.YYYYMM.tif",
 	"name": "cru_ts_405_pre_monthly_mean",
-	"title": "Monthly Precipication - CRU TS (v4.05)",
+	"title": "Monthly Precipitation - CRU TS (v4.05)",
 	"description": "Montly precipitation from Climate Research Unit (CRU) in millimeters. Version 4.05",
     "details": "Created by extracting monthly precipitation data from CRU",
 	"version": "4.05",
