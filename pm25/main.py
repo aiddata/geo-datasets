@@ -28,7 +28,7 @@ year_list = range(2003, 2004)
 #CHANGE VAR
 month_list = range(1, 3)
 
-timestamp = get_current_timestamp('%Y_%m_%d_%H_%M')
+timestamp = get_current_timestamp("%Y_%m_%d_%H_%M")
 
 #CHANGE VAR: adjust based on whether you want parallel processing
 run_parallel = True
@@ -40,35 +40,35 @@ max_workers = 4
 def convert_file(input_path, output_path):
     #converts nc file to tiff file, compatible with parallel processing system
     overwrite = False
-    if file_exists(output_path) and not overwrite:
+    if os.path.isfile(output_path) and not overwrite:
         return (output_path, "Exists", 0)
     try:
         rootgrp = Dataset(input_path, "r", format="NETCDF4")
 
-        lon_min = rootgrp.variables['lon'][:].min()
-        lon_max = rootgrp.variables['lon'][:].max()
-        lon_size = len(rootgrp.variables['lon'][:])
-        lon_res = rootgrp.variables['lon'][1] - rootgrp.variables['lon'][0]
+        lon_min = rootgrp.variables["lon"][:].min()
+        lon_max = rootgrp.variables["lon"][:].max()
+        lon_size = len(rootgrp.variables["lon"][:])
+        lon_res = rootgrp.variables["lon"][1] - rootgrp.variables["lon"][0]
         lon_res_true = 0.0099945068359375
 
-        lat_min = rootgrp.variables['lat'][:].min()
-        lat_max = rootgrp.variables['lat'][:].max()
-        lat_size = len(rootgrp.variables['lat'][:])
+        lat_min = rootgrp.variables["lat"][:].min()
+        lat_max = rootgrp.variables["lat"][:].max()
+        lat_size = len(rootgrp.variables["lat"][:])
         lat_res_true = 0.009998321533203125
-        lat_res = rootgrp.variables['lat'][1] - rootgrp.variables['lat'][0]
+        lat_res = rootgrp.variables["lat"][1] - rootgrp.variables["lat"][0]
 
-        data = np.flip(rootgrp.variables['GWRPM25'][:], axis=0)
+        data = np.flip(rootgrp.variables["GWRPM25"][:], axis=0)
 
         meta = {
-            'driver': 'GTiff',
-            'dtype': 'float32',
-            'nodata': data.fill_value,
-            'width': lon_size,
-            'height': lat_size,
-            'count': 1,
-            'crs': {'init': 'epsg:4326'},
-            'compress': 'lzw',
-            'transform': Affine(lon_res, 0.0, lon_min,
+            "driver": "GTiff",
+            "dtype": "float32",
+            "nodata": data.fill_value,
+            "width": lon_size,
+            "height": lat_size,
+            "count": 1,
+            "crs": {"init": "epsg:4326"},
+            "compress": "lzw",
+            "transform": Affine(lon_res, 0.0, lon_min,
                                 0.0, -lat_res, lat_max)
             }
 
