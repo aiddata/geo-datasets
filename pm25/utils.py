@@ -7,37 +7,58 @@ import time
 import datetime
 import warnings
 import rasterio
+import numpy as np
+from affine import Affine
+from netCDF4 import Dataset
 
+use_prefect = False
 
 def get_current_timestamp(format_str="'%Y_%m_%d_%H_%M"):
     return datetime.datetime.fromtimestamp(int(time.time())).strftime(format_str)
 
-def run_tasks(func, flist, mode, max_workers=None, chunksize=1):
-    # run all downloads (parallel and serial options)
-    if mode == "parallel":
 
-        # see: https://mpi4py.readthedocs.io/en/stable/mpi4py.futures.html
-        from mpi4py.futures import MPIPoolExecutor
 
-        if max_workers is None:
+def convert_file(input_path, output_path):
+    #converts nc file to tiff file, compatible with parallel processing system
+    overwrite = False
+    if os.path.isfile(output_path) and not overwrite:
+        return (output_path, "Exists", 0)
+    try:
+        rootgrp = Dataset(input_path, "r", format="NETCDF4")
 
-            if "OMPI_UNIVERSE_SIZE" not in os.environ:
-                raise ValueError("Mode set to parallel but max_workers not specified and OMPI_UNIVERSE_SIZE env var not found")
+        lon_min = rootgrp.variables["lon"][:].min()
+        lon_max = rootgrp.variables["lon"][:].max()
+        lon_size = len(rootgrp.variables["lon"][:])
+        lon_res = rootgrp.variables["lon"][1] - rootgrp.variables["lon"][0]
+        lon_res_true = 0.0099945068359375
 
-            max_workers = os.environ["OMPI_UNIVERSE_SIZE"]
-            warnings.warn(f"Mode set to parallel but max_workers not specified. Defaulting to OMPI_UNIVERSE_SIZE env var value ({max_workers})")
+        lat_min = rootgrp.variables["lat"][:].min()
+        lat_max = rootgrp.variables["lat"][:].max()
+        lat_size = len(rootgrp.variables["lat"][:])
+        lat_res_true = 0.009998321533203125
+        lat_res = rootgrp.variables["lat"][1] - rootgrp.variables["lat"][0]
 
-        with MPIPoolExecutor(max_workers=max_workers) as executor:
-            results_gen = executor.starmap(func, flist, chunksize=chunksize)
+        data = np.flip(rootgrp.variables["GWRPM25"][:], axis=0)
 
-        results = list(results_gen)
+        meta = {
+            "driver": "GTiff",
+            "dtype": "float32",
+            "nodata": data.fill_value,
+            "width": lon_size,
+            "height": lat_size,
+            "count": 1,
+            "crs": {"init": "epsg:4326"},
+            "compress": "lzw",
+            "transform": Affine(lon_res, 0.0, lon_min,
+                                0.0, -lat_res, lat_max)
+            }
 
-    else:
-        results = []
-        for i in flist:
-            results.append(func(*i))
 
-    return results
+        export_raster(np.array([data.data]), output_path, meta)
+        
+        return(output_path, "Converted", 0)
+    except Exception as e:
+        return(output_path, repr(e), 1)
 
                 
 def export_raster(data, path, meta, **kwargs):

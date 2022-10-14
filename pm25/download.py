@@ -51,11 +51,11 @@ if __name__ == "__main__":
             monthly_item = i
     # download Annual files, if we found them
     if annual_item:
-        download_items(annual_item, "input_files/Annual/")
+        download_items(annual_item, "input_data/Annual/")
     else:
         print("Couldn't find an Annual folder")
     # download Monthly files, if we found them
     if monthly_item:
-        download_items(monthly_item, "input_files/Monthly/")
+        download_items(monthly_item, "input_data/Monthly/")
     else:
         print("Couldn't find a Monthly folder")

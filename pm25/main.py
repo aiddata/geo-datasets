@@ -5,21 +5,17 @@ import warnings
 import os
 import pandas as pd
 
-import rasterio
-from affine import Affine
-from netCDF4 import Dataset
-import numpy as np
-
-from utils import get_current_timestamp, file_exists, export_raster, run_tasks
+from utils import get_current_timestamp, export_raster, convert_file
+from prefect_wrapper import convert_wrapper
 
 # -------------------------------------
 #CHANGE VAR
-input_dir = "/home/jacob/Documents/geo-datasets/pm25/output_data"
+input_dir = "/home/jacob/Documents/geo-datasets/pm25/input_data/"
 input_path_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.nc"
 
 #CONSIDER: Changing the output file name to something cleaner
 #CHANGE VAR
-input_dir = "/home/jacob/Documents/geo-datasets/pm25/output_data"
+output_dir = "/home/jacob/Documents/geo-datasets/pm25/output_data"
 output_path_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.tif"
 
 #CHANGE VAR
@@ -31,79 +27,113 @@ month_list = range(1, 3)
 timestamp = get_current_timestamp("%Y_%m_%d_%H_%M")
 
 #CHANGE VAR: adjust based on whether you want parallel processing
-run_parallel = True
+run_parallel = False
 
 #CHANGE VAR: adjust based on system's maximum workers
 max_workers = 4
-# -------------------------------------
 
-def convert_file(input_path, output_path):
-    #converts nc file to tiff file, compatible with parallel processing system
-    overwrite = False
-    if os.path.isfile(output_path) and not overwrite:
-        return (output_path, "Exists", 0)
-    try:
-        rootgrp = Dataset(input_path, "r", format="NETCDF4")
-
-        lon_min = rootgrp.variables["lon"][:].min()
-        lon_max = rootgrp.variables["lon"][:].max()
-        lon_size = len(rootgrp.variables["lon"][:])
-        lon_res = rootgrp.variables["lon"][1] - rootgrp.variables["lon"][0]
-        lon_res_true = 0.0099945068359375
-
-        lat_min = rootgrp.variables["lat"][:].min()
-        lat_max = rootgrp.variables["lat"][:].max()
-        lat_size = len(rootgrp.variables["lat"][:])
-        lat_res_true = 0.009998321533203125
-        lat_res = rootgrp.variables["lat"][1] - rootgrp.variables["lat"][0]
-
-        data = np.flip(rootgrp.variables["GWRPM25"][:], axis=0)
-
-        meta = {
-            "driver": "GTiff",
-            "dtype": "float32",
-            "nodata": data.fill_value,
-            "width": lon_size,
-            "height": lat_size,
-            "count": 1,
-            "crs": {"init": "epsg:4326"},
-            "compress": "lzw",
-            "transform": Affine(lon_res, 0.0, lon_min,
-                                0.0, -lat_res, lat_max)
-            }
-
-
-        export_raster(np.array([data.data]), output_path, meta)
-        
-        return(output_path, "Converted", 0)
-    except Exception as e:
-        return(output_path, repr(e), 1)
+use_prefect = True
 
 # -------------------------------------
+
 if __name__ == "__main__":
 
     print("Preparing Data Conversion:")
-
-    os.makedirs(output_dir, exist_ok=True)
+    
+    # create output directories
+    os.makedirs(os.path.join(output_dir, "Monthly"), exist_ok=True)
+    os.makedirs(os.path.join(output_dir, "Annual"), exist_ok=True)
 
     input_path_list = []
     output_path_list = []
-    #CONSIDER: find a way to set each year's month range individually so if researcher wants different months for each year can adjust
+    
+    # run annual data
+    for f in os.listdir(os.path.join(output_dir, "Annual")):
+        input_path_list.append(os.path.join(output_dir, "Annual", f))
+        output_path_list.append(os.path.join(output_dir, "Annual", f))
+
+    # run monthly data
+    # TODO: find a way to set each year's month range individually so if researcher wants different months for each year can adjust
     for year in year_list:
         for month in month_list:
             if month < 10:
                 month = "0" + str(month)
             input_path = input_path_template.format(YEAR = year, MONTH = month)
-            input_path_list.append(os.path.join(input_dir, input_path))
+            input_path_list.append(os.path.join(input_dir, "Monthly", input_path))
 
             output_path = output_path_template.format(YEAR = year, MONTH = month)
-            output_path_list.append(os.path.join(output_dir, output_path))
+            output_path_list.append(os.path.join(output_dir, "Monthly", output_path))
     df = pd.DataFrame({"input_file_path": input_path_list, "output_file_path": output_path_list})
     flist = list(zip(df["input_file_path"], df["output_file_path"]))
 
     print("Running Data Conversion:")
 
-    results = run_tasks(convert_file, flist, run_parallel, max_workers=max_workers, chunksize=1)
+    if use_prefect:
+        # make sure prefect is available
+        # TODO: handle error if prefect is not available
+        from prefect import flow
+        prefect_task_runner = None
+        if run_parallel:
+            from prefect_dask import DaskTaskRunner
+            from dask_jobqueue import PBSCluster
+            prefect_task_runner = DaskTaskRunner(**dask_task_runner_kwargs)
+            cluster_kwargs = {
+                "name": "ajh:ape",
+                "shebang": "#!/bin/tcsh",
+                "resource_spec": "nodes=1:c18a:ppn=12",
+                "walltime": "00:20:00",
+                "cores": 12,
+                "processes": 12,
+                "memory": "30GB",
+                "interface": "ib0",
+                "job_script_prologue": ["cd " + os.getcwd()]
+                # "job_extra_directives": ["-j oe"],
+            }
+
+            adapt_kwargs = {
+                "minimum": 12,
+                "maximum": 12,
+            }
+
+            dask_task_runner_kwargs = {
+                "cluster_class": PBSCluster,
+                "cluster_kwargs": cluster_kwargs,
+                "adapt_kwargs": adapt_kwargs,
+            }
+    
+        @flow(task_runner=prefect_task_runner)
+        def test_prefect_flow(flist):
+            # TODO: submit all tasks, then cache results
+            results = []
+            for i in flist:
+                results.append(convert_wrapper(*i))
+            return results
+
+        results = test_prefect_flow(flist)
+    else:
+        # run all downloads (parallel and serial options)
+        if run_parallel:
+
+            # see: https://mpi4py.readthedocs.io/en/stable/mpi4py.futures.html
+            from mpi4py.futures import MPIPoolExecutor
+
+            if max_workers is None:
+
+                if "OMPI_UNIVERSE_SIZE" not in os.environ:
+                    raise ValueError("Mode set to parallel but max_workers not specified and OMPI_UNIVERSE_SIZE env var not found")
+
+                max_workers = os.environ["OMPI_UNIVERSE_SIZE"]
+                warnings.warn(f"Mode set to parallel but max_workers not specified. Defaulting to OMPI_UNIVERSE_SIZE env var value ({max_workers})")
+
+            with MPIPoolExecutor(max_workers=max_workers) as executor:
+                results_gen = executor.starmap(convert_file, flist, chunksize=chunksize)
+
+            results = list(results_gen)
+
+        else:
+            results = []
+            for i in flist:
+                results.append(convert_file(*i))
 
     print("Results:")
     
