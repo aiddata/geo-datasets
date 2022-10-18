@@ -1,35 +1,28 @@
 # for converting MONTHLY pm data downloaded from https://wustl.app.box.com/v/ACAG-V5GL02-GWRPM25/folder/148055008434 
 # version: multiple file download - HPC version, based off Dr. Goodman's script for converting nc file to tiff image, MONTHLY data
 
-import warnings
 import os
+import warnings
 import pandas as pd
 
-from utils import get_current_timestamp, export_raster, convert_file
-from prefect_wrapper import convert_wrapper
+from utils import get_current_timestamp, convert_file
 
 # -------------------------------------
-#CHANGE VAR
-input_dir = "/home/jacob/Documents/geo-datasets/pm25/input_data/"
+
+input_dir = os.path.join(os.getcwd(), "input_data")
 input_path_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.nc"
 
-#CONSIDER: Changing the output file name to something cleaner
-#CHANGE VAR
-output_dir = "/home/jacob/Documents/geo-datasets/pm25/output_data"
+output_dir = os.path.join(os.getcwd(), "output_data")
 output_path_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.tif"
 
-#CHANGE VAR
-year_list = range(2003, 2004)
+year_list = [2008, 2009]
 
-#CHANGE VAR
-month_list = range(1, 3)
+month_list = range(2, 3)
 
 timestamp = get_current_timestamp("%Y_%m_%d_%H_%M")
 
-#CHANGE VAR: adjust based on whether you want parallel processing
 run_parallel = False
 
-#CHANGE VAR: adjust based on system's maximum workers
 max_workers = 4
 
 use_prefect = True
@@ -48,8 +41,8 @@ if __name__ == "__main__":
     output_path_list = []
     
     # run annual data
-    for f in os.listdir(os.path.join(output_dir, "Annual")):
-        input_path_list.append(os.path.join(output_dir, "Annual", f))
+    for f in os.listdir(os.path.join(input_dir, "Annual")):
+        input_path_list.append(os.path.join(input_dir, "Annual", f))
         output_path_list.append(os.path.join(output_dir, "Annual", f))
 
     # run monthly data
@@ -71,12 +64,13 @@ if __name__ == "__main__":
     if use_prefect:
         # make sure prefect is available
         # TODO: handle error if prefect is not available
-        from prefect import flow
-        prefect_task_runner = None
+        from prefect import task, flow
+        from prefect.task_runners import SequentialTaskRunner
+        from prefect_wrapper import task_wrapper
+        prefect_task_runner = SequentialTaskRunner
         if run_parallel:
             from prefect_dask import DaskTaskRunner
             from dask_jobqueue import PBSCluster
-            prefect_task_runner = DaskTaskRunner(**dask_task_runner_kwargs)
             cluster_kwargs = {
                 "name": "ajh:ape",
                 "shebang": "#!/bin/tcsh",
@@ -100,14 +94,15 @@ if __name__ == "__main__":
                 "cluster_kwargs": cluster_kwargs,
                 "adapt_kwargs": adapt_kwargs,
             }
+
+            prefect_task_runner = DaskTaskRunner(**dask_task_runner_kwargs)
     
         @flow(task_runner=prefect_task_runner)
         def test_prefect_flow(flist):
-            # TODO: submit all tasks, then cache results
-            results = []
+            task_futures = []
             for i in flist:
-                results.append(convert_wrapper(*i))
-            return results
+                task_futures.append(task_wrapper.submit(convert_file, *i))
+            return [t.result() for t in task_futures]
 
         results = test_prefect_flow(flist)
     else:
