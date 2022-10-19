@@ -41,7 +41,7 @@ def convert_file(input_path, output_path):
         data = np.flip(rootgrp.variables["GWRPM25"][:], axis=0)
 
         meta = {
-            "driver": "GTiff",
+            "driver": "COG",
             "dtype": "float32",
             "nodata": data.fill_value,
             "width": lon_size,
