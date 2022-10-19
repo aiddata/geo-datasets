@@ -1,6 +1,6 @@
 # Surface PM2.5
 
-[Link to dataset](https://sites.wustl.edu/acag/datasets/surface-pm2-5/)
+This is the [Surface PM2.5 dataset](https://sites.wustl.edu/acag/datasets/surface-pm2-5/) from the [Atmospheric Composition Analysis Group](https://sites.wustl.edu/acag/) at Washington University in St. Louis.
 
 ## Downloading
 
@@ -39,3 +39,33 @@
    python download.py
    ```
 8. The hour time limit runs out on your Developer Token, so you'll need to generate another one and re-run the script. It will automatically check the hashes of every file, skipping the ones that are good.
+
+## Processing
+
+### Install conda environment
+
+- If you are using Linux, it's probably easiest to load up the existing conda environment in this repository:
+  ```
+  conda env create -f env.yaml
+  conda activate pm25
+  ```
+- Alternatively, run `create_env.sh` to build the dependencies for your platform:
+  ```
+  chmod +x create_env.sh
+  ./create_env.sh
+  ```
+
+### Tweak settings in `main.py`
+
+Near the top of `main.py`, there are a few options you should review before running this project.
+Choose whether or not you'd like to use prefect, and set run_parallel to True if you are using the HPC.
+
+### Run script
+
+The results will be written to the `output_data` subdirectory, which will be automatically created if it didn't exist already.
+
+```
+python main.py
+```
+
+If you are using the W&M HPC, tweak `jobscript` and then run `qsub jobscript`
