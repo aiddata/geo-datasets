@@ -1,0 +1,6 @@
+*.zip
+original_dev_scripts/
+logs/
+data/h5_tiles
+data/tif_tiles
+data/tif_mosaic
