@@ -4,3 +4,4 @@ logs/
 data/h5_tiles
 data/tif_tiles
 data/tif_mosaic
+__pycache__
