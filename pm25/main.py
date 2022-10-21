@@ -5,6 +5,7 @@ import os
 import warnings
 import pandas as pd
 
+from download import download_data
 from utils import get_current_timestamp, convert_file
 from run_tasks import run_tasks
 
@@ -20,11 +21,20 @@ year_list = [2008, 2009]
 
 timestamp = get_current_timestamp("%Y_%m_%d_%H_%M")
 
+# can be "mpi" or "parallel"
+# any other value will run the project locally
 backend = None
 
 run_parallel = False
 
 max_workers = 4
+
+# skip existing files while downloading?
+skip_existing = True
+
+# verify existing files' hashes while downloading?
+# (skip_existing must be set to True above)
+verify_existing = True
 
 # -------------------------------------
 
@@ -57,14 +67,19 @@ def gen_task_list():
 
 if __name__ == "__main__":
 
-    print("Preparing Data Conversion:")
+    print("Downloading / Verifying Data")
+
+    download_data(skip_existing=skip_existing, verify_existing=verify_existing)
+
+    print("Generating Task List")
+
     df, flist = gen_task_list()
 
-    print("Running Data Conversion:")
+    print("Running Data Conversion")
 
     results = run_tasks(task_list=flist, task_func=convert_file, backend=backend, run_parallel=False)
 
-    print("Results:")
+    print("Compiling Results")
     
     results_df = pd.DataFrame(results, columns=["output_file_path", "message", "status"])
 
