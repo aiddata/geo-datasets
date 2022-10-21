@@ -1,5 +1,5 @@
 
-## WorldPop 1km Mosaic of Population Count
+## Malaria Atlast - PF Incidence Dataset
 
 To run:
 1.  If on HPC (vortex-alpha nodes), prepare modules and base environment
