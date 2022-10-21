@@ -3,9 +3,9 @@ import hashlib
 from boxsdk import OAuth2, Client
 
 auth = OAuth2(
-    client_id='YOUR_CLIENT_ID',
+    client_id="YOUR_CLIENT_ID",
     client_secret="",
-    access_token='YOUR_DEVELOPER_TOKEN',
+    access_token="YOUR_DEVELOPER_TOKEN",
 )
 
 def sha1(filename):
