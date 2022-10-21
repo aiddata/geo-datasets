@@ -17,7 +17,7 @@ input_path_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.nc"
 output_dir = os.path.join(os.getcwd(), "output_data")
 output_path_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.tif"
 
-year_list = [2008, 2009]
+year_list = [1998, 2020]
 
 timestamp = get_current_timestamp("%Y_%m_%d_%H_%M")
 
