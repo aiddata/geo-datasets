@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
     print("Running Data Conversion")
 
-    results = run_tasks(task_list=flist, task_func=convert_file, backend=backend, run_parallel=False)
+    results = run_tasks(task_list=flist, task_func=convert_file, backend=backend, run_parallel=run_parallel, max_workers=max_workers)
 
     print("Compiling Results")
     
