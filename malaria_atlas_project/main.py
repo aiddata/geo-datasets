@@ -10,30 +10,18 @@ from pathlib import Path
 
 import pandas as pd
 
-from utility import get_current_timestamp
-from download import  manage_download, copy_files
+from utility import get_current_timestamp, manage_download, task
 from run_tasks import run_tasks
 
 # -------------------------------------
 
 timestamp = get_current_timestamp('%Y_%m_%d_%H_%M')
 
+raw_data_base_dir = Path("/sciclone/aiddata10/REU/geo/raw/malaria_atlas_project")
+processed_data_base_dir = Path("/sciclone/aiddata10/REU/geo/data/rasters/malaria_atlas_project")
+
 # change var = if want to download a different variant's data
-data_zipFile_url = 'https://data.malariaatlas.org/geoserver/Malaria/ows?service=CSW&version=2.0.1&request=DirectDownload&ResourceId=Malaria:202206_Global_Pf_Incidence_Rate'
-data_name = "202206_Global_Pf_Incidence_Rate"
-
-
-
-# base_dir = Path('/sciclone/aiddata10/REU/geo')
-# raw_data_dir = base_dir / "raw/malaria_data/1km_mosaic"
-# processed_data_dir = base_dir / "data/malaria_data/1km_mosaic"
-# log_dir = base_dir / "data/malaria_data/1km_mosaic/logs"
-
-base_dir = Path('/home/userx/Desktop')
-raw_data_dir = base_dir / "malaria_data/1km_mosaic/raw_data"
-processed_data_dir = base_dir / "malaria_data/1km_mosaic/data"
-log_dir = base_dir / "malaria_data/1km_mosaic/logs"
-
+dataset = "pf_incidence_rate"
 
 # change var = set to year range wanted
 year_list = range(2000, 2021)
@@ -44,25 +32,41 @@ run_parallel = True
 # change var: set max_workers to own max_workers
 max_workers = 12
 
+dataset_lookup = {
+    "pf_incidence_rate": {
+        "data_zipFile_url": 'https://data.malariaatlas.org/geoserver/Malaria/ows?service=CSW&version=2.0.1&request=DirectDownload&ResourceId=Malaria:202206_Global_Pf_Incidence_Rate',
+        "data_name": "202206_Global_Pf_Incidence_Rate"
+    },
+}
+
+
 # -------------------------------------
 
-raw_data_dir.mkdir(parents=True, exist_ok=True)
+data_info = dataset_lookup[dataset]
+
+raw_data_zip_dir = raw_data_base_dir / "zip" / dataset
+raw_data_geotiff_dir = raw_data_base_dir / "geotiff" / dataset
+processed_data_dir = processed_data_base_dir / dataset
+log_dir = processed_data_dir / "logs"
+
+raw_data_zip_dir.mkdir(parents=True, exist_ok=True)
+raw_data_geotiff_dir.mkdir(parents=True, exist_ok=True)
 processed_data_dir.mkdir(parents=True, exist_ok=True)
 log_dir.mkdir(parents=True, exist_ok=True)
+
+
+
+
+print("Running data download")
 
 # test connection
 test_request = requests.get("https://data.malariaatlas.org", verify=True)
 test_request.raise_for_status()
 
-
-print("Running data download")
-
-
-
-zipFileLocalName = os.path.join(raw_data_dir, data_name + ".zip")
+zipFileLocalName = os.path.join(raw_data_zip_dir, data_info["name"] + ".zip")
 
 # download data zipFile from url to the local output directory
-manage_download(data_zipFile_url, zipFileLocalName)
+manage_download(data_info["data_zipFile_url"], zipFileLocalName)
 
 # create zipFile to check if data was properly downloaded
 try:
@@ -71,41 +75,42 @@ except:
     print("Could not read downloaded zipfile")
     raise
 
+
+print("Copying data files")
+
 # validate years for processing
 zip_years = sorted([int(i[-8:-4]) for i in dataZip.namelist() if i.endswith('.tif')])
 years = [i for i in year_list if i in zip_years]
 if len(year_list) != len(years):
     warnings.warn(f'Years specificed for processing which were not in downloaded data {set(year_list).symmetric_difference(set(years))}')
 
-
-print("Copying data files")
-
 df_list = []
 for year in years:
-    year_file_name = f'{data_name}_{year}.tif'
+    year_file_name = f'{year}.tif'
     item = {
-        "zipFile": zipFileLocalName,
-        "zipfile_loc": year_file_name,
-        "output_loc": os.path.join(processed_data_dir, year_file_name)
+        "zip_path": zipFileLocalName,
+        "zip_file": year_file_name,
+        "tif_path": raw_data_geotiff_dir / year_file_name,
+        "cog_path": processed_data_base_dir / year_file_name
     }
     df_list.append(item)
 
 df = pd.DataFrame(df_list)
 
 # generate list of tasks to iterate over
-flist = list(zip(df["zipFile"], df["zipfile_loc"], df["output_loc"]))
+flist = list(zip(df["zip_path"], df["zip_file"], df["tif_path"], df["cog_path"]))
 
 # unzip data zipFile and copy the years wanted
-results = run_tasks(copy_files, flist, backend=None, run_parallel=run_parallel, add_error_wrapper=True, max_workers=max_workers)
+results = run_tasks(task, flist, backend=None, run_parallel=run_parallel, add_error_wrapper=True, max_workers=max_workers)
 
 
 
 print("Results:")
 
 # join download function results back to df
-results_df = pd.DataFrame(results, columns=["status", "message", "output_loc"])
+results_df = pd.DataFrame(results, columns=["status", "message", "cog_path"])
 
-output_df = df.merge(results_df, on="output_loc", how="left")
+output_df = df.merge(results_df, on="cog_path", how="left")
 
 errors_df = output_df[output_df["status"] != 0]
 print("{} errors found out of {} tasks".format(len(errors_df), len(output_df)))
