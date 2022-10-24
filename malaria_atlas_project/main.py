@@ -1,6 +1,24 @@
-# download incidence data for Plasmodium falciparum species of malaria, data available 2000-2020, downloads as single-band LZW-compressed GeoTIFF files at 2.5 arcminute resolution
-# download the zip file for all the data, then extract data for years wanted into the main directory
-# link: https://malariaatlas.org/malaria-burden-data-download/
+"""
+Download and prepare data from the Malaria Atlas Project
+
+https://data.malariaatlas.org
+
+Data is no longer directly available from a file server but is instead provided via a GeoServer instance.
+This can still be retrieved using a standard request call but to determine the proper URL requires initiating the download via their website mapping platform and tracing the corresponding network call. This process only needs to be done once for new datasets; URLs for the datasets listed below have already been identifed.
+
+
+Current download options:
+- pf_incidence_rate: incidence data for Plasmodium falciparum species of malaria (rate per 1000 people)
+
+
+Unless otherwise specified, all datasets are:
+- global
+- from 2000-2020
+- downloaded as a single zip file containing each datasets (all data in zip root directory)
+- single band LZW-compressed GeoTIFF files at 2.5 arcminute resolution
+
+
+"""
 
 import os
 import requests

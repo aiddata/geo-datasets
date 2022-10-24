@@ -4,8 +4,8 @@
 	"file_extension": ".tif",
 	"file_mask": "YYYY.tif",
 	"name": "map_pf_incidence_rate",
-    "title": "Malaria Atlas Project - Pf Incidence Rate",
-    "description": "Number of newly diagnosed Plasmodium falciparum cases per 1,000 population, on a given year",
+    "title": "Malaria Atlas Project - Malaria (Pf) Incidence Rate",
+    "description": "Number of newly diagnosed Malaria (Plasmodium falciparum) cases per 1,000 population, in a given year",
     "details": "",
 	"version": 2020,
 	"options": {
@@ -22,7 +22,7 @@
 		"pixel_check": false
 	},
 	"extras": {
-	    "citation": "",
+	    "citation": "Hay, S.I. and Snow, R.W., 2006. The Malaria Atlas Project: developing global maps of malaria risk. PLoS medicine, 3(12), p.e473.",
 	    "sources_web": "https://data.malariaatlas.org/",
 	    "sources_name": "Malaria Atlas Project",
 	    "tags": ["malaria", "health", "welfare"]
