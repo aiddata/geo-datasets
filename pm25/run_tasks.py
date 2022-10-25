@@ -6,18 +6,22 @@ cluster_kwargs = {
     "name": "ajh:ape",
     "shebang": "#!/bin/tcsh",
     "resource_spec": "nodes=1:c18a:ppn=12",
-    "walltime": "00:20:00",
-    "cores": 12,
-    "processes": 12,
-    "memory": "30GB",
+    "walltime": "01:00:00",
+    "cores": 10,
+    "processes": 1,
+    "memory": "26GB",
     "interface": "ib0",
-    "job_script_prologue": ["cd " + os.getcwd()]
+    "job_script_prologue": [
+        "module load anaconda3/2021.05",
+        "conda activate " + os.environ["CONDA_DEFAULT_ENV"],
+        "cd " + os.getcwd(),
+    ]
     # "job_extra_directives": ["-j oe"],
 }
 
 adapt_kwargs = {
-    "minimum": 12,
-    "maximum": 12,
+    "minimum": 15,
+    "maximum": 15,
 }
 
 
@@ -50,7 +54,7 @@ def _simple_wrapper(func, args):
     return func(*args)
 
 
-def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrapper=False, cluster_kwargs=None, adapt_kwargs=None, retries=1):
+def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrapper=False, cluster_kwargs=cluster_kwargs, adapt_kwargs=adapt_kwargs, retries=3, **kwargs):
 
     from prefect import task, flow
     from prefect.task_runners import SequentialTaskRunner, ConcurrentTaskRunner
@@ -80,7 +84,6 @@ def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrappe
 
 
     if add_error_wrapper:
-        print("\n\n\nHIIII\n\n\n")
         @task(retries=retries)
         def prefect_task_wrapper(func, *args, **kwargs):
             ctx = get_run_context()
@@ -93,8 +96,6 @@ def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrappe
             else:
                 return (0, "Success", func(*args, **kwargs))
     else:
-        print("\n\n\nNOOOOO\n\n\n")
-
         @task(retries=retries)
         def prefect_task_wrapper(func, *args, **kwargs):
             return func(*args, **kwargs)
@@ -112,7 +113,7 @@ def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrappe
     return results
 
 
-def run_mpi_tasks(task_func, task_list, add_error_wrapper=False, max_workers=None, chunksize=1):
+def run_mpi_tasks(task_func, task_list, max_workers=None, chunksize=1, add_error_wrapper=False):
 
     # see: https://mpi4py.readthedocs.io/en/stable/mpi4py.futures.html
     from mpi4py.futures import MPIPoolExecutor
@@ -168,4 +169,3 @@ def run_standard_tasks(task_func, task_list, add_error_wrapper=False):
             results.append(task_func(*i))
 
     return results
-
