@@ -18,7 +18,7 @@ input_filename_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.
 output_dir = PurePath(os.getcwd(), "output_data")
 output_filename_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.tif"
 
-year_list = [1998, 2020]
+year_list = range(1998, 2020)
 
 timestamp = get_current_timestamp("%Y_%m_%d_%H_%M")
 
