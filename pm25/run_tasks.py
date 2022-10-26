@@ -113,7 +113,7 @@ def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrappe
     return results
 
 
-def run_mpi_tasks(task_func, task_list, max_workers=None, chunksize=1, add_error_wrapper=False):
+def run_mpi_tasks(task_func, task_list, add_error_wrapper=False, max_workers=None, chunksize=1):
 
     # see: https://mpi4py.readthedocs.io/en/stable/mpi4py.futures.html
     from mpi4py.futures import MPIPoolExecutor

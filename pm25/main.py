@@ -18,11 +18,11 @@ input_filename_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.
 output_dir = PurePath(os.getcwd(), "output_data")
 output_filename_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.tif"
 
-year_list = range(1998, 2020)
+year_list = range(1998, 2021)
 
 timestamp = get_current_timestamp("%Y_%m_%d_%H_%M")
 
-# can be "mpi" or "parallel"
+# can be "mpi" or "prefect"
 # any other value will run the project locally
 backend = None
 
@@ -56,7 +56,7 @@ def gen_task_list():
     # run monthly data
     # TODO: find a way to set each year's month range individually so if researcher wants different months for each year can adjust
     for year in year_list:
-        for i in range(1, 12):
+        for i in range(1, 13):
             month = str(i).zfill(2)
             input_path = input_filename_template.format(YEAR = year, MONTH = month)
             input_path_list.append(input_dir / "Monthly" / input_path)
