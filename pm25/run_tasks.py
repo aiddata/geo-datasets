@@ -3,11 +3,11 @@ import warnings
 
 
 cluster_kwargs = {
-    "name": "ajh:ape",
+    "name": "geo:pm25",
     "shebang": "#!/bin/tcsh",
     "resource_spec": "nodes=1:c18a:ppn=12",
     "walltime": "01:00:00",
-    "cores": 10,
+    "cores": 1,
     "processes": 1,
     "memory": "26GB",
     "interface": "ib0",
@@ -20,8 +20,8 @@ cluster_kwargs = {
 }
 
 adapt_kwargs = {
-    "minimum": 15,
-    "maximum": 15,
+    "minimum": 16,
+    "maximum": 16,
 }
 
 
@@ -106,7 +106,17 @@ def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrappe
         task_futures = []
         for i in task_list:
             task_futures.append(prefect_task_wrapper.submit(task_func, *i))
-        return [t.result() for t in task_futures]
+        tf_results = []
+        while len(task_futures) > 0:
+            for i, tf in enumerate(task_futures):
+                try:
+                    result = tf.result()
+                except MissingResult:
+                    pass
+                else:
+                    tf_results.append(result)
+                    task_futures.pop(i)
+        return tf_results
 
     results = build_prefect_flow(task_list)
 
