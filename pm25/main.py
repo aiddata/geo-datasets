@@ -13,10 +13,8 @@ from run_tasks import run_tasks
 # -------------------------------------
 
 input_dir = PurePath(os.getcwd(), "input_data")
-input_filename_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.nc"
-
+filename_template = "V5GL02.HybridPM25.Global.{YEAR}{FIRST_MONTH}-{YEAR}{LAST_MONTH}"
 output_dir = PurePath(os.getcwd(), "output_data")
-output_filename_template = "V5GL02.HybridPM25.Global.{YEAR}{MONTH}-{YEAR}{MONTH}.tif"
 
 year_list = range(1998, 2021)
 
@@ -24,10 +22,11 @@ timestamp = get_current_timestamp("%Y_%m_%d_%H_%M")
 
 # can be "mpi" or "prefect"
 # any other value will run the project locally
-backend = None
+backend = "prefect"
 
-run_parallel = False
+run_parallel = True
 
+# this only applies if backend == "mpi"
 max_workers = 4
 
 # skip existing files while downloading?
@@ -49,20 +48,29 @@ def gen_task_list():
     output_path_list = []
     
     # run annual data
-    for f in os.listdir(input_dir / "Annual"):
-        input_path_list.append(input_dir / "Annual" / f)
-        output_path_list.append((output_dir / "Annual" / f).with_suffix(".tif"))
+    for year in year_list:
+        filename = filename_template.format(YEAR = year, FIRST_MONTH = "01", LAST_MONTH = "12")
+        input_path = input_dir / "Annual" / (filename + ".nc")
+        if os.path.exists(input_path):
+            input_path_list.append(input_path)
+            output_path = output_dir / "Annual" / (filename + ".tif")
+            output_path_list.append(output_path)
+        else:
+            warnings.warn(f"No annual data found for year {year}. Skipping...")
 
     # run monthly data
     # TODO: find a way to set each year's month range individually so if researcher wants different months for each year can adjust
     for year in year_list:
         for i in range(1, 13):
             month = str(i).zfill(2)
-            input_path = input_filename_template.format(YEAR = year, MONTH = month)
-            input_path_list.append(input_dir / "Monthly" / input_path)
-
-            output_path = output_filename_template.format(YEAR = year, MONTH = month)
-            output_path_list.append(output_dir / "Monthly" / output_path)
+            filename = filename_template.format(YEAR = year, FIRST_MONTH = month, LAST_MONTH = month)
+            input_path = input_dir / "Monthly" / (filename + ".nc")
+            if os.path.exists(input_path):
+                input_path_list.append(input_path)
+                output_path = output_dir / "Monthly" / (filename + ".tif")
+                output_path_list.append(output_path)
+            else:
+                warnings.warn(f"No monthly data found for year {year} month {month}. Skipping...")
     df = pd.DataFrame({"input_file_path": input_path_list, "output_file_path": output_path_list})
     return df, list(zip(df["input_file_path"], df["output_file_path"]))
 
