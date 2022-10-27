@@ -59,6 +59,7 @@ def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrappe
     from prefect import task, flow
     from prefect.task_runners import SequentialTaskRunner, ConcurrentTaskRunner
     from prefect.context import get_run_context
+    from prefect.exceptions import MissingResult
 
     # TODO: option to choose consecutive vs sequential
     prefect_task_runner = ConcurrentTaskRunner
