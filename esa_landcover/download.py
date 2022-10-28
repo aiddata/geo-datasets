@@ -8,7 +8,8 @@ import cdsapi
 import pandas as pd
 import glob
 import zipfile
-from utility import run_tasks, get_current_timestamp
+from run_tasks import run_tasks
+from utility import get_current_timestamp
 
 c = cdsapi.Client()
 
@@ -23,9 +24,9 @@ v211_years = range(2016, 2020)
 raw_dir = "/sciclone/aiddata10/REU/geo/raw/esa_landcover"
 
 # accepts int or str
-years = range(1992, 2020)
+years = range(1992, 2021)
 
-mode = "parallel"
+backend = "prefect"
 
 max_workers = 30
 
@@ -87,7 +88,7 @@ if __name__ == "__main__":
     df = pd.DataFrame(qlist, columns=[ 'version', 'year'])
 
 
-    results = run_tasks(download, qlist, mode, max_workers)
+    results = run_tasks(download, qlist, backend=backend, max_workers=max_workers)
 
 
     # join download function results back to df

@@ -7,7 +7,8 @@ import os
 import glob
 import pandas as pd
 import numpy as np
-from utility import run_tasks, get_current_timestamp, raster_calc
+from run_tasks import run_tasks
+from utility import get_current_timestamp, raster_calc
 
 
 timestamp = get_current_timestamp('%Y_%m_%d_%H_%M')
@@ -23,7 +24,7 @@ output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/esa_landcover"
 # accepts int or str
 years = range(1992, 2020)
 
-mode = "parallel"
+backend = None
 
 max_workers = 30
 
@@ -96,7 +97,7 @@ if __name__ == '__main__':
 
 
 
-    results = run_tasks(run_lc_mapping, qlist, mode, max_workers)
+    results = run_tasks(run_lc_mapping, qlist, backend=backend, max_workers=max_workers)
 
 
 
