@@ -24,7 +24,9 @@ output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/esa_landcover"
 # accepts int or str
 years = range(1992, 2020)
 
-backend = None
+backend = "prefect"
+
+run_parallel = True
 
 max_workers = 30
 
@@ -97,7 +99,7 @@ if __name__ == '__main__':
 
 
 
-    results = run_tasks(run_lc_mapping, qlist, backend=backend, max_workers=max_workers)
+    results = run_tasks(run_lc_mapping, qlist, backend=backend, max_workers=max_workers, run_parallel=run_parallel)
 
 
 

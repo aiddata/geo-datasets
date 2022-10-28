@@ -28,6 +28,8 @@ years = range(1992, 2021)
 
 backend = "prefect"
 
+run_parallel = True
+
 max_workers = 30
 
 # -------------------------------------
@@ -88,7 +90,7 @@ if __name__ == "__main__":
     df = pd.DataFrame(qlist, columns=[ 'version', 'year'])
 
 
-    results = run_tasks(download, qlist, backend=backend, max_workers=max_workers)
+    results = run_tasks(download, qlist, backend=backend, max_workers=max_workers, run_parallel=run_parallel)
 
 
     # join download function results back to df
