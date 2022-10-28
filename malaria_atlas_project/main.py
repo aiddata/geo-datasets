@@ -104,7 +104,7 @@ if len(year_list) != len(years):
 
 df_list = []
 for year in years:
-    year_file_name = f'{year}.tif'
+    year_file_name = data_info["data_name"] + f"_{year}.tif"
     item = {
         "zip_path": zipFileLocalName,
         "zip_file": year_file_name,
