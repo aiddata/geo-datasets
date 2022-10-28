@@ -119,7 +119,7 @@ df = pd.DataFrame(df_list)
 flist = list(zip(df["zip_path"], df["zip_file"], df["tif_path"], df["cog_path"]))
 
 # unzip data zipFile and copy the years wanted
-results = run_tasks(task, flist, backend=None, run_parallel=run_parallel, add_error_wrapper=True, max_workers=max_workers)
+results = run_tasks(task, flist, backend=None, run_parallel=run_parallel, add_error_wrapper=False, max_workers=max_workers)
 
 
 
