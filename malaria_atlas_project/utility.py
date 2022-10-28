@@ -36,17 +36,19 @@ def manage_download(url, local_filename, overwrite=False):
     """
     max_attempts = 5
     if os.path.isfile(local_filename) and not overwrite:
-        print(f'Download Exists: {url}')
+        print(f"Download Exists: {url}")
     else:
         attempts = 1
         while attempts <= max_attempts:
             try:
                 download_file(url, local_filename)
-                print(f"Downloaded: {url}")
             except Exception as e:
                 attempts += 1
                 if attempts > max_attempts:
                     raise e
+            else:
+                print(f"Downloaded: {url}")
+                return
 
 
 def copy_files(zip_path, zip_file, dst_path, overwrite=False):
