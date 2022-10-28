@@ -42,7 +42,7 @@ def manage_download(url, local_filename, overwrite=False):
         while attempts <= max_attempts:
             try:
                 download_file(url, local_filename)
-                print("Downloaded: {url}")
+                print(f"Downloaded: {url}")
             except Exception as e:
                 attempts += 1
                 if attempts > max_attempts:
