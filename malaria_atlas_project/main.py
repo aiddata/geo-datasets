@@ -81,7 +81,7 @@ print("Running data download")
 test_request = requests.get("https://data.malariaatlas.org", verify=True)
 test_request.raise_for_status()
 
-zipFileLocalName = os.path.join(raw_data_zip_dir, data_info["name"] + ".zip")
+zipFileLocalName = os.path.join(raw_data_zip_dir, data_info["data_name"] + ".zip")
 
 # download data zipFile from url to the local output directory
 manage_download(data_info["data_zipFile_url"], zipFileLocalName)
