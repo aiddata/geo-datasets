@@ -44,10 +44,13 @@ dataset = "pf_incidence_rate"
 # change var = set to year range wanted
 year_list = range(2000, 2021)
 
-# change var: If want to change mode to serial need to change to False not "serial"
+# can be "mpi" or "prefect"
+# any other value will run the project locally
+backend = "prefect"
+
 run_parallel = True
 
-# change var: set max_workers to own max_workers
+# this only applies if backend == "mpi"
 max_workers = 12
 
 dataset_lookup = {
@@ -119,7 +122,7 @@ df = pd.DataFrame(df_list)
 flist = list(zip(df["zip_path"], df["zip_file"], df["tif_path"], df["cog_path"]))
 
 # unzip data zipFile and copy the years wanted
-results = run_tasks(task, flist, backend=None, run_parallel=run_parallel, add_error_wrapper=False, max_workers=max_workers)
+results = run_tasks(task, flist, backend=backend, run_parallel=run_parallel, add_error_wrapper=False, max_workers=max_workers)
 
 
 
