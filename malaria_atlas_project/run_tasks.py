@@ -3,21 +3,25 @@ import warnings
 
 
 cluster_kwargs = {
-    "name": "ajh:ape",
+    "name": "geo:mal",
     "shebang": "#!/bin/tcsh",
     "resource_spec": "nodes=1:c18a:ppn=12",
-    "walltime": "00:20:00",
-    "cores": 12,
-    "processes": 12,
-    "memory": "30GB",
+    "walltime": "01:00:00",
+    "cores": 1,
+    "processes": 1,
+    "memory": "26GB",
     "interface": "ib0",
-    "job_script_prologue": ["cd " + os.getcwd()]
+    "job_script_prologue": [
+        "module load anaconda3/2021.05",
+        "conda activate " + os.environ["CONDA_DEFAULT_ENV"],
+        "cd " + os.getcwd(),
+    ]
     # "job_extra_directives": ["-j oe"],
 }
 
 adapt_kwargs = {
-    "minimum": 12,
-    "maximum": 12,
+    "minimum": 16,
+    "maximum": 16,
 }
 
 
@@ -50,11 +54,12 @@ def _simple_wrapper(func, args):
     return func(*args)
 
 
-def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrapper=False, cluster_kwargs=None, adapt_kwargs=None, retries=1):
+def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrapper=False, cluster_kwargs=cluster_kwargs, adapt_kwargs=adapt_kwargs, retries=3, **kwargs):
 
     from prefect import task, flow
     from prefect.task_runners import SequentialTaskRunner, ConcurrentTaskRunner
     from prefect.context import get_run_context
+    from prefect.exceptions import MissingResult
 
     # TODO: option to choose consecutive vs sequential
     prefect_task_runner = ConcurrentTaskRunner
@@ -80,7 +85,6 @@ def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrappe
 
 
     if add_error_wrapper:
-        print("\n\n\nHIIII\n\n\n")
         @task(retries=retries)
         def prefect_task_wrapper(func, *args, **kwargs):
             ctx = get_run_context()
@@ -93,8 +97,6 @@ def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrappe
             else:
                 return (0, "Success", func(*args, **kwargs))
     else:
-        print("\n\n\nNOOOOO\n\n\n")
-
         @task(retries=retries)
         def prefect_task_wrapper(func, *args, **kwargs):
             return func(*args, **kwargs)
@@ -105,7 +107,17 @@ def run_prefect_tasks(task_func, task_list, run_parallel=False, add_error_wrappe
         task_futures = []
         for i in task_list:
             task_futures.append(prefect_task_wrapper.submit(task_func, *i))
-        return [t.result() for t in task_futures]
+        tf_results = []
+        while len(task_futures) > 0:
+            for i, tf in enumerate(task_futures):
+                try:
+                    result = tf.result()
+                except MissingResult:
+                    pass
+                else:
+                    tf_results.append(result)
+                    task_futures.pop(i)
+        return tf_results
 
     results = build_prefect_flow(task_list)
 
@@ -168,4 +180,3 @@ def run_standard_tasks(task_func, task_list, add_error_wrapper=False):
             results.append(task_func(*i))
 
     return results
-
