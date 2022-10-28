@@ -29,7 +29,7 @@ http://maps.elie.ucl.ac.be/CCI/viewer/download.php
 4. Create Conda environment
 	- First make sure Anaconda and MPI implementation are available. If on W&M HPC's Vortex nodes for example:
 		```
-		module load anaconda3/2020.02
+		module load anaconda3/2021.05
 		module load openmpi/3.1.4/gcc-9.3.0
 		```
 	- To create a new environment:
