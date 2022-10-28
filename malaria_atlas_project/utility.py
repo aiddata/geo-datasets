@@ -99,8 +99,14 @@ def convert_to_cog(src_path, dst_path):
 
 def task(zip_path, zip_file, tif_path, cog_path):
 
-    _ = copy_files(zip_path, zip_file, tif_path)
-
-    convert_to_cog(tif_path, cog_path)
-
-    return cog_path
+    try:
+        _ = copy_files(zip_path, zip_file, tif_path)
+        convert_to_cog(tif_path, cog_path)
+    except Exception as e:
+        status = 1
+        message = str(e)
+    else:
+        status = 0
+        message = "Success"
+    finally:
+        return [status, message, cog_path]
