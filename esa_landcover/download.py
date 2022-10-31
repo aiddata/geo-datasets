@@ -1,43 +1,24 @@
 """
 Download and unzip raw ESA Landcover data from Copernicus CDS
-
 """
 
 import os
-import cdsapi
-import pandas as pd
 import glob
 import zipfile
+from typing import Collection, Optional
+
+import cdsapi
+import pandas as pd
+
 from run_tasks import run_tasks
 from utility import get_current_timestamp
 
-c = cdsapi.Client()
+def download(version, year, raw_dir):
+    c = cdsapi.Client()
 
-timestamp = get_current_timestamp('%Y_%m_%d_%H_%M')
-
-v207_years = range(1992, 2016)
-v211_years = range(2016, 2020)
-
-# -------------------------------------
-
-# download directory
-raw_dir = "/sciclone/aiddata10/REU/geo/raw/esa_landcover"
-
-# accepts int or str
-years = range(1992, 2021)
-
-backend = "prefect"
-
-run_parallel = True
-
-max_workers = 30
-
-# -------------------------------------
-
-
-def download(version, year):
-    overwrite = False
     dl_path = os.path.join(raw_dir, "compressed", f"{year}.zip")
+
+    overwrite = False
     try:
         if len(glob.glob(dl_path)) == 0 or overwrite:
             dl_meta = {
@@ -69,9 +50,9 @@ def download(version, year):
     else:
         return (0, "Success", year)
 
+def download_data(raw_dir: str, output_dir: str, years: Collection[int], backend: Optional[str], run_parallel: bool, max_workers: int, v207_years: Collection[int], v211_years = Collection[int]):
 
-
-if __name__ == "__main__":
+    timestamp = get_current_timestamp('%Y_%m_%d_%H_%M')
 
     os.makedirs(os.path.join(raw_dir, "compressed"), exist_ok=True)
     os.makedirs(os.path.join(raw_dir, "uncompressed"), exist_ok=True)
@@ -85,13 +66,13 @@ if __name__ == "__main__":
             version = 'v2.1.1'
         else:
             raise Exception("Invalid year {}".format(year))
-        qlist.append((version, year))
+        qlist.append([version, year])
 
-    df = pd.DataFrame(qlist, columns=[ 'version', 'year'])
-
+    df = pd.DataFrame(qlist, columns=["version", "year"])
+    
+    tlist = [q.append(raw_dir) for q in qlist]
 
     results = run_tasks(download, qlist, backend=backend, max_workers=max_workers, run_parallel=run_parallel)
-
 
     # join download function results back to df
     results_df = pd.DataFrame(results, columns=["status", "message", "year"])

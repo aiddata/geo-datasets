@@ -5,38 +5,13 @@ Download and unzip raw ESA Landcover data from Copernicus CDS
 
 import os
 import glob
+from typing import Collection, Optional
+
 import pandas as pd
 import numpy as np
+
 from run_tasks import run_tasks
 from utility import get_current_timestamp, raster_calc
-
-
-timestamp = get_current_timestamp('%Y_%m_%d_%H_%M')
-
-# -------------------------------------
-
-# download directory
-raw_dir = "/sciclone/aiddata10/REU/geo/raw/esa_landcover"
-
-# final data directory
-output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/esa_landcover"
-
-# accepts int or str
-years = range(1992, 2020)
-
-backend = "prefect"
-
-run_parallel = True
-
-max_workers = 30
-
-# -------------------------------------
-
-
-input_dir = os.path.join(raw_dir, "uncompressed")
-
-os.makedirs(output_dir, exist_ok=True)
-
 
 mapping = {
     0: [0],
@@ -62,8 +37,6 @@ map_func = np.vectorize(vector_mapping.get)
 # for new_cat, old_cat in mapping.items():
 #     data = np.where(data == old_cat, new_cat, data)
 
-
-
 def run_lc_mapping(input_path, output_path):
     print("Processing: {0}".format(input_path))
     try:
@@ -77,9 +50,12 @@ def run_lc_mapping(input_path, output_path):
     except Exception as e:
         return (1, e, output_path)
 
+def prepare_data(raw_dir: str, output_dir: str, years: Collection[int], backend: Optional[str], run_parallel: bool, max_workers: int):
 
+    timestamp = get_current_timestamp('%Y_%m_%d_%H_%M')
 
-if __name__ == '__main__':
+    input_dir = os.path.join(raw_dir, "uncompressed")
+
 
     precheck = []
 
@@ -118,4 +94,3 @@ if __name__ == '__main__':
     # output results to csv
     output_path = os.path.join(raw_dir, f"prepare_{timestamp}.csv")
     output_df.to_csv(output_path, index=False)
-
