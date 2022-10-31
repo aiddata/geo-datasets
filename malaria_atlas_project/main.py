@@ -44,10 +44,13 @@ dataset = "pf_incidence_rate"
 # change var = set to year range wanted
 year_list = range(2000, 2021)
 
-# change var: If want to change mode to serial need to change to False not "serial"
+# can be "mpi" or "prefect"
+# any other value will run the project locally
+backend = "prefect"
+
 run_parallel = True
 
-# change var: set max_workers to own max_workers
+# this only applies if backend == "mpi"
 max_workers = 12
 
 dataset_lookup = {
@@ -81,7 +84,7 @@ print("Running data download")
 test_request = requests.get("https://data.malariaatlas.org", verify=True)
 test_request.raise_for_status()
 
-zipFileLocalName = os.path.join(raw_data_zip_dir, data_info["name"] + ".zip")
+zipFileLocalName = os.path.join(raw_data_zip_dir, data_info["data_name"] + ".zip")
 
 # download data zipFile from url to the local output directory
 manage_download(data_info["data_zipFile_url"], zipFileLocalName)
@@ -104,7 +107,7 @@ if len(year_list) != len(years):
 
 df_list = []
 for year in years:
-    year_file_name = f'{year}.tif'
+    year_file_name = data_info["data_name"] + f"_{year}.tif"
     item = {
         "zip_path": zipFileLocalName,
         "zip_file": year_file_name,
@@ -119,7 +122,7 @@ df = pd.DataFrame(df_list)
 flist = list(zip(df["zip_path"], df["zip_file"], df["tif_path"], df["cog_path"]))
 
 # unzip data zipFile and copy the years wanted
-results = run_tasks(task, flist, backend=None, run_parallel=run_parallel, add_error_wrapper=True, max_workers=max_workers)
+results = run_tasks(task, flist, backend=backend, run_parallel=run_parallel, add_error_wrapper=False, max_workers=max_workers)
 
 
 

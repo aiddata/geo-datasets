@@ -36,17 +36,19 @@ def manage_download(url, local_filename, overwrite=False):
     """
     max_attempts = 5
     if os.path.isfile(local_filename) and not overwrite:
-        print(f'Download Exists: {url}')
+        print(f"Download Exists: {url}")
     else:
         attempts = 1
         while attempts <= max_attempts:
             try:
                 download_file(url, local_filename)
-                print("Downloaded: {url}")
             except Exception as e:
                 attempts += 1
                 if attempts > max_attempts:
                     raise e
+            else:
+                print(f"Downloaded: {url}")
+                return
 
 
 def copy_files(zip_path, zip_file, dst_path, overwrite=False):
@@ -97,8 +99,14 @@ def convert_to_cog(src_path, dst_path):
 
 def task(zip_path, zip_file, tif_path, cog_path):
 
-    _ = copy_files(zip_path, zip_file, tif_path)
-
-    convert_to_cog(tif_path, cog_path)
-
-    return cog_path
+    try:
+        _ = copy_files(zip_path, zip_file, tif_path)
+        convert_to_cog(tif_path, cog_path)
+    except Exception as e:
+        status = 1
+        message = str(e)
+    else:
+        status = 0
+        message = "Success"
+    finally:
+        return [status, message, cog_path]
