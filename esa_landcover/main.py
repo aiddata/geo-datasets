@@ -29,7 +29,11 @@ download_kwargs = {
     "v211_years": range(2016, 2021),
 }
 
-if __name__ == "__main__":
+@flow
+def process_dataset():
     os.makedirs(project_kwargs["output_dir"], exist_ok=True)
     download_data(**project_kwargs, **download_kwargs)
     prepare_data(**project_kwargs)
+
+if __name__ == "__main__":
+    process_dataset()
