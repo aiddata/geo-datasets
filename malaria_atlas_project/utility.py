@@ -10,6 +10,37 @@ from rasterio import windows
 
 
 
+import configparser
+import json
+import os
+
+
+def load_parameters():
+
+    config = configparser.ConfigParser()
+
+    if not os.path.exists('config.ini'):
+        raise Exception('No config.ini file found')
+
+    config.read('config.ini')
+
+    parameters = {
+
+        # flow parameters
+        "dataset": config["params"]["dataset"],
+        "raw_data_base_dir": config["params"]["raw_data_base_dir"],
+        "processed_data_base_dir": config["params"]["processed_data_base_dir"],
+        "year_list": json.loads(config["params"]["year_list"]),
+
+        # deployment configs
+        "backend": config["deploy"]["backend"],
+        "run_parallel": config.getboolean("deploy", "run_parallel"),
+        "max_workers": config["deploy"]["max_workers"],
+
+    }
+    return parameters
+
+
 def get_current_timestamp(format_str=None):
     if format_str is None:
         format_str = '%Y_%m_%d_%H_%M'
@@ -49,6 +80,29 @@ def manage_download(url, local_filename, overwrite=False):
             else:
                 print(f"Downloaded: {url}")
                 return
+
+
+def test_download_connection():
+    # test connection
+    test_request = requests.get("https://data.malariaatlas.org", verify=True)
+    test_request.raise_for_status()
+
+
+def check_zipfile(path):
+    # create zipFile to check if data was properly downloaded
+    try:
+        dataZip = ZipFile(path)
+    except:
+        print("Could not read downloaded zipfile")
+        raise
+
+
+def download(src, dst):
+    test_download_connection()
+
+    manage_download(src, dst)
+
+    check_zipfile(dst)
 
 
 def copy_files(zip_path, zip_file, dst_path, overwrite=False):
