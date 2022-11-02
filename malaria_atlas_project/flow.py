@@ -5,12 +5,13 @@ import warnings
 from pathlib import Path
 
 import pandas as pd
+from prefect import flow
 
 from utility import get_current_timestamp, task, download, load_parameters
 from run_tasks import run_tasks
 
 
-
+@flow
 def data_flow(dataset, year_list, raw_data_base_dir, processed_data_base_dir, backend, run_parallel, max_workers):
 
     raw_data_base_dir = Path(raw_data_base_dir)
@@ -42,7 +43,7 @@ def data_flow(dataset, year_list, raw_data_base_dir, processed_data_base_dir, ba
 
     print("Running data download")
 
-    zipFileLocalName = raw_data_zip_dir / data_info["data_name"] + ".zip"
+    zipFileLocalName = raw_data_zip_dir / f"{data_info['data_name']}.zip"
 
     # download data zipFile from url to the local output directory
     download(data_info["data_zipFile_url"], zipFileLocalName)
@@ -66,7 +67,7 @@ def data_flow(dataset, year_list, raw_data_base_dir, processed_data_base_dir, ba
             "zip_path": zipFileLocalName,
             "zip_file": year_file_name,
             "tif_path": raw_data_geotiff_dir / year_file_name,
-            "cog_path": processed_data_base_dir / year_file_name
+            "cog_path": processed_data_dir / year_file_name
         }
         df_list.append(item)
 
