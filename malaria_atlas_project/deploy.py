@@ -21,19 +21,19 @@ flow = flow_import(module_name, flow_name)
 # create and load storage block
 
 block_name = "geodata-github"
-block_repo = "https://github.com/sgoodm/geo-datasets"
+block_repo = "https://github.com/aiddata/geo-datasets"
 block_repo_dir = "malaria_atlas_project"
 
 block = GitHub(
     repository=block_repo,
     #access_token=<my_access_token> # only required for private repos
 )
-block.get_directory(block_repo_dir) # specify a subfolder of repo
-block.save(block_name)
-
-storage = GitHub.load(block_name) # load a pre-defined block
+# block.get_directory(block_repo_dir) # specify a subfolder of repo
+block.save(block_name, overwrite=True)
 
 
+# load a pre-defined block
+storage = GitHub.load(block_name)
 
 
 # build deployment
@@ -42,7 +42,7 @@ deployment = Deployment.build_from_flow(
     name="malaria_atlas_project_pf_prevalence_rate",
     version=1,
     work_queue_name="geo-datasets",
-    storage=storage,
+    storage=storage.get_directory(block_repo_dir),
     parameters=load_parameters()
 )
 
@@ -54,6 +54,12 @@ deployment.apply()
 """
 to run a flow from deployment (from cli):
 
-prefect deployment run malaria_atlas_project_pf_prevalence_rate/data_flow
+prefect deployment run data-flow/malaria_atlas_project_pf_prevalence_rate
+
+
+to activate associated queue (from cli):
+
+prefect agent start --work-queue geo-datasets
+
 
 """
