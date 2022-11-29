@@ -12,13 +12,6 @@ from bs4 import BeautifulSoup
 from pyhdf.SD import SD, SDC
 
 
-def get_current_timestamp(format_str=None):
-    if format_str is None:
-        format_str = '%Y_%m_%d_%H_%M'
-    timestamp = datetime.datetime.fromtimestamp(int(time.time())).strftime(format_str)
-    return timestamp
-
-
 def run_tasks(func, flist, mode, max_workers=None, chunksize=1):
     # run all downloads (parallel and serial options)
     if mode == "parallel":
@@ -56,7 +49,7 @@ def listFD(url, ext=''):
     """
     page = requests.get(url).text
     soup = BeautifulSoup(page, 'html.parser')
-    urllist = [url + '/' + node.get('href') for node in soup.find_all('a') if node.get('href').endswith(ext)]
+    urllist = [url + "/" + node.get('href').strip("/") for node in soup.find_all('a') if node.get('href').endswith(ext)]
     return urllist
 
 
