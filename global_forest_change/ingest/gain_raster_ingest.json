@@ -1,0 +1,43 @@
+{
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/global_forest_change/GFC-2020-v1.8/gain/gain.tif",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "gfc_2020_v18_gain",
+    "title": "Forest cover gain ",
+    "description": "Forest gain during the period 2000-2012, defined as the inverse of loss, or a non-forest to forest change entirely within the study period. Raw data is encoded as either 1 (gain) or 0 (no gain). Values provided through GeoQuery are the sum of pixels within each boundary that experienced a gain.",
+    "details": "",
+    "version": "1.8",
+    "options": {
+        "resolution": 0.00025,
+        "extract_types": ["categorical"],
+        "extract_types_info" : {
+            "categorical" : "number of pixels of forest loss which occured in each year",
+            "count" : "total count of pixels per unit of analysis"
+        },
+        "factor": 1,
+        "variable_description": "pixels of forest loss"
+    },
+    "extras": {
+        "citation": "Hansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavina, D. Thau, S. V. Stehman, S. J. Goetz, T. R. Loveland, A. Kommareddy, A. Egorov, L. Chini, C. O. Justice, and J. R. G. Townshend. 2013. “High-Resolution Global Maps of 21st-Century Forest Cover Change.” Science 342 (15 November): 850–53.",
+        "sources_web": "https://storage.googleapis.com/earthenginepartners-hansen/GFC-2020-v1.8/download.html",
+        "sources_name": "Hansen/UMD/Google/USGS/NASA",
+        "tags": ["enivronment", "forest", "loss"],
+        "category_map": {
+            "no_loss": 0,
+            "loss_2001": 1,
+            "loss_2002": 2,
+            "loss_2003": 3,
+            "loss_2004": 4,
+            "loss_2005": 5,
+            "loss_2006": 6,
+            "loss_2007": 7,
+            "loss_2008": 8,
+            "loss_2009": 9,
+            "loss_2010": 10,
+            "loss_2011": 11,
+            "loss_2012": 12
+        }
+    },
+    "active": 1
+}

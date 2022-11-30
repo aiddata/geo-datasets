@@ -1,0 +1,29 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/udel_climate/air_temp_2017/yearly/mean",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "air_temp_YYYY_mean.tif",
+	"name": "udel_air_temp_v501_mean",
+    "title": "Air Temperature (Yearly Average) - UDel",
+    "description": "Average monthly air temperature per year in degrees Celsius. Created using UDel Air Temperature dataset (v5.01)",
+    "details": "",
+	"version": 5.01,
+	"options": {
+	    "resolution": 0.5,
+        "extract_types": ["max", "mean", "min"],
+        "extract_types_info": {
+            "max": "maximum air temperature per unit of analysis",
+            "mean": "average air temperature per unit of analysis",
+            "min": "minimum air temperature per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "degrees Celsius"
+	},
+	"extras": {
+	    "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
+	    "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html",
+	    "sources_name": "University of Delaware",
+	    "tags": ["temperature", "udel", "climate", "environment"]
+	},
+	"active": 1
+}

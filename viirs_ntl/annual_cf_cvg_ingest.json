@@ -1,0 +1,30 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/viirs/eogdata/annual/v20/cf_cvg",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "YYYY.tif",
+	"name": "viirs_ntl_annual_v20_cf_cvg",
+    "title": "Annual VIIRS Nighttime Lights v2 - Count of Cloud Free Coverage",
+    "description": "Annual VIIRS nighttime lights product Version 2. Count of pixels within boundary with at least 1 cloud free observation of nighttime lights. Can be used in combination with VIIRS Nighttime Light Average product to determine if sufficient coverage exists with boundary features.",
+    "details": "",
+	"version": 2,
+	"options": {
+	    "resolution": 0.0041666667,
+        "extract_types": ["sum", "count"],
+        "extract_types_info" : {
+            "sum": "count of pixels with at least one cloud free measurement within each unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "Cloud free measurements",
+		"pixel_check": false
+	},
+	"extras": {
+	    "citation": "C. D. Elvidge, M. Zhizhin, T. Ghosh, F-C. Hsu, Annual time series of global VIIRS nighttime lights derived from monthly averages: 2012 to 2019, Remote Sensing",
+	    "sources_web": "https://eogdata.mines.edu/products/vnl/",
+	    "sources_name": "Earth Observation Group - VIIRS Nighttime Lights",
+	    "tags": ["nighttimelights", "viirs", "economics", "welfare"]
+	},
+	"active": 1
+}
+

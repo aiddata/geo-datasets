@@ -1,0 +1,32 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/viirs/eogdata/monthly_notile/v10/vcmcfg/avg_masked",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "YYYYMM.tif",
+	"name": "viirs_ntl_monthly_v10_vcmcfg_avg_masked",
+    "title": "Monthly VIIRS Nighttime Lights v1 - Average Value",
+    "description": "Monthly VIIRS nighttime lights product Version 1. Average value with background pixels masked. Please use in combination with VIIRS Nighttime Light Cloud Free Coverage product to confirm sufficient cloud free measurements are available within your boundary features.",
+    "details": "Excludes any data impacted by stray light",
+	"version": 1,
+	"options": {
+	    "resolution": 0.0041666667,
+        "extract_types": ["max", "mean", "min", "sum", "count"],
+        "extract_types_info" : {
+            "max" : "maximum value measured within each unit of analysis",
+            "mean" : "average value measured  within each unit of analysis",
+            "min" : "minimum value measured  within each unit of analysis",
+            "sum": "sum of values measured within each unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "Radiance (nW cm^-2 sr^-1)"
+	},
+	"extras": {
+	    "citation": "C. D. Elvidge, K. E. Baugh, M. Zhizhin, and F.-C. Hsu, “Why VIIRS data are superior to DMSP for mapping nighttime lights,” Asia-Pacific Advanced Network 35, vol. 35, p. 62, 2013.",
+	    "sources_web": "https://eogdata.mines.edu/products/vnl/",
+	    "sources_name": "Earth Observation Group - VIIRS Nighttime Lights",
+	    "tags": ["nighttimelights", "viirs", "economics", "welfare"]
+	},
+	"active": 1
+}
+

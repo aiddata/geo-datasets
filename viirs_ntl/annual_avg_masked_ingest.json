@@ -1,0 +1,32 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/viirs/eogdata/annual/v20/avg_masked",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "YYYY.tif",
+	"name": "viirs_ntl_annual_v20_avg_masked",
+    "title": "Annual VIIRS Nighttime Lights v2 - Average Value",
+    "description": "Annual VIIRS nighttime lights product Version 2. Average value with background pixels masked. Please use in combination with VIIRS Nighttime Light Cloud Free Coverage product to confirm sufficient cloud free measurements are available within your boundary features.",
+    "details": "",
+	"version": 2,
+	"options": {
+	    "resolution": 0.0041666667,
+        "extract_types": ["max", "mean", "min", "sum", "count"],
+        "extract_types_info" : {
+            "max" : "maximum value measured within each unit of analysis",
+            "mean" : "average value measured  within each unit of analysis",
+            "min" : "minimum value measured  within each unit of analysis",
+            "sum": "sum of values measured within each unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "Radiance (nW cm^-2 sr^-1)"
+	},
+	"extras": {
+	    "citation": "C. D. Elvidge, M. Zhizhin, T. Ghosh, F-C. Hsu, Annual time series of global VIIRS nighttime lights derived from monthly averages: 2012 to 2019, Remote Sensing",
+	    "sources_web": "https://eogdata.mines.edu/products/vnl/",
+	    "sources_name": "Earth Observation Group - VIIRS Nighttime Lights",
+	    "tags": ["nighttimelights", "viirs", "economics", "welfare"]
+	},
+	"active": 1
+}
+

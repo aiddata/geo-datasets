@@ -1,11 +1,11 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/modis_lst/yearly/day/mean",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/MODIS/terra/MOLT/MOD11C3.006/annual/day/mean",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "modis_lst_day_cmg_YYYY.tif",
-	"name": "modis_lst_day_yearly_mean",
-	"title": "Yearly Daytime Land surface temperature - MODIS",
-	"description": "Yearly daytime land surface temperature. Created by aggregating (mean) MOD11C3 v6 Monthly CMG LST",
+	"name": "modis_lst_mod11c3_006_day_annual_mean",
+	"title": "Annual daytime land surface temperature - MODIS",
+	"description": "Annual daytime land surface temperature in Kelvins. Created by aggregating (mean) month data from MOD11C3.006 CMG LST product",
     "details": "",
 	"version": "MOD11C3.006",
 	"options": {

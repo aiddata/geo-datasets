@@ -1,0 +1,27 @@
+{
+    "base": "/sciclone/aiddata10/REU/geo/data/boundaries/nyc/nyc_boroughs",
+    "type": "boundary",
+    "file_extension": ".geojson",
+    "file_mask": "None",
+    "name": "nyc_boroughs",
+    "title": "New York City Boroughs",
+    "description": "The borough boundaries of New York City clipped to the shoreline at mean high tide.",
+    "version": 2020,
+    "options": {
+        "group": "nyc",
+        "group_title": "New York City",
+        "group_class": "sub"
+    },
+    "extras": {
+        "tags": [
+            "nyc",
+            "new york",
+            "boroughs",
+            "usa"
+        ],
+        "citation": "New York City Department of City Planning",
+        "sources_name": "NYC Open Data",
+        "sources_web": "https://data.cityofnewyork.us/City-Government/Borough-Boundaries/tqmj-j8zm"
+    },
+    "active": 1
+}

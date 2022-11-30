@@ -30,37 +30,28 @@ full file name - "AVH13C1.A1981181.N07.004.2013227210959.hdf"
 import os
 import errno
 from collections import OrderedDict
+from datetime import datetime
+
+import rasterio
 import numpy as np
+import pandas as pd
 from osgeo import gdal, osr
 
-from datetime import datetime
-import rasterio
 
+mode = "auto"
 
-# mode = "serial"
-mode = "parallel"
-
-# NOTE: use `qsub jobscript` for running parallel
-if mode == "parallel":
-    from mpi4py import MPI
-    comm = MPI.COMM_WORLD
-    size = comm.Get_size()
-    rank = comm.Get_rank()
-
-
+max_workers = 71
 
 build_list = [
-    # "daily",
-    # "monthly",
+    "daily",
+    "monthly",
     "yearly"
 ]
 
 
-src_base = "/sciclone/aiddata10/REU/geo/raw/ltdr/ltdr.nascom.nasa.gov/allData/Ver4"
+src_base = "/sciclone/aiddata10/REU/geo/raw/ltdr/LAADS/465"
 
-dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/ltdr/avhrr_ndvi_v4"
-
-
+dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/ltdr/avhrr_ndvi_v5"
 
 
 # filter options to accept/deny based on sensor, year
@@ -72,115 +63,119 @@ filter_options = {
     'sensor_accept': [],
     'use_sensor_deny': False,
     'sensor_deny': [],
-    'use_year_accept': False,
-    'year_accept': ['1987'],
-    'use_year_deny': True,
-    'year_deny': ['2017']
+    'use_year_accept': True,
+    'year_accept': ['2019', '2020'],
+    'use_year_deny': False,
+    'year_deny': ['2019']
 }
 
 
 # -----------------------------------------------------------------------------
 
 
-def build_data_list(input_base, ops):
+def build_data_list(input_base, output_base, ops):
+    f = []
+    # find all .hdf files under input_base in filesystem
+    for root, dirs, files in os.walk(input_base):
+        for file in files:
+            if file.endswith(".hdf"):
+		        # ...and add them to the f array
+                f.append(os.path.join(root, file))
+    df_dict_list = []
 
-    # reference object used to eliminate duplicate year / day combos
-    # when overlaps between sensors exists, always use data from newer sensor
+    for input_path in f:
+        items = os.path.basename(input_path).split(".")
+        year = items[1][1:5]
+        day = items[1][5:8]
+        sensor = items[2]
+        month = "{0:02d}".format(
+            datetime.strptime("{0}+{1}".format(year, day), "%Y+%j").month)
+        output_path = os.path.join(
+            output_base, "daily/avhrr_ndvi_v5_{}_{}_{}.tif".format(sensor, year, day)
+        )
+        df_dict_list.append({
+            "input_path": input_path,
+            "sensor": sensor,
+            "year": year,
+            "month": month,
+            "day": day,
+            "year_month": year+"_"+month,
+            "year_day": year+"_"+day,
+            "output_path": output_path
+        })
+    df = pd.DataFrame(df_dict_list)
 
-    if ops['use_sensor_accept'] and ops['use_sensor_deny']:
-        raise Exception('Cannot use accept and deny options for sensors')
+    ### This was the deprecated function DataFrame.sort()
+    ### Trying to drop-in replace with new sort_values function -Jacob
+    df = df.sort_values(by=["input_path"])
 
-    if ops['use_year_accept'] and ops['use_year_deny']:
-        raise Exception('Cannot use accept and deny options for years')
-
-
-    ref = OrderedDict()
-
-    # get sensors
-    sensors = [
-        name for name in os.listdir(input_base)
-        if os.path.isdir(os.path.join(input_base, name))
-            and name.startswith("N")
-            and len(name) == 3
-    ]
-
+    # df = df.drop_duplicates(subset="year_day", take_last=True)
+    sensors = sorted(list(set(df["sensor"])))
+    years = sorted(list(set(df["year"])))
+    filter_sensors = None
     if ops['use_sensor_accept']:
-        sensors = [i for i in sensors if i in ops['sensor_accept']]
+        filter_sensors = [i for i in sensors if i in ops['sensor_accept']]
     elif ops['use_sensor_deny']:
-        sensors = [i for i in sensors if i not in ops['sensor_deny']]
-
-    sensors.sort()
-
-
-    for sensor in sensors:
-
-        # get years for sensors
-        path_sensor = input_base +"/"+ sensor
-
-        years = [
-            name for name in os.listdir(path_sensor)
-            if os.path.isdir(os.path.join(path_sensor, name))
-        ]
-
-        if ops['use_year_accept']:
-            years = [i for i in years if i in ops['year_accept']]
-        elif ops['use_year_deny']:
-            years = [i for i in years if i not in ops['year_deny']]
-
-        years.sort()
-
-        for year in years:
-
-            if not year in ref:
-                ref[year] = {}
-
-            # get days for year
-            path_year = path_sensor +"/"+ year
-            filenames = [
-                name for name in os.listdir(path_year)
-                if not os.path.isdir(os.path.join(path_year, name))
-                    and name.endswith(".hdf")
-                    and name.split(".")[0] == "AVH13C1"
-            ]
-            filenames.sort()
-
-            for filename in filenames:
-
-                filename = filename[:-4]
-                day = filename.split(".")[1][5:]
-
-                # sensor list is sorted so duplicate day will always be newer
-                ref[year][day] = filename
+        filter_sensors = [i for i in sensors if i not in ops['sensor_deny']]
+    if filter_sensors:
+        df = df.loc[df["sensor"].isin(filter_sensors)]
+    filter_years = None
+    if ops['use_year_accept']:
+        filter_years = [i for i in years if i in ops['year_accept']]
+    elif ops['use_year_deny']:
+        filter_years = [i for i in years if i not in ops['year_deny']]
+    if filter_years:
+        df = df.loc[df["year"].isin(filter_years)]
+    return df
 
 
-            # sort filenames after year finishes
-            ref[year] = OrderedDict(
-                sorted(ref[year].iteritems(), key=lambda (k,v): v))
-
-    return ref
-
-
-def prep_daily_data(task, input_base, output_base):
-
-    year, day, filename = task
-
-    sensor = filename.split('.')[2]
-
-    src_file = os.path.join(input_base, sensor, year, filename + ".hdf")
-
-    dst_dir = os.path.join(output_base, 'daily', year)
-
+def prep_daily_data(task):
     try:
-        os.makedirs(dst_dir)
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
+        src, dst = task
+        year = os.path.basename(src).split(".")[1][1:5]
+        day = os.path.basename(src).split(".")[1][5:8]
+        sensor = os.path.basename(src).split(".")[2]
+        print ("Processing Day {} {} {}".format(sensor, year, day))
+        process_daily_data(src, dst)
+    except Exception as e:
+        print("Error processing day {} {} {}:".format(sensor, year, day))
+        print(e)
 
-    print "{0} {1} {2}".format(sensor, year, day)
-    process_daily_data(src_file, dst_dir)
+
+def prep_monthly_data(task):
+    try:
+        year_month, month_files, month_path = task
+        print ("Processing Month {}".format(year_month))
+        data, meta = aggregate_rasters(file_list=month_files, method="max")
+        write_raster(month_path, data, meta)
+    except Exception as e:
+        print("Error processing month {}:".format(year_month))
+        print(e)
 
 
-def process_daily_data(input_path, output_dir):
+def prep_yearly_data(task):
+    try:
+        year, year_files, year_path = task
+        print ("Processing Year {}".format(year))
+        data, meta = aggregate_rasters(file_list=year_files, method="mean")
+        write_raster(year_path, data, meta)
+    except Exception as e:
+        print("Error processing year {}:".format(year))
+        print(e)
+
+def create_mask(qa_array, mask_vals):
+    qa_mask_vals = [abs(x - 15) for x in mask_vals]
+    mask_bin_array = [0] * 16
+    for x in qa_mask_vals:
+        mask_bin_array[x] = 1
+    mask_bin = int(''.join(map(str, mask_bin_array)), 2)
+
+    flag = lambda i: (i & 65535 & mask_bin) != 0
+
+    qa_mask = pd.DataFrame(qa_array).applymap(flag).to_numpy()
+    return qa_mask
+
+def process_daily_data(input_path, output_path):
     """Process input raster and create output in output directory
 
     Unpack NDVI subdataset from a HDF container
@@ -201,38 +196,66 @@ def process_daily_data(input_path, output_dir):
     be useful for future data prep scripts that can use this as startng point.
 
     """
-    output_path = "{0}/{1}.tif".format(
-        output_dir,
-        os.path.basename(os.path.splitext(input_path)[0])
-    )
-
     # open the dataset and subdataset
     hdf_ds = gdal.Open(input_path, gdal.GA_ReadOnly)
 
-    subdataset = 0
-    band_ds = gdal.Open(
-        hdf_ds.GetSubDatasets()[subdataset][0], gdal.GA_ReadOnly)
+    layers = hdf_ds.GetSubDatasets()
+
+    # ndvi
+    ndvi_ds = gdal.Open(layers[0][0], gdal.GA_ReadOnly)
+    # qa
+    qa_ds = gdal.Open(layers[1][0], gdal.GA_ReadOnly)
 
     # clean data
-    band_array = band_ds.ReadAsArray().astype(np.int16)
+    ndvi_array = ndvi_ds.ReadAsArray().astype(np.int16)
 
-    # band_array[np.where(band_array < 0)] = -9999
+    qa_array = qa_ds.ReadAsArray().astype(np.int16)
 
-    band_array[np.where((band_array < 0) & (band_array > -9999))] = 0
-    band_array[np.where(band_array > 10000)] = 10000
+    # list of qa fields and bit numbers
+    # https://ltdr.modaps.eosdis.nasa.gov/ltdr/docs/AVHRR_LTDR_V5_Document.pdf
+    # MSB first (invert for Python list lookip)
 
+    qa_bits = {
+        15: "Polar flag: latitude > 60deg (land) or > 50deg (ocean)",
+        14: "BRDF-correction issues",
+        13: "RHO3 value is invalid",
+        12: "Channel 5 value is invalid",
+        11: "Channel 4 value is invalid",
+        10: "Channel 3 value is invalid",
+        9: "Channel 2 (NIR) value is invalid",
+        8: "Channel 1 (visible) value is invalid",
+        7: "Channel 1-5 are invalid",
+        6: "Pixel is at night (high solar zenith angle)",
+        5: "Pixel is over dense dark vegetation",
+        4: "Pixel is over sun glint",
+        3: "Pixel is over water",
+        2: "Pixel contains cloud shadow",
+        1: "Pixel is cloudy",
+        0: "Unused"
+    }
 
+    # qa_mask_vals = [15, 9, 8, 6, 4, 3, 2, 1]
+    qa_mask_vals = [15, 9, 8, 1]
+
+    qa_mask = create_mask(qa_array, qa_mask_vals)
+
+    ndvi_array[qa_mask] = -9999
+
+    ndvi_array[np.where((ndvi_array < 0) & (ndvi_array > -9999))] = 0
+    ndvi_array[np.where(ndvi_array > 10000)] = 10000
+
+    # -----------------
 
     # prep projections and transformations
     src_proj = osr.SpatialReference()
-    src_proj.ImportFromWkt(band_ds.GetProjection())
+    src_proj.ImportFromWkt(ndvi_ds.GetProjection())
 
     dst_proj = osr.SpatialReference()
     dst_proj.ImportFromEPSG(4326)
 
     tx = osr.CoordinateTransformation(src_proj, dst_proj)
 
-    src_gt = band_ds.GetGeoTransform()
+    src_gt = ndvi_ds.GetGeoTransform()
     pixel_xsize = src_gt[1]
     pixel_ysize = abs(src_gt[5])
 
@@ -240,12 +263,14 @@ def process_daily_data(input_path, output_dir):
     (ulx, uly, ulz ) = tx.TransformPoint(src_gt[0], src_gt[3])
 
     (lrx, lry, lrz ) = tx.TransformPoint(
-        src_gt[0] + src_gt[1]*band_ds.RasterXSize,
-        src_gt[3] + src_gt[5]*band_ds.RasterYSize)
+        src_gt[0] + src_gt[1]*ndvi_ds.RasterXSize,
+        src_gt[3] + src_gt[5]*ndvi_ds.RasterYSize)
 
     # new geotransform
     dst_gt = (ulx, pixel_xsize, src_gt[2],
-               uly, src_gt[4], -pixel_ysize)
+                uly, src_gt[4], -pixel_ysize)
+
+    # -----------------
 
     # create new raster
     driver = gdal.GetDriverByName('GTiff')
@@ -262,58 +287,16 @@ def process_daily_data(input_path, output_dir):
     out_ds.SetProjection(dst_proj.ExportToWkt())
 
     out_band = out_ds.GetRasterBand(1)
-    out_band.WriteArray(band_array)
+    out_band.WriteArray(ndvi_array)
     out_band.SetNoDataValue(-9999)
 
-    # ***
-    # reproject is converting all nodata to zero
-    # https://gis.stackexchange.com/questions/158503/9999-no-data-value-becomes-0-when-writing-array-to-gdal-memory-file
-    # (issue may have been resolve in gdal 2.0, currently
-    # have older version on sciclone)
-    #
-    # since out data isn't actually changing shape due to the reproj
-    # from epsg 4008, just another geographic datum proj
-    # we don't really need to reproject, just reassign the proj
-    # and fill in the data. hacky and not ideal, but we rarely use
-    # python gdal bindings anymore and i don't want to dig into
-    # an issue that was probably fixed in a newer version.
-    #
-    # will look into updating gdal at some point on sciclone,
-    # or readdress when/if we need python gdal bindings in future
-    # ***
-    #
-    # # reproject
-    # # need to test different resampling methods
-    # # (nearest is default, probably used by gdal_translate)
-    # # do not actually  think it matters for this case though
-    # # as there does not seem to be much if any need for r
-    # # resampling when reprojecting between these projections
-    # gdal.ReprojectImage(band_ds, out_ds,
-    #                     src_proj.ExportToWkt(), dst_proj.ExportToWkt(),
-    #                     gdal.GRA_Bilinear)
-    #                     # gdal.GRA_NearestNeighbour)
+    # complete write
+    out_ds = None
 
     # close out datasets
     hdf_ds = None
-    band_ds = None
-    out_ds = None
+    ndvi_ds = None
 
-
-
-def prep_monthly_data(task, output_base):
-    year, month, month_files = task
-
-    data, meta = aggregate_rasters(file_list=month_files, method="max")
-    month_path = os.path.join(output_base, 'monthly', year, "avhrr_ndvi_{0}_{1}.tif".format(year, month))
-    write_raster(month_path, data, meta)
-
-
-def prep_yearly_data(task, output_base):
-    year, year_files = task
-
-    data, meta = aggregate_rasters(file_list=year_files, method="mean")
-    year_path = os.path.join(output_base, 'yearly', "avhrr_ndvi_{0}.tif".format(year))
-    write_raster(year_path, data, meta)
 
 
 def aggregate_rasters(file_list, method="mean"):
@@ -332,14 +315,13 @@ def aggregate_rasters(file_list, method="mean"):
     Return
         result: rasterio Raster instance
     """
-
     store = None
     for ix, file_path in enumerate(file_list):
 
         try:
             raster = rasterio.open(file_path)
         except:
-            print "Could not include file in aggregation ({0})".format(file_path)
+            print ("Could not include file in aggregation ({0})".format(file_path))
             continue
 
         active = raster.read(masked=True)
@@ -380,204 +362,112 @@ def aggregate_rasters(file_list, method="mean"):
 
 
 def write_raster(path, data, meta):
-    try:
-        os.makedirs(os.path.dirname(path))
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
-
+    make_dir(os.path.dirname(path))
     meta['dtype'] = data.dtype
-
     with rasterio.open(path, 'w', **meta) as result:
         try:
             result.write(data)
         except:
-            print path
-            print meta
-            print data.shape
+            print (path)
+            print (meta)
+            print (data.shape)
             raise
+
+
+def make_dir(path):
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+
+
+def run(tasks, func, mode="auto"):
+    parallel = False
+
+    if mode in ["auto", "parallel"]:
+        try:
+            from mpi4py.futures import MPIPoolExecutor
+            parallel = True
+        except:
+            if mode == "parallel":
+                raise Exception("Failed to run job in parallel")
+    elif mode != "serial":
+        raise Exception("Invalid `mode` value for script.")
+
+    if parallel:
+        with MPIPoolExecutor(max_workers=max_workers) as executor:
+            executor.map(func, tasks)
+    else:
+        # For each task in tasks, run the passed function (func) on the task
+        for task in tasks:
+            try:
+                func(tasks[c])
+            except Exception as e:
+                print("Error processing: {0}".format(tasks[c]))
+                print(e)
 
 # -----------------------------------------------------------------------------
 
-print "generating initial data list..."
+if __name__ == '__main__':
+    # Build day, month, year dataframes
 
-ref = build_data_list(src_base, filter_options)
+    # build day dataframe
+    day_df = build_data_list(src_base, dst_base, filter_options)
 
-# -------------------------------------
+    # build month dataframe
 
-print "building day list..."
+    # Using pandas "named aggregation" to make ensure predictable column names in output.
+    # See bottom of this page:
+    # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.core.groupby.DataFrameGroupBy.aggregate.html
+    # see also https://pandas.pydata.org/pandas-docs/stable/user_guide/groupby.html#groupby-aggregate-named
+    month_df = day_df[["output_path", "year", "year_month"]].groupby("year_month", as_index=False).aggregate(
+        day_path_list = pd.NamedAgg(column="output_path",   aggfunc=lambda x: tuple(x)),
+        count =         pd.NamedAgg(column="output_path",   aggfunc="count"),
+        year =          pd.NamedAgg(column="year",          aggfunc="last")
+    )
 
-# day_qlist item format = [year, day, filename]
-day_qlist = []
-for year in ref:
-    for day, filename in ref[year].iteritems():
-        day_qlist.append([year, day, filename])
+    minimum_days_in_month = 20
 
-# -------------------------------------
+    month_df = month_df.loc[month_df["count"] >= minimum_days_in_month]
 
-print "running daily data..."
+    month_df["output_path"] = month_df.apply(
+        lambda x: os.path.join(dst_base, "monthly/avhrr_ndvi_v5_{}.tif".format(x["year_month"])), axis=1
+    )
 
-if "daily" in build_list:
+    # build year dataframe
+    year_df = month_df[["output_path", "year"]].groupby("year", as_index=False).aggregate({
+        "output_path": [lambda x: tuple(x), "count"]
+    })
+    year_df.columns = ["year", "month_path_list", "count"]
 
-    if mode == "parallel":
 
-        c = rank
-        while c < len(day_qlist):
+    year_df["output_path"] = year_df["year"].apply(
+        lambda x: os.path.join(dst_base, "yearly/avhrr_ndvi_v5_{}.tif".format(x))
+    )
 
-            try:
-                prep_daily_data(day_qlist[c], src_base, dst_base)
-            except Exception as e:
-                print "Error processing day: {0} {1} ({2})".format(*day_qlist[c])
-                print e
-                # raise Exception('day processing')
+    # Make _qlist arrays, which are handled by prep_xxx_data functions as lists of tasks
 
-            c += size
+    day_qlist = []
+    for _, row in day_df.iterrows():
+        day_qlist.append([row["input_path"], row["output_path"]])
 
-        comm.Barrier()
+    month_qlist = []
+    for _, row in month_df.iterrows():
+        month_qlist.append([row["year_month"], row["day_path_list"], row["output_path"]])
 
-    elif mode == "serial":
+    year_qlist = []
+    for _, row in year_df.iterrows():
+        year_qlist.append([row["year"], row["month_path_list"], row["output_path"]])
 
-        for c in range(len(day_qlist)):
-            prep_daily_data(day_qlist[c], src_base, dst_base)
+    if "daily" in build_list:
+        make_dir(os.path.join(dst_base, "daily"))
+        run(day_qlist, prep_daily_data, mode=mode)
 
-    else:
-        raise Exception("Invalid `mode` value for script.")
+    if "monthly" in build_list:
+        make_dir(os.path.join(dst_base, "monthly"))
+        run(month_qlist, prep_monthly_data, mode=mode)
 
-# -------------------------------------
-
-print "building month list..."
-
-month_qlist = []
-
-month = None
-month_files = []
-for year in ref:
-
-    for day, filename in ref[year].iteritems():
-
-        day_path = os.path.join(dst_base, 'daily', year, filename + ".tif")
-
-        cur_month = "{0:02d}".format(
-            datetime.strptime("{0}+{1}".format(year, day), "%Y+%j").month)
-
-        # print "{0} {1} {2}".format(year, day, cur_month)
-        # print filename
-
-        if month is None:
-            month = cur_month
-
-        elif cur_month != month:
-
-            # filenames are sorted, so when month does not match
-            # it mean you hit end of month
-
-            list_year = str(int(year) - 1) if month == '12' else year
-            month_qlist.append((list_year, month, month_files))
-
-            # print "{0} {1}".format(list_year, month)
-            # for i in month_files: print i
-
-            # init next month
-            month = cur_month
-            month_files = []
-
-
-        # add day to month list
-        month_files.append(day_path)
-
-
-# make sure to add final month of final year
-month_qlist.append((year, month, month_files))
-
-if mode == "serial" or rank == 0:
-    for i in month_qlist: print "{0} {1} {2}".format(i[0], i[1], len(i[2]))
-
-# filter out months with insufficient data
-minimum_days_in_month = 20
-month_qlist = [i for i in month_qlist if len(i[2]) > minimum_days_in_month]
-
-# -------------------------------------
-
-print "running monthly data..."
-
-if "monthly" in build_list:
-
-    if mode == "parallel":
-
-        c = rank
-        while c < len(month_qlist):
-
-            try:
-                prep_monthly_data(month_qlist[c], dst_base)
-            except Exception as e:
-                print "Error processing month: {0} {1}".format(month_qlist[c][0], month_qlist[c][1])
-                # raise
-                print e
-                # raise Exception('month processing')
-
-            c += size
-
-        comm.Barrier()
-
-    elif mode == "serial":
-
-        for c in range(len(month_qlist)):
-            prep_monthly_data(month_qlist[c], dst_base)
-
-    else:
-        raise Exception("Invalid `mode` value for script.")
-
-# -------------------------------------
-
-print "building year list..."
-
-year_months = {}
-for year, month, _ in month_qlist:
-
-    # first year of data, not enough months
-    if year == '1981':
-        pass
-
-    if not year in year_months:
-        year_months[year] = []
-
-    month_path = os.path.join(dst_base, 'monthly', year, "avhrr_ndvi_{0}_{1}.tif".format(year, month))
-
-    year_months[year].append(month_path)
-
-
-year_qlist = [(year, month_path) for year, month_path in year_months.iteritems()]
-
-
-# -------------------------------------
-
-print "running yearly data..."
-
-if "yearly" in build_list:
-
-    if mode == "parallel":
-
-        c = rank
-        while c < len(year_qlist):
-
-            try:
-                prep_yearly_data(year_qlist[c], dst_base)
-            except Exception as e:
-                print "Error processing year: {0}".format(year_qlist[c][0])
-                # raise
-                print e
-                # raise Exception('year processing')
-
-
-            c += size
-
-        comm.Barrier()
-
-    elif mode == "serial":
-
-        for c in range(len(year_qlist)):
-            prep_yearly_data(year_qlist[c], dst_base)
-
-    else:
-        raise Exception("Invalid `mode` value for script.")
-
+    if "yearly" in build_list:
+        make_dir(os.path.join(dst_base, "yearly"))
+        run(year_qlist, prep_yearly_data, mode=mode)

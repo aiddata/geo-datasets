@@ -1,0 +1,28 @@
+{
+    "base": "/sciclone/aiddata10/REU/geo/data/boundaries/nyc/nyc_congressional_districts",
+    "type": "boundary",
+    "file_extension": ".geojson",
+    "file_mask": "None",
+    "name": "nyc_congressional_districts",
+    "title": "New York City Congressional Districts",
+    "description": "US House of Representatives Congressional District boundaries for the City of New York, clipped to the shoreline at mean high tide. These district boundaries represent the redistricting as of the US Census 2010.",
+    "version": 2010,
+    "options": {
+        "group": "nyc",
+        "group_title": "New York City",
+        "group_class": "actual"
+    },
+    "extras": {
+        "tags": [
+            "nyc",
+            "new york",
+            "congressional",
+            "districts",
+            "usa"
+        ],
+        "citation": "New York City Department of City Planning",
+        "sources_name": "NYC Open Data",
+        "sources_web": "https://data.cityofnewyork.us/City-Government/Congressional-Districts/qd3c-zuu7"
+    },
+    "active": 1
+}

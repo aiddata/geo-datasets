@@ -1,0 +1,23 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/boundaries/atlasofurbanexpansion/2016/urban_edge_t3",
+	"type": "boundary",
+	"file_extension": ".geojson",
+	"file_mask": "None",
+	"name": "atlasofurbanexpansion2016_urban_edge_t3",
+	"title": "Global Sample of 200 Cities - Urban Extents 2014",
+	"description": "Urban extents of sample cities in 2014. Additional details at atlasofurbanexpansion.org",
+    "details": "Over 100 additional columns of information on each city are included, as provided by the Atlas of Urban Expansion. For additional information about this supplemental data, as well as a full list of the 200 cities in the sample please visit http://www.atlasofurbanexpansion.org/cities",
+	"version": 2016,
+	"options": {
+        "group": "atlasofurbanexpansion2016",
+        "group_title": "Atlas of Urban Expansion",
+        "group_class": "sub"
+	},
+	"extras": {
+        "citation": "Angel et al., Atlas of Urban Expansion-2016 Edition, New York: New York University, Nairobi: UN-Habitat, and Cambridge, MA: Lincoln Institute of Land Policy, 2016.",
+	    "sources_web": "http://www.atlasofurbanexpansion.org",
+	    "sources_name": "Atlas of Urban Expansion (NYU, UN-Habitat, Lincoln Institute of Land Policy)",
+	    "tags": ["atlasofurbanexpansion", "cities", "city", "urban", "Accra", "Addis Ababa", "Ahmedabad", "Ahvaz", "Alexandria", "Algiers", "Anqing, Anhui", "Antwerp", "Arusha", "Astrakhan", "Auckland", "Bacolod", "Baghdad", "Baku", "Bamako", "Bangkok", "Beijing, Beijing", "Beira", "Belgaum", "Belgrade", "Belo Horizonte", "Berezniki", "Berlin", "Bicheng, Chongqing", "Bogota", "Budapest", "Buenos Aires", "Bukhara", "Busan", "Cabimas", "Cairo", "Caracas", "Cebu City", "Changzhi, Hunan", "Changzhou, Jingsu", "Chengdu, Sichuan", "Chengguan, Guizhou", "Cheonan", "Chicago", "Cirebon", "Cleveland", "Cochabamba", "Coimbatore", "Cordoba", "Culiacan", "Curitiba", "Dhaka", "Dzerzhinsk", "Florianopolis", "Fukuoka", "Gainesville, FL", "Gaoyou, Jiangsu", "Gombe", "Gomel", "Gorgan", "Guadalajara", "Guangzhou, Guangdong", "Guatemala City", "Guixi, Chongqing", "Gwangju", "Haikou, Hainan", "Halle", "Hangzhou, Zhejiang", "Hindupur", "Ho Chi Minh City", "Holguin", "Hong Kong, Hong Kong", "Houston", "Hyderabad", "Ibadan", "Ilheus", "Ipoh", "Istanbul", "Jaipur", "Jalna", "Jequie", "Jinan, Shandong", "Jinju", "Johannesburg", "Kabul", "Kaiping, Guangdong", "Kairouan", "Kampala", "Kanpur", "Karachi", "Kaunas", "Kayseri", "Khartoum", "Kigali", "Killeen", "Kinshasa", "Kolkata", "Kozhikode", "Lagos", "Lahore", "Lausanne", "Le Mans", "Leon", "Leshan, Sichuan", "London", "Los Angeles", "Luanda", "Lubumbashi", "Madrid", "Malatya", "Malegaon", "Manchester", "Manila", "Marrakesh", "Medan", "Mexico City", "Milan", "Minneapolis", "Modesto", "Montreal", "Moscow", "Mumbai", "Myeik", "Nakuru", "Ndola", "New York", "Nikolaev", "Okayama", "Oldenburg", "Osaka", "Oyo", "Palembang", "Palermo", "Palmas", "Parbhani", "Parepare", "Paris", "Pematangsiantar", "Philadelphia", "Pingxiang, Jiangxi", "Pokhara", "Port Elizabeth", "Portland, OR", "Pune", "Pyongyang", "Qingdao, Shandong", "Qom", "Quito", "Rajshahi", "Raleigh", "Rawang", "Reynosa", "Ribeirao Preto", "Riyadh", "Rovno", "Saidpur", "Saint Petersburg", "San Salvador", "Sana", "Santiago", "Sao Paulo", "Seoul", "Shanghai, Shanghai", "Sheffield", "Shenzhen, Guangdong", "Shymkent", "Sialkot", "Singapore", "Singrauli", "Sitapur", "Springfield, MA", "Suining, Sichuan", "Suva", "Sydney", "Taipei, Taiwan", "Tangshan, Hebei", "Tashkent", "Tebessa", "Tehran", "Tel Aviv", "Thessaloniki", "Tianjin, Tianjin", "Tijuana", "Tokyo", "Toledo", "Tyumen", "Ulaanbaatar", "Valledupar", "Victoria", "Vienna", "Vijayawada", "Vinh Long", "Warsaw", "Wuhan, Hubei", "Xingping, Shaanxi", "Xucheng, Jiangsu", "Yamaguchi", "Yanggu, Shandong", "Yiyang, Hunan", "Yucheng, Zhejiang", "Yulin, Guangxi", "Zhengzhou, Henan", "Zhuji, Zhejiang", "Zunyi, Guizhou", "Zwolle"]
+	},
+	"active": 1
+}
