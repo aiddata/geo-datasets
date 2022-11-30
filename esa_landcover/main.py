@@ -72,16 +72,14 @@ def export_raster(data, path, meta, **kwargs):
 
 
 class ESALandcover(Dataset):
+    name = "ESA Landcover"
 
-    def __init__(self, config_file="config.ini"):
-        config = ConfigParser()
-        config.read(config_file)
+    def __init__(self, raw_dir, output_dir, years, overwrite=True):
 
-        self.name = config["Config"]["name"]
-        self.raw_dir = Path(config["Config"]["raw_dir"])
-        self.output_dir = Path(config["Config"]["output_dir"])
-        self.overwrite = config["Config"].getboolean("overwrite")
-        self.years = [int(y) for y in config["Config"]["years"].split(", ")]
+        self.raw_dir = Path(raw_dir)
+        self.output_dir = Path(output_dir)
+        self.overwrite = overwrite
+        self.years = [int(y) for y in years]
 
         self.v207_years = range(1992, 2016)
         self.v211_years = range(2016, 2021)
@@ -174,6 +172,16 @@ class ESALandcover(Dataset):
         process = self.run_tasks(self.process, process_inputs)
         self.log_run(process)
 
+def get_config_dict(config_file="config.ini"):
+        config = ConfigParser()
+        config.read(config_file)
+
+        return {
+            "raw_dir": Path(config["Config"]["raw_dir"]),
+            "output_dir": Path(config["Config"]["output_dir"]),
+            "years": [int(y) for y in config["Config"]["years"].split(", ")],
+            "overwrite": config["Config"].getboolean("overwrite"),
+        }
 
 if __name__ == "__main__":
-    ESALandcover().run(backend="mpi", run_parallel=True)
+    ESALandcover(**get_config_dict()).run(backend="local", run_parallel=True)
