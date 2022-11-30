@@ -124,38 +124,42 @@ def copy_files(zip_path, zip_file, dst_path, overwrite=False):
             raise e
 
 
-def convert_to_cog(src_path, dst_path):
+def convert_to_cog(src_path, dst_path, overwrite=False):
     '''Convert GeoTIFF to Cloud Optimized GeoTIFF (COG)
     '''
-    with rasterio.open(src_path, 'r') as src:
+    if os.path.isfile(dst_path) and overwrite:
+        os.remove(dst_path)
 
-        profile = copy(src.profile)
+    if not os.path.isfile(dst_path):
+        with rasterio.open(src_path, 'r') as src:
 
-        profile.update({
-            'driver': 'COG',
-            'compress': 'LZW',
-        })
+            profile = copy(src.profile)
 
-        with rasterio.open(dst_path, 'w+', **profile) as dst:
+            profile.update({
+                'driver': 'COG',
+                'compress': 'LZW',
+            })
 
-            for ji, src_window in src.block_windows(1):
-                # convert relative input window location to relative output window location
-                # using real world coordinates (bounds)
-                src_bounds = windows.bounds(src_window, transform=src.profile["transform"])
-                dst_window = windows.from_bounds(*src_bounds, transform=dst.profile["transform"])
-                # round the values of dest_window as they can be float
-                dst_window = windows.Window(round(dst_window.col_off), round(dst_window.row_off), round(dst_window.width), round(dst_window.height))
-                # read data from source window
-                r = src.read(1, window=src_window)
-                # write data to output window
-                dst.write(r, 1, window=dst_window)
+            with rasterio.open(dst_path, 'w', **profile) as dst:
+
+                for ji, src_window in src.block_windows(1):
+                    # convert relative input window location to relative output window location
+                    # using real world coordinates (bounds)
+                    src_bounds = windows.bounds(src_window, transform=src.profile["transform"])
+                    dst_window = windows.from_bounds(*src_bounds, transform=dst.profile["transform"])
+                    # round the values of dest_window as they can be float
+                    dst_window = windows.Window(round(dst_window.col_off), round(dst_window.row_off), round(dst_window.width), round(dst_window.height))
+                    # read data from source window
+                    r = src.read(1, window=src_window)
+                    # write data to output window
+                    dst.write(r, 1, window=dst_window)
 
 
 def task(zip_path, zip_file, tif_path, cog_path):
 
     try:
         _ = copy_files(zip_path, zip_file, tif_path)
-        convert_to_cog(tif_path, cog_path)
+        convert_to_cog(tif_path, cog_path, overwrite=False)
     except Exception as e:
         status = 1
         message = str(e)
