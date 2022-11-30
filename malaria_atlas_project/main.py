@@ -21,19 +21,20 @@ Unless otherwise specified, all datasets are:
 import os
 import shutil
 import requests
+from copy import copy
 from pathlib import Path
 from zipfile import ZipFile
 from configparser import ConfigParser
 
-import pandas as pd
 import rasterio
+from rasterio import windows
 
 from dataset import Dataset
 
 
 class MalariaAtlasProject(Dataset):
     name = "Malaria Atlas Project"
-    
+
     def __init__(self, raw_dir, output_dir, years, dataset="pf_incidence_rate", overwrite=False):
 
         self.raw_dir = Path(raw_dir)
@@ -115,15 +116,16 @@ class MalariaAtlasProject(Dataset):
 
         # validate years for processing
         zip_years = sorted([int(i[-8:-4]) for i in dataZip.namelist() if i.endswith('.tif')])
+        year_list = self.years
         years = [i for i in year_list if i in zip_years]
         if len(year_list) != len(years):
             missing_years = set(year_list).symmetric_difference(set(years))
-            logger.warning(f"Years not found in downloaded data ")
+            logger.warning(f"Years not found in downloaded data {missing_years}")
 
         flist = []
         for year in years:
             year_file_name = self.data_info["data_name"] + f"_{year}.tif"
-            
+
             tif_path = raw_geotiff_dir / year_file_name
             cog_path = self.output_dir / year_file_name
 
@@ -188,6 +190,7 @@ class MalariaAtlasProject(Dataset):
 
         conversions = self.run_tasks(self.convert_to_cog, copy_futures)
         self.log_run(conversions)
+
 
 def get_config_dict(config_file="config.ini"):
     config = ConfigParser()
