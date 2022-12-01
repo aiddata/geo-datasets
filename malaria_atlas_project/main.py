@@ -174,7 +174,7 @@ class MalariaAtlasProject(Dataset):
         raw_zip_dir = self.raw_dir / "zip" / self.dataset
         raw_zip_dir.mkdir(parents=True, exist_ok=True)
 
-        logger.info("Testing Connection...")
+        logger.info("Testing Connection123...")
         self.test_connection()
 
         logger.info("Running data download")

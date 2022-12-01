@@ -34,15 +34,15 @@ block = GitHub(
 block.save(block_name, overwrite=True)
 
 
-# load a pre-defined block and specify a subfolder of repo
-storage = GitHub.load(block_name).get_directory(block_repo_dir)
-
+# # load a pre-defined block and specify a subfolder of repo
+storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
+storage.save("malaria_atlas_project")
 
 # build deployment
 deployment = Deployment.build_from_flow(
     flow=flow,
     name="malaria_atlas_project_pf_prevalence_rate",
-    version=2,
+    version=6,
     work_queue_name="geo-datasets",
     storage=storage,
     parameters=get_config_dict()
