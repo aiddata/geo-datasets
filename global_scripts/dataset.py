@@ -9,9 +9,6 @@ from collections import namedtuple
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 
-from prefect import flow, task, get_run_logger
-from prefect.task_runners import SequentialTaskRunner, ConcurrentTaskRunner
-from prefect_dask import DaskTaskRunner
 
 """
 A namedtuple that represents the results of one task
@@ -75,6 +72,7 @@ class Dataset(ABC):
         If you are using Prefect, the logs will be managed by Prefect
         """
         if self.backend == "prefect":
+            from prefect import get_run_logger
             return get_run_logger()
         else:
             return logging.getLogger("dataset")
@@ -114,6 +112,9 @@ class Dataset(ABC):
         Run tasks using Prefect, using whichever task runner decided in self.run()
         This will always return a list of TaskResults!
         """
+
+        from prefect import task
+
         @task(name=name)
         def task_wrapper(self, func, inputs):
             return self.error_wrapper(func, inputs)
@@ -244,9 +245,13 @@ class Dataset(ABC):
         if backend == "prefect":
             self.backend = "prefect"
 
+            from prefect import flow
+            from prefect.task_runners import SequentialTaskRunner, ConcurrentTaskRunner
+
             if task_runner == "sequential":
                 tr = SequentialTaskRunner
             elif task_runner == "dask":
+                from prefect_dask import DaskTaskRunner
                 tr = DaskTaskRunner(**kwargs)
             elif task_runner == "concurrent" or task_runner is None:
                 tr = ConcurrentTaskRunner
