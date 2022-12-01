@@ -206,6 +206,7 @@ def get_config_dict(config_file="config.ini"):
         "task_runner": config["Config"]["task_runner"],
         "run_parallel": config["Config"].getboolean("run_parallel"),
         "max_workers": int(config["Config"]["max_workers"]),
+        "log_dir": Path(config["Config"]["raw_dir"]) / "logs"
     }
 
 if __name__ == "__main__":
