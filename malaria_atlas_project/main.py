@@ -202,6 +202,10 @@ def get_config_dict(config_file="config.ini"):
         "raw_dir": Path(config["Config"]["raw_dir"]),
         "output_dir": Path(config["Config"]["output_dir"]),
         "overwrite": config["Config"].getboolean("overwrite"),
+        "backend": config["Config"]["backend"],
+        "task_runner": config["Config"]["task_runner"],
+        "run_parallel": config["Config"].getboolean("run_parallel"),
+        "max_workers": int(config["Config"]["max_workers"]),
     }
 
 if __name__ == "__main__":
