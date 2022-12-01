@@ -57,7 +57,7 @@ class Dataset(ABC):
     """
     This is the base class for Datasets, providing functions that manage task runs and logs
     """
-    
+
     @abstractmethod
     def main(self):
         """
@@ -195,11 +195,12 @@ class Dataset(ABC):
                 should_expand_results = True
 
         fieldnames = ["status_code", "status_message"]
+        rows_to_write = []
         if should_expand_results:
             for h, _ in expansion_spec:
                 fieldnames.append(h)
             for r in results:
-                row_results.append(r[:1].extend([r[i] for _, i in expansion_spec]))
+                rows_to_write.append(r[:1].extend([r[i] for _, i in expansion_spec]))
         else:
             fieldnames.append("results")
             rows_to_write = [list(r) for r in results]
@@ -267,7 +268,7 @@ class Dataset(ABC):
 
                 self.backend = "mpi"
                 self.mpi_max_workers = max_workers
-                
+
                 self.main()
 
             elif backend == "local" or backend is None:
