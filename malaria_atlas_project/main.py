@@ -210,4 +210,10 @@ def get_config_dict(config_file="config.ini"):
     }
 
 if __name__ == "__main__":
-    MalariaAtlasProject(**get_config_dict()).run()
+
+    config_dict = get_config_dict()
+
+    class_instance = MalariaAtlasProject(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["dataset"], config_dict["overwrite"])
+
+    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
+
