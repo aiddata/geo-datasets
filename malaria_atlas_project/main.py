@@ -29,6 +29,10 @@ from configparser import ConfigParser
 import rasterio
 from rasterio import windows
 
+import sys
+sys.path.append('global_scripts')
+
+
 from dataset import Dataset
 
 
