@@ -21,7 +21,7 @@ flow = flow_import(module_name, flow_name)
 # create and load storage block
 
 block_name = "geo-datasets-github"
-block_repo = "https://github.com/aiddata/geo-datasets"
+block_repo = "https://github.com/aiddata/geo-datasets.git"
 block_reference = 'develop' # branch or tag
 block_repo_dir = "malaria_atlas_project"
 
@@ -36,20 +36,28 @@ block.save(block_name, overwrite=True)
 
 # # load a pre-defined block and specify a subfolder of repo
 storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
-storage.save("malaria_atlas_project")
 
 # build deployment
 deployment = Deployment.build_from_flow(
     flow=flow,
     name="malaria_atlas_project_pf_prevalence_rate",
-    version=6,
-    work_queue_name="geo-datasets",
+    version=1,
+    # work_queue_name="geo-datasets",
+    work_queue_name="geodata",
     storage=storage,
-    parameters=get_config_dict()
+    path="malaria_atlas_project",
+    # skip_upload=True,
+    parameters=get_config_dict("malaria_atlas_project/config.ini"),
+    apply=True
 )
 
-# apply deployment
-deployment.apply()
+# alternative to apply deployment after creating build
+# deployment.apply()
+
+
+# prefect deployment build flow.py:malaria_atlas_project -n "test_deploy105" -sb github/geo-datasets-github2 -q geodata --apply
+
+# prefect deployment run malaria-atlas-project/malaria_atlas_project_pf_prevalence_rate55
 
 
 
