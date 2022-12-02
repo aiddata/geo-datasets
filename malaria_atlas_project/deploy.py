@@ -1,3 +1,5 @@
+import sys
+sys.path.append('global_scripts')
 
 from prefect.deployments import Deployment
 from prefect.filesystems import GitHub
@@ -15,7 +17,6 @@ def flow_import(module_name, flow_name):
 
 # Driver Code
 flow = flow_import(module_name, flow_name)
-
 
 
 # create and load storage block
@@ -41,7 +42,7 @@ storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
 deployment = Deployment.build_from_flow(
     flow=flow,
     name="malaria_atlas_project_pf_prevalence_rate",
-    version=1,
+    version=3,
     # work_queue_name="geo-datasets",
     work_queue_name="geodata",
     storage=storage,
