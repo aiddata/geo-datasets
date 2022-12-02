@@ -19,6 +19,7 @@ Unless otherwise specified, all datasets are:
 """
 
 import os
+import sys
 import shutil
 import requests
 from copy import copy
@@ -29,8 +30,8 @@ from configparser import ConfigParser
 import rasterio
 from rasterio import windows
 
-import sys
-sys.path.append('global_scripts')
+sys.path.append(os.path.join(os.path.realpath(__file__), 'global_scripts'))
+print(sys.path)
 
 
 from dataset import Dataset
