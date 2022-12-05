@@ -31,9 +31,6 @@ import rasterio
 from rasterio import windows
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-print(os.listdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
-print(sys.path)
-
 
 from dataset import Dataset
 
