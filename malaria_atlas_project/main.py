@@ -30,8 +30,9 @@ from configparser import ConfigParser
 import rasterio
 from rasterio import windows
 
-sys.path.append(os.path.join(os.path.realpath(__file__), 'global_scripts'))
-print(sys.path)
+
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'malaria_atlas_project'))
 
 
 from dataset import Dataset
