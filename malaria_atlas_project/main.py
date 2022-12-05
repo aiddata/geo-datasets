@@ -31,17 +31,17 @@ import rasterio
 from rasterio import windows
 
 
-# from prefect.filesystems import GitHub
+from prefect.filesystems import GitHub
 
 
-# block_name = "geo-datasets-github"
-# GitHub.load(block_name).get_directory('global_scripts')
+block_name = "geo-datasets-github"
+GitHub.load(block_name).get_directory('global_scripts')
 
-# sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-# sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'malaria_atlas_project'))
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'malaria_atlas_project'))
 
-# print(sys.path)
-# print(os.listdir(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts')))
+print(sys.path)
+print(os.listdir(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts')))
 
 from dataset import Dataset
 
