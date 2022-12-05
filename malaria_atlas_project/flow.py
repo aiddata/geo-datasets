@@ -1,6 +1,13 @@
 import sys, os
-sys.path.append(os.path.join(os.path.realpath(__file__), 'global_scripts'))
-    print(sys.path)
+
+
+from prefect.filesystems import GitHub
+block_name = "geo-datasets-github"
+GitHub.load(block_name).get_directory('global_scripts')
+
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'malaria_atlas_project'))
+
 
 
 from prefect import flow
