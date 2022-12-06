@@ -270,6 +270,11 @@ class Dataset(ABC):
             logger.addHandler(logging.StreamHandler())
 
             if backend == "mpi":
+                from mpi4py import MPI
+                comm = MPI.COMM_WORLD
+                rank = comm.Get_rank()
+                if rank != 0:
+                    return
 
                 self.backend = "mpi"
                 self.mpi_max_workers = max_workers
