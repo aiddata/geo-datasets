@@ -56,14 +56,13 @@ class MalariaAtlasProject(Dataset):
         self.data_info = dataset_lookup[self.dataset]
 
 
-
     def test_connection(self):
         # test connection
         test_request = requests.get("https://data.malariaatlas.org", verify=True)
         test_request.raise_for_status()
 
 
-    def copy_files(self, zip_path, zip_file, dst_path, cog_path, overwrite=False):
+    def copy_files(self, zip_path, zip_file, dst_path, cog_path):
         if not os.path.isfile(dst_path) or self.overwrite:
             with ZipFile(zip_path) as myzip:
                 with myzip.open(zip_file) as src:
@@ -80,6 +79,14 @@ class MalariaAtlasProject(Dataset):
         """
         Convert GeoTIFF to Cloud Optimized GeoTIFF (COG)
         """
+        logger = self.get_logger()
+
+        if not self.overwrite and dst_path.exists():
+            logger.info(f"COG Exists: {dst_path}")
+            return
+
+        logger.info(f"Generating COG: {dst_path}")
+
         with rasterio.open(src_path, 'r') as src:
 
             profile = copy(src.profile)
@@ -103,6 +110,7 @@ class MalariaAtlasProject(Dataset):
                     # write data to output window
                     dst.write(r, 1, window=dst_window)
 
+
     def copy_data_files(self, zip_file_local_name):
 
         logger = self.get_logger()
@@ -111,7 +119,7 @@ class MalariaAtlasProject(Dataset):
         try:
             dataZip = ZipFile(zip_file_local_name)
         except:
-            print("Could not read downloaded zipfile")
+            logger.warning(f"Could not read downloaded zipfile: {zip_file_local_name}")
             raise
 
         raw_geotiff_dir = self.raw_dir / "geotiff" / self.dataset
@@ -136,6 +144,7 @@ class MalariaAtlasProject(Dataset):
 
         return flist
 
+
     def download_file(self, url, local_filename):
         """Download a file from url to local_filename
         Downloads in chunks
@@ -146,7 +155,8 @@ class MalariaAtlasProject(Dataset):
                 for chunk in r.iter_content(chunk_size=1024*1024):
                     f.write(chunk)
 
-    def manage_download(self, url, local_filename, overwrite=False):
+
+    def manage_download(self, url, local_filename):
         """download individual file using session created
         this needs to be a standalone function rather than a method
         of SessionWithHeaderRedirection because we need to be able
@@ -155,7 +165,7 @@ class MalariaAtlasProject(Dataset):
         logger = self.get_logger()
 
         max_attempts = 5
-        if os.path.isfile(local_filename) and not overwrite:
+        if os.path.isfile(local_filename) and not self.overwrite:
             logger.info(f"Download Exists: {url}")
         else:
             attempts = 1
@@ -191,6 +201,7 @@ class MalariaAtlasProject(Dataset):
         copy_futures = self.run_tasks(self.copy_files, file_copy_list)
         self.log_run(copy_futures)
 
+        logger.info("Converting raw tifs to COGs")
         conversions = self.run_tasks(self.convert_to_cog, copy_futures)
         self.log_run(conversions)
 
