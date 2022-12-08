@@ -88,6 +88,7 @@ class WorldPopCount(Dataset):
 
 
     def create_process_list(self):
+        logger = self.get_logger()
 
         flist = []
         downloaded_files = [i for i in self.raw_dir.iterdir() if str(i).endswith('.tif')]
@@ -95,6 +96,8 @@ class WorldPopCount(Dataset):
             year = int(i.name.split('_')[1])
             if year in self.years:
                 flist.append((i, self.output_dir / i.name))
+
+        logger.info(f"COG conversion list: {flist}")
 
         return flist
 
