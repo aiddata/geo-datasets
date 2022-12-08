@@ -21,9 +21,9 @@ flow = flow_import(module_name, flow_name)
 
 # create and load storage block
 
-block_name = "geo-datasets-github"
+block_name = "geo-datasets-github-esa"
 block_repo = "https://github.com/aiddata/geo-datasets.git"
-block_reference = 'develop' # branch or tag
+block_reference = 'esa_landcover' #'develop' # branch or tag
 block_repo_dir = "esa_landcover"
 
 block = GitHub(

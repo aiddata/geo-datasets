@@ -3,7 +3,7 @@ import sys, os
 from prefect import flow
 from prefect.filesystems import GitHub
 
-block_name = "geo-datasets-github"
+block_name = "geo-datasets-github-esa"
 GitHub.load(block_name).get_directory('global_scripts')
 
 # sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
