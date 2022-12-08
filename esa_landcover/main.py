@@ -14,6 +14,8 @@ import cdsapi
 import rasterio
 import numpy as np
 
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+
 from dataset import Dataset
 
 def raster_calc(input_path, output_path, function, **kwargs):
