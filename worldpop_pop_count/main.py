@@ -73,7 +73,7 @@ class WorldPopCount(Dataset):
                         raise e
                 else:
                     logger.info(f"Downloaded: {url}")
-                    return
+                    return (url, local_filename)
 
 
     def download_file(self, url, local_filename):
@@ -146,7 +146,7 @@ class WorldPopCount(Dataset):
         download_flist = self.create_download_list()
         self.raw_dir.mkdir(parents=True, exist_ok=True)
         downloads = self.run_tasks(self.manage_download, download_flist)
-        self.log_run(downloads)
+        self.log_run(downloads, expand_results=["url", "download_path"])
 
         logger.info("Converting raw tifs to COGs")
         process_flist = self.create_process_list()
