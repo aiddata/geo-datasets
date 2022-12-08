@@ -153,10 +153,15 @@ class ESALandcover(Dataset):
 
     def process(self, input_path, output_path):
         logger = self.get_logger()
-        logger.info(f"Processing: {input_path}")
-        kwargs = {"driver": "GTiff", "compress": "LZW"}
-        netcdf_path = f"netcdf:{input_path}:lccs_class"
-        raster_calc(netcdf_path, output_path, self.map_func, **kwargs)
+
+        if output_path.exists() and not self.overwrite:
+            logger.info(f"Processed layer exists: {input_path}")
+
+        else:
+            logger.info(f"Processing: {input_path}")
+            kwargs = {"driver": "GTiff", "compress": "LZW"}
+            netcdf_path = f"netcdf:{input_path}:lccs_class"
+            raster_calc(netcdf_path, output_path, self.map_func, **kwargs)
 
 
     def main(self):
