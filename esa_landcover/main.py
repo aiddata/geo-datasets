@@ -35,7 +35,7 @@ def raster_calc(input_path, output_path, function, **kwargs):
                 out_data = out_data.astype(meta["dtype"])
                 dst.write(out_data, window=window)
 
-                
+
 def export_raster(data, path, meta, **kwargs):
     """
     Export raster array to geotiff
@@ -107,7 +107,7 @@ class ESALandcover(Dataset):
         self.map_func = np.vectorize(vector_mapping.get)
 
     def download(self, year):
-        
+
         logger = self.get_logger()
 
         if year in self.v207_years:
@@ -155,7 +155,7 @@ class ESALandcover(Dataset):
         netcdf_path = f"netcdf:{input_path}:lccs_class"
         raster_calc(netcdf_path, output_path, self.map_func, **kwargs)
 
-    
+
     def main(self):
 
         os.makedirs(self.raw_dir / "compressed", exist_ok=True)
@@ -173,15 +173,25 @@ class ESALandcover(Dataset):
         self.log_run(process)
 
 def get_config_dict(config_file="config.ini"):
-        config = ConfigParser()
-        config.read(config_file)
+    config = ConfigParser()
+    config.read(config_file)
 
-        return {
-            "raw_dir": Path(config["Config"]["raw_dir"]),
-            "output_dir": Path(config["Config"]["output_dir"]),
-            "years": [int(y) for y in config["Config"]["years"].split(", ")],
-            "overwrite": config["Config"].getboolean("overwrite"),
-        }
+    return {
+        "raw_dir": Path(config["Config"]["raw_dir"]),
+        "output_dir": Path(config["Config"]["output_dir"]),
+        "years": [int(y) for y in config["Config"]["years"].split(", ")],
+        "overwrite": config["Config"].getboolean("overwrite"),
+        "backend": config["Config"]["backend"],
+        "task_runner": config["Config"]["task_runner"],
+        "run_parallel": config["Config"].getboolean("run_parallel"),
+        "max_workers": int(config["Config"]["max_workers"]),
+        "log_dir": Path(config["Config"]["raw_dir"]) / "logs"
+    }
 
 if __name__ == "__main__":
-    ESALandcover(**get_config_dict()).run(backend="local", run_parallel=True)
+
+    config_dict = get_config_dict()
+
+    class_instance = ESALandcover(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite"])
+
+    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
