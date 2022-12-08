@@ -1,3 +1,28 @@
+"""
+This script is intended to build and deploy a Prefect flow using settings/parameters defined in an
+accompany config.ini for the dataset.
+
+---------------------------------------
+
+Roughly equivalent actions via cli
+#
+# *** the below commands are just a general starting point, and not meant to run as is. note that there
+#     are no parameters specified or storage block creation
+
+# to deploy:
+prefect deployment build flow.py:flow_function_name -n "deployment_name" -sb github/existing_storage_block_name -q work_queue_name --apply
+
+# to not immediately deploy remove `--apply` from the above line, then use the build yaml to run the following:
+# prefect deployment apply build-deployment.yaml
+
+# to run the deployment
+prefect deployment run flow_function_name/deployment_name
+
+# start workqueue
+prefect agent start -q 'work_queue_name'
+
+"""
+
 import sys
 from configparser import ConfigParser
 
@@ -64,34 +89,4 @@ deployment = Deployment.build_from_flow(
 # deployment.apply()
 
 
-# prefect deployment build flow.py:malaria_atlas_project -n "test_deploy105" -sb github/geo-datasets-github2 -q geodata --apply
 
-# prefect deployment run malaria-atlas-project/malaria_atlas_project_pf_prevalence_rate55
-
-
-
-"""
-to run a flow from deployment (from cli):
-
-prefect deployment run data-flow/malaria_atlas_project_pf_prevalence_rate
-
-
-to activate associated queue (from cli):
-
-prefect agent start --work-queue geo-datasets
-
-
-"""
-
-"""
-run all via cli:
-
-prefect deployment build ./flow.py:data_flow -n malaria_atlas_project_pf_prevalence_rate2 -q geo-datasets2
-
-prefect deployment apply data_flow-deployment.yaml
-
-prefect deployment run data-flow/malaria_atlas_project_pf_prevalence_rate3
-
-prefect agent start -q 'geo-datasets3'
-
-"""
