@@ -6,16 +6,13 @@ worldpop: https://www.worldpop.org/geodata/listing?id=64
 
 import os
 import sys
-import shutil
 import requests
 from copy import copy
 from pathlib import Path
-from zipfile import ZipFile
 from configparser import ConfigParser
 
 import rasterio
 from rasterio import windows
-import pandas as pd
 
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
@@ -45,18 +42,11 @@ class WorldPopCount(Dataset):
 
     def create_download_list(self):
 
-        year_file_list = []
+        flist = []
         for year in self.years:
-            year_url = self.template_url.replace("{YEAR}", str(year))
-            year_file_list.append(year_url)
-
-        df = pd.DataFrame({"raw_url": year_file_list})
-
-        # use basename from url to create local filename
-        df["output"] = df["raw_url"].apply(lambda x: os.path.join(self.output_dir, os.path.basename(x)))
-
-        # generate list of tasks to iterate over
-        flist = list(zip(df["raw_url"], df["output"]))
+            src_url = self.template_url.replace("{YEAR}", str(year))
+            dst_path = os.path.join(self.output_dir, os.path.basename(src_url))
+            flist.append((src_url, dst_path))
 
         return flist
 
