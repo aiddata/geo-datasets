@@ -172,6 +172,7 @@ class ESALandcover(Dataset):
         process = self.run_tasks(self.process, process_inputs)
         self.log_run(process)
 
+
 def get_config_dict(config_file="config.ini"):
     config = ConfigParser()
     config.read(config_file)
