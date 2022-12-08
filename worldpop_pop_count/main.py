@@ -24,7 +24,7 @@ from dataset import Dataset
 
 
 class WorldPopCount(Dataset):
-    name = "Malaria Atlas Project"
+    name = "WorldPop Count"
 
     def __init__(self, raw_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
 
@@ -97,19 +97,6 @@ class WorldPopCount(Dataset):
                     f.write(chunk)
 
 
-    # def copy_files(self, zip_path, zip_file, dst_path, cog_path):
-    #     if not os.path.isfile(dst_path) or self.overwrite_processing:
-    #         with ZipFile(zip_path) as myzip:
-    #             with myzip.open(zip_file) as src:
-    #                 with open(dst_path, "wb") as dst:
-    #                     shutil.copyfileobj(src, dst)
-
-    #         if not os.path.isfile(dst_path):
-    #             raise Exception("File extracted but not found at destination")
-
-    #     return (dst_path, cog_path)
-
-
     def create_process_list(self):
 
         flist = []
@@ -157,40 +144,6 @@ class WorldPopCount(Dataset):
                     dst.write(r, 1, window=dst_window)
 
 
-    # def copy_data_files(self, zip_file_local_name):
-
-    #     logger = self.get_logger()
-
-    #     # create zipFile to check if data was properly downloaded
-    #     try:
-    #         dataZip = ZipFile(zip_file_local_name)
-    #     except:
-    #         logger.warning(f"Could not read downloaded zipfile: {zip_file_local_name}")
-    #         raise
-
-    #     raw_geotiff_dir = self.raw_dir / "geotiff" / self.dataset
-    #     raw_geotiff_dir.mkdir(parents=True, exist_ok=True)
-
-    #     # validate years for processing
-    #     zip_years = sorted([int(i[-8:-4]) for i in dataZip.namelist() if i.endswith('.tif')])
-    #     year_list = self.years
-    #     years = [i for i in year_list if i in zip_years]
-    #     if len(year_list) != len(years):
-    #         missing_years = set(year_list).symmetric_difference(set(years))
-    #         logger.warning(f"Years not found in downloaded data {missing_years}")
-
-    #     flist = []
-    #     for year in years:
-    #         year_file_name = self.data_info["data_name"] + f"_{year}.tif"
-
-    #         tif_path = raw_geotiff_dir / year_file_name
-    #         cog_path = self.output_dir / year_file_name
-
-    #         flist.append((zip_file_local_name, year_file_name, tif_path, cog_path))
-
-    #     return flist
-
-
     def main(self):
 
         logger = self.get_logger()
@@ -219,7 +172,7 @@ def get_config_dict(config_file="config.ini"):
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "overwrited_download": config["main"].getboolean("overwrited_download"),
+        "overwrite_download": config["main"].getboolean("overwrite_download"),
         "overwrite_processing": config["main"].getboolean("overwrite_processing"),
         "backend": config["run"]["backend"],
         "task_runner": config["run"]["task_runner"],
