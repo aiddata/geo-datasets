@@ -100,7 +100,8 @@ class WorldPopCount(Dataset):
     def create_process_list(self):
 
         flist = []
-        for i in self.raw_dir.iterdir():
+        downloaded_files = [i for i in self.raw_dir.iterdir() if str(i).endswith('.tif')]
+        for i in downloaded_files:
             year = int(i.name.split('_')[1])
             if year in self.years:
                 flist.append((i, self.output_dir / i.name))
