@@ -1,14 +1,20 @@
 import sys, os
+from configparser import ConfigParser
 
 from prefect import flow
 from prefect.filesystems import GitHub
 
-block_name = "geo-datasets-github"
+
+config_file = "config.ini"
+config = ConfigParser()
+config.read(config_file)
+
+
+block_name = config["deploy"]["storage_block"]
 GitHub.load(block_name).get_directory('global_scripts')
 
 # sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'malaria_atlas_project'))
-
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
 
 
 from main import MalariaAtlasProject

@@ -1,22 +1,29 @@
 import sys
-sys.path.append('global_scripts')
+from configparser import ConfigParser
 
 from prefect.deployments import Deployment
 from prefect.filesystems import GitHub
 
 from main import get_config_dict
 
+sys.path.append('global_scripts')
+
+config_file = "config.ini"
+config = ConfigParser()
+config.read(config_file)
+
+
 # load flow
 module_name = "flow"
-flow_name = "malaria_atlas_project"
+flow_name = config["deploy"]["flow_name"]
 
 
 # create and load storage block
 
-block_name = "geo-datasets-github"
-block_repo = "https://github.com/aiddata/geo-datasets.git"
-block_reference = 'develop' # branch or tag
-block_repo_dir = "malaria_atlas_project"
+block_name = config["deploy"]["storage_block"]
+block_repo = config["github"]["repo"]
+block_reference = config["github"]["branch"] # branch or tag
+block_repo_dir = config["github"]["directory"]
 
 block = GitHub(
     repository=block_repo,
@@ -42,12 +49,12 @@ storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
 # build deployment
 deployment = Deployment.build_from_flow(
     flow=flow,
-    name="malaria_atlas_project_pf_prevalence_rate",
+    name=config["deploy"]["deployment_name"],
     version=6,
     # work_queue_name="geo-datasets",
-    work_queue_name="geodata",
+    work_queue_name=config["deploy"]["work_queue"],
     storage=storage,
-    path="malaria_atlas_project",
+    path=block_repo_dir,
     # skip_upload=True,
     parameters=get_config_dict("malaria_atlas_project/config.ini"),
     apply=True

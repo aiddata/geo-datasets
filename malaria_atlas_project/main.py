@@ -200,16 +200,16 @@ def get_config_dict(config_file="config.ini"):
     config.read(config_file)
 
     return {
-        "dataset": config["Config"]["dataset"],
-        "years": [int(y) for y in config["Config"]["years"].split(", ")],
-        "raw_dir": Path(config["Config"]["raw_dir"]),
-        "output_dir": Path(config["Config"]["output_dir"]),
-        "overwrite": config["Config"].getboolean("overwrite"),
-        "backend": config["Config"]["backend"],
-        "task_runner": config["Config"]["task_runner"],
-        "run_parallel": config["Config"].getboolean("run_parallel"),
-        "max_workers": int(config["Config"]["max_workers"]),
-        "log_dir": Path(config["Config"]["raw_dir"]) / "logs"
+        "dataset": config["main"]["dataset"],
+        "years": [int(y) for y in config["main"]["years"].split(", ")],
+        "raw_dir": Path(config["main"]["raw_dir"]),
+        "output_dir": Path(config["main"]["output_dir"]),
+        "overwrite": config["main"].getboolean("overwrite"),
+        "backend": config["run"]["backend"],
+        "task_runner": config["run"]["task_runner"],
+        "run_parallel": config["run"].getboolean("run_parallel"),
+        "max_workers": int(config["run"]["max_workers"]),
+        "log_dir": Path(config["run"]["raw_dir"]) / "logs"
     }
 
 if __name__ == "__main__":
