@@ -151,8 +151,19 @@ class Dataset(ABC):
 
         timestamp = datetime.today()
 
+        logger = self.get_logger()
+
+        if not callable(func):
+            raise TypeError("Function passed to run_tasks is not callable")
+
         if name is None:
-            name = func.__name__
+            try:
+                name = func.__name__
+            except AttributeError:
+                logger.warning("No name given for task run, and function does not have a name")
+                name = "(no name)"
+        elif not isinstance(name, str):
+            raise TypeError("Name of task run must be a string")
 
         if self.backend == "serial":
             results = self.run_serial_tasks(name, func, input_list)
