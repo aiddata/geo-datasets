@@ -5,7 +5,7 @@ from prefect import flow
 from prefect.filesystems import GitHub
 
 
-config_file = "config.ini"
+config_file = "malaria_atlas_project/config.ini"
 config = ConfigParser()
 config.read(config_file)
 

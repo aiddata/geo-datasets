@@ -8,13 +8,13 @@ from main import get_config_dict
 
 sys.path.append('global_scripts')
 
-config_file = "config.ini"
+config_file = "malaria_atlas_project/config.ini"
 config = ConfigParser()
 config.read(config_file)
 
 
 # load flow
-module_name = "flow"
+module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
 
 
@@ -56,7 +56,7 @@ deployment = Deployment.build_from_flow(
     storage=storage,
     path=block_repo_dir,
     # skip_upload=True,
-    parameters=get_config_dict("malaria_atlas_project/config.ini"),
+    parameters=get_config_dict(config_file),
     apply=True
 )
 
