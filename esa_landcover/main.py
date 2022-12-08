@@ -1,6 +1,7 @@
 """
 Download and prepare data
 """
+import sys
 import os
 import glob
 import time
