@@ -45,7 +45,7 @@ class WorldPopCount(Dataset):
         flist = []
         for year in self.years:
             src_url = self.template_url.replace("{YEAR}", str(year))
-            dst_path = os.path.join(self.output_dir, os.path.basename(src_url))
+            dst_path = os.path.join(self.raw_dir, os.path.basename(src_url))
             flist.append((src_url, dst_path))
 
         return flist
