@@ -160,8 +160,8 @@ class Dataset(ABC):
             try:
                 name = func.__name__
             except AttributeError:
-                logger.warning("No name given for task run, and function does not have a name")
-                name = "(no name)"
+                logger.warning("No name given for task run, and function does not have a name (multiple unnamed functions may result in log files being overwritten)")
+                name = "unnamed"
         elif not isinstance(name, str):
             raise TypeError("Name of task run must be a string")
 
