@@ -77,11 +77,12 @@ def export_raster(data, path, meta, **kwargs):
 class ESALandcover(Dataset):
     name = "ESA Landcover"
 
-    def __init__(self, raw_dir, output_dir, years, overwrite=False):
+    def __init__(self, raw_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
 
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
-        self.overwrite = overwrite
+        self.overwrite_download = overwrite_download
+        self.overwrite_processing = overwrite_processing
         self.years = [int(y) for y in years]
 
         self.v207_years = range(1992, 2016)
@@ -124,7 +125,7 @@ class ESALandcover(Dataset):
         dl_path = self.raw_dir / "compressed" / f"{year}.zip"
         print(dl_path)
 
-        if not dl_path.exists() or self.overwrite:
+        if not dl_path.exists() or self.overwrite_download:
             dl_meta = {
                 "variable": "all",
                 "format": "zip",
@@ -142,7 +143,7 @@ class ESALandcover(Dataset):
             if len(netcdf_namelist) != 1:
                 raise Exception(f"Multiple or no ({len(netcdf_namelist)}) net cdf files found in zip for {year}")
             output_file_path = self.raw_dir / "uncompressed" / netcdf_namelist[0]
-            if (not os.path.isfile(output_file_path) or self.overwrite):
+            if (not os.path.isfile(output_file_path) or self.overwrite_download):
                 zf.extract(netcdf_namelist[0], self.raw_dir / "uncompressed")
                 logger.info(f"Unzip complete: {zipfile_path}...")
             else:
@@ -154,7 +155,10 @@ class ESALandcover(Dataset):
     def process(self, input_path, output_path):
         logger = self.get_logger()
 
-        if output_path.exists() and not self.overwrite:
+        if self.overwrite_download and not self.overwrite_processing:
+            logger.warning("Overwrite download set but not overwrite processing.")
+
+        if output_path.exists() and not self.overwrite_processing:
             logger.info(f"Processed layer exists: {input_path}")
 
         else:
@@ -189,7 +193,8 @@ def get_config_dict(config_file="config.ini"):
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "overwrite": config["main"].getboolean("overwrite"),
+        "overwrite_download": config["main"].getboolean("overwrite_download"),
+        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
         "backend": config["run"]["backend"],
         "task_runner": config["run"]["task_runner"],
         "run_parallel": config["run"].getboolean("run_parallel"),
@@ -201,6 +206,6 @@ if __name__ == "__main__":
 
     config_dict = get_config_dict()
 
-    class_instance = ESALandcover(raw_dir=config_dict["raw_dir"], output_dir=config_dict["output_dir"], years=config_dict["years"], overwrite=config_dict["overwrite"])
+    class_instance = ESALandcover(raw_dir=config_dict["raw_dir"], output_dir=config_dict["output_dir"], years=config_dict["years"], overwrite_download=config_dict["overwrite_download"], overwrite_processing=config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])

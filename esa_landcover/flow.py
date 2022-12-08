@@ -21,8 +21,8 @@ from main import ESALandcover
 
 
 @flow
-def esa_landcover(raw_dir, output_dir, years, overwrite, backend, task_runner, run_parallel,  max_workers, log_dir):
+def esa_landcover(raw_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel,  max_workers, log_dir):
 
-    class_instance = ESALandcover(raw_dir=raw_dir, output_dir=output_dir, years=years, overwrite=overwrite)
+    class_instance = ESALandcover(raw_dir=raw_dir, output_dir=output_dir, years=years, overwrite_download=overwrite_download, overwrite_processing=overwrite_processing)
 
     class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=log_dir)
