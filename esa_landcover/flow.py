@@ -10,23 +10,12 @@ GitHub.load(block_name).get_directory('global_scripts')
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'esa_landcover'))
 
 
-
 from main import ESALandcover
 
-years = [int(y) for y in range(1998, 2021)]
 
 @flow
-def esa_landcover(
-    raw_dir: str="/sciclone/aiddata10/REU/geo/raw/esa_landcover",
-    output_dir: str="/sciclone/aiddata10/REU/geo/data/rasters/esa_landcover",
-    years=years,
-    overwrite=True,
-    backend="prefect",
-    task_runner=None,
-    run_parallel=True,
-    max_workers=None
-    ):
+def esa_landcover(raw_dir, output_dir, years, overwrite, backend, task_runner, run_parallel,  max_workers, log_dir):
 
     class_instance = ESALandcover(raw_dir=raw_dir, output_dir=output_dir, years=years, overwrite=overwrite)
 
-    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers)
+    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=log_dir)
