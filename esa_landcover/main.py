@@ -206,6 +206,6 @@ if __name__ == "__main__":
 
     config_dict = get_config_dict()
 
-    class_instance = ESALandcover(raw_dir=config_dict["raw_dir"], output_dir=config_dict["output_dir"], years=config_dict["years"], overwrite_download=config_dict["overwrite_download"], overwrite_processing=config_dict["overwrite_processing"])
+    class_instance = ESALandcover(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])

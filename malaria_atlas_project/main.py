@@ -38,13 +38,14 @@ from dataset import Dataset
 class MalariaAtlasProject(Dataset):
     name = "Malaria Atlas Project"
 
-    def __init__(self, raw_dir, output_dir, years, dataset="pf_incidence_rate", overwrite=False):
+    def __init__(self, raw_dir, output_dir, years, dataset="pf_incidence_rate", overwrite_download=False, overwrite_processing=False):
 
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
         self.years = years
         self.dataset = dataset
-        self.overwrite = overwrite
+        self.overwrite_download = overwrite_download
+        self.overwrite_processing = overwrite_processing
 
         dataset_lookup = {
             "pf_incidence_rate": {
@@ -63,7 +64,7 @@ class MalariaAtlasProject(Dataset):
 
 
     def copy_files(self, zip_path, zip_file, dst_path, cog_path):
-        if not os.path.isfile(dst_path) or self.overwrite:
+        if not os.path.isfile(dst_path) or self.overwrite_processing:
             with ZipFile(zip_path) as myzip:
                 with myzip.open(zip_file) as src:
                     with open(dst_path, "wb") as dst:
@@ -81,7 +82,7 @@ class MalariaAtlasProject(Dataset):
         """
         logger = self.get_logger()
 
-        if not self.overwrite and dst_path.exists():
+        if not self.overwrite_processing and dst_path.exists():
             logger.info(f"COG Exists: {dst_path}")
             return
 
@@ -165,7 +166,7 @@ class MalariaAtlasProject(Dataset):
         logger = self.get_logger()
 
         max_attempts = 5
-        if os.path.isfile(local_filename) and not self.overwrite:
+        if os.path.isfile(local_filename) and not self.overwrite_download:
             logger.info(f"Download Exists: {url}")
         else:
             attempts = 1
@@ -215,7 +216,8 @@ def get_config_dict(config_file="config.ini"):
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
-        "overwrite": config["main"].getboolean("overwrite"),
+        "overwrited_download": config["main"].getboolean("overwrited_download"),
+        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
         "backend": config["run"]["backend"],
         "task_runner": config["run"]["task_runner"],
         "run_parallel": config["run"].getboolean("run_parallel"),
@@ -227,6 +229,6 @@ if __name__ == "__main__":
 
     config_dict = get_config_dict()
 
-    class_instance = MalariaAtlasProject(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["dataset"], config_dict["overwrite"])
+    class_instance = MalariaAtlasProject(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["dataset"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
