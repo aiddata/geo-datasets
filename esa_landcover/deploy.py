@@ -10,14 +10,6 @@ from main import get_config_dict
 module_name = "flow"
 flow_name = "esa_landcover"
 
-def flow_import(module_name, flow_name):
-    module = __import__(module_name)
-    import_flow = getattr(module, flow_name)
-    return import_flow
-
-# Driver Code
-flow = flow_import(module_name, flow_name)
-
 
 # create and load storage block
 
@@ -34,8 +26,17 @@ block = GitHub(
 # block.get_directory(block_repo_dir)
 block.save(block_name, overwrite=True)
 
+# -------------------------------------
 
-# # load a pre-defined block and specify a subfolder of repo
+def flow_import(module_name, flow_name):
+    module = __import__(module_name)
+    import_flow = getattr(module, flow_name)
+    return import_flow
+
+# Driver Code
+flow = flow_import(module_name, flow_name)
+
+# load a pre-defined block and specify a subfolder of repo
 storage = GitHub.load(block_name)
 
 # build deployment
