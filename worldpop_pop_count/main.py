@@ -62,8 +62,6 @@ class WorldPopCount(Dataset):
         max_attempts = 5
         if os.path.isfile(local_filename) and not self.overwrite_download:
             logger.info(f"Download Exists: {url}")
-            raise
-            return (url, local_filename)
 
         else:
             attempts = 1
@@ -76,7 +74,6 @@ class WorldPopCount(Dataset):
                         raise e
                 else:
                     logger.info(f"Downloaded: {url}")
-                    return (url, local_filename)
 
 
     def download_file(self, url, local_filename):
@@ -152,7 +149,7 @@ class WorldPopCount(Dataset):
         download_flist = self.create_download_list()
         self.raw_dir.mkdir(parents=True, exist_ok=True)
         downloads = self.run_tasks(self.manage_download, download_flist)
-        self.log_run(downloads, expand_args=["url", "download_path"], expand_results=["url", "download_path"])
+        self.log_run(downloads, expand_args=["url", "download_path"])
 
         logger.info("Converting raw tifs to COGs")
         process_flist = self.create_process_list()
