@@ -228,12 +228,12 @@ class Dataset(ABC):
             if should_expand_args:
                 row.append(row.extend([f"**{r[2][i]}**" if r[2] is not None else "**None**" for _, i in args_expansion_spec]))
             else:
-                row.append(r[2])
+                row.append(f"**{r[2]}**")
 
             if should_expand_results:
                 row.append(row.extend([f"**{r[3][i]}**" if r[3] is not None else "**None**"  for _, i in results_expansion_spec]))
             else:
-                row.append(r[3])
+                row.append(f"**{r[3]}**")
 
             rows_to_write.append(row)
 
