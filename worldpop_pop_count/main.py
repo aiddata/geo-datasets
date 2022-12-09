@@ -62,6 +62,7 @@ class WorldPopCount(Dataset):
         max_attempts = 5
         if os.path.isfile(local_filename) and not self.overwrite_download:
             logger.info(f"Download Exists: {url}")
+            raise
             return (url, local_filename)
 
         else:
