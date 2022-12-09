@@ -123,6 +123,13 @@ class Dataset(ABC):
 
         @task(name=name)
         def task_wrapper(self, func, inputs):
+            if self.task_runner == "hpc":
+                from prefect.filesystems import GitHub
+                block_name = "geo-datasets-github"
+                GitHub.load(block_name).get_directory('global_scripts')
+                import sys
+                sys.path.insert(1, 'global_scripts')
+
             return self.error_wrapper(func, inputs)
 
         futures =  [task_wrapper.submit(self, func, i) for i in input_list]
