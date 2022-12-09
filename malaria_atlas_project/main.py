@@ -165,6 +165,14 @@ class MalariaAtlasProject(Dataset):
         """
         logger = self.get_logger()
 
+        from prefect.filesystems import GitHub
+        block_name = "geo-datasets-github"
+        GitHub.load(block_name).get_directory('global_scripts')
+        import sys
+        sys.path.insert(1, 'global_scripts')
+        logger.warning(sys.path)
+        print(sys.path)
+
         max_attempts = 5
         if os.path.isfile(local_filename) and not self.overwrite_download:
             logger.info(f"Download Exists: {url}")
