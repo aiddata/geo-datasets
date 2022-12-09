@@ -92,6 +92,10 @@ class MalariaAtlasProject(Dataset):
 
             profile = copy(src.profile)
 
+            # These creation options are not supported by the COG driver
+            for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
+                del profile[k]
+
             profile.update({
                 'driver': 'COG',
                 'compress': 'LZW',
@@ -203,7 +207,7 @@ class MalariaAtlasProject(Dataset):
         self.log_run(copy_futures)
 
         logger.info("Converting raw tifs to COGs")
-        conversions = self.run_tasks(self.convert_to_cog, copy_futures)
+        conversions = self.run_tasks(self.convert_to_cog, copy_futures.results())
         self.log_run(conversions)
 
 
