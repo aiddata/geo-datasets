@@ -14,7 +14,7 @@ from collections.abc import Sequence
 A namedtuple that represents the results of one task
 You can access a status code, for example, using TaskResult.status_code or TaskResult[0]
 """
-TaskResult = namedtuple("TaskResult", ["status_code", "status_message", "result"])
+TaskResult = namedtuple("TaskResult", ["status_code", "status_message", "args", "result"])
 
 class ResultTuple(Sequence):
     """
@@ -42,6 +42,12 @@ class ResultTuple(Sequence):
         success_count = sum(1 for t in self.elements if t.status_code == 0)
         error_count = len(self.elements) - success_count
         return f"<ResultTuple named \"{self.name}\" with {success_count} successes, {error_count} errors>"
+
+    def args(self):
+        args = [t.args for t in self.elements if t.status_code == 0]
+        if len(args) < len(self.elements):
+            logging.getLogger("dataset").warning(f"args() function for ResultTuple {self.name} skipping errored tasks")
+        return args
 
     def results(self):
         results = [t.result for t in self.elements if t.status_code == 0]
@@ -84,9 +90,9 @@ class Dataset(ABC):
         It will always return a TaskResult!
         """
         try:
-            return TaskResult(0, "Success", func(*args))
+            return TaskResult(0, "Success", args, func(*args))
         except Exception as e:
-            return TaskResult(1, repr(e), None)
+            return TaskResult(1, repr(e), args, None)
 
 
     def run_serial_tasks(self, name, func, input_list):
@@ -173,6 +179,7 @@ class Dataset(ABC):
 
     def log_run(self,
                 results,
+                expand_args: list=[],
                 expand_results: list=[],
                 time_format_str: str="%Y_%m_%d_%H_%M"):
         """
@@ -188,23 +195,47 @@ class Dataset(ABC):
         time_str = results.timestamp.strftime(time_format_str)
         log_file = self.log_dir / f"{results.name}_{time_str}.csv"
 
-        expansion_spec = []
-        should_expand_results = False
-        for i, h in enumerate(expand_results):
-            if h is not None:
-                expansion_spec.append(h, i)
-                should_expand_results = True
-
         fieldnames = ["status_code", "status_message"]
-        rows_to_write = []
-        if should_expand_results:
-            for h, _ in expansion_spec:
-                fieldnames.append(h)
-            for r in results:
-                rows_to_write.append(r[:1].extend([r[i] for _, i in expansion_spec]))
-        else:
+
+        should_expand_args = False
+        args_expansion_spec = []
+
+        for ai, ax in enumerate(expand_args):
+            if ax is not None:
+                should_expand_args = True
+                fieldnames.append(ax)
+                args_expansion_spec.append((ax, ai))
+
+        if not should_expand_args:
+            fieldnames.append("args")
+
+        should_expand_results = False
+        results_expansion_spec = []
+
+        for ri, rx in enumerate(expand_results):
+            if rx is not None:
+                should_expand_results = True
+                fieldnames.append(rx)
+                results_expansion_spec.append((rx, ri))
+
+        if not should_expand_results:
             fieldnames.append("results")
-            rows_to_write = [list(r) for r in results]
+
+        rows_to_write = []
+
+        for r in results:
+            row = [r[0], r[1]]
+            if should_expand_args:
+                row.append(row.extend([r[2][i] if r[2] is not None else None for _, i in args_expansion_spec]))
+            else:
+                row.append(r[2])
+
+            if should_expand_results:
+                row.append(row.extend([r[3][i] if r[3] is not None else None  for _, i in results_expansion_spec]))
+            else:
+                row.append(r[3])
+
+            rows_to_write.append(row)
 
         with open(log_file, "w", newline="") as lf:
             writer = csv.writer(lf)
