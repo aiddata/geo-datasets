@@ -292,11 +292,15 @@ class Dataset(ABC):
 
             if task_runner == "sequential":
                 tr = SequentialTaskRunner
+            elif task_runner == "concurrent" or task_runner is None:
+                tr = ConcurrentTaskRunner
             elif task_runner == "dask":
                 from prefect_dask import DaskTaskRunner
                 tr = DaskTaskRunner(**kwargs)
-            elif task_runner == "concurrent" or task_runner is None:
-                tr = ConcurrentTaskRunner
+            elif task_runner == "hpc":
+                from hpc import HPCDaskTaskRunner
+                job_name = "".join(self.name.split())
+                tr = HPCDaskTaskRunner(num_procs=max_workers, job_name=job_name, **kwargs)
             else:
                 raise ValueError("Prefect task runner not recognized")
 
