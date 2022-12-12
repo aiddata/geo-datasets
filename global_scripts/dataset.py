@@ -136,12 +136,10 @@ class Dataset(ABC):
         results = []
         for f in futures:
             state = f[1].wait()
-            print(state.name)
-            if state.name == "Completed":
-                status_code = 0
+            if state.is_completed():
+                results.append(TaskResult(0, "Success", f[0], state.result()))
             else:
-                status_code = 1
-            results.append(TaskResult(status_code, state.name, f[0], state.result()))
+                results.append(TaskResult(1, repr(state.result(raise_on_failure=False)), f[0], None))
 
         return results
 
@@ -327,7 +325,7 @@ class Dataset(ABC):
         log_dir: str="logs",
         logger_level=logging.INFO,
         retries: int=3,
-        retry_delay: int=30,
+        retry_delay: int=5,
         **kwargs):
         """
         Run a dataset
