@@ -127,11 +127,9 @@ class Dataset(ABC):
 
         from prefect import task
 
-        @task(name=name, retries=self.retries, retry_delay_seconds=self.retry_delay)
-        def task_wrapper(self, func, args):
-            return func(*args)
+        task_wrapper = task(func, name=name, retries=self.retries, retry_delay_seconds=self.retry_delay)
 
-        futures =  [(i, task_wrapper.submit(self, func, i)) for i in input_list]
+        futures =  [(i, task_wrapper.submit(*i)) for i in input_list]
 
         results = []
         for f in futures:
