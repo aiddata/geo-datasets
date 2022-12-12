@@ -1,5 +1,6 @@
 import os
 import csv
+import time
 import logging
 import multiprocessing
 from pathlib import Path
@@ -89,10 +90,15 @@ class Dataset(ABC):
         This is the wrapper that is used when running individual tasks
         It will always return a TaskResult!
         """
-        try:
-            return TaskResult(0, "Success", args, func(*args))
-        except Exception as e:
-            return TaskResult(1, repr(e), args, None)
+        for try_no in range(self.retries + 1):
+            try:
+                return TaskResult(0, "Success", args, func(*args))
+            except Exception as e:
+                if try_no < self.retries:
+                    time.sleep(self.retry_delay)
+                    continue
+                else:
+                    return TaskResult(1, repr(e), args, None)
 
 
     def run_serial_tasks(self, name, func, input_list):
@@ -121,12 +127,23 @@ class Dataset(ABC):
 
         from prefect import task
 
-        @task(name=name)
-        def task_wrapper(self, func, inputs):
-            return self.error_wrapper(func, inputs)
+        @task(name=name, retries=self.retries, retry_delay_seconds=self.retry_delay)
+        def task_wrapper(self, func, args):
+            return func(*args)
 
-        futures = [task_wrapper.submit(self, func, i) for i in input_list]
-        return [f.result() for f in futures]
+        futures =  [(i, task_wrapper.submit(self, func, i)) for i in input_list]
+
+        results = []
+        for f in futures:
+            state = f[1].wait()
+            print(state.name)
+            if state.name == "Completed":
+                status_code = 0
+            else:
+                status_code = 1
+            results.append(TaskResult(status_code, state.name, f[0], state.result()))
+
+        return results
 
 
     def run_mpi_tasks(self, name, func, input_list):
@@ -146,9 +163,10 @@ class Dataset(ABC):
     def run_tasks(self,
                   func,
                   input_list,
-                  retries: int=0,
                   allow_futures: bool=True,
-                  name: Optional[str]=None):
+                  name: Optional[str]=None,
+                  retries: Optional[int]=None,
+                  retry_delay: Optional[int]=None):
         """
         Run a bunch of tasks, calling one of the above run_tasks functions
         This is the function that should be called most often from self.main()
@@ -157,10 +175,14 @@ class Dataset(ABC):
 
         timestamp = datetime.today()
 
-        logger = self.get_logger()
-
         if not callable(func):
             raise TypeError("Function passed to run_tasks is not callable")
+
+        # Save global retry settings, and override with current values
+        old_retries, old_retry_delay = self.retries, self.retry_delay
+        self.retries, self.retry_delay = self.init_retries(retries, retry_delay)
+
+        logger = self.get_logger()
 
         if name is None:
             try:
@@ -191,6 +213,9 @@ class Dataset(ABC):
             logger.info(f"Task run {name} completed with {success_count} successes and no errors")
         else:
             logger.warning(f"Task run {name} completed with {error_count} errors and {success_count} successes")
+
+        # Restore global retry settings
+        self.retries, self.retry_delay = old_retries, old_retry_delay
 
         return ResultTuple(results, name, timestamp)
 
@@ -261,6 +286,37 @@ class Dataset(ABC):
             writer.writerows(rows_to_write)
 
 
+    def init_retries(self, retries: int, retry_delay: int, save_settings: bool=False):
+        """
+        Given a number of task retries and a retry_delay,
+        checks to make sure those values are valid
+        (ints greater than or equal to zero), and
+        optionally sets class variables to keep their
+        settings
+        """
+        if isinstance(retries, int):
+            if retries < 0:
+                raise ValueError("Number of task retries must be greater than or equal to zero")
+            elif save_settings:
+                self.retries = retries
+        elif retries is None:
+            retries = self.retries
+        else:
+            raise TypeError("retries must be an int greater than or equal to zero")
+
+        if isinstance(retry_delay, int):
+            if retry_delay < 0:
+                raise ValueError("Retry delay must be greater than or equal to zero")
+            elif save_settings:
+                self.retry_delay = retry_delay
+        elif retry_delay is None:
+            retry_delay = self.retry_delay
+        else:
+            raise TypeError("retry_delay must be an int greater than or equal to zero, representing the number of seconds to wait before retrying a task")
+
+        return retries, retry_delay
+
+
     def run(
         self,
         backend: Optional[str]=None,
@@ -270,6 +326,8 @@ class Dataset(ABC):
         chunksize: int=1,
         log_dir: str="logs",
         logger_level=logging.INFO,
+        retries: int=3,
+        retry_delay: int=30,
         **kwargs):
         """
         Run a dataset
@@ -278,6 +336,8 @@ class Dataset(ABC):
         """
 
         timestamp = datetime.today()
+
+        self.init_retries(retries, retry_delay, save_settings=True)
 
         self.log_dir = Path(log_dir)
         self.chunksize = chunksize
