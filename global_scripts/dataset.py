@@ -125,7 +125,7 @@ class Dataset(ABC):
         def task_wrapper(self, func, inputs):
             return self.error_wrapper(func, inputs)
 
-        futures =  [task_wrapper.submit(self, func, i) for i in input_list]
+        futures = [task_wrapper.submit(self, func, i) for i in input_list]
         return [f.result() for f in futures]
 
 
@@ -184,6 +184,13 @@ class Dataset(ABC):
 
         if len(results) == 0:
             raise ValueError(f"Task run {name} yielded no results. Did it receive any inputs?")
+
+        success_count = sum(1 for r in results if r.status_code == 0)
+        error_count = len(results) - success_count
+        if error_count == 0:
+            logger.info(f"Task run {name} completed with {success_count} successes and no errors")
+        else:
+            logger.warning(f"Task run {name} completed with {error_count} errors and {success_count} successes")
 
         return ResultTuple(results, name, timestamp)
 
