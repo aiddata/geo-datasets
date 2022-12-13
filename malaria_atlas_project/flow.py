@@ -22,8 +22,8 @@ from malaria import MalariaAtlasProject
 
 @flow
 def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
+    import sys, os
     sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
-    import os
     print(os.listdir(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"])))
     print(sys.path)
 
