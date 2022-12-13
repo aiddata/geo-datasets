@@ -211,7 +211,7 @@ class MalariaAtlasProject(Dataset):
         self.log_run(copy_futures)
 
         logger.info("Converting raw tifs to COGs")
-        conversions = self.run_tasks(self.convert_to_cog, copy_futures)
+        conversions = self.run_tasks(self.convert_to_cog, copy_futures.results())
         self.log_run(conversions)
 
 
