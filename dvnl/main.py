@@ -1,13 +1,8 @@
-# VERSION: works with dataset class, currently doesn't support dask or prefect yet
 # data download script for DVNL ntl data 
 # info link: https://eogdata.mines.edu/products/dmsp/#dvnl 
 
 import os
 import sys
-import copy
-import time
-import datetime
-import warnings
 import requests
 import rasterio
 from rasterio import windows
@@ -37,48 +32,28 @@ class DVNL(Dataset):
         test_request.raise_for_status()
 
 
-    def download_file(self, url, local_filename):
-        """Download a file from url to local_filename
-        Downloads in chunks
-        """
-        with requests.get(url, stream=True, verify=True) as r:
-            r.raise_for_status()
-            with open(local_filename, 'wb') as f:
-                for chunk in r.iter_content(chunk_size=1024*1024):
-                    f.write(chunk)
-
     def manage_download(self, year, overwrite=False):
-        """download individual file using session created
-        this needs to be a standalone function rather than a method
-        of SessionWithHeaderRedirection because we need to be able
-        to pass it to our mpi4py map function
         """
-        
+        Download individual file
+        """
 
         logger = self.get_logger()
 
         download_dest = self.download_url.format(YEAR = year)
         local_filename = self.raw_dir / f"raw_dvnl_{year}.tif"
 
-        max_attempts = 5
         if os.path.isfile(local_filename) and not overwrite:
             logger.info(f"Download Exists: {download_dest}")
         else:
-            attempts = 1
-            while attempts <= max_attempts:
-                try:
-                    self.download_file(download_dest, local_filename)
-                except Exception as e:
-                    attempts += 1
-                    if attempts > max_attempts:
-                        logger.info(f"Download error: " + e)
+            with requests.get(download_dest, stream=True, verify=True) as r:
+                r.raise_for_status()
+                with open(local_filename, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=1024*1024):
+                        f.write(chunk)
+            logger.info(f"Downloaded: {download_dest}")
 
-                else:
-                    logger.info(f"Downloaded: {download_dest}")
-                    return (download_dest, local_filename)
-        
-        
-    
+        return (download_dest, local_filename)
+
 
     def convert_to_cog(self, year, overwrite=False):
         """
@@ -120,8 +95,6 @@ class DVNL(Dataset):
             return (src_path, dst_path)
 
 
-        
-
     def main(self):
 
         logger = self.get_logger()
@@ -143,10 +116,10 @@ class DVNL(Dataset):
 
 
 def get_config_dict(config_file="config.ini"):
-        config = ConfigParser()
-        config.read(config_file)
+    config = ConfigParser()
+    config.read(config_file)
 
-        return {
+    return {
             "raw_dir": Path(config["main"]["raw_dir"]),
             "output_dir": Path(config["main"]["output_dir"]),
             "years": [int(y) for y in config["main"]["years"].split(", ")],
