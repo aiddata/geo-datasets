@@ -30,7 +30,7 @@ from configparser import ConfigParser
 import rasterio
 from rasterio import windows
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
 
@@ -168,14 +168,6 @@ class MalariaAtlasProject(Dataset):
         to pass it to our mpi4py map function
         """
         logger = self.get_logger()
-
-        from prefect.filesystems import GitHub
-        block_name = "geo-datasets-github"
-        GitHub.load(block_name).get_directory('global_scripts')
-        import sys
-        sys.path.insert(1, 'global_scripts')
-        logger.warning(sys.path)
-        print(sys.path)
 
         max_attempts = 5
         if os.path.isfile(local_filename) and not self.overwrite_download:
