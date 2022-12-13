@@ -16,22 +16,22 @@ GitHub.load(block_name).get_directory('global_scripts')
 # sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
 
-import malaria
+# import malaria
 from malaria import MalariaAtlasProject
 
 
 @flow
 def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
 
-    import sys, os
-    sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
-    print(os.listdir(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"])))
-    print(sys.path)
+    # import sys, os
+    # sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
+    # print(os.listdir(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"])))
+    # print(sys.path)
 
-    import malaria
+    # import malaria
     #from malaria import MalariaAtlasProject
 
 
-    class_instance = malaria.MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
+    class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
 
     class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=log_dir)
