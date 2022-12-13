@@ -92,6 +92,10 @@ class MalariaAtlasProject(Dataset):
 
             profile = copy(src.profile)
 
+            # These creation options are not supported by the COG driver
+            for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
+                del profile[k]
+
             profile.update({
                 'driver': 'COG',
                 'compress': 'LZW',
@@ -139,7 +143,7 @@ class MalariaAtlasProject(Dataset):
             year_file_name = self.data_info["data_name"] + f"_{year}.tif"
 
             tif_path = raw_geotiff_dir / year_file_name
-            cog_path = self.output_dir / year_file_name
+            cog_path = self.output_dir / self.dataset / year_file_name
 
             flist.append((zip_file_local_name, year_file_name, tif_path, cog_path))
 
@@ -196,6 +200,9 @@ class MalariaAtlasProject(Dataset):
         # download data zipFile from url to the local output directory
         downloads = self.run_tasks(self.manage_download, [(self.data_info["data_zipFile_url"], zip_file_local_name)])
         self.log_run(downloads)
+
+        dataset_output_dir = self.output_dir / self.dataset
+        dataset_output_dir.mkdir(parents=True, exist_ok=True)
 
         logger.info("Copying data files")
         file_copy_list = self.copy_data_files(zip_file_local_name)
