@@ -11,7 +11,7 @@ vortex_cluster_kwargs = {
     "memory": "30GB",
     "interface": "ib0",
     "job_script_prologue": [
-        "source "/usr/local/anaconda3-2021.05/etc/profile.d/conda.csh"", 
+        "source "/usr/local/anaconda3-2021.05/etc/profile.d/conda.csh", 
         "module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05",
         "conda activate geodata38"
     ]
