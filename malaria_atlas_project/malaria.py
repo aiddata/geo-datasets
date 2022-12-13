@@ -436,7 +436,7 @@ from configparser import ConfigParser
 import rasterio
 from rasterio import windows
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+#sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 #sys.path.insert(1, '/sciclone/home20/smgoodman/geo-datasets-testing/geo-datasets/global_scripts')
 
 #from dataset import Dataset
@@ -639,16 +639,4 @@ def get_config_dict(config_file="config.ini"):
         "log_dir": Path(config["main"]["raw_dir"]) / "logs"
     }
 
-if __name__ == "__main__":
-
-    #from dataset import Dataset
-
-    #sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-    #sys.path.insert(1, '/sciclone/home20/smgoodman/geo-datasets-testing/geo-datasets/global_scripts')
-
-    #config_dict = get_config_dict()
-
-    #class_instance = MalariaAtlasProject(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["dataset"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
-
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
 

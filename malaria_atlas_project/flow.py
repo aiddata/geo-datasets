@@ -26,9 +26,10 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
 
     print(sys.path)
 
-    from malaria import MalariaAtlasProject
+    import malaria
+    #from malaria import MalariaAtlasProject
 
 
-    class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
+    class_instance = malaria.MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
 
     class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=log_dir)
