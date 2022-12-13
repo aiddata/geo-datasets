@@ -3,6 +3,7 @@
 # info link: https://eogdata.mines.edu/products/dmsp/#dvnl 
 
 import os
+import sys
 import copy
 import time
 import datetime
@@ -13,6 +14,8 @@ from rasterio import windows
 from copy import copy
 from pathlib import Path
 from configparser import ConfigParser
+
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
 
