@@ -17,7 +17,7 @@ GitHub.load(block_name).get_directory('global_scripts')
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
 
 
-from main import MalariaAtlasProject
+from malaria import MalariaAtlasProject
 
 
 @flow
