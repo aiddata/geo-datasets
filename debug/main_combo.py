@@ -14,7 +14,9 @@ vortex_cluster_kwargs = {
         "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh", 
         "module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05",
         "conda activate geodata38",
-        "git clone -b malaria_debug https://github.com/aiddata/geo-datasets.git",
+        "set tmpdir=`mktemp -d",
+        "cd $tmpdir",
+        "git clone -b malaria_debug https://github.com/aiddata/geo-datasets.git .",
         "cd geo-datasets/debug",
         "ls ./"
     ],
