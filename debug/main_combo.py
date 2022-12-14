@@ -15,8 +15,10 @@ vortex_cluster_kwargs = {
         "module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05",
         "conda activate geodata38",
         "git clone -b malaria_debug https://github.com/aiddata/geo-datasets.git",
-        "cd geo-datasets/debug"
-    ]
+        "cd geo-datasets/debug",
+        "ls ./"
+    ],
+    "log_directory": "/sciclone/home20/smgoodman"
 }
 
 # these have not yet been tuned
