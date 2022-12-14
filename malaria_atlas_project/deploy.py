@@ -29,7 +29,7 @@ from configparser import ConfigParser
 from prefect.deployments import Deployment
 from prefect.filesystems import GitHub
 
-from main import get_config_dict
+from malaria_main import get_config_dict
 
 sys.path.append('global_scripts')
 
