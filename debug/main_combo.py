@@ -16,9 +16,8 @@ vortex_cluster_kwargs = {
         "conda activate geodata38",
         "set tmpdir=`mktemp -d",
         "cd $tmpdir",
-        "git clone -b malaria_debug https://github.com/aiddata/geo-datasets.git .",
+        "git clone -b malaria_debug https://github.com/aiddata/geo-datasets.git",
         "cd geo-datasets/debug",
-        "ls ./"
     ],
     "log_directory": "/sciclone/home20/smgoodman"
 }
