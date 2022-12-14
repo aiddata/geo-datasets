@@ -18,6 +18,7 @@ vortex_cluster_kwargs = {
         "cd $tmpdir",
         "git clone -b malaria_debug https://github.com/aiddata/geo-datasets.git",
         "cd geo-datasets/debug",
+        "cp ../global_scripts/* ."
     ],
     "log_directory": "/sciclone/home20/smgoodman"
 }

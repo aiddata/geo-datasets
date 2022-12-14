@@ -20,7 +20,7 @@ sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
 
 
-from main_combo import DebugDataset
+from deploy_main import DebugDataset
 
 
 @flow
@@ -30,7 +30,7 @@ def debug_flow(raw_dir, backend, task_runner, run_parallel, max_workers, log_dir
     print(os.listdir(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"])))
     print(sys.path)
 
-    from main_combo import DebugDataset
+    from deploy_main import DebugDataset
 
     class_instance = DebugDataset(raw_dir)
 
