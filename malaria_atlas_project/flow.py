@@ -14,6 +14,7 @@ config.read(config_file)
 
 block_name = config["deploy"]["storage_block"]
 GitHub.load(block_name).get_directory('global_scripts')
+GitHub.load(block_name).get_directory(config["github"]["directory"])
 
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
@@ -31,7 +32,7 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
 
     #import malaria
     #from malaria import MalariaAtlasProject
-    # from main_combo import MalariaAtlasProject
+    from main_combo import MalariaAtlasProject
 
 
     class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
