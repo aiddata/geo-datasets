@@ -319,6 +319,7 @@ class Dataset(ABC):
         task_runner: Optional[str]=None,
         run_parallel: bool=False,
         max_workers: Optional[int]=None,
+        cores_per_process: Optional[int]=None,
         chunksize: int=1,
         log_dir: str="logs",
         logger_level=logging.INFO,
