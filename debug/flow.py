@@ -24,7 +24,7 @@ from main_combo import DebugDataset
 
 
 @flow
-def malaria_atlas_project(raw_dir, backend, task_runner, run_parallel, max_workers, log_dir):
+def debug_flow(raw_dir, backend, task_runner, run_parallel, max_workers, log_dir):
     import sys, os
     sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
     print(os.listdir(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"])))
