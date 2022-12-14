@@ -13,7 +13,8 @@ vortex_cluster_kwargs = {
     "job_script_prologue": [
         "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh", 
         "module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05",
-        "conda activate geodata38"
+        "conda activate geodata38",
+        "git clone -b malaria_debug https://github.com/aiddata/geo-datasets.git"
     ]
 }
 
@@ -580,7 +581,9 @@ class MalariaAtlasProject(Dataset):
         logger = self.get_logger()
         print('md', sys.path)
         #sys.path.insert(1, '/sciclone/home20/smgoodman/geo-datasets-testing/geo-datasets/global_scripts')
-
+        sys.path.insert(1, 'geo-datasets/global_scripts')
+        sys.path.insert(1, 'geo-datasets/malaria_atlas_project')
+        
         max_attempts = 5
         if os.path.isfile(local_filename) and not self.overwrite_download:
             logger.info(f"Download Exists: {url}")
@@ -606,7 +609,10 @@ class MalariaAtlasProject(Dataset):
 
         logger.info("Testing Connection...")
         self.test_connection()
+
         #sys.path.insert(1, '/sciclone/home20/smgoodman/geo-datasets-testing/geo-datasets/global_scripts')
+        sys.path.insert(1, 'geo-datasets/global_scripts')
+        sys.path.insert(1, 'geo-datasets/malaria_atlas_project')
 
         logger.info("Running data download")
         zip_file_local_name = raw_zip_dir / (self.data_info["data_name"] + ".zip")
