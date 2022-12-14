@@ -102,6 +102,9 @@ class MalariaAtlasProject(Dataset):
                 if k in profile:
                     del profile[k]
 
+            print(profile)
+            logger.info(profile)
+            
             with rasterio.open(dst_path, 'w+', **profile) as dst:
 
                 for ji, src_window in src.block_windows(1):
