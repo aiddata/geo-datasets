@@ -92,14 +92,15 @@ class MalariaAtlasProject(Dataset):
 
             profile = copy(src.profile)
 
-            # These creation options are not supported by the COG driver
-            for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
-                del profile[k]
-
             profile.update({
                 'driver': 'COG',
                 'compress': 'LZW',
             })
+
+            # These creation options are not supported by the COG driver
+            for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
+                if k in profile:
+                    del profile[k]
 
             with rasterio.open(dst_path, 'w+', **profile) as dst:
 
