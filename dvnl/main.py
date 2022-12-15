@@ -19,11 +19,12 @@ class DVNL(Dataset):
 
     name = "DVNL"
 
-    def __init__(self, raw_dir, output_dir, years, overwrite=False):
+    def __init__(self, raw_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
         self.raw_dir = raw_dir
         self.output_dir = output_dir
         self.years = years
-        self.overwrite = overwrite
+        self.overwrite_download = overwrite_download
+        self.overwrite_processing = overwrite_processing
         self.download_url = "https://eogdata.mines.edu/wwwdata/viirs_products/dvnl/DVNL_{YEAR}.tif"
     
     def test_connection(self):
@@ -32,7 +33,7 @@ class DVNL(Dataset):
         test_request.raise_for_status()
 
 
-    def manage_download(self, year, overwrite=False):
+    def manage_download(self, year):
         """
         Download individual file
         """
@@ -42,7 +43,7 @@ class DVNL(Dataset):
         download_dest = self.download_url.format(YEAR = year)
         local_filename = self.raw_dir / f"raw_dvnl_{year}.tif"
 
-        if os.path.isfile(local_filename) and not overwrite:
+        if os.path.isfile(local_filename) and not self.overwrite_download:
             logger.info(f"Download Exists: {download_dest}")
         else:
             with requests.get(download_dest, stream=True, verify=True) as r:
@@ -55,7 +56,7 @@ class DVNL(Dataset):
         return (download_dest, local_filename)
 
 
-    def convert_to_cog(self, year, overwrite=False):
+    def convert_to_cog(self, year):
         """
         Convert GeoTIFF to Cloud Optimized GeoTIFF (COG)
         """
@@ -64,7 +65,7 @@ class DVNL(Dataset):
         src_path = self.raw_dir / f"raw_dvnl_{year}.tif"
         dst_path = self.output_dir / f"dvnl_{year}.tif"
 
-        if os.path.isfile(dst_path) and not overwrite:
+        if os.path.isfile(dst_path) and not self.overwrite_processing:
             logger.info(f"Converted File Exists: {dst_path}")
             return (src_path, dst_path)
 
@@ -110,7 +111,7 @@ class DVNL(Dataset):
 
         os.makedirs(self.output_dir, exist_ok=True)
 
-        logger.info("Converting data files")
+        logger.info("Converting raw tifs to COGs")
         conversions = self.run_tasks(self.convert_to_cog, [[y] for y in self.years])
         self.log_run(conversions)
 
@@ -127,12 +128,13 @@ def get_config_dict(config_file="config.ini"):
             "backend": config["run"]["backend"],
             "run_parallel": config["run"].getboolean("run_parallel"),
             "max_workers": int(config["run"]["max_workers"]),
-            "overwrite": config["main"].getboolean("overwrite")
+            "overwrite_download": config["main"].getboolean("overwrite_download"),
+            "overwrite_processing": config["main"].getboolean("overwrite_processing")
         }
 
 if __name__ == "__main__":
     config_dict = get_config_dict()
 
-    class_instance = DVNL(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite"])
+    class_instance = DVNL(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
