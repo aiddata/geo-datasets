@@ -51,6 +51,10 @@ def get_cluster_kwargs(
             raise ValueError("Cluster name not recognized")
     cluster_kwargs["name"] = job_name
     cluster_kwargs["walltime"] = walltime
+    if 'cluster_kwargs' in kwargs:
+        cluster_kwargs.update(kwargs['cluster_kwargs'])
+        del kwargs['cluster_kwargs']
+        
     cluster_kwargs.update(kwargs)
     if cores_per_process:
         cluster_kwargs["processes"] = math.floor(
