@@ -7,6 +7,6 @@
 module load anaconda3/2021.05
 conda activate geodata38
 
-setenv TMPDIR /sciclone/scr20
+setenv TMPDIR /sciclone/scr20/sgoodman
 
 prefect agent start -q geodata
