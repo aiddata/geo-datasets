@@ -28,7 +28,7 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
     time_format_str: str="%Y_%m_%d_%H_%M"
     time_str = timestamp.strftime(time_format_str)
     timestamp_log_dir = Path(log_dir) / time_str
-    timestamp_log_dir.mkdir(parents=True, exists_ok=True)
+    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",

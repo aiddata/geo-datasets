@@ -246,8 +246,8 @@ if __name__ == "__main__":
     timestamp = datetime.today()
     time_format_str: str="%Y_%m_%d_%H_%M"
     time_str = timestamp.strftime(time_format_str)
-    timestamp_log_dir = Path(log_dir / time_str)
-    timestamp_log_dir.mkdir(parents=True, exists_ok=True)
+    timestamp_log_dir = Path(log_dir) / time_str
+    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
 
     class_instance = MalariaAtlasProject(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["dataset"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
