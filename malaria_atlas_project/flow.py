@@ -38,7 +38,7 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
             "cd geo-datasets/malaria_atlas_project",
             "cp ../global_scripts/* ."
         ],
-        "log_directory": "/sciclone/home20/smgoodman"
+        "log_directory": log_dir
     }
 
     class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
