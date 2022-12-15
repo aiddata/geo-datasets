@@ -10,17 +10,6 @@ vortex_cluster_kwargs = {
     "processes": 12,
     "memory": "30GB",
     "interface": "ib0",
-    # "job_script_prologue": [
-    #     "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-    #     "module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05",
-    #     "conda activate geodata38",
-    #     "set tmpdir=`mktemp -d`",
-    #     "cd $tmpdir",
-    #     "git clone -b develop https://github.com/aiddata/geo-datasets.git",
-    #     "cd geo-datasets/malaria_atlas_project",
-    #     "cp ../global_scripts/* ."
-    # ],
-    # "log_directory": "/sciclone/home20/smgoodman"
 }
 
 # these have not yet been tuned
@@ -56,6 +45,7 @@ def get_cluster_kwargs(
         del kwargs['cluster_kwargs']
         
     cluster_kwargs.update(kwargs)
+
     if cores_per_process:
         cluster_kwargs["processes"] = math.floor(
             cluster_kwargs["cores"] / cores_per_process
