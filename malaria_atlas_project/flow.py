@@ -27,7 +27,7 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
     timestamp = datetime.today()
     time_format_str: str="%Y_%m_%d_%H_%M"
     time_str = timestamp.strftime(time_format_str)
-    timestamp_log_dir = Path(log_dir / time_str)
+    timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exists_ok=True)
 
     cluster_kwargs = {
@@ -52,7 +52,7 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
             "cd geo-datasets/malaria_atlas_project",
             "cp ../global_scripts/* ."
         ],
-        "log_directory": timestamp_log_dir
+        "log_directory": str(timestamp_log_dir)
     }
 
     class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
