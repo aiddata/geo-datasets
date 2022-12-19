@@ -48,4 +48,4 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
 
     class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
 
-    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, cores_per_process=cores_per_process, log_dir=timestamp_log_dir, cluster_kwargs=cluster_kwargs)
+    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, cores_per_process=cores_per_process, log_dir=timestamp_log_dir, **cluster_kwargs)
