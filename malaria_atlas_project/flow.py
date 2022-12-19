@@ -7,7 +7,6 @@ from configparser import ConfigParser
 from prefect import flow
 from prefect.filesystems import GitHub
 
-from main import MalariaAtlasProject
 
 
 config_file = "malaria_atlas_project/config.ini"
@@ -19,6 +18,9 @@ GitHub.load(block_name).get_directory('global_scripts')
 
 
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
+from main import MalariaAtlasProject
+
+
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 @flow
@@ -29,7 +31,7 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-    tmp_dir = Path(os.getcwd()) / 'malaria_atlas_project'
+    # tmp_dir = Path(os.getcwd()) / 'malaria_atlas_project'
 
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
