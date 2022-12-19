@@ -15,9 +15,9 @@ vortex_cluster_kwargs = {
 # these have not yet been tuned
 hima_cluster_kwargs = {
     "shebang": "#!/bin/tcsh",
-    "resource_spec": "nodes=1:c18a:ppn=12",
-    "cores": 12,
-    "processes": 12,
+    "resource_spec": "nodes=1:hima:ppn=32",
+    "cores": 3,
+    "processes": 3,
     "memory": "30GB",
     "interface": "ib0",
 }

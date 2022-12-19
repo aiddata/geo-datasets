@@ -36,8 +36,7 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
         "cores": 12,
         "processes": 12,
         "memory": "30GB",
-        # "interface": "ib0",
-        "interface": "eth0",
+        "interface": "ib0",
         "job_extra_directives": [
             "#PBS -j oe",
             # "#PBS -o ",
@@ -45,13 +44,36 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
         ],
         "job_script_prologue": [
             "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-            "module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05",
+            "module loadanaconda3/2021.05",
             "conda activate geodata38",
             f"cd {tmp_dir}",
         ],
         "log_directory": str(timestamp_log_dir)
     }
 
+    cluster = "hima"
+
+    cluster_kwargs = {
+        "shebang": "#!/bin/tcsh",
+        "resource_spec": "nodes=1:hima:ppn=32",
+        "cores": 2,
+        "processes": 2,
+        "memory": "30GB",
+        "interface": "ib0",
+        "job_extra_directives": [
+            "#PBS -j oe",
+            # "#PBS -o ",
+            # "#PBS -e ",
+        ],
+        "job_script_prologue": [
+            "source /usr/local/anaconda3-2020.02/etc/profile.d/conda.csh",
+            "module load anaconda3/2021.05",
+            "conda activate geodata_38h1",
+            f"cd {tmp_dir}",
+        ],
+        "log_directory": str(timestamp_log_dir)
+    }
+    
     class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
 
     class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, cores_per_process=cores_per_process, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
