@@ -18,7 +18,7 @@ block_name = config["deploy"]["storage_block"]
 GitHub.load(block_name).get_directory('global_scripts')
 
 
-# sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), config["github"]["directory"]))
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 @flow
@@ -45,10 +45,6 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
         ],
 
         "job_script_prologue": [
-            "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-            "module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05",
-            "conda activate geodata38",
-
             f"cd {tmp_dir}",
         ],
 
