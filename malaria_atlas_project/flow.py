@@ -7,8 +7,6 @@ from configparser import ConfigParser
 from prefect import flow
 from prefect.filesystems import GitHub
 
-from main import MalariaAtlasProject
-
 
 config_file = "malaria_atlas_project/config.ini"
 config = ConfigParser()
@@ -17,7 +15,10 @@ config.read(config_file)
 block_name = config["deploy"]["storage_block"]
 GitHub.load(block_name).get_directory('global_scripts')
 
+from main import MalariaAtlasProject
+
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+
 
 @flow
 def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, cores_per_process, log_dir):
