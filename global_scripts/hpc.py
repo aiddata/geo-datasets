@@ -34,7 +34,6 @@ def get_cluster_kwargs(
         cluster_kwargs = vortex_cluster_kwargs
     elif cluster == "hima":
         cluster_kwargs = hima_cluster_kwargs
-        raise NotImplementedError("Hima cluster not yet supported")
     else:
         if 'cluster_kwargs' not in kwargs:
             raise ValueError("Cluster name not recognized")
