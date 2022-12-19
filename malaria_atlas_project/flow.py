@@ -46,20 +46,20 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
             # "#PBS -e ",
         ],
 
-        # "job_script_prologue": [
-        #     f"cd {tmp_dir}",
-        # ],
-
         "job_script_prologue": [
-            "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-            "module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05",
-            "conda activate geodata38",
-            "set tmpdir=`mktemp -d`",
-            "cd $tmpdir",
-            "git clone -b develop https://github.com/aiddata/geo-datasets.git",
-            "cd geo-datasets/malaria_atlas_project",
-            "cp ../global_scripts/* ."
+            f"cd {tmp_dir}",
         ],
+
+        # "job_script_prologue": [
+        #     "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+        #     "module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05",
+        #     "conda activate geodata38",
+        #     "set tmpdir=`mktemp -d`",
+        #     "cd $tmpdir",
+        #     "git clone -b develop https://github.com/aiddata/geo-datasets.git",
+        #     "cd geo-datasets/malaria_atlas_project",
+        #     "cp ../global_scripts/* ."
+        # ],
 
         "log_directory": str(timestamp_log_dir)
     }
