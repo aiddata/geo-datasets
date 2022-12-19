@@ -5,6 +5,8 @@
 #PBS -j oe
 
 module load anaconda3/2021.05
+# module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0
+
 conda activate geodata38
 
 setenv TMPDIR /sciclone/scr20/$USER
