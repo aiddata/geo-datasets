@@ -36,7 +36,7 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
         "cores": 12,
         "processes": 12,
         "memory": "30GB",
-        "interface": "ib0",
+        # "interface": "ib0",
         "job_extra_directives": [
             "#PBS -j oe",
             # "#PBS -o ",
