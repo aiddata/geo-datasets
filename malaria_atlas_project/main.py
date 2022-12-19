@@ -28,9 +28,6 @@ from zipfile import ZipFile
 from configparser import ConfigParser
 from datetime import datetime
 
-import rasterio
-from rasterio import windows
-
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
@@ -81,6 +78,10 @@ class MalariaAtlasProject(Dataset):
         """
         Convert GeoTIFF to Cloud Optimized GeoTIFF (COG)
         """
+
+        import rasterio
+        from rasterio import windows
+
         logger = self.get_logger()
 
         if not self.overwrite_processing and dst_path.exists():
@@ -105,7 +106,7 @@ class MalariaAtlasProject(Dataset):
 
             print(profile)
             logger.info(profile)
-            
+
             with rasterio.open(dst_path, 'w+', **profile) as dst:
 
                 for ji, src_window in src.block_windows(1):
