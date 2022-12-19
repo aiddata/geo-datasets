@@ -43,7 +43,7 @@ def get_cluster_kwargs(
     if 'cluster_kwargs' in kwargs:
         cluster_kwargs.update(kwargs['cluster_kwargs'])
         del kwargs['cluster_kwargs']
-        
+
     cluster_kwargs.update(kwargs)
 
     if cores_per_process:
