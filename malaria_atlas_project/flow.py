@@ -27,6 +27,25 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
+
+    cluster_kwargs = {
+        "shebang": "#!/bin/tcsh",
+        "resource_spec": "nodes=1:c18a:ppn=12",
+        "cores": 12,
+        "processes": 12,
+        "memory": "30GB",
+        "interface": "ib0",
+        "job_extra_directives": [
+            "#PBS -j oe",
+            # "#PBS -o ",
+            # "#PBS -e ",
+        ],
+        "job_script_prologue": [
+            f"cd {tmp_dir}",
+        ],
+        "log_directory": str(timestamp_log_dir)
+    }
+
     class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
 
-    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, cores_per_process=cores_per_process, log_dir=timestamp_log_dir, job_script_prologue=[f"cd {tmp_dir}"])
+    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, cores_per_process=cores_per_process, log_dir=timestamp_log_dir, cluster_kwargs=cluster_kwargs)
