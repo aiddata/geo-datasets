@@ -3,12 +3,9 @@ Download and prepare data
 """
 import sys
 import os
-import glob
-import time
 import zipfile
 import datetime
 from pathlib import Path
-from typing import Optional
 from configparser import ConfigParser
 
 import cdsapi
