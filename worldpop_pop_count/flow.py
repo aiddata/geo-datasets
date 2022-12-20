@@ -32,8 +32,8 @@ def worldpop_pop_count(raw_dir, output_dir, years, overwrite_download, overwrite
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 7,
-        "processes": 7,
+        "cores": 1,
+        "processes": 1,
         "memory": "32GB",
         "interface": "ib0",
         "job_extra_directives": [
