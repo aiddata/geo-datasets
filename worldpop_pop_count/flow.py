@@ -54,6 +54,7 @@ def worldpop_pop_count(raw_dir, output_dir, years, overwrite_download, overwrite
     class_instance = WorldPopCount(raw_dir, output_dir, years, overwrite_download, overwrite_processing)
 
     if task_runner != 'hpc':
+        os.chdir(tmp_dir)
         class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
     else:
         class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
