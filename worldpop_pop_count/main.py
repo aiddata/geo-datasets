@@ -12,10 +12,6 @@ from pathlib import Path
 from configparser import ConfigParser
 from datetime import datetime
 
-import rasterio
-from rasterio import windows
-
-
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
@@ -115,40 +111,41 @@ class WorldPopCount(Dataset):
 
         if not self.overwrite_processing and dst_path.exists():
             logger.info(f"COG Exists: {dst_path}")
-            return
 
-        logger.info(f"Generating COG: {dst_path}")
+        else:
 
-        with rasterio.open(src_path, 'r') as src:
+            logger.info(f"Generating COG: {dst_path}")
 
-            profile = copy(src.profile)
+            with rasterio.open(src_path, 'r') as src:
 
-            profile.update({
-                'driver': 'COG',
-                'compress': 'LZW',
-            })
+                profile = copy(src.profile)
 
-            # These creation options are not supported by the COG driver
-            for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
-                if k in profile:
-                    del profile[k]
+                profile.update({
+                    'driver': 'COG',
+                    'compress': 'LZW',
+                })
 
-            print(profile)
-            logger.info(profile)
+                # These creation options are not supported by the COG driver
+                for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
+                    if k in profile:
+                        del profile[k]
 
-            with rasterio.open(dst_path, 'w+', **profile) as dst:
+                print(profile)
+                logger.info(profile)
 
-                for ji, src_window in src.block_windows(1):
-                    # convert relative input window location to relative output window location
-                    # using real world coordinates (bounds)
-                    src_bounds = windows.bounds(src_window, transform=src.profile["transform"])
-                    dst_window = windows.from_bounds(*src_bounds, transform=dst.profile["transform"])
-                    # round the values of dest_window as they can be float
-                    dst_window = windows.Window(round(dst_window.col_off), round(dst_window.row_off), round(dst_window.width), round(dst_window.height))
-                    # read data from source window
-                    r = src.read(1, window=src_window)
-                    # write data to output window
-                    dst.write(r, 1, window=dst_window)
+                with rasterio.open(dst_path, 'w+', **profile) as dst:
+
+                    for ji, src_window in src.block_windows(1):
+                        # convert relative input window location to relative output window location
+                        # using real world coordinates (bounds)
+                        src_bounds = windows.bounds(src_window, transform=src.profile["transform"])
+                        dst_window = windows.from_bounds(*src_bounds, transform=dst.profile["transform"])
+                        # round the values of dest_window as they can be float
+                        dst_window = windows.Window(round(dst_window.col_off), round(dst_window.row_off), round(dst_window.width), round(dst_window.height))
+                        # read data from source window
+                        r = src.read(1, window=src_window)
+                        # write data to output window
+                        dst.write(r, 1, window=dst_window)
 
 
     def main(self):
