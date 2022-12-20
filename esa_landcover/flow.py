@@ -20,7 +20,7 @@ tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def esa_landcover(raw_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel,  max_workers, cores_per_process, log_dir):
+def esa_landcover(raw_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel,  max_workers, log_dir):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -32,8 +32,8 @@ def esa_landcover(raw_dir, output_dir, years, overwrite_download, overwrite_proc
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 1,
-        "processes": 1,
+        "cores": 3,
+        "processes": 3,
         "memory": "32GB",
         "interface": "ib0",
         "job_extra_directives": [
@@ -75,4 +75,4 @@ def esa_landcover(raw_dir, output_dir, years, overwrite_download, overwrite_proc
 
     class_instance = ESALandcover(raw_dir, output_dir, years, overwrite_download, overwrite_processing)
 
-    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, cores_per_process=cores_per_process, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
+    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
