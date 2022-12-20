@@ -15,9 +15,10 @@ import cdsapi
 import rasterio
 import numpy as np
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
+
 
 def raster_calc(input_path, output_path, function, **kwargs):
     """
@@ -110,6 +111,7 @@ class ESALandcover(Dataset):
 
         self.map_func = np.vectorize(vector_mapping.get)
 
+
     def download(self, year):
 
         logger = self.get_logger()
@@ -169,17 +171,20 @@ class ESALandcover(Dataset):
 
 
     def main(self):
+        logger = self.get_logger()
 
         os.makedirs(self.raw_dir / "compressed", exist_ok=True)
         os.makedirs(self.raw_dir / "uncompressed", exist_ok=True)
 
         # Download data
+        logger.info("Running data download")
         download = self.run_tasks(self.download, [[y] for y in self.years])
         self.log_run(download)
 
         os.makedirs(self.output_dir, exist_ok=True)
 
         # Process data
+        logger.info("Running processing")
         process_inputs = zip(download.results(), [self.output_dir / f"esa_lc_{year}.tif" for year in self.years])
         process = self.run_tasks(self.process, process_inputs)
         self.log_run(process)
@@ -199,13 +204,23 @@ def get_config_dict(config_file="config.ini"):
         "task_runner": config["run"]["task_runner"],
         "run_parallel": config["run"].getboolean("run_parallel"),
         "max_workers": int(config["run"]["max_workers"]),
+        "cores_per_process": int(config["run"]["cores_per_process"]),
         "log_dir": Path(config["main"]["raw_dir"]) / "logs"
     }
+
 
 if __name__ == "__main__":
 
     config_dict = get_config_dict()
 
+    log_dir = config_dict["log_dir"]
+    timestamp = datetime.today()
+    time_format_str: str="%Y_%m_%d_%H_%M"
+    time_str = timestamp.strftime(time_format_str)
+    timestamp_log_dir = Path(log_dir) / time_str
+    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+
     class_instance = ESALandcover(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
+    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], cores_per_process=config_dict["cores_per_process"], log_dir=timestamp_log_dir)
