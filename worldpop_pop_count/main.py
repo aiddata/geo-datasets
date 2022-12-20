@@ -146,17 +146,21 @@ class WorldPopCount(Dataset):
         logger.info("Testing Connection...")
         self.test_connection()
 
-        logger.info("Running data download")
+        logger.info("Preparing for data download")
         download_flist = self.create_download_list()
         self.raw_dir.mkdir(parents=True, exist_ok=True)
+
+        logger.info("Running data download")
         downloads = self.run_tasks(self.manage_download, download_flist)
         self.log_run(downloads, expand_args=["url", "download_path"])
 
-        logger.info("Converting raw tifs to COGs")
+        logger.info("Preparing for processing")
         process_flist = self.create_process_list()
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
+        logger.info("Converting raw tifs to COGs")
         conversions = self.run_tasks(self.convert_to_cog, process_flist)
-        self.log_run(conversions)
+        self.log_run(conversions, expand_args=["src_path", "dst_path"])
 
 
 def get_config_dict(config_file="config.ini"):
