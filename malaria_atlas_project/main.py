@@ -239,6 +239,7 @@ def get_config_dict(config_file="config.ini"):
         "log_dir": Path(config["main"]["raw_dir"]) / "logs"
     }
 
+
 if __name__ == "__main__":
 
     config_dict = get_config_dict()
