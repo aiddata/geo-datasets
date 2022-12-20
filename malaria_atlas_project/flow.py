@@ -32,9 +32,9 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 12,
-        "processes": 12,
-        "memory": "30GB",
+        "cores": 6,
+        "processes": 6,
+        "memory": "32GB",
         "interface": "ib0",
         "job_extra_directives": [
             "#PBS -j oe",
