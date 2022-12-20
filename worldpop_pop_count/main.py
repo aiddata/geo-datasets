@@ -107,6 +107,10 @@ class WorldPopCount(Dataset):
         """
         Convert GeoTIFF to Cloud Optimized GeoTIFF (COG)
         """
+
+        import rasterio
+        from rasterio import windows
+
         logger = self.get_logger()
 
         if not self.overwrite_processing and dst_path.exists():
@@ -123,6 +127,14 @@ class WorldPopCount(Dataset):
                 'driver': 'COG',
                 'compress': 'LZW',
             })
+
+            # These creation options are not supported by the COG driver
+            for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
+                if k in profile:
+                    del profile[k]
+
+            print(profile)
+            logger.info(profile)
 
             with rasterio.open(dst_path, 'w+', **profile) as dst:
 
