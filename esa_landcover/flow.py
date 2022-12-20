@@ -32,9 +32,9 @@ def esa_landcover(raw_dir, output_dir, years, overwrite_download, overwrite_proc
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 12,
-        "processes": 12,
-        "memory": "30GB",
+        "cores": 1,
+        "processes": 1,
+        "memory": "32GB",
         "interface": "ib0",
         "job_extra_directives": [
             "#PBS -j oe",
