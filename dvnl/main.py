@@ -20,8 +20,8 @@ class DVNL(Dataset):
     name = "DVNL"
 
     def __init__(self, raw_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
-        self.raw_dir = raw_dir
-        self.output_dir = output_dir
+        self.raw_dir = Path(raw_dir)
+        self.output_dir = Path(output_dir)
         self.years = years
         self.overwrite_download = overwrite_download
         self.overwrite_processing = overwrite_processing
@@ -126,8 +126,10 @@ def get_config_dict(config_file="config.ini"):
             "years": [int(y) for y in config["main"]["years"].split(", ")],
             "log_dir": Path(config["main"]["output_dir"]) / "logs", 
             "backend": config["run"]["backend"],
+            "task_runner": config["run"]["task_runner"],
             "run_parallel": config["run"].getboolean("run_parallel"),
             "max_workers": int(config["run"]["max_workers"]),
+            "cores_per_process": int(config["run"]["cores_per_process"]),
             "overwrite_download": config["main"].getboolean("overwrite_download"),
             "overwrite_processing": config["main"].getboolean("overwrite_processing")
         }
@@ -137,4 +139,4 @@ if __name__ == "__main__":
 
     class_instance = DVNL(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
-    class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
+    class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
