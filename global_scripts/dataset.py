@@ -332,8 +332,6 @@ class Dataset(ABC):
         This is how Datasets should usually be run
         """
 
-        timestamp = datetime.today()
-
         self.init_retries(retries, retry_delay, save_settings=True)
 
         self.log_dir = Path(log_dir)

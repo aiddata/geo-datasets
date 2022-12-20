@@ -50,6 +50,10 @@ def worldpop_pop_count(raw_dir, output_dir, years, overwrite_download, overwrite
         "log_directory": str(timestamp_log_dir)
     }
 
+    if task_runner != 'hpc':
+        cluster = None
+        cluster_kwargs = None
+
     class_instance = WorldPopCount(raw_dir, output_dir, years, overwrite_download, overwrite_processing)
 
     class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
