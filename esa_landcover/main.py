@@ -58,7 +58,7 @@ def export_raster(data, path, meta, **kwargs):
         'count': 1,
         'crs': {'init': 'epsg:4326'},
         'driver': 'COG',
-        'compress': 'lzw',
+        'compress': 'LZW',
         'nodata': -9999,
     }
 
@@ -162,7 +162,10 @@ class ESALandcover(Dataset):
 
         else:
             logger.info(f"Processing: {input_path}")
-            kwargs = {"driver": "GTiff", "compress": "LZW"}
+            kwargs = {
+                "driver": "COG",
+                "compress": "LZW"
+            }
             netcdf_path = f"netcdf:{input_path}:lccs_class"
             raster_calc(netcdf_path, output_path, self.map_func, **kwargs)
 
