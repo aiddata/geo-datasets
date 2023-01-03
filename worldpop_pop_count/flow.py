@@ -34,7 +34,7 @@ def worldpop_pop_count(raw_dir, output_dir, years, overwrite_download, overwrite
         "resource_spec": "nodes=1:c18a:ppn=12",
         "cores": 1,
         "processes": 1,
-        "memory": "32GB",
+        "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [
             "#PBS -j oe",
