@@ -7,20 +7,20 @@ from prefect import flow
 from prefect.filesystems import GitHub
 
 
-config_file = "malaria_atlas_project/config.ini"
+config_file = "esa_landcover/config.ini"
 config = ConfigParser()
 config.read(config_file)
 
 block_name = config["deploy"]["storage_block"]
 GitHub.load(block_name).get_directory('global_scripts')
 
-from main import MalariaAtlasProject
+from main import ESALandcover
 
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
+def esa_landcover(raw_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel,  max_workers, log_dir):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -32,8 +32,8 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 6,
-        "processes": 6,
+        "cores": 3,
+        "processes": 3,
         "memory": "32GB",
         "interface": "ib0",
         "job_extra_directives": [
@@ -73,6 +73,6 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
     #     "log_directory": str(timestamp_log_dir)
     # }
 
-    class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
+    class_instance = ESALandcover(raw_dir, output_dir, years, overwrite_download, overwrite_processing)
 
     class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
