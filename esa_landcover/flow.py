@@ -43,7 +43,7 @@ def esa_landcover(raw_dir, output_dir, years, overwrite_download, overwrite_proc
         ],
         "job_script_prologue": [
             "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-            "module loadanaconda3/2021.05",
+            "module load anaconda3/2021.05",
             "conda activate geodata38",
             f"cd {tmp_dir}",
         ],
