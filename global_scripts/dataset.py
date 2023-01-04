@@ -161,8 +161,8 @@ class Dataset(ABC):
                   input_list,
                   allow_futures: bool=True,
                   name: Optional[str]=None,
-                  retries: Optional[int]=None,
-                  retry_delay: Optional[int]=None):
+                  retries: Optional[int]=3,
+                  retry_delay: Optional[int]=60):
         """
         Run a bunch of tasks, calling one of the above run_tasks functions
         This is the function that should be called most often from self.main()
