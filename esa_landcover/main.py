@@ -25,9 +25,19 @@ def raster_calc(input_path, output_path, function, **kwargs):
     :param function: function to apply to input raster values
     :param kwargs: additional meta args used to write output raster
     """
+
+    default_meta = {
+        'count': 1,
+        'crs': {'init': 'epsg:4326'},
+        'driver': 'COG',
+        'compress': 'LZW',
+        'nodata': -9999,
+    }
+
     with rasterio.open(input_path) as src:
         assert len(set(src.block_shapes)) == 1
         meta = src.meta.copy()
+        meta.update(**default_meta)
         meta.update(**kwargs)
         with rasterio.open(output_path, "w", **meta) as dst:
             for ji, window in src.block_windows(1):
@@ -35,6 +45,8 @@ def raster_calc(input_path, output_path, function, **kwargs):
                 out_data = function(in_data)
                 out_data = out_data.astype(meta["dtype"])
                 dst.write(out_data, window=window)
+
+    return
 
 
 def export_raster(data, path, meta, **kwargs):
@@ -169,6 +181,8 @@ class ESALandcover(Dataset):
             netcdf_path = f"netcdf:{input_path}:lccs_class"
             raster_calc(netcdf_path, output_path, self.map_func, **kwargs)
 
+        return
+        
 
     def main(self):
         logger = self.get_logger()
