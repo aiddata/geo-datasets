@@ -29,8 +29,8 @@ def raster_calc(input_path, output_path, function, **kwargs):
     default_meta = {
         'count': 1,
         'crs': {'init': 'epsg:4326'},
-        'driver': 'COG',
-        'compress': 'LZW',
+        'driver': 'GTiff',
+        # 'compress': 'LZW',
         'nodata': -9999,
     }
 
@@ -42,9 +42,9 @@ def raster_calc(input_path, output_path, function, **kwargs):
         with rasterio.open(output_path, "w", **meta) as dst:
             for ji, window in src.block_windows(1):
                 in_data = src.read(window=window)
-                out_data = function(in_data)
-                out_data = out_data.astype(meta["dtype"])
-                dst.write(out_data, window=window)
+                # out_data = function(in_data)
+                # out_data = out_data.astype(meta["dtype"])
+                # dst.write(out_data, window=window)
 
     return
 
@@ -182,7 +182,7 @@ class ESALandcover(Dataset):
             raster_calc(netcdf_path, output_path, self.map_func, **kwargs)
 
         return
-        
+
 
     def main(self):
         logger = self.get_logger()
