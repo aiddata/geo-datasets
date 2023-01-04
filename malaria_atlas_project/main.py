@@ -146,10 +146,10 @@ class MalariaAtlasProject(Dataset):
 
         flist = []
         for year in years:
-            year_file_name = self.data_info["data_name"][7:] + f"_{year}.tif"
+            year_file_name = self.data_info["data_name"] + f"_{year}.tif"
 
             tif_path = raw_geotiff_dir / year_file_name
-            cog_path = self.output_dir / self.dataset / year_file_name
+            cog_path = self.output_dir / self.dataset / year_file_name[7:]
 
             flist.append((zip_file_local_name, year_file_name, tif_path, cog_path))
 
