@@ -43,7 +43,7 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
         ],
         "job_script_prologue": [
             "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-            "module load anaconda3/2021.05",
+            "module loadanaconda3/2021.05",
             "conda activate geodata38",
             f"cd {tmp_dir}",
         ],
