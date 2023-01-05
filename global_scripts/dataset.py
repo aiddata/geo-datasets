@@ -152,17 +152,21 @@ class Dataset(ABC):
         while futures:
             for ix, (inputs, future) in enumerate(futures):
                 state = future.get_state()
+                print(repr(state))
                 if state.is_completed():
+                    print('complete', ix, inputs)
                     results.append(TaskResult(0, "Success", inputs, state.result()))
                     _ = futures.pop(ix)
                 elif state.is_failed() or state.is_crashed() or state.is_cancelled():
+                    print('fail', ix, inputs)
                     try:
-                        msg = repr(state.result(raise_on_failure=False))
+                        msg = repr(state.result(raise_on_failure=True))
                     except:
                         msg = "Unable to retrieve error message"
                     results.append(TaskResult(1, msg, inputs, None))
                     _ = futures.pop(ix)
                 else:
+                    print('not ready', ix, inputs)
                     pass
 
         return results
