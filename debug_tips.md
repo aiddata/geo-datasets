@@ -1,5 +1,6 @@
 * package versions:
     - prefect==2.7.3
+    - prefect-dask==0.2.2
     - dask-jobqueue==0.8.1
     - rasterio==1.3.3 (needs to be installed using pip typically)
 
