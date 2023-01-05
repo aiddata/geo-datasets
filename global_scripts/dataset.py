@@ -153,6 +153,7 @@ class Dataset(ABC):
             for ix, (inputs, future) in enumerate(futures):
                 state = future.get_state()
                 print(repr(state))
+                print(repr(future))
                 if state.is_completed():
                     print('complete', ix, inputs)
                     results.append(TaskResult(0, "Success", inputs, future.result()))
@@ -168,7 +169,7 @@ class Dataset(ABC):
                 else:
                     print('not ready', ix, inputs)
                     pass
-
+            time.sleep(15)
         return results
 
 
