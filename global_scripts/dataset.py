@@ -129,15 +129,41 @@ class Dataset(ABC):
 
         task_wrapper = task(func, name=name, retries=self.retries, retry_delay_seconds=self.retry_delay)
 
-        futures =  [(i, task_wrapper.submit(*i)) for i in input_list]
+        futures =  [(i, task_wrapper.submit(*i, return_state=False)) for i in input_list]
 
         results = []
-        for f in futures:
-            state = f[1].wait()
-            if state.is_completed():
-                results.append(TaskResult(0, "Success", f[0], state.result()))
-            else:
-                results.append(TaskResult(1, repr(state.result(raise_on_failure=False)), f[0], None))
+
+        # for inputs, future in futures:
+        #     state = future.wait()
+        #     while True:
+        #         if state.is_completed():
+        #             results.append(TaskResult(0, "Success", inputs, state.result()))
+        #             break
+        #         elif state.is_failed() or state.is_crashed():
+        #             try:
+        #                 msg = repr(state.result(raise_on_failure=False))
+        #             except:
+        #                 msg = "Unable to retrieve error message"
+        #             results.append(TaskResult(1, msg, inputs, None))
+        #             break
+        #         else:
+        #             pass
+
+        while futures:
+            for ix, (inputs, future) in enumerate(futures):
+                state = future.get_state()
+                if state.is_completed():
+                    results.append(TaskResult(0, "Success", inputs, state.result()))
+                    _ = futures.pop(ix)
+                elif state.is_failed() or state.is_crashed() or state.is_cancelled():
+                    try:
+                        msg = repr(state.result(raise_on_failure=False))
+                    except:
+                        msg = "Unable to retrieve error message"
+                    results.append(TaskResult(1, msg, inputs, None))
+                    _ = futures.pop(ix)
+                else:
+                    pass
 
         return results
 
