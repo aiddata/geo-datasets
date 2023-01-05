@@ -155,12 +155,12 @@ class Dataset(ABC):
                 print(repr(state))
                 if state.is_completed():
                     print('complete', ix, inputs)
-                    results.append(TaskResult(0, "Success", inputs, state.result()))
+                    results.append(TaskResult(0, "Success", inputs, future.result()))
                     _ = futures.pop(ix)
                 elif state.is_failed() or state.is_crashed() or state.is_cancelled():
                     print('fail', ix, inputs)
                     try:
-                        msg = repr(state.result(raise_on_failure=True))
+                        msg = repr(future.result(raise_on_failure=True))
                     except:
                         msg = "Unable to retrieve error message"
                     results.append(TaskResult(1, msg, inputs, None))
