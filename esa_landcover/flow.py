@@ -14,13 +14,14 @@ config.read(config_file)
 block_name = config["deploy"]["storage_block"]
 GitHub.load(block_name).get_directory('global_scripts')
 
+
 from main import ESALandcover
 
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def esa_landcover(raw_dir, tmp_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel,  max_workers, log_dir):
+def esa_landcover(raw_dir, process_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel,  max_workers, log_dir):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -74,6 +75,6 @@ def esa_landcover(raw_dir, tmp_dir, output_dir, years, overwrite_download, overw
     #     "log_directory": str(timestamp_log_dir)
     # }
 
-    class_instance = ESALandcover(raw_dir, tmp_dir, output_dir, years, overwrite_download, overwrite_processing)
+    class_instance = ESALandcover(raw_dir, process_dir, output_dir, years, overwrite_download, overwrite_processing)
 
     class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)

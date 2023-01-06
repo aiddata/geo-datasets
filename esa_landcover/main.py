@@ -88,10 +88,10 @@ def export_raster(data, path, meta, **kwargs):
 class ESALandcover(Dataset):
     name = "ESA Landcover"
 
-    def __init__(self, raw_dir, tmp_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
+    def __init__(self, raw_dir, process_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
 
         self.raw_dir = Path(raw_dir)
-        self.tmp_dir = Path(tmp_dir)
+        self.process_dir = Path(process_dir)
         self.output_dir = Path(output_dir)
         self.overwrite_download = overwrite_download
         self.overwrite_processing = overwrite_processing
@@ -181,7 +181,7 @@ class ESALandcover(Dataset):
                 "compress": "LZW"
             }
 
-            tmp_path = self.tmp_dir / Path(input_path).name
+            tmp_path = self.process_dir / Path(input_path).name
             shutil.copyfile(input_path, tmp_path)
             netcdf_path = f"netcdf:{tmp_path}:lccs_class"
 
@@ -216,7 +216,7 @@ def get_config_dict(config_file="config.ini"):
 
     return {
         "raw_dir": Path(config["main"]["raw_dir"]),
-        "tmp_dir": Path(config["main"]["tmp_dir"]),
+        "process_dir": Path(config["main"]["process_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "overwrite_download": config["main"].getboolean("overwrite_download"),
@@ -234,13 +234,13 @@ if __name__ == "__main__":
     config_dict = get_config_dict()
 
     log_dir = config_dict["log_dir"]
-    timestamp = datetime.today()
+    timestamp = datetime.datetime.today()
     time_format_str: str="%Y_%m_%d_%H_%M"
     time_str = timestamp.strftime(time_format_str)
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
 
-    class_instance = ESALandcover(config_dict["raw_dir"], config_dict["tmp_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
+    class_instance = ESALandcover(config_dict["raw_dir"], config_dict["process_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
