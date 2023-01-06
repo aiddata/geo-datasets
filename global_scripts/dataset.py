@@ -157,7 +157,6 @@ class Dataset(ABC):
                 if state.is_completed():
                     print('complete', ix, inputs)
                     results.append(TaskResult(0, "Success", inputs, future.result()))
-                    _ = futures.pop(ix)
                 elif state.is_failed() or state.is_crashed() or state.is_cancelled():
                     print('fail', ix, inputs)
                     try:
@@ -165,10 +164,11 @@ class Dataset(ABC):
                     except:
                         msg = "Unable to retrieve error message"
                     results.append(TaskResult(1, msg, inputs, None))
-                    _ = futures.pop(ix)
                 else:
                     print('not ready', ix, inputs)
-                    pass
+                    continue
+                _ = futures.pop(ix)
+                future.release()
             time.sleep(15)
         return results
 
