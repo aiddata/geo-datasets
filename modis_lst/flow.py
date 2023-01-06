@@ -19,7 +19,7 @@ from main import MODISLandSurfaceTemp
 
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
-sys.path.append(tmp_dir.as_posix())
+# sys.path.append(tmp_dir.as_posix())
 
 
 @flow
@@ -33,14 +33,14 @@ def modis_lst(raw_dir, output_dir, username, password, years, overwrite_download
     cluster = "vortex"
 
     cluster_kwargs = {
-        "shebang": "#!/bin/tsch",
+        "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 12,
-        "processes": 1,
-        "memory": "30GB",
+        "cores": 6,
+        "processes": 6,
+        "memory": "32GB",
         "interface": "ib0",
         "job_extra_directives": [
-            "#PBS -j oe",
+            "-j oe",
         ],
         "job_script_prologue": [
             f"cd {tmp_dir}",
