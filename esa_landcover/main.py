@@ -46,7 +46,6 @@ def raster_calc(input_path, output_path, function, **kwargs):
                 out_data = function(in_data)
                 out_data = out_data.astype(meta["dtype"])
                 dst.write(out_data, window=window)
-                break
 
     return
 
