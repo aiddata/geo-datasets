@@ -40,15 +40,12 @@ def raster_calc(input_path, output_path, function, **kwargs):
         meta.update(**default_meta)
         meta.update(**kwargs)
         with rasterio.open(output_path, "w", **meta) as dst:
-            c = 0
             for ji, window in src.block_windows(1):
                 in_data = src.read(window=window)
                 out_data = function(in_data)
                 out_data = out_data.astype(meta["dtype"])
                 dst.write(out_data, window=window)
-                c+=1
-                if c > 10:
-                    return
+                break
 
     return
 
