@@ -181,11 +181,15 @@ class ESALandcover(Dataset):
                 "compress": "LZW"
             }
 
-            tmp_path = self.process_dir / Path(input_path).name
-            shutil.copyfile(input_path, tmp_path)
-            netcdf_path = f"netcdf:{tmp_path}:lccs_class"
+            tmp_input_path = self.process_dir / Path(input_path).name
+            tmp_output_path = self.process_dir / Path(output_path).name
 
-            raster_calc(netcdf_path, output_path, self.map_func, **kwargs)
+            shutil.copyfile(input_path, tmp_input_path)
+
+            netcdf_path = f"netcdf:{tmp_input_path}:lccs_class"
+            raster_calc(netcdf_path, tmp_output_path, self.map_func, **kwargs)
+
+            shutil.copyfile(tmp_output_path, output_path)
 
         return
 
