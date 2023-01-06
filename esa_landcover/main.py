@@ -39,9 +39,9 @@ def raster_calc(input_path, output_path, function, **kwargs):
         meta = src.meta.copy()
         meta.update(**default_meta)
         meta.update(**kwargs)
-        with rasterio.open(output_path, "w", **meta) as dst:
-            for ji, window in src.block_windows(1):
-                in_data = src.read(window=window)
+        # with rasterio.open(output_path, "w", **meta) as dst:
+            # for ji, window in src.block_windows(1):
+                # in_data = src.read(window=window)
                 # out_data = function(in_data)
                 # out_data = out_data.astype(meta["dtype"])
                 # dst.write(out_data, window=window)

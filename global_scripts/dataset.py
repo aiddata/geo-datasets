@@ -133,43 +133,44 @@ class Dataset(ABC):
 
         results = []
 
-        # for inputs, future in futures:
-        #     state = future.wait()
-        #     while True:
-        #         if state.is_completed():
-        #             results.append(TaskResult(0, "Success", inputs, state.result()))
-        #             break
-        #         elif state.is_failed() or state.is_crashed():
-        #             try:
-        #                 msg = repr(state.result(raise_on_failure=False))
-        #             except:
-        #                 msg = "Unable to retrieve error message"
-        #             results.append(TaskResult(1, msg, inputs, None))
-        #             break
-        #         else:
-        #             pass
-
-        while futures:
-            for ix, (inputs, future) in enumerate(futures):
-                state = future.get_state()
-                print(repr(state))
-                print(repr(future))
+        for inputs, future in futures:
+            state = future.wait()
+            while True:
                 if state.is_completed():
-                    print('complete', ix, inputs)
-                    results.append(TaskResult(0, "Success", inputs, future.result()))
-                elif state.is_failed() or state.is_crashed() or state.is_cancelled():
-                    print('fail', ix, inputs)
+                    results.append(TaskResult(0, "Success", inputs, state.result()))
+                    break
+                elif state.is_failed() or state.is_crashed():
                     try:
-                        msg = repr(future.result(raise_on_failure=True))
+                        msg = repr(state.result(raise_on_failure=False))
                     except:
                         msg = "Unable to retrieve error message"
                     results.append(TaskResult(1, msg, inputs, None))
+                    break
                 else:
-                    print('not ready', ix, inputs)
-                    continue
-                _ = futures.pop(ix)
-                future.release()
-            time.sleep(15)
+                    pass
+
+        # while futures:
+        #     for ix, (inputs, future) in enumerate(futures):
+        #         state = future.get_state()
+        #         print(repr(state))
+        #         print(repr(future))
+        #         if state.is_completed():
+        #             print('complete', ix, inputs)
+        #             results.append(TaskResult(0, "Success", inputs, future.result()))
+        #         elif state.is_failed() or state.is_crashed() or state.is_cancelled():
+        #             print('fail', ix, inputs)
+        #             try:
+        #                 msg = repr(future.result(raise_on_failure=True))
+        #             except:
+        #                 msg = "Unable to retrieve error message"
+        #             results.append(TaskResult(1, msg, inputs, None))
+        #         else:
+        #             print('not ready', ix, inputs)
+        #             continue
+        #         _ = futures.pop(ix)
+        #         future.release()
+        #     time.sleep(15)
+
         return results
 
 
