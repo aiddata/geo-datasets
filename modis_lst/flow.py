@@ -19,8 +19,6 @@ from main import MODISLandSurfaceTemp
 
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
-# sys.path.append(tmp_dir.as_posix())
-
 
 @flow
 def modis_lst(raw_dir, output_dir, username, password, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
