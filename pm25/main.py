@@ -2,6 +2,7 @@
 # version: multiple file download - HPC version, based off Dr. Goodman's script for converting nc file to tiff image, MONTHLY data
 
 import os
+import sys
 import time
 import hashlib
 import datetime
@@ -14,6 +15,8 @@ import pandas as pd
 from affine import Affine
 from netCDF4 import Dataset as NCDFDataset
 from boxsdk import JWTAuth, Client
+
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
                 
@@ -69,24 +72,24 @@ class PM25(Dataset):
     def __init__(self,
                  raw_dir: str,
                  output_dir: str,
+                 box_config_path: str,
                  years: list,
-                 skip_existing=True,
-                 verify_existing=True):
+                 skip_existing_downloads=True,
+                 verify_existing_downloads=True):
 
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
 
         self.years = [int(y) for y in years]
 
-        # TODO: add this to __init__ parameters?
-        self.box_config_path = "box_login_config.json"
+        self.box_config_path = Path(box_config_path)
     
         # skip existing files while downloading?
-        self.skip_existing = skip_existing
+        self.skip_existing_downloads = skip_existing_downloads
 
         # verify existing files' hashes while downloading?
-        # (skip_existing must also be set to True)
-        self.verify_existing = verify_existing
+        # (skip_existing_downloads must also be set to True)
+        self.verify_existing_downloads = verify_existing_downloads
 
         self.overwrite = False
 
@@ -101,8 +104,10 @@ class PM25(Dataset):
         """
         Downloads the contents of a Box folder to a dst_folder
 
-        skip_existing will skip file names that already exist in dst_folder
-        verify_existing will verify the hashes of existing files in dst_folder, if skip_existing is True
+        skip_existing will skip file names that already exist
+        in dst_folder verify_existing will verify the hashes
+        of existing files in dst_folder, if skip_existing is
+        True
         """
 
         logger = self.get_logger()
@@ -273,7 +278,7 @@ class PM25(Dataset):
         logger = self.get_logger()
 
         logger.info("Downloading / Verifying Data")
-        self.download_data(skip_existing=self.skip_existing, verify_existing=self.verify_existing)
+        self.download_data(skip_existing=self.skip_existing_downloads, verify_existing=self.verify_existing_downloads)
 
         logger.info("Generating Task List")
         conv_flist = self.build_process_list()
@@ -290,7 +295,8 @@ class PM25(Dataset):
 if __name__ == "__main__":
     raw_dir = Path(os.getcwd(), "input_data")
     output_dir = Path(os.getcwd(), "output_data")
+    box_config_path = "box_login_config.json"
 
     year_list = range(1998, 2021)
 
-    PM25(raw_dir, output_dir, year_list, skip_existing=True, verify_existing=False).run()
+    PM25(raw_dir, output_dir, box_config_path, year_list, skip_existing_downloads=True, verify_existing_downloads=False).run()
