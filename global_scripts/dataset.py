@@ -398,7 +398,7 @@ class Dataset(ABC):
             elif task_runner == "hpc":
                 from hpc import HPCDaskTaskRunner
                 job_name = "".join(self.name.split())
-                tr = HPCDaskTaskRunner(num_procs=max_workers, job_name=job_name, **kwargs)
+                tr = HPCDaskTaskRunner(num_procs=max_workers, job_name=job_name, log_dir=self.log_dir, **kwargs)
             else:
                 raise ValueError("Prefect task runner not recognized")
 

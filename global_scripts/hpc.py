@@ -1,5 +1,9 @@
 import math
+from pathlib import Path
+from warnings import warn
 from typing import Optional
+from contextlib import AsyncExitStack
+
 from dask_jobqueue import PBSCluster
 from prefect_dask.task_runners import DaskTaskRunner
 
@@ -60,7 +64,12 @@ def hpc_dask_cluster(num_procs: int, **kwargs) -> PBSCluster:
 
 
 class HPCDaskTaskRunner(DaskTaskRunner):
-    def __init__(self, num_procs: int, **kwargs):
+    def __init__(self, num_procs: int, log_dir=None, **kwargs):
+        if log_dir is not None:
+            self.log_dir = Path(log_dir)
+        else:
+            self.log_dir = None
+
         adapt_max = num_procs
         if "cluster_kwargs" in kwargs and "processes" in kwargs["cluster_kwargs"]:
             adapt_min = kwargs["cluster_kwargs"]["processes"]
@@ -72,3 +81,14 @@ class HPCDaskTaskRunner(DaskTaskRunner):
             "adapt_kwargs": {"minimum": adapt_min, "maximum": adapt_max},
         }
         super().__init__(**dask_task_runner_kwargs)
+
+    async def _start(self, exit_stack: AsyncExitStack):
+        await super()._start(exit_stack)
+        try:
+            if self.log_dir is not None:
+                with open(self.log_dir / "hpc_job_script", "x") as job_script_log:
+                    job_script_log.write(self._cluster.job_script())
+        except FileExistsError:
+            warn("hpc_job_script already exists in log directory! Skipping without overwriting.")
+        except Exception as e:
+            warn(f"Error occured while logging HPC job script: {repr(e)}")
