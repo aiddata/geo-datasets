@@ -47,7 +47,7 @@ def raster_calc(input_path, output_path, function, **kwargs):
                 out_data = out_data.astype(meta["dtype"])
                 dst.write(out_data, window=window)
                 c+=1
-                if c > 100:
+                if c > 10:
                     return
 
     return
