@@ -184,11 +184,14 @@ class ESALandcover(Dataset):
             tmp_input_path = self.process_dir / Path(input_path).name
             tmp_output_path = self.process_dir / Path(output_path).name
 
+            logger.info(f"Copying input to tmp {input_path} {tmp_input_path}...")
             shutil.copyfile(input_path, tmp_input_path)
 
+            logger.info(f"Running raster calc {tmp_input_path}...")
             netcdf_path = f"netcdf:{tmp_input_path}:lccs_class"
             raster_calc(netcdf_path, tmp_output_path, self.map_func, **kwargs)
 
+            logger.info(f"Copying output tmp to final {tmp_output_path} {output_path}...")
             shutil.copyfile(tmp_output_path, output_path)
 
         return
