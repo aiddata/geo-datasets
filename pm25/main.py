@@ -8,6 +8,7 @@ import hashlib
 import datetime
 import warnings
 from pathlib import Path
+from configparser import ConfigParser
 
 import rasterio
 import numpy as np
@@ -96,13 +97,14 @@ class PM25(Dataset):
         self.filename_template = "V5GL02.HybridPM25.Global.{YEAR}{FIRST_MONTH}-{YEAR}{LAST_MONTH}"
 
 
-    def download_items(self,
+    def download_folder(self,
                        box_folder,
                        dst_folder,
                        skip_existing=True,
                        verify_existing=True):
         """
-        Downloads the contents of a Box folder to a dst_folder
+        Generates a task list for download_item from a Box
+        folder
 
         skip_existing will skip file names that already exist
         in dst_folder verify_existing will verify the hashes
@@ -112,9 +114,10 @@ class PM25(Dataset):
 
         logger = self.get_logger()
 
+        dst_folder = Path(dst_folder)
         os.makedirs(dst_folder, exist_ok=True)
 
-        successful_downloads = []
+        task_list = []
 
         for i in box_folder.get_items():
             file_timeframe = i.name.split(".")[3].split("-")
@@ -123,6 +126,7 @@ class PM25(Dataset):
                 second_year = str(file_timeframe[1])[:4]
                 if first_year == second_year and int(first_year) in self.years:
                     
+
                     dst_file = os.path.join(dst_folder, i.name)
 
                     if skip_existing and os.path.isfile(dst_file):
@@ -137,25 +141,19 @@ class PM25(Dataset):
                             continue
                     else:
                         logger.info(f"Downloading: {dst_file}")
-
-                        with open(dst_file, "wb") as dst:
+                        with open(dst_folder / i.name, "wb") as dst:
                             i.download_to(dst)
 
-                    successful_downloads.append(dst_file)
 
                 else:
                     logger.debug(f"Skipping {i.name}, year not in range for this run")
             else:
                 raise Exception(f"Unable to parse file name: {i.name}")
 
-        return successful_downloads
 
-
-    def download_data(self, **kwargs):
+    def download(self, **kwargs):
         """
-        Downloads data from the Box shared folder for this dataset.
-
-        kwargs are passed to download_items
+        Generates a task list of downloads from the Box shared folder for this dataset.
         """
 
         # load JWT authentication JSON (see README.md for how to set this up)
@@ -189,11 +187,11 @@ class PM25(Dataset):
         elif not monthly_item:
             raise KeyError("Could not find directory \"Global/Monthly\" in shared Box folder")
 
-        # download Annual files
-        self.download_items(annual_item, "input_data/Annual/", **kwargs)
+        # generate Annual tasks
+        self.download_folder(annual_item, "input_data/Annual/", **kwargs)
 
-        # download Monthly files
-        self.download_items(monthly_item, "input_data/Monthly/", **kwargs)
+        # generate Monthly tasks
+        self.download_folder(monthly_item, "input_data/Monthly/", **kwargs)
 
 
     def convert_file(self, input_path, output_path):
@@ -277,8 +275,8 @@ class PM25(Dataset):
 
         logger = self.get_logger()
 
-        logger.info("Downloading / Verifying Data")
-        self.download_data(skip_existing=self.skip_existing_downloads, verify_existing=self.verify_existing_downloads)
+        logger.info("Downloading Data")
+        self.download(skip_existing=self.skip_existing_downloads, verify_existing=self.verify_existing_downloads)
 
         logger.info("Generating Task List")
         conv_flist = self.build_process_list()
@@ -292,11 +290,26 @@ class PM25(Dataset):
         self.log_run(conv)
 
 
+def get_config_dict(config_file="config.ini"):
+    config = ConfigParser()
+    config.read(config_file)
+
+    return {
+        "raw_dir": Path(config["main"]["raw_dir"]),
+        "output_dir": Path(config["main"]["output_dir"]),
+        "years": [int(y) for y in config["main"]["years"].split(", ")],
+        "box_config_path": Path(config["main"]["box_config_path"]),
+        "skip_existing_downloads": config["main"].getboolean("skip_existing_downloads"),
+        "verify_existing_downloads": config["main"].getboolean("verify_existing_downloads"),
+        "backend": config["run"]["backend"],
+        "task_runner": config["run"]["task_runner"],
+        "run_parallel": config["run"].getboolean("run_parallel"),
+        "max_workers": int(config["run"]["max_workers"]),
+        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
+    }
+
+
 if __name__ == "__main__":
-    raw_dir = Path(os.getcwd(), "input_data")
-    output_dir = Path(os.getcwd(), "output_data")
-    box_config_path = "box_login_config.json"
+    config = get_config_dict()
 
-    year_list = range(1998, 2021)
-
-    PM25(raw_dir, output_dir, box_config_path, year_list, skip_existing_downloads=True, verify_existing_downloads=False).run()
+    PM25(config["raw_dir"], config["output_dir"], config["box_config_path"], config["years"], config["skip_existing_downloads"], config["verify_existing_downloads"]).run(backend=config["backend"], task_runner=config["task_runner"], run_parallel=config["run_parallel"], max_workers=config["max_workers"], log_dir=config["log_dir"])
