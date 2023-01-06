@@ -2,7 +2,9 @@
 
 Produces monthly and annual land surface temperature products for day and night readings.
 
-@@ -8,14 +8,64 @@ https://lpdaac.usgs.gov/products/mod11c3v006/
+More info:
+https://lpdaac.usgs.gov/products/mod11c3v006/
+
 Downloaded from:
 https://e4ftl01.cr.usgs.gov/MOLT/MOD11C3.006
 
