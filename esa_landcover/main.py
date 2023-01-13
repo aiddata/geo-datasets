@@ -122,7 +122,7 @@ class ESALandcover(Dataset):
             default_meta = {
                 # 'count': 1,
                 # 'crs': {'init': 'epsg:4326'},
-                'driver': 'COG',
+                'driver': 'GTiff',
                 'compress': 'LZW',
                 # 'nodata': -9999,
             }
