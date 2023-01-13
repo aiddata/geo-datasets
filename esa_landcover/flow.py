@@ -52,6 +52,9 @@ def esa_landcover(raw_dir, process_dir, output_dir, years, overwrite_download, o
         "log_directory": str(timestamp_log_dir)
     }
 
+    if task_runner != "hpc":
+        os.chdir(tmp_dir)
+
     # cluster = "hima"
 
     # cluster_kwargs = {
