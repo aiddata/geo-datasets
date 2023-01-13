@@ -5,7 +5,7 @@ import sys
 import os
 import zipfile
 import shutil
-import datetime
+from datetime import datetime
 from pathlib import Path
 from configparser import ConfigParser
 
@@ -16,73 +16,6 @@ import numpy as np
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
-
-
-def raster_calc(input_path, output_path, function, **kwargs):
-    """
-    Calculate raster values using rasterio based on function provided
-    :param input_path: input raster
-    :param output_path: path to write output raster to
-    :param function: function to apply to input raster values
-    :param kwargs: additional meta args used to write output raster
-    """
-
-    default_meta = {
-        'count': 1,
-        'crs': {'init': 'epsg:4326'},
-        'driver': 'GTiff',
-        # 'compress': 'LZW',
-        'nodata': -9999,
-    }
-
-    with rasterio.open(input_path) as src:
-        assert len(set(src.block_shapes)) == 1
-        meta = src.meta.copy()
-        meta.update(**default_meta)
-        meta.update(**kwargs)
-        with rasterio.open(output_path, "w", **meta) as dst:
-            for ji, window in src.block_windows(1):
-                in_data = src.read(window=window)
-                out_data = function(in_data)
-                out_data = out_data.astype(meta["dtype"])
-                dst.write(out_data, window=window)
-
-    return
-
-
-def export_raster(data, path, meta, **kwargs):
-    """
-    Export raster array to geotiff
-    """
-
-    logger = self.get_logger()
-
-    if not isinstance(meta, dict):
-        raise ValueError("meta must be a dictionary")
-
-    if 'dtype' in meta:
-        if meta["dtype"] != data.dtype:
-            logger.warning(f"Dtype specified by meta({meta['dtype']}) does not match data dtype ({data.dtype}). Adjusting data dtype to match meta.")
-        data = data.astype(meta["dtype"])
-    else:
-        meta['dtype'] = data.dtype
-
-    default_meta = {
-        'count': 1,
-        'crs': {'init': 'epsg:4326'},
-        'driver': 'COG',
-        'compress': 'LZW',
-        'nodata': -9999,
-    }
-
-    for k, v in default_meta.items():
-        if k not in meta:
-            logger.info(f"Value for `{k}` not in meta provided. Using default value ({v})")
-            meta[k] = v
-
-    # write geotif file
-    with rasterio.open(path, "w", **meta) as dst:
-        dst.write(data)
 
 
 class ESALandcover(Dataset):
@@ -176,22 +109,36 @@ class ESALandcover(Dataset):
 
         else:
             logger.info(f"Processing: {input_path}")
-            kwargs = {
-                "driver": "COG",
-                "compress": "LZW"
-            }
 
             tmp_input_path = self.process_dir / Path(input_path).name
             tmp_output_path = self.process_dir / Path(output_path).name
 
-            logger.info(f"Copying input to tmp {input_path} {tmp_input_path}...")
+            logger.info(f"Copying input to tmp {input_path} {tmp_input_path}")
             shutil.copyfile(input_path, tmp_input_path)
 
-            logger.info(f"Running raster calc {tmp_input_path}...")
+            logger.info(f"Running raster calc {tmp_input_path} {tmp_output_path}")
             netcdf_path = f"netcdf:{tmp_input_path}:lccs_class"
-            raster_calc(netcdf_path, tmp_output_path, self.map_func, **kwargs)
 
-            logger.info(f"Copying output tmp to final {tmp_output_path} {output_path}...")
+            default_meta = {
+                # 'count': 1,
+                # 'crs': {'init': 'epsg:4326'},
+                'driver': 'COG',
+                'compress': 'LZW',
+                # 'nodata': -9999,
+            }
+
+            with rasterio.open(netcdf_path) as src:
+                assert len(set(src.block_shapes)) == 1
+                meta = src.meta.copy()
+                meta.update(**default_meta)
+                with rasterio.open(tmp_output_path, "w", **meta) as dst:
+                    for ji, window in src.block_windows(1):
+                        in_data = src.read(window=window)
+                        out_data = self.map_func(in_data)
+                        out_data = out_data.astype(meta["dtype"])
+                        dst.write(out_data, window=window)
+
+            logger.info(f"Copying output tmp to final {tmp_output_path} {output_path}")
             shutil.copyfile(tmp_output_path, output_path)
 
         return
@@ -241,7 +188,7 @@ if __name__ == "__main__":
     config_dict = get_config_dict()
 
     log_dir = config_dict["log_dir"]
-    timestamp = datetime.datetime.today()
+    timestamp = datetime.today()
     time_format_str: str="%Y_%m_%d_%H_%M"
     time_str = timestamp.strftime(time_format_str)
     timestamp_log_dir = Path(log_dir) / time_str

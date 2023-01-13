@@ -134,20 +134,17 @@ class Dataset(ABC):
         results = []
 
         for inputs, future in futures:
-            state = future.wait()
-            while True:
-                if state.is_completed():
-                    results.append(TaskResult(0, "Success", inputs, state.result()))
-                    break
-                elif state.is_failed() or state.is_crashed():
-                    try:
-                        msg = repr(state.result(raise_on_failure=False))
-                    except:
-                        msg = "Unable to retrieve error message"
-                    results.append(TaskResult(1, msg, inputs, None))
-                    break
-                else:
-                    pass
+            state = future.wait(timeout=60*60)
+            if state.is_completed():
+                results.append(TaskResult(0, "Success", inputs, state.result()))
+            elif state.is_failed() or state.is_crashed():
+                try:
+                    msg = repr(state.result(raise_on_failure=False))
+                except:
+                    msg = "Unable to retrieve error message"
+                results.append(TaskResult(1, msg, inputs, None))
+            else:
+                pass
 
         # while futures:
         #     for ix, (inputs, future) in enumerate(futures):
