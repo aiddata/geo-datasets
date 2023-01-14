@@ -36,7 +36,7 @@ def esa_landcover(raw_dir, process_dir, output_dir, years, overwrite_download, o
         "walltime": "02:00:00",
         "cores": 2,
         "processes": 2,
-        "memory": "32GB",
+        "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [
             "#PBS -j oe",
