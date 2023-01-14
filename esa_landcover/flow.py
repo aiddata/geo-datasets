@@ -34,8 +34,8 @@ def esa_landcover(raw_dir, process_dir, output_dir, years, overwrite_download, o
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
         "walltime": "02:00:00",
-        "cores": 1,
-        "processes": 1,
+        "cores": 2,
+        "processes": 2,
         "memory": "32GB",
         "interface": "ib0",
         "job_extra_directives": [
