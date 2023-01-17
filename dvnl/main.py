@@ -125,7 +125,7 @@ def get_config_dict(config_file="config.ini"):
             "raw_dir": Path(config["main"]["raw_dir"]),
             "output_dir": Path(config["main"]["output_dir"]),
             "years": [int(y) for y in config["main"]["years"].split(", ")],
-            "log_dir": Path(config["main"]["output_dir"]) / "logs",
+            "log_dir": Path(config["main"]["raw_dir"]) / "logs",
             "backend": config["run"]["backend"],
             "task_runner": config["run"]["task_runner"],
             "run_parallel": config["run"].getboolean("run_parallel"),
