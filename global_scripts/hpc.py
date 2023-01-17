@@ -72,7 +72,7 @@ class HPCDaskTaskRunner(DaskTaskRunner):
 
         adapt_max = num_procs
         if "cluster_kwargs" in kwargs and "processes" in kwargs["cluster_kwargs"]:
-            adapt_min = kwargs["cluster_kwargs"]["processes"]
+            adapt_min = num_procs#kwargs["cluster_kwargs"]["processes"]
         else:
             adapt_min = num_procs
         dask_task_runner_kwargs = {
