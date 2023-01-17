@@ -1,0 +1,30 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/dvnl",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "dvnl_YYYY.tif",
+	"name": "dvnl",
+    "title": "DMSP-like VIIRS Nighttime Lights",
+	"description": "Conversion of VIIRS NTL product original radiance measurements to DMSP digital numbers",
+	"version": 1,
+	"options": {
+	    "resolution": 0.008333333333333,
+        "extract_types": ["max", "mean", "min", "sum", "count"],
+        "extract_types_info" : {
+            "max" : "maximum value measured within each unit of analysis",
+            "mean" : "average value measured  within each unit of analysis",
+            "min" : "minimum value measured  within each unit of analysis",
+            "sum": "sum of values measured within each unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "digital number 0-63."
+	},
+	"extras": {
+	    "citation": "Nechaev, D.; Zhizhin, M.; Poyda, A.; Ghosh, T.; Hsu, F.-C.; Elvidge, C. Cross-Sensor Nighttime Lights Image Calibration for DMSP/OLS and SNPP/VIIRS with Residual U-Net. Remote Sens. 2021, 13, 5026.",
+	    "sources_web": "https://eogdata.mines.edu/products/dmsp/#dvnl",
+	    "sources_name": "The Colorado School of Mines Earth Observation Group",
+	    "tags": ["nighttimelights", "dmsp", "viirs", "economics", "welfare"]
+	},
+	"active": 1
+}
