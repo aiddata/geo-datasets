@@ -3,7 +3,7 @@
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "dvnl_YYYY.tif",
-	"name": "dvnl",
+	"name": "dvnl_2022",
     "title": "DMSP-like VIIRS Nighttime Lights",
 	"description": "Conversion of VIIRS NTL product original radiance measurements to DMSP digital numbers",
 	"version": 1,
