@@ -1,5 +1,5 @@
-# data download script for DVNL ntl data 
-# info link: https://eogdata.mines.edu/products/dmsp/#dvnl 
+# data download script for DVNL ntl data
+# info link: https://eogdata.mines.edu/products/dmsp/#dvnl
 
 import os
 import sys
@@ -26,7 +26,8 @@ class DVNL(Dataset):
         self.overwrite_download = overwrite_download
         self.overwrite_processing = overwrite_processing
         self.download_url = "https://eogdata.mines.edu/wwwdata/viirs_products/dvnl/DVNL_{YEAR}.tif"
-    
+
+
     def test_connection(self):
         # test connection
         test_request = requests.get("https://eogdata.mines.edu/wwwdata/viirs_products/dvnl/", verify=True)
@@ -124,12 +125,11 @@ def get_config_dict(config_file="config.ini"):
             "raw_dir": Path(config["main"]["raw_dir"]),
             "output_dir": Path(config["main"]["output_dir"]),
             "years": [int(y) for y in config["main"]["years"].split(", ")],
-            "log_dir": Path(config["main"]["output_dir"]) / "logs", 
+            "log_dir": Path(config["main"]["output_dir"]) / "logs",
             "backend": config["run"]["backend"],
             "task_runner": config["run"]["task_runner"],
             "run_parallel": config["run"].getboolean("run_parallel"),
             "max_workers": int(config["run"]["max_workers"]),
-            "cores_per_process": int(config["run"]["cores_per_process"]),
             "overwrite_download": config["main"].getboolean("overwrite_download"),
             "overwrite_processing": config["main"].getboolean("overwrite_processing")
         }

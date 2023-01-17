@@ -1,11 +1,11 @@
 import os
-import sys
 from pathlib import Path
 from datetime import datetime
 from configparser import ConfigParser
 
 from prefect import flow
 from prefect.filesystems import GitHub
+
 
 config_file = "dvnl/config.ini"
 config = ConfigParser()
@@ -18,8 +18,9 @@ from main import DVNL
 
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
+
 @flow
-def dvnl(raw_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, cores_per_process, log_dir):
+def dvnl(raw_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -40,11 +41,17 @@ def dvnl(raw_dir, output_dir, years, overwrite_download, overwrite_processing, b
             # "#PBS -e ",
         ],
         "job_script_prologue": [
+            "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+            "module load anaconda3/2021.05",
+            "conda activate geodata38",
             f"cd {tmp_dir}",
         ],
         "log_directory": str(timestamp_log_dir)
     }
 
+    if task_runner != "hpc":
+        os.chdir(tmp_dir)
+
     class_instance = DVNL(raw_dir, output_dir, years, overwrite_download, overwrite_processing)
 
-    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, cores_per_process=cores_per_process, log_dir=timestamp_log_dir, cluster_kwargs=cluster_kwargs)
+    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster_kwargs=cluster_kwargs)
