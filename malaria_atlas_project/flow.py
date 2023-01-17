@@ -50,6 +50,9 @@ def malaria_atlas_project(raw_dir, output_dir, years, dataset, overwrite_downloa
         "log_directory": str(timestamp_log_dir)
     }
 
+    if task_runner != "hpc":
+        os.chdir(tmp_dir)
+
     # cluster = "hima"
 
     # cluster_kwargs = {
