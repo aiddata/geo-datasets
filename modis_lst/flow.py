@@ -46,6 +46,9 @@ def modis_lst(raw_dir, output_dir, username, password, years, overwrite_download
         "log_directory": str(timestamp_log_dir),
     }
 
+    if task_runner != "hpc":
+        os.chdir(tmp_dir)
+
     class_instance = MODISLandSurfaceTemp(raw_dir=raw_dir, output_dir=output_dir, username=username, password=password, years=years, overwrite_download=overwrite_download, overwrite_processing=overwrite_processing)
 
     class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
