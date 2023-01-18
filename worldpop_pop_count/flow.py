@@ -50,9 +50,6 @@ def worldpop_pop_count(raw_dir, output_dir, years, overwrite_download, overwrite
         "log_directory": str(timestamp_log_dir)
     }
 
-    if task_runner != "hpc":
-        os.chdir(tmp_dir)
-
     class_instance = WorldPopCount(raw_dir, output_dir, years, overwrite_download, overwrite_processing)
 
     if task_runner != 'hpc':
