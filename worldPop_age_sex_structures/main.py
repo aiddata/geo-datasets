@@ -55,8 +55,6 @@ class WorldPopAgeSex(Dataset):
         for sex in self.sex_list:
             for age in self.age_list:
                 download_dir = self.template_download_dir_basename.format(SEX = sex, AGE = age)
-                (self.process_dir / 'download' / download_dir ).mkdir(parents=True, exist_ok=True)
-                (self.raw_dir / download_dir).mkdir(parents=True, exist_ok=True)
                 for year in self.years:
                     src_url = self.template_url.format(SEX = sex, AGE = age, YEAR = year)
                     tmp_path = self.process_dir / 'download' / download_dir / os.path.basename(src_url)
@@ -79,6 +77,8 @@ class WorldPopAgeSex(Dataset):
             logger.info(f"Download Exists: {url}")
 
         else:
+            Path(tmp_path).parent.mkdir(parents=True, exist_ok=True)
+
             attempts = 1
             while attempts <= max_attempts:
                 try:
@@ -89,6 +89,7 @@ class WorldPopAgeSex(Dataset):
                         raise e
                 else:
                     logger.info(f"Downloaded to tmp: {url}")
+                    Path(dst_path).parent.mkdir(parents=True, exist_ok=True)
                     self.move_file(tmp_path, dst_path)
                     logger.info(f"Copied to dst: {url}")
 
