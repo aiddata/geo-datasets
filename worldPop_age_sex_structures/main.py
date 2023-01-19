@@ -73,7 +73,7 @@ class WorldPopAgeSex(Dataset):
         logger = self.get_logger()
 
         max_attempts = 5
-        if os.path.isfile(tmp_path) and not self.overwrite_download:
+        if os.path.isfile(dst_path) and not self.overwrite_download:
             logger.info(f"Download Exists: {url}")
 
         else:
