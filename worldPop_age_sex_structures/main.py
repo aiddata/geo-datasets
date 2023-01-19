@@ -55,7 +55,7 @@ class WorldPopAgeSex(Dataset):
         for sex in self.sex_list:
             for age in self.age_list:
                 download_dir = self.template_download_dir_basename.format(SEX = sex, AGE = age)
-                (self.process_dir / download_dir).mkdir(parents=True, exist_ok=True)
+                (self.process_dir / 'download' / download_dir ).mkdir(parents=True, exist_ok=True)
                 (self.raw_dir / download_dir).mkdir(parents=True, exist_ok=True)
                 for year in self.years:
                     src_url = self.template_url.format(SEX = sex, AGE = age, YEAR = year)
