@@ -92,6 +92,7 @@ class WorldPopAgeSex(Dataset):
                     Path(dst_path).parent.mkdir(parents=True, exist_ok=True)
                     self.move_file(tmp_path, dst_path)
                     logger.info(f"Copied to dst: {url}")
+                    return
 
 
     def download_file(self, url, tmp_path):

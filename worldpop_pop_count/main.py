@@ -71,6 +71,7 @@ class WorldPopCount(Dataset):
                         raise e
                 else:
                     logger.info(f"Downloaded: {url}")
+                    return
 
 
     def download_file(self, url, local_filename):
