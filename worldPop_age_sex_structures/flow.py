@@ -32,9 +32,9 @@ def worldpop_pop_age_sex(process_dir, raw_dir, output_dir, years, overwrite_down
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "walltime": "04:00:00",
-        "cores": 4,
-        "processes": 4,
+        "walltime": "02:00:00",
+        "cores": 5,
+        "processes": 5,
         "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [
