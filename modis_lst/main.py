@@ -1,6 +1,7 @@
 import os
 import sys
 import requests
+import shutil
 from pathlib import Path
 from urllib.parse import urlparse
 from configparser import ConfigParser
@@ -159,7 +160,7 @@ def aggregate_rasters(file_list, method="mean"):
 class MODISLandSurfaceTemp(Dataset):
     name = "MODIS Land Surface Temperatures"
 
-    def __init__(self, raw_dir, output_dir, username, password, years, overwrite_download, overwrite_processing):
+    def __init__(self, process_dir, raw_dir, output_dir, username, password, years, overwrite_download, overwrite_processing):
         self.username = username
         self.password = password
 
@@ -171,6 +172,7 @@ class MODISLandSurfaceTemp(Dataset):
         self.root_url = "https://e4ftl01.cr.usgs.gov"
         self.data_url = os.path.join(self.root_url, "MOLT/MOD11C3.061")
 
+        self.process_dir = Path(process_dir)
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
 
@@ -188,7 +190,7 @@ class MODISLandSurfaceTemp(Dataset):
         test_request.raise_for_status()
 
 
-    def download_file(self, url, dst_file, identifier):
+    def download_file(self, url, tmp_file, dst_file, identifier):
         """
         download individual file using session created
 
@@ -202,6 +204,8 @@ class MODISLandSurfaceTemp(Dataset):
         if dst_file.exists() and not self.overwrite_download:
             logger.info(f"File already exists: {dst_file}. Skipping...")
         else:
+            Path(tmp_file).parent.mkdir(parents=True, exist_ok=True)
+
             # create session with the user credentials that will be used to authenticate access to the data
             # Note: session can be serialized but because we are streaming the files it cannot
             session = SessionWithHeaderRedirection(self.username, self.password)
@@ -210,10 +214,13 @@ class MODISLandSurfaceTemp(Dataset):
 
             with session.get(url, stream=True) as r:
                 r.raise_for_status()
-                with open(dst_file, 'wb') as f:
+                with open(tmp_file, 'wb') as f:
                     for chunk in r.iter_content(chunk_size=1024*1024):
                         f.write(chunk)
-            logger.info(f"Wrote file: {dst_file}")
+
+            logger.info(f"Downloaded to tmp: {url} > {tmp_file}")
+            shutil.copyfile(tmp_file, dst_file)
+            logger.info(f"Copied to dst: {tmp_file} > {dst_file}")
 
 
     def build_download_list(self):
@@ -260,9 +267,10 @@ class MODISLandSurfaceTemp(Dataset):
 
                         # use basename from url to create local filename
                         hdf_url_name = Path(urlparse(hdf_url).path).name
-                        output = self.raw_dir / (f"{temporal}_{hdf_url_name}")
+                        tmp_path = self.process_dir / (f"{temporal}_{hdf_url_name}")
+                        dst_path = self.raw_dir / (f"{temporal}_{hdf_url_name}")
 
-                        flist.append((hdf_url, output, temporal))
+                        flist.append((hdf_url, tmp_path, dst_path, temporal))
 
         # confirm HDF url was found for each temporal directory
         missing_files_msg = f"{missing_files_count} missing HDF files"
@@ -382,6 +390,7 @@ def get_config_dict(config_file="config.ini"):
     config.read(config_file)
 
     return {
+        "process_dir": Path(config["main"]["process_dir"]),
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "username": config["main"]["username"],
@@ -401,6 +410,6 @@ if __name__ == "__main__":
 
     config_dict = get_config_dict()
 
-    class_instance = MODISLandSurfaceTemp(config_dict["raw_dir"], config_dict["output_dir"], config_dict["username"], config_dict["password"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
+    class_instance = MODISLandSurfaceTemp(config_dict["process_dir"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["username"], config_dict["password"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])

@@ -21,7 +21,7 @@ tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def modis_lst(raw_dir, output_dir, username, password, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
+def modis_lst(process_dir, raw_dir, output_dir, username, password, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -47,7 +47,7 @@ def modis_lst(raw_dir, output_dir, username, password, years, overwrite_download
     }
 
 
-    class_instance = MODISLandSurfaceTemp(raw_dir=raw_dir, output_dir=output_dir, username=username, password=password, years=years, overwrite_download=overwrite_download, overwrite_processing=overwrite_processing)
+    class_instance = MODISLandSurfaceTemp(process_dir=process_dir, raw_dir=raw_dir, output_dir=output_dir, username=username, password=password, years=years, overwrite_download=overwrite_download, overwrite_processing=overwrite_processing)
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
