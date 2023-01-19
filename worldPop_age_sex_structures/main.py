@@ -154,14 +154,18 @@ class WorldPopAgeSex(Dataset):
                 profile = copy(src.profile)
 
                 profile.update({
-                    'driver': 'COG',
+                    'driver': 'GTiff',
                     'compress': 'LZW',
+                    'BLOCKXSIZE': 512,
+                    'BLOCKYSIZE': 512,
+                    'TILED': True,
+                    'INTERLEAVE': 'BAND',
                 })
 
                 # These creation options are not supported by the COG driver
-                for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
-                    if k in profile:
-                        del profile[k]
+                # for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
+                #     if k in profile:
+                #         del profile[k]
 
                 print(profile)
                 logger.info(profile)
