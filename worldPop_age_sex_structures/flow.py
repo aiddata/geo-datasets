@@ -33,8 +33,8 @@ def worldpop_pop_age_sex(tmp_dir, raw_dir, output_dir, years, overwrite_download
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
         "walltime": "04:00:00",
-        "cores": 6,
-        "processes": 6,
+        "cores": 1,
+        "processes": 1,
         "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [

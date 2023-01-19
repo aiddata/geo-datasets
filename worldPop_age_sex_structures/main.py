@@ -36,8 +36,8 @@ class WorldPopAgeSex(Dataset):
 
 
         self.age_list = [0, 1]
-        for k in range(5, 85, 5):
-            self.age_list.append(k)
+        # for k in range(5, 85, 5):
+        #     self.age_list.append(k)
 
         self.sex_list =  ["m", "f"]
 
