@@ -113,9 +113,6 @@ class WorldPopAgeSex(Dataset):
     def create_process_list(self):
         logger = self.get_logger()
 
-        (self.process_dir / 'cog_tmp').mkdir(parents=True, exist_ok=True)
-        (self.output_dir).mkdir(parents=True, exist_ok=True)
-
         flist = []
         # downloaded_files = [i for i in self.raw_dir.iterdir() if str(i).endswith('.tif')]
         downloaded_files = list(self.raw_dir.glob('**/*.tif'))
@@ -146,6 +143,9 @@ class WorldPopAgeSex(Dataset):
             logger.info(f"COG Exists: {dst_path}")
 
         else:
+
+            (self.process_dir / 'cog_tmp').mkdir(parents=True, exist_ok=True)
+            (self.output_dir).mkdir(parents=True, exist_ok=True)
 
             logger.info(f"Generating COG: {tmp_path} / {dst_path}")
 
