@@ -117,7 +117,9 @@ class WorldPopAgeSex(Dataset):
         (self.output_dir).mkdir(parents=True, exist_ok=True)
 
         flist = []
-        downloaded_files = [i for i in self.raw_dir.iterdir() if str(i).endswith('.tif')]
+        # downloaded_files = [i for i in self.raw_dir.iterdir() if str(i).endswith('.tif')]
+        downloaded_files = list(self.raw_dir.glob('**/*.tif'))
+
         for i in downloaded_files:
             year = int(i.name.split('_')[1])
             if year in self.years:
