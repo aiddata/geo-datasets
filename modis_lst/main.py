@@ -1,14 +1,11 @@
 import os
 import sys
-import time
-import datetime
 import requests
 from pathlib import Path
 from urllib.parse import urlparse
 from configparser import ConfigParser
 
 import numpy as np
-from prefect import flow
 from affine import Affine
 
 import warnings
@@ -19,6 +16,7 @@ from pyhdf.SD import SD, SDC
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
+
 
 def listFD(url, ext=''):
     """Find all links in a webpage
@@ -32,12 +30,13 @@ def listFD(url, ext=''):
     urllist = [url + "/" + node.get('href').strip("/") for node in soup.find_all('a') if node.get('href').endswith(ext)]
     return urllist
 
+
 class SessionWithHeaderRedirection(requests.Session):
     """
     overriding requests.Session.rebuild_auth to mantain headers when redirected
     from: https://wiki.earthdata.nasa.gov/display/EL/How+To+Access+Data+With+Python
     """
-    
+
     AUTH_HOST = 'urs.earthdata.nasa.gov'
     def __init__(self, username, password):
         super().__init__()
@@ -47,7 +46,7 @@ class SessionWithHeaderRedirection(requests.Session):
         Overrides from the library to keep headers when redirected to or from
         the NASA auth host.
         """
-        
+
         headers = prepared_request.headers
         url = prepared_request.url
         if 'Authorization' in headers:
@@ -165,7 +164,7 @@ class MODISLandSurfaceTemp(Dataset):
         self.password = password
 
         self.years = [str(y) for y in years]
-        
+
         self.overwrite_download = overwrite_download
         self.overwrite_processing = overwrite_processing
 
@@ -173,12 +172,13 @@ class MODISLandSurfaceTemp(Dataset):
         self.data_url = os.path.join(self.root_url, "MOLT/MOD11C3.006")
 
         self.raw_dir = Path(raw_dir)
-        os.makedirs(self.raw_dir / "monthly" / "day", exist_ok=True)
-        os.makedirs(self.raw_dir / "monthly" / "night", exist_ok=True)
         self.output_dir = Path(output_dir)
-        os.makedirs(self.output_dir, exist_ok=True)
+
+        self.raw_dir.mkdir(parents=True, exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.method = "mean"
+
 
     def test_connection(self):
         logger = self.get_logger()
@@ -186,7 +186,7 @@ class MODISLandSurfaceTemp(Dataset):
 
         test_request = requests.get(self.data_url)
         test_request.raise_for_status()
-        
+
 
     def download_file(self, url, dst_file, identifier):
         """
@@ -214,6 +214,7 @@ class MODISLandSurfaceTemp(Dataset):
                     for chunk in r.iter_content(chunk_size=1024*1024):
                         f.write(chunk)
             logger.info(f"Wrote file: {dst_file}")
+
 
     def build_download_list(self):
 
@@ -260,7 +261,7 @@ class MODISLandSurfaceTemp(Dataset):
                         # use basename from url to create local filename
                         hdf_url_name = Path(urlparse(hdf_url).path).name
                         output = self.raw_dir / (f"{temporal}_{hdf_url_name}")
-                        
+
                         flist.append((hdf_url, output, temporal))
 
         # confirm HDF url was found for each temporal directory
@@ -276,7 +277,7 @@ class MODISLandSurfaceTemp(Dataset):
     def process_hdf(self, input_path, layer, output_path, identifier):
 
         logger = self.get_logger()
-        
+
         if self.overwrite_processing or not os.path.isfile(output_path):
             # read HDF data files
             file = SD(input_path, SDC.READ)
@@ -304,16 +305,17 @@ class MODISLandSurfaceTemp(Dataset):
             for p in self.raw_dir.iterdir():
                 if p.suffix == ".hdf":
                     temporal = p.name.split("_")[0]
-                    output_path = self.output_dir / "monthly" / l_time / f"modis_lst_day_cmg_{temporal}.tif"
+                    output_path = self.output_dir / "monthly" / l_time / f"modis_lst_{l_time}_cmg_{temporal}.tif"
                     output_path_list.append(output_path)
                     layer = f"LST_{c_time}_CMG"
 
                     flist.append((p.as_posix(), layer, output_path.as_posix(), temporal))
 
         for i in set(output_path_list):
-            os.makedirs(i.parent, exist_ok=True)
+            i.parent.mkdir(parents=True, exist_ok=True)
 
         return flist
+
 
     def run_yearly_data(self, year, year_files, method, out_path):
         data, meta = aggregate_rasters(file_list=year_files, method=method)
@@ -325,7 +327,7 @@ class MODISLandSurfaceTemp(Dataset):
         src_dir = self.output_dir / "monthly"
 
         dst_dir = self.output_dir / "annual"
-        os.makedirs(dst_dir, exist_ok = True)
+        dst_dir.mkdir(parents=True, exist_ok=True)
 
         flist = []
         output_dir_list = []
@@ -359,18 +361,15 @@ class MODISLandSurfaceTemp(Dataset):
         # Test Connection
         self.test_connection()
 
-
         # Download
         download_list = self.build_download_list()
         download = self.run_tasks(self.download_file, download_list)
         self.log_run(download)
 
-
         # Process
         process_list = self.build_process_list()
         process = self.run_tasks(self.process_hdf, process_list)
         self.log_run(process)
-
 
         # Aggregate
         data_to_agg = self.build_aggregation_list()
@@ -396,6 +395,7 @@ def get_config_dict(config_file="config.ini"):
         "max_workers": int(config["run"]["max_workers"]),
         "log_dir": Path(config["main"]["raw_dir"]) / "logs",
     }
+
 
 if __name__ == "__main__":
 
