@@ -21,9 +21,9 @@ from dataset import Dataset
 class WorldPopAgeSex(Dataset):
     name = "WorldPop Age Sex"
 
-    def __init__(self, tmp_dir, raw_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
+    def __init__(self, process_dir, raw_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
 
-        self.tmp_dir = Path(tmp_dir)
+        self.process_dir = Path(process_dir)
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
         self.years = years
@@ -55,11 +55,11 @@ class WorldPopAgeSex(Dataset):
         for sex in self.sex_list:
             for age in self.age_list:
                 download_dir = self.template_download_dir_basename.format(SEX = sex, AGE = age)
-                (self.tmp_dir / download_dir).mkdir(parents=True, exist_ok=True)
+                (self.process_dir / download_dir).mkdir(parents=True, exist_ok=True)
                 (self.raw_dir / download_dir).mkdir(parents=True, exist_ok=True)
                 for year in self.years:
                     src_url = self.template_url.format(SEX = sex, AGE = age, YEAR = year)
-                    tmp_path = self.tmp_dir / 'download' / download_dir / os.path.basename(src_url)
+                    tmp_path = self.process_dir / 'download' / download_dir / os.path.basename(src_url)
                     dst_path = self.raw_dir / download_dir / os.path.basename(src_url)
                     flist.append((src_url, tmp_path, dst_path))
 
@@ -111,7 +111,7 @@ class WorldPopAgeSex(Dataset):
     def create_process_list(self):
         logger = self.get_logger()
 
-        (self.tmp_dir / 'cog_tmp').mkdir(parents=True, exist_ok=True)
+        (self.process_dir / 'cog_tmp').mkdir(parents=True, exist_ok=True)
         (self.output_dir).mkdir(parents=True, exist_ok=True)
 
         flist = []
@@ -119,7 +119,7 @@ class WorldPopAgeSex(Dataset):
         for i in downloaded_files:
             year = int(i.name.split('_')[1])
             if year in self.years:
-                flist.append((i, self.tmp_dir / 'cog_tmp' / i.name, self.output_dir / i.name))
+                flist.append((i, self.process_dir / 'cog_tmp' / i.name, self.output_dir / i.name))
 
         logger.info(f"COG conversion list: {flist}")
 
@@ -208,7 +208,7 @@ def get_config_dict(config_file="config.ini"):
     config.read(config_file)
 
     return {
-        "tmp_dir": Path(config["main"]["tmp_dir"]),
+        "process_dir": Path(config["main"]["process_dir"]),
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
@@ -233,6 +233,6 @@ if __name__ == "__main__":
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
 
-    class_instance = WorldPopAgeSex(config_dict["tmp_dir"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
+    class_instance = WorldPopAgeSex(config_dict["process_dir"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)

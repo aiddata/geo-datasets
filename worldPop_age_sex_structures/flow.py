@@ -20,7 +20,7 @@ tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def worldpop_pop_age_sex(tmp_dir, raw_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
+def worldpop_pop_age_sex(process_dir, raw_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -51,7 +51,7 @@ def worldpop_pop_age_sex(tmp_dir, raw_dir, output_dir, years, overwrite_download
         "log_directory": str(timestamp_log_dir)
     }
 
-    class_instance = WorldPopAgeSex(tmp_dir, raw_dir, output_dir, years, overwrite_download, overwrite_processing)
+    class_instance = WorldPopAgeSex(process_dir, raw_dir, output_dir, years, overwrite_download, overwrite_processing)
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
