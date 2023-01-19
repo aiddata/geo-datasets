@@ -169,7 +169,7 @@ class MODISLandSurfaceTemp(Dataset):
         self.overwrite_processing = overwrite_processing
 
         self.root_url = "https://e4ftl01.cr.usgs.gov"
-        self.data_url = os.path.join(self.root_url, "MOLT/MOD11C3.006")
+        self.data_url = os.path.join(self.root_url, "MOLT/MOD11C3.061")
 
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
