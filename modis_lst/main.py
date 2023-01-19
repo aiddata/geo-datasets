@@ -76,7 +76,7 @@ def export_raster(data, path, meta, **kwargs):
     default_meta = {
         'count': 1,
         'crs': {'init': 'epsg:4326'},
-        'driver': 'GTiff',
+        'driver': 'COG',
         'compress': 'lzw',
         'nodata': -9999,
     }
