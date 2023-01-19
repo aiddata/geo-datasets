@@ -36,8 +36,8 @@ class WorldPopAgeSex(Dataset):
 
 
         self.age_list = [0, 1]
-        # for k in range(5, 85, 5):
-        #     self.age_list.append(k)
+        for k in range(5, 85, 5):
+            self.age_list.append(k)
 
         self.sex_list =  ["m", "f"]
 
@@ -122,7 +122,7 @@ class WorldPopAgeSex(Dataset):
             age = int(i.name.split('_')[2])
             year = int(i.name.split('_')[3])
             if sex in self.sex_list and age in self.age_list and year in self.years:
-                flist.append((i, self.process_dir / 'cog_tmp' / i.name, self.output_dir / i.name))
+                flist.append((i, self.process_dir / 'cog_tmp' / i.name, self.output_dir / f'{sex}_{age}' / i.name))
 
         logger.info(f"COG conversion list: {flist}")
 
