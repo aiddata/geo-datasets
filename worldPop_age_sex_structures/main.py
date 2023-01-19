@@ -154,12 +154,12 @@ class WorldPopAgeSex(Dataset):
                 profile = copy(src.profile)
 
                 profile.update({
-                    'driver': 'GTiff',
+                    'driver': 'COG',
                     'compress': 'LZW',
-                    'BLOCKXSIZE': 512,
-                    'BLOCKYSIZE': 512,
-                    'TILED': True,
-                    'INTERLEAVE': 'BAND',
+                    # 'BLOCKXSIZE': 512,
+                    # 'BLOCKYSIZE': 512,
+                    # 'TILED': True,
+                    # 'INTERLEAVE': 'BAND',
                 })
 
                 # These creation options are not supported by the COG driver
