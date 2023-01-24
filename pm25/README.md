@@ -8,7 +8,7 @@ This is the [Surface PM2.5 dataset](https://sites.wustl.edu/acag/datasets/surfac
 
 A Box application is necessary to automatically download this dataset from Box.
 
-If you have an enterprise account with Box, e.g. an account given to you by your university, these steps will require an authorization by your enterprise admin. 
+If you have an enterprise account with Box, e.g. an account given to you by your university, these steps will require an authorization by your enterprise admin.
 In this case, it might be easiest for you to create a separate, personal Box account to use with this script.
 Other authorization methods are available to you, see [this boxsdk docs page](https://github.com/box/box-python-sdk/blob/main/docs/usage/authentication.md) for more information.
 
@@ -18,6 +18,7 @@ Other authorization methods are available to you, see [this boxsdk docs page](ht
 4. Go to your new app's Configuration page, scroll down to "Application Scopes", and make sure "Write all files and folders stored in Box" is enabled. This setting is necessary to download files from Box.
 5. Scroll down to "Advanced Features" and enable "Generate user access tokens"
 6. Scroll down to "Add and Manage Public Keys" and click on "Generate a Public/Private Keypair". Move the downloaded JSON file to `box_login_config.json` in this directory.
+    - Note: This required 2-factor authentication to be set up. Follow prompt to do so after clicking "Generate a Public/Private Keypair" if not already enabled. Once enabled, click "Generate a Public/Private Keypair" again.
 7. Navigate to your app's Authorization page, and submit your app for authorization from your enterprise admin. If you are using a personal account, you will receive an email to authorize the application.
 8. Authorize the application from your Box Admin page (it is easiest to follow the link in the email).
 
