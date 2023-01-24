@@ -24,16 +24,29 @@ prefect agent start -q 'work_queue_name'
 """
 
 import sys
+import os
 from configparser import ConfigParser
 
 from prefect.deployments import Deployment
 from prefect.filesystems import GitHub
 
+
+
+if len(sys.argv) != 2:
+    raise Exception("deploy.py requires input defining which dataset directory to obtain the config.ini from")
+
+dataset_dir = sys.argv[1].strip("/")
+
+if dataset_dir not in os.listdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))):
+    raise Exception("dataset directory provided not found in current directory")
+
+
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), dataset_dir))
+
 from main import get_config_dict
 
-sys.path.append('global_scripts')
 
-config_file = "esa_landcover/config.ini"
+config_file = dataset_dir + "/config.ini"
 config = ConfigParser()
 config.read(config_file)
 

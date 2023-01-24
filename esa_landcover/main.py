@@ -3,83 +3,28 @@ Download and prepare data
 """
 import sys
 import os
-import glob
-import time
 import zipfile
-import datetime
+import shutil
+from datetime import datetime
 from pathlib import Path
-from typing import Optional
 from configparser import ConfigParser
 
 import cdsapi
 import rasterio
 import numpy as np
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
-
-def raster_calc(input_path, output_path, function, **kwargs):
-    """
-    Calculate raster values using rasterio based on function provided
-    :param input_path: input raster
-    :param output_path: path to write output raster to
-    :param function: function to apply to input raster values
-    :param kwargs: additional meta args used to write output raster
-    """
-    with rasterio.open(input_path) as src:
-        assert len(set(src.block_shapes)) == 1
-        meta = src.meta.copy()
-        meta.update(**kwargs)
-        with rasterio.open(output_path, "w", **meta) as dst:
-            for ji, window in src.block_windows(1):
-                in_data = src.read(window=window)
-                out_data = function(in_data)
-                out_data = out_data.astype(meta["dtype"])
-                dst.write(out_data, window=window)
-
-
-def export_raster(data, path, meta, **kwargs):
-    """
-    Export raster array to geotiff
-    """
-
-    logger = self.get_logger()
-
-    if not isinstance(meta, dict):
-        raise ValueError("meta must be a dictionary")
-
-    if 'dtype' in meta:
-        if meta["dtype"] != data.dtype:
-            logger.warning(f"Dtype specified by meta({meta['dtype']}) does not match data dtype ({data.dtype}). Adjusting data dtype to match meta.")
-        data = data.astype(meta["dtype"])
-    else:
-        meta['dtype'] = data.dtype
-
-    default_meta = {
-        'count': 1,
-        'crs': {'init': 'epsg:4326'},
-        'driver': 'COG',
-        'compress': 'lzw',
-        'nodata': -9999,
-    }
-
-    for k, v in default_meta.items():
-        if k not in meta:
-            logger.info(f"Value for `{k}` not in meta provided. Using default value ({v})")
-            meta[k] = v
-
-    # write geotif file
-    with rasterio.open(path, "w", **meta) as dst:
-        dst.write(data)
 
 
 class ESALandcover(Dataset):
     name = "ESA Landcover"
 
-    def __init__(self, raw_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
+    def __init__(self, raw_dir, process_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
 
         self.raw_dir = Path(raw_dir)
+        self.process_dir = Path(process_dir)
         self.output_dir = Path(output_dir)
         self.overwrite_download = overwrite_download
         self.overwrite_processing = overwrite_processing
@@ -109,6 +54,7 @@ class ESALandcover(Dataset):
         vector_mapping = {vi: k for k, v in mapping.items() for vi in v}
 
         self.map_func = np.vectorize(vector_mapping.get)
+
 
     def download(self, year):
 
@@ -163,23 +109,56 @@ class ESALandcover(Dataset):
 
         else:
             logger.info(f"Processing: {input_path}")
-            kwargs = {"driver": "GTiff", "compress": "LZW"}
-            netcdf_path = f"netcdf:{input_path}:lccs_class"
-            raster_calc(netcdf_path, output_path, self.map_func, **kwargs)
+
+            tmp_input_path = self.process_dir / Path(input_path).name
+            tmp_output_path = self.process_dir / Path(output_path).name
+
+            logger.info(f"Copying input to tmp {input_path} {tmp_input_path}")
+            shutil.copyfile(input_path, tmp_input_path)
+
+            logger.info(f"Running raster calc {tmp_input_path} {tmp_output_path}")
+            netcdf_path = f"netcdf:{tmp_input_path}:lccs_class"
+
+            default_meta = {
+                # 'count': 1,
+                # 'crs': {'init': 'epsg:4326'},
+                'driver': 'COG',
+                'compress': 'LZW',
+                # 'nodata': -9999,
+            }
+
+            with rasterio.open(netcdf_path) as src:
+                assert len(set(src.block_shapes)) == 1
+                meta = src.meta.copy()
+                meta.update(**default_meta)
+                with rasterio.open(tmp_output_path, "w", **meta) as dst:
+                    for ji, window in src.block_windows(1):
+                        in_data = src.read(window=window)
+                        out_data = self.map_func(in_data)
+                        out_data = out_data.astype(meta["dtype"])
+                        dst.write(out_data, window=window)
+
+            logger.info(f"Copying output tmp to final {tmp_output_path} {output_path}")
+            shutil.copyfile(tmp_output_path, output_path)
+
+        return
 
 
     def main(self):
+        logger = self.get_logger()
 
         os.makedirs(self.raw_dir / "compressed", exist_ok=True)
         os.makedirs(self.raw_dir / "uncompressed", exist_ok=True)
 
         # Download data
+        logger.info("Running data download")
         download = self.run_tasks(self.download, [[y] for y in self.years])
         self.log_run(download)
 
         os.makedirs(self.output_dir, exist_ok=True)
 
         # Process data
+        logger.info("Running processing")
         process_inputs = zip(download.results(), [self.output_dir / f"esa_lc_{year}.tif" for year in self.years])
         process = self.run_tasks(self.process, process_inputs)
         self.log_run(process)
@@ -191,6 +170,7 @@ def get_config_dict(config_file="config.ini"):
 
     return {
         "raw_dir": Path(config["main"]["raw_dir"]),
+        "process_dir": Path(config["main"]["process_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "overwrite_download": config["main"].getboolean("overwrite_download"),
@@ -202,10 +182,19 @@ def get_config_dict(config_file="config.ini"):
         "log_dir": Path(config["main"]["raw_dir"]) / "logs"
     }
 
+
 if __name__ == "__main__":
 
     config_dict = get_config_dict()
 
-    class_instance = ESALandcover(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
+    log_dir = config_dict["log_dir"]
+    timestamp = datetime.today()
+    time_format_str: str="%Y_%m_%d_%H_%M"
+    time_str = timestamp.strftime(time_format_str)
+    timestamp_log_dir = Path(log_dir) / time_str
+    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
+
+    class_instance = ESALandcover(config_dict["raw_dir"], config_dict["process_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
+
+    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)

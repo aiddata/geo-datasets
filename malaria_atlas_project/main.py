@@ -26,11 +26,9 @@ from copy import copy
 from pathlib import Path
 from zipfile import ZipFile
 from configparser import ConfigParser
+from datetime import datetime
 
-import rasterio
-from rasterio import windows
-
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
 
@@ -80,6 +78,10 @@ class MalariaAtlasProject(Dataset):
         """
         Convert GeoTIFF to Cloud Optimized GeoTIFF (COG)
         """
+
+        import rasterio
+        from rasterio import windows
+
         logger = self.get_logger()
 
         if not self.overwrite_processing and dst_path.exists():
@@ -96,6 +98,14 @@ class MalariaAtlasProject(Dataset):
                 'driver': 'COG',
                 'compress': 'LZW',
             })
+
+            # These creation options are not supported by the COG driver
+            for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
+                if k in profile:
+                    del profile[k]
+
+            print(profile)
+            logger.info(profile)
 
             with rasterio.open(dst_path, 'w+', **profile) as dst:
 
@@ -139,7 +149,7 @@ class MalariaAtlasProject(Dataset):
             year_file_name = self.data_info["data_name"] + f"_{year}.tif"
 
             tif_path = raw_geotiff_dir / year_file_name
-            cog_path = self.output_dir / year_file_name
+            cog_path = self.output_dir / self.dataset / year_file_name[7:]
 
             flist.append((zip_file_local_name, year_file_name, tif_path, cog_path))
 
@@ -197,13 +207,16 @@ class MalariaAtlasProject(Dataset):
         downloads = self.run_tasks(self.manage_download, [(self.data_info["data_zipFile_url"], zip_file_local_name)])
         self.log_run(downloads)
 
+        dataset_output_dir = self.output_dir / self.dataset
+        dataset_output_dir.mkdir(parents=True, exist_ok=True)
+
         logger.info("Copying data files")
         file_copy_list = self.copy_data_files(zip_file_local_name)
         copy_futures = self.run_tasks(self.copy_files, file_copy_list)
         self.log_run(copy_futures)
 
         logger.info("Converting raw tifs to COGs")
-        conversions = self.run_tasks(self.convert_to_cog, copy_futures)
+        conversions = self.run_tasks(self.convert_to_cog, copy_futures.results())
         self.log_run(conversions)
 
 
@@ -216,7 +229,7 @@ def get_config_dict(config_file="config.ini"):
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
-        "overwrited_download": config["main"].getboolean("overwrited_download"),
+        "overwrite_download": config["main"].getboolean("overwrite_download"),
         "overwrite_processing": config["main"].getboolean("overwrite_processing"),
         "backend": config["run"]["backend"],
         "task_runner": config["run"]["task_runner"],
@@ -225,10 +238,19 @@ def get_config_dict(config_file="config.ini"):
         "log_dir": Path(config["main"]["raw_dir"]) / "logs"
     }
 
+
 if __name__ == "__main__":
 
     config_dict = get_config_dict()
 
+    log_dir = config_dict["log_dir"]
+    timestamp = datetime.today()
+    time_format_str: str="%Y_%m_%d_%H_%M"
+    time_str = timestamp.strftime(time_format_str)
+    timestamp_log_dir = Path(log_dir) / time_str
+    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+
     class_instance = MalariaAtlasProject(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["dataset"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
+    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)

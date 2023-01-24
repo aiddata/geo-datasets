@@ -7,21 +7,20 @@ from prefect import flow
 from prefect.filesystems import GitHub
 
 
-config_file = "esa_landcover/config.ini"
+config_file = "worldPop_age_sex_structures/config.ini"
 config = ConfigParser()
 config.read(config_file)
 
 block_name = config["deploy"]["storage_block"]
 GitHub.load(block_name).get_directory('global_scripts')
 
-
-from main import ESALandcover
+from main import WorldPopAgeSex
 
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def esa_landcover(raw_dir, process_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel,  max_workers, log_dir):
+def worldpop_pop_age_sex(process_dir, raw_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -34,8 +33,8 @@ def esa_landcover(raw_dir, process_dir, output_dir, years, overwrite_download, o
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
         "walltime": "02:00:00",
-        "cores": 2,
-        "processes": 2,
+        "cores": 5,
+        "processes": 5,
         "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [
@@ -52,30 +51,7 @@ def esa_landcover(raw_dir, process_dir, output_dir, years, overwrite_download, o
         "log_directory": str(timestamp_log_dir)
     }
 
-    # cluster = "hima"
-
-    # cluster_kwargs = {
-    #     "shebang": "#!/bin/tcsh",
-    #     "resource_spec": "nodes=1:hima:ppn=32",
-    #     "cores": 2,
-    #     "processes": 2,
-    #     "memory": "30GB",
-    #     "interface": "ib0",
-    #     "job_extra_directives": [
-    #         "#PBS -j oe",
-    #         # "#PBS -o ",
-    #         # "#PBS -e ",
-    #     ],
-    #     "job_script_prologue": [
-    #         "source /usr/local/anaconda3-2020.02/etc/profile.d/conda.csh",
-    #         "module load anaconda3/2021.05",
-    #         "conda activate geodata_38h1",
-    #         f"cd {tmp_dir}",
-    #     ],
-    #     "log_directory": str(timestamp_log_dir)
-    # }
-
-    class_instance = ESALandcover(raw_dir, process_dir, output_dir, years, overwrite_download, overwrite_processing)
+    class_instance = WorldPopAgeSex(process_dir, raw_dir, output_dir, years, overwrite_download, overwrite_processing)
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
