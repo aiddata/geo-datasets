@@ -110,46 +110,14 @@ class PM25(Dataset):
         True
         """
 
-        logger = self.get_logger()
-
-        dst_folder = Path(dst_folder)
-        os.makedirs(dst_folder, exist_ok=True)
-
-        task_list = []
+        dst_folder.mkdir(parents=True, exist_ok=True)
 
         for i in box_folder.get_items():
-            file_timeframe = i.name.split(".")[3].split("-")
-            if len(file_timeframe) == 2:
-                first_year = str(file_timeframe[0])[:4]
-                second_year = str(file_timeframe[1])[:4]
-                if first_year == second_year and int(first_year) in self.years:
+            dst_file = os.path.join(dst_folder, i.name)
+            self.download_file(i, dst_file, skip_existing, verify_existing)
 
 
-                    dst_file = os.path.join(dst_folder, i.name)
-
-                    if skip_existing and os.path.isfile(dst_file):
-                        if verify_existing:
-                            if sha1(dst_file) == i.sha1:
-                                logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
-                                continue
-                            else:
-                                logger.info(f"File already exists with incorrect hash, downloading again: {dst_file}")
-                        else:
-                            logger.info(f"File already downloaded, skipping: {dst_file}")
-                            continue
-                    else:
-                        logger.info(f"Downloading: {dst_file}")
-                        with open(dst_folder / i.name, "wb") as dst:
-                            i.download_to(dst)
-
-
-                else:
-                    logger.debug(f"Skipping {i.name}, year not in range for this run")
-            else:
-                raise Exception(f"Unable to parse file name: {i.name}")
-
-
-    def download(self, **kwargs):
+    def build_folder_download_list(self):
         """
         Generates a task list of downloads from the Box shared folder for this dataset.
         """
@@ -185,11 +153,65 @@ class PM25(Dataset):
         elif not monthly_item:
             raise KeyError("Could not find directory \"Global/Monthly\" in shared Box folder")
 
+        return [annual_item, monthly_item]
+
+
+    def download_folders(self, **kwargs):
+
+        annual_item, monthly_item = self.build_folder_download_list(**kwargs)
+
         # generate Annual tasks
-        self.download_folder(annual_item, "input_data/Annual/", **kwargs)
+        self.download_folder(annual_item, self.raw_dir / "Global" / "Annual", **kwargs)
 
         # generate Monthly tasks
-        self.download_folder(monthly_item, "input_data/Monthly/", **kwargs)
+        self.download_folder(monthly_item, self.raw_dir / "Global" / "Monthly", **kwargs)
+
+
+    def build_file_download_list(self, **kwargs):
+
+        annual_item, monthly_item = self.build_folder_download_list(**kwargs)
+
+        annual_item_list = [(i, self.raw_dir / "Global" / "Annual" / i.name) for i in annual_item.get_items()]
+        monthly_item_list = [(i, self.raw_dir / "Global" / "Monthly" / i.name) for i in monthly_item.get_items()]
+
+        download_item_list = annual_item_list + monthly_item_list
+
+        (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
+        (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
+
+        return download_item_list
+
+
+    def download_file(self, item, dst_file, skip_existing=True, verify_existing=True):
+
+        logger = self.get_logger()
+
+        file_timeframe = item.name.split(".")[3].split("-")
+        if len(file_timeframe) == 2:
+
+            first_year = str(file_timeframe[0])[:4]
+            second_year = str(file_timeframe[1])[:4]
+
+            if first_year == second_year and int(first_year) in self.years:
+
+                if skip_existing and os.path.isfile(dst_file):
+                    if verify_existing:
+                        if sha1(dst_file) == item.sha1:
+                            logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
+                        else:
+                            logger.info(f"File already exists with incorrect hash, downloading again: {dst_file}")
+                    else:
+                        logger.info(f"File already downloaded, skipping: {dst_file}")
+                else:
+                    logger.info(f"Downloading: {dst_file}")
+                    with open(dst_file, "wb") as dst:
+                        item.download_to(dst)
+
+            else:
+                logger.debug(f"Skipping {item.name}, year not in range for this run")
+        else:
+            raise Exception(f"Unable to parse file name: {item.name}")
+
 
 
     def convert_file(self, input_path, output_path):
@@ -242,7 +264,7 @@ class PM25(Dataset):
         output_path_list = []
 
         # run annual data
-        for year in year_list:
+        for year in self.years:
             filename = self.filename_template.format(YEAR = year, FIRST_MONTH = "01", LAST_MONTH = "12")
             input_path = self.raw_dir / "Annual" / (filename + ".nc")
             if os.path.exists(input_path):
@@ -254,7 +276,7 @@ class PM25(Dataset):
 
         # run monthly data
         # TODO: find a way to set each year's month range individually so if researcher wants different months for each year can adjust
-        for year in year_list:
+        for year in self.years:
             for i in range(1, 13):
                 month = str(i).zfill(2)
                 filename = self.filename_template.format(YEAR = year, FIRST_MONTH = month, LAST_MONTH = month)
