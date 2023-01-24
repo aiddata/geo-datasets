@@ -1,18 +1,16 @@
-# for converting MONTHLY pm data downloaded from https://wustl.app.box.com/v/ACAG-V5GL02-GWRPM25/folder/148055008434 
+# for converting MONTHLY pm data downloaded from https://wustl.app.box.com/v/ACAG-V5GL02-GWRPM25/folder/148055008434
 # version: multiple file download - HPC version, based off Dr. Goodman's script for converting nc file to tiff image, MONTHLY data
 
 import os
 import sys
-import time
 import hashlib
-import datetime
 import warnings
+from datetime import datetime
 from pathlib import Path
 from configparser import ConfigParser
 
 import rasterio
 import numpy as np
-import pandas as pd
 from affine import Affine
 from netCDF4 import Dataset as NCDFDataset
 from boxsdk import JWTAuth, Client
@@ -20,7 +18,7 @@ from boxsdk import JWTAuth, Client
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
-                
+
 
 def export_raster(data, path, meta, **kwargs):
     """
@@ -84,7 +82,7 @@ class PM25(Dataset):
         self.years = [int(y) for y in years]
 
         self.box_config_path = Path(box_config_path)
-    
+
         # skip existing files while downloading?
         self.skip_existing_downloads = skip_existing_downloads
 
@@ -125,7 +123,7 @@ class PM25(Dataset):
                 first_year = str(file_timeframe[0])[:4]
                 second_year = str(file_timeframe[1])[:4]
                 if first_year == second_year and int(first_year) in self.years:
-                    
+
 
                     dst_file = os.path.join(dst_folder, i.name)
 
@@ -236,13 +234,13 @@ class PM25(Dataset):
             logger.info(f"Exported file: {output_path}")
 
         return str(output_path)
-    
+
 
     def build_process_list(self):
 
         input_path_list = []
         output_path_list = []
-        
+
         # run annual data
         for year in year_list:
             filename = self.filename_template.format(YEAR = year, FIRST_MONTH = "01", LAST_MONTH = "12")
@@ -310,6 +308,17 @@ def get_config_dict(config_file="config.ini"):
 
 
 if __name__ == "__main__":
-    config = get_config_dict()
 
-    PM25(config["raw_dir"], config["output_dir"], config["box_config_path"], config["years"], config["skip_existing_downloads"], config["verify_existing_downloads"]).run(backend=config["backend"], task_runner=config["task_runner"], run_parallel=config["run_parallel"], max_workers=config["max_workers"], log_dir=config["log_dir"])
+    config_dict = get_config_dict()
+
+    log_dir = config_dict["log_dir"]
+    timestamp = datetime.today()
+    time_format_str: str="%Y_%m_%d_%H_%M"
+    time_str = timestamp.strftime(time_format_str)
+    timestamp_log_dir = Path(log_dir) / time_str
+    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+
+    class_instance = PM25(config_dict["raw_dir"], config_dict["output_dir"], config_dict["box_config_dict_path"], config_dict["years"], config_dict["skip_existing_downloads"], config_dict["verify_existing_downloads"])
+
+    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)

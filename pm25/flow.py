@@ -35,12 +35,15 @@ def pm25(raw_dir, output_dir, box_config_path, years, skip_existing_downloads, v
         "resource_spec": "nodes=1:c18a:ppn=12",
         "cores": 6,
         "processes": 6,
-        "memory": "32GB",
+        "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [
             "-j oe",
         ],
         "job_script_prologue": [
+            "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+            "module load anaconda3/2021.05",
+            "conda activate geodata38",
             f"cd {tmp_dir}",
         ],
         "log_directory": str(timestamp_log_dir),
@@ -48,4 +51,8 @@ def pm25(raw_dir, output_dir, box_config_path, years, skip_existing_downloads, v
 
     class_instance = PM25(raw_dir=raw_dir, output_dir=output_dir, box_config_path=box_config_path, years=years, skip_existing_downloads=skip_existing_downloads, verify_existing_downloads=verify_existing_downloads)
 
-    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
+    if task_runner != 'hpc':
+        os.chdir(tmp_dir)
+        class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+    else:
+        class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
