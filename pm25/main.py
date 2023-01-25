@@ -235,7 +235,7 @@ class PM25(Dataset):
 
         for item, dst_file in file_list:
             attempts = 0
-            logger.info(f"Downloading: {dst_file}")
+            logger.info(f"Initiating download attempt: {dst_file}")
             while attempts < 5:
                 try:
                     self.download_file(item, dst_file)
