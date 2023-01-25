@@ -160,8 +160,8 @@ class GPWv4(Dataset):
                     if k in profile:
                         del profile[k]
 
-                print(profile)
-                logger.info(profile)
+                # print(profile)
+                # logger.info(profile)
 
                 with rasterio.open(dst_path, 'w+', **profile) as dst:
 
