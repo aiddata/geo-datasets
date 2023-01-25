@@ -226,9 +226,8 @@ class PM25(Dataset):
     #     self.download_folder(monthly_item, self.raw_dir / "Global" / "Monthly")
 
 
-    def download_all_files(self, file_list):
-        # if not file_list:
-        #     file_list = self.build_file_download_list()
+    def download_all_files(self, null):
+        file_list = self.build_file_download_list()
 
         for item, dst_file in file_list:
             attempts = 0
@@ -362,7 +361,7 @@ class PM25(Dataset):
         # self.download_global_zip()
 
         dl_file_list = self.build_file_download_list()
-        dl = self.run_tasks(self.download_all_files, [dl_file_list])
+        dl = self.run_tasks(self.download_all_files, [None])
         self.log_run(dl)
 
 
