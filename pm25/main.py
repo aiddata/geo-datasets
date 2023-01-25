@@ -136,12 +136,43 @@ class PM25(Dataset):
 
     def build_file_download_list(self):
 
+        logger = self.get_logger()
+
         annual_item, monthly_item = self.build_folder_download_list()
 
         annual_item_list = [(i, self.raw_dir / "Global" / "Annual" / i.name) for i in annual_item.get_items()]
         monthly_item_list = [(i, self.raw_dir / "Global" / "Monthly" / i.name) for i in monthly_item.get_items()]
 
-        download_item_list = annual_item_list + monthly_item_list
+        tmp_download_item_list = annual_item_list + monthly_item_list
+
+        download_item_list = []
+
+        for item, dst_file in tmp_download_item_list:
+            file_timeframe = item.name.split(".")[3].split("-")
+            if len(file_timeframe) == 2:
+
+                first_year = str(file_timeframe[0])[:4]
+                second_year = str(file_timeframe[1])[:4]
+
+                if first_year == second_year and int(first_year) in self.years:
+
+                    if self.skip_existing_downloads and os.path.isfile(dst_file):
+                        if self.verify_existing_downloads:
+                            if sha1(dst_file) == item.sha1:
+                                logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
+                            else:
+                                logger.info(f"File already exists with incorrect hash, downloading again: {dst_file}")
+                        else:
+                            logger.info(f"File already downloaded, skipping: {dst_file}")
+                    else:
+                        logger.info(f"Adding to download list: {dst_file}")
+                        download_item_list.append(item)
+
+                else:
+                    logger.debug(f"Skipping {item.name}, year not in range for this run")
+            else:
+                raise Exception(f"Unable to parse file name: {item.name}")
+
 
         (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
         (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
@@ -151,26 +182,15 @@ class PM25(Dataset):
 
     def download_global_zip(self):
 
+        items = [i[0] for i in self.build_file_download_list()]
+
         # load JWT authentication JSON (see README.md for how to set this up)
         auth = JWTAuth.from_settings_file(self.box_config_path)
 
         # create Box client
         client = Client(auth)
 
-        # find shared folder
-        shared_folder = client.get_shared_item("https://wustl.app.box.com/v/ACAG-V5GL02-GWRPM25")
-
-        # find Global folder
-        for i in shared_folder.get_items():
-            if i.name == "Global":
-                global_item = i
-
-        # raise a KeyError if Global directory cannot be found
-        if not global_item:
-            raise KeyError("Could not find directory \"Global\" in shared Box folder")
-
         with open(self.raw_dir / 'test_global_dl.zip', 'wb') as output_file:
-            items = [global_item]
             status = client.download_zip('pm25_global_dl', items, output_file)
 
 
