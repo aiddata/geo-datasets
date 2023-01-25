@@ -166,7 +166,7 @@ class PM25(Dataset):
                             logger.info(f"File already downloaded, skipping: {dst_file}")
                     else:
                         logger.info(f"Adding to download list: {dst_file}")
-                        download_item_list.append(item)
+                        download_item_list.append([item, dst_file])
 
                 else:
                     logger.debug(f"Skipping {item.name}, year not in range for this run")
