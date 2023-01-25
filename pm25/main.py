@@ -134,7 +134,7 @@ class PM25(Dataset):
         return [annual_item, monthly_item]
 
 
-    def build_file_download_list(self):
+    def build_file_download_list(self, _):
 
         logger = self.get_logger()
 
@@ -362,10 +362,11 @@ class PM25(Dataset):
 
 
         logger.info("Building download list")
-        dl_file_list = self.build_file_download_list()
+        # dl_file_list = self.build_file_download_list()
+        dl_file_list = self.run_tasks(self.build_file_download_list, [[None]])
+
 
         logger.info("Downloading Data")
-
         dl = self.run_tasks(self.download_file, dl_file_list)
         self.log_run(dl)
 
