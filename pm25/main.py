@@ -228,16 +228,23 @@ class PM25(Dataset):
 
     def download_all_files(self, *args, **kwargs):
 
+        logger = self.get_logger()
+
+        logger.info("Building file download list")
         file_list = self.build_file_download_list()
 
         for item, dst_file in file_list:
             attempts = 0
+            logger.info(f"Downloading: {dst_file}")
             while attempts < 5:
                 try:
                     self.download_file(item, dst_file)
+                    logger.info(f"Downloaded: {dst_file}")
                     break
                 except:
                     attempts += 1
+                    logger.info(f"Retry attempt #{attempts}: {dst_file}")
+
 
 
     def download_file(self, item, dst_file):

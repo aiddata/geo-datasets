@@ -33,8 +33,8 @@ def pm25(raw_dir, output_dir, box_config_path, years, skip_existing_downloads, v
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 6,
-        "processes": 6,
+        "cores": 1,
+        "processes": 1,
         "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [
