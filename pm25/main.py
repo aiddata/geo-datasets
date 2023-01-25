@@ -190,8 +190,8 @@ class PM25(Dataset):
 
             if first_year == second_year and int(first_year) in self.years:
 
-                if self.skip_existing and os.path.isfile(dst_file):
-                    if self.verify_existing:
+                if self.skip_existing_downloads and os.path.isfile(dst_file):
+                    if self.verify_existing_downloads:
                         if sha1(dst_file) == item.sha1:
                             logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
                         else:
@@ -200,8 +200,8 @@ class PM25(Dataset):
                         logger.info(f"File already downloaded, skipping: {dst_file}")
                 else:
                     logger.info(f"Downloading: {dst_file}")
-                    with open(dst_file, "wb") as dst:
-                        item.download_to(dst)
+                    # with open(dst_file, "wb") as dst:
+                    #     item.download_to(dst)
 
             else:
                 logger.debug(f"Skipping {item.name}, year not in range for this run")
