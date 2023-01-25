@@ -226,24 +226,24 @@ class PM25(Dataset):
     #     self.download_folder(monthly_item, self.raw_dir / "Global" / "Monthly")
 
 
-    def download_all_files(self, *args, **kwargs):
+    # def download_all_files(self, *args, **kwargs):
 
-        logger = self.get_logger()
+    #     logger = self.get_logger()
 
-        logger.info("Building file download list")
-        file_list = self.build_file_download_list()
+    #     logger.info("Building file download list")
+    #     file_list = self.build_file_download_list()
 
-        for item, dst_file in file_list:
-            attempts = 0
-            logger.info(f"Initiating download attempt: {dst_file}")
-            while attempts < 5:
-                try:
-                    self.download_file(item, dst_file)
-                    logger.info(f"Downloaded: {dst_file}")
-                    break
-                except:
-                    attempts += 1
-                    logger.info(f"Retry attempt #{attempts}: {dst_file}")
+    #     for item, dst_file in file_list:
+    #         attempts = 0
+    #         logger.info(f"Initiating download attempt: {dst_file}")
+    #         while attempts < 5:
+    #             try:
+    #                 self.download_file(item, dst_file)
+    #                 logger.info(f"Downloaded: {dst_file}")
+    #                 break
+    #             except:
+    #                 attempts += 1
+    #                 logger.info(f"Retry attempt #{attempts}: {dst_file}")
 
 
 
@@ -360,17 +360,17 @@ class PM25(Dataset):
 
         logger = self.get_logger()
 
+
+        logger.info("Building download list")
+        dl_file_list = self.build_file_download_list()
+
         logger.info("Downloading Data")
 
-        # dl_file_list = self.build_file_download_list()
-        # dl = self.run_tasks(self.download_file, dl_file_list)
-        # self.log_run(dl)
-
-        # self.download_global_zip()
-
-        # dl_file_list = self.build_file_download_list()
-        dl = self.run_tasks(self.download_all_files, [[None]])
+        dl = self.run_tasks(self.download_file, dl_file_list)
         self.log_run(dl)
+
+        # dl = self.run_tasks(self.download_all_files, [[None]])
+        # self.log_run(dl)
 
 
 
