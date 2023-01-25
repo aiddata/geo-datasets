@@ -374,16 +374,16 @@ class PM25(Dataset):
 
 
 
-        # logger.info("Generating Task List")
-        # conv_flist = self.build_process_list()
+        logger.info("Generating Task List")
+        conv_flist = self.build_process_list()
 
-        # # create output directories
-        # os.makedirs(self.output_dir / "Annual", exist_ok=True)
-        # os.makedirs(self.output_dir / "Monthly", exist_ok=True)
+        # create output directories
+        os.makedirs(self.output_dir / "Annual", exist_ok=True)
+        os.makedirs(self.output_dir / "Monthly", exist_ok=True)
 
-        # logger.info("Running Data Conversion")
-        # conv = self.run_tasks(self.convert_file, conv_flist)
-        # self.log_run(conv)
+        logger.info("Running Data Conversion")
+        conv = self.run_tasks(self.convert_file, conv_flist)
+        self.log_run(conv)
 
 
 def get_config_dict(config_file="config.ini"):
