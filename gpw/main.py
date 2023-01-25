@@ -84,11 +84,15 @@ class GPWv4(Dataset):
 
     def download(self, src, dst, extract_dir):
 
+        logger = self.get_logger()
+
+        logger.info(f"Downloading {src}")
         if not self.only_unzip or not dst.exists():
             response = requests.get(src, headers={'Cookie': f'sedac={self.sedac_cookie}'}, allow_redirects=True)
             with open(dst, 'wb') as dst_file:
                 dst_file.write(response.content)
 
+        logger.info(f"Extracting {dst}")
         with zipfile.ZipFile(dst, 'r') as zip_ref:
             zip_ref.extract([member for member in zip_ref.namelist() if member.endswith('.tif')][0], path=extract_dir)
 
