@@ -269,8 +269,8 @@ class PM25(Dataset):
                         logger.info(f"File already downloaded, skipping: {dst_file}")
                 else:
                     logger.info(f"Downloading: {dst_file}")
-                    # with open(dst_file, "wb") as dst:
-                    #     item.download_to(dst)
+                    with open(dst_file, "wb") as dst:
+                        item.download_to(dst)
 
             else:
                 logger.debug(f"Skipping {item.name}, year not in range for this run")
@@ -368,7 +368,7 @@ class PM25(Dataset):
 
         # self.download_global_zip()
 
-        dl_file_list = self.build_file_download_list()
+        # dl_file_list = self.build_file_download_list()
         dl = self.run_tasks(self.download_all_files, [[None]])
         self.log_run(dl)
 
