@@ -365,7 +365,7 @@ class PM25(Dataset):
         # self.download_global_zip()
 
         dl_file_list = self.build_file_download_list()
-        dl = self.run_tasks(self.download_all_files, ['run', 'dummy'])
+        dl = self.run_tasks(self.download_all_files, [['run'], ['dummy']])
         self.log_run(dl)
 
 
