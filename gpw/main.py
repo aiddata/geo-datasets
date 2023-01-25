@@ -63,8 +63,8 @@ class GPWv4(Dataset):
         for var in ["density", "count"]:
 
             # path to download/extract files to
-            var_dl_dir = self.raw_dir / "var"
-            var_final_dir = self.output_dir / "var"
+            var_dl_dir = self.raw_dir / var
+            var_final_dir = self.output_dir / var
 
             var_dl_dir.mkdir(parents=True, exist_ok=True)
             var_final_dir.mkdir(parents=True, exist_ok=True)
