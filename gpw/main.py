@@ -90,7 +90,7 @@ class GPWv4(Dataset):
                 dst.write(response.content)
 
         with zipfile.ZipFile(dst, 'r') as zip_ref:
-            zip_ref.extractall(extract_dir, members=[member for member in zip_ref.namelist() if member.endswith('.tif')])
+            zip_ref.extract([member for member in zip_ref.namelist() if member.endswith('.tif')][0], path=extract_dir)
 
 
     def main(self):
