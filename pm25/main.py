@@ -149,6 +149,32 @@ class PM25(Dataset):
         return download_item_list
 
 
+    def download_global_zip(self):
+
+        # load JWT authentication JSON (see README.md for how to set this up)
+        auth = JWTAuth.from_settings_file(self.box_config_path)
+
+        # create Box client
+        client = Client(auth)
+
+        # find shared folder
+        shared_folder = client.get_shared_item("https://wustl.app.box.com/v/ACAG-V5GL02-GWRPM25")
+
+        # find Global folder
+        for i in shared_folder.get_items():
+            if i.name == "Global":
+                global_item = i
+
+        # raise a KeyError if Global directory cannot be found
+        if not global_item:
+            raise KeyError("Could not find directory \"Global\" in shared Box folder")
+
+        with open(self.raw_dir / 'test_global_dl.zip', 'wb') as output_file:
+            items = [global_item]
+            status = client.download_zip('pm25_global_dl', items, output_file)
+
+
+
     def download_folder(self, box_folder, dst_folder):
         """
         Generates a task list for download_item from a Box
@@ -292,21 +318,25 @@ class PM25(Dataset):
         logger = self.get_logger()
 
         logger.info("Downloading Data")
-        dl_file_list = self.build_file_download_list()
-        dl = self.run_tasks(self.download_file, dl_file_list)
-        self.log_run(dl)
+
+        # dl_file_list = self.build_file_download_list()
+        # dl = self.run_tasks(self.download_file, dl_file_list)
+        # self.log_run(dl)
+
+        self.download_global_zip()
 
 
-        logger.info("Generating Task List")
-        conv_flist = self.build_process_list()
 
-        # create output directories
-        os.makedirs(self.output_dir / "Annual", exist_ok=True)
-        os.makedirs(self.output_dir / "Monthly", exist_ok=True)
+        # logger.info("Generating Task List")
+        # conv_flist = self.build_process_list()
 
-        logger.info("Running Data Conversion")
-        conv = self.run_tasks(self.convert_file, conv_flist)
-        self.log_run(conv)
+        # # create output directories
+        # os.makedirs(self.output_dir / "Annual", exist_ok=True)
+        # os.makedirs(self.output_dir / "Monthly", exist_ok=True)
+
+        # logger.info("Running Data Conversion")
+        # conv = self.run_tasks(self.convert_file, conv_flist)
+        # self.log_run(conv)
 
 
 def get_config_dict(config_file="config.ini"):
