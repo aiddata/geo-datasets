@@ -122,7 +122,7 @@ class GPWv4(Dataset):
             for i in extracted_files:
                 year = int(i.name.split('_')[-3])
                 if year in self.years:
-                    flist.append((i, self.output_dir / i.name))
+                    flist.append((i, var_final_dir / i.name))
 
         # logger.info(f"COG conversion list: {flist}")
 
@@ -182,15 +182,15 @@ class GPWv4(Dataset):
 
         logger = self.get_logger()
 
-        logger.info("Download documentation")
-        self.download_docs()
+        # logger.info("Download documentation")
+        # self.download_docs()
 
-        logger.info("Building download list")
-        dl_list = self.build_download_list()
+        # logger.info("Building download list")
+        # dl_list = self.build_download_list()
 
-        logger.info("Running download and extract")
-        dl = self.run_tasks(self.download, dl_list)
-        self.log_run(dl)
+        # logger.info("Running download and extract")
+        # dl = self.run_tasks(self.download, dl_list)
+        # self.log_run(dl)
 
         logger.info("Converting to COG")
         cog_list = self.create_process_list()
