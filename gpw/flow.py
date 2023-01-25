@@ -21,7 +21,7 @@ tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def pm25(raw_dir, output_dir, years, sedac_cookie, unzip_only, overwrite_download, overwrite_extract, backend, task_runner, run_parallel, max_workers, log_dir):
+def gpwv4(raw_dir, output_dir, years, sedac_cookie, unzip_only, overwrite_download, overwrite_extract, backend, task_runner, run_parallel, max_workers, log_dir):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")

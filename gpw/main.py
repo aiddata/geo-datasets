@@ -116,7 +116,7 @@ def get_config_dict(config_file="config.ini"):
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "sedac_cookie": config["run"]["sedac_cookie"],
+        "sedac_cookie": config["main"]["sedac_cookie"],
         "unzip_only": config["main"].getboolean("unzip_only"),
         "overwrite_download": config["main"].getboolean("overwrite_download"),
         "overwrite_extract": config["main"].getboolean("overwrite_extract"),
