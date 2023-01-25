@@ -180,48 +180,61 @@ class PM25(Dataset):
         return download_item_list
 
 
-    def download_global_zip(self):
+    # def download_global_zip(self):
 
-        items = [i[0] for i in self.build_file_download_list()]
+    #     items = [i[0] for i in self.build_file_download_list()]
 
-        # load JWT authentication JSON (see README.md for how to set this up)
-        auth = JWTAuth.from_settings_file(self.box_config_path)
+    #     # load JWT authentication JSON (see README.md for how to set this up)
+    #     auth = JWTAuth.from_settings_file(self.box_config_path)
 
-        # create Box client
-        client = Client(auth)
+    #     # create Box client
+    #     client = Client(auth)
 
-        with open(self.raw_dir / 'test_global_dl.zip', 'wb') as output_file:
-            status = client.download_zip('pm25_global_dl', items, output_file)
-
-
-
-    def download_folder(self, box_folder, dst_folder):
-        """
-        Generates a task list for download_item from a Box
-        folder
-
-        skip_existing will skip file names that already exist
-        in dst_folder verify_existing will verify the hashes
-        of existing files in dst_folder, if skip_existing is
-        True
-        """
-
-        dst_folder.mkdir(parents=True, exist_ok=True)
-
-        for i in box_folder.get_items():
-            dst_file = os.path.join(dst_folder, i.name)
-            self.download_file(i, dst_file)
+    #     import time
+    #     with open(self.raw_dir / 'test_global_dl.zip', 'wb') as output_file:
+    #         status = client.download_zip('pm25_global_dl', items, output_file)
+    #         while status != 'done':
+    #             time.sleep(15)
 
 
-    def download_folders(self):
+    # def download_folder(self, box_folder, dst_folder):
+    #     """
+    #     Generates a task list for download_item from a Box
+    #     folder
 
-        annual_item, monthly_item = self.build_folder_download_list()
+    #     skip_existing will skip file names that already exist
+    #     in dst_folder verify_existing will verify the hashes
+    #     of existing files in dst_folder, if skip_existing is
+    #     True
+    #     """
 
-        # generate Annual tasks
-        self.download_folder(annual_item, self.raw_dir / "Global" / "Annual")
+    #     dst_folder.mkdir(parents=True, exist_ok=True)
 
-        # generate Monthly tasks
-        self.download_folder(monthly_item, self.raw_dir / "Global" / "Monthly")
+    #     for i in box_folder.get_items():
+    #         dst_file = os.path.join(dst_folder, i.name)
+    #         self.download_file(i, dst_file)
+
+
+    # def download_folders(self):
+
+    #     annual_item, monthly_item = self.build_folder_download_list()
+
+    #     # generate Annual tasks
+    #     self.download_folder(annual_item, self.raw_dir / "Global" / "Annual")
+
+    #     # generate Monthly tasks
+    #     self.download_folder(monthly_item, self.raw_dir / "Global" / "Monthly")
+
+
+    def download_all_files(self, file_list):
+        for item, dst_file in file_list:
+            attempts = 0
+            while attempts < 5:
+                try:
+                    self.download_file(item, dst_file)
+                    break
+                except:
+                    attempts += 1
 
 
     def download_file(self, item, dst_file):
@@ -343,7 +356,11 @@ class PM25(Dataset):
         # dl = self.run_tasks(self.download_file, dl_file_list)
         # self.log_run(dl)
 
-        self.download_global_zip()
+        # self.download_global_zip()
+
+        dl_file_list = self.build_file_download_list()
+        dl = self.run_tasks(self.download_all_files(), [dl_file_list])
+        self.log_run(dl)
 
 
 
