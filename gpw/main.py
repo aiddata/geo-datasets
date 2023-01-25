@@ -22,7 +22,6 @@ class GPWv4(Dataset):
                  output_dir: str,
                  years: list,
                  sedac_cookie: str,
-                 only_unzip: bool = False,
                  overwrite_download: bool = False,
                  overwrite_extract: bool = False):
         """
@@ -42,7 +41,7 @@ class GPWv4(Dataset):
         self.years = [int(year) for year in years]
 
         self.sedac_cookie = sedac_cookie
-        self.only_unzip = only_unzip
+
         self.overwrite_download = overwrite_download
         self.overwrite_extract = overwrite_extract
 
@@ -86,15 +85,22 @@ class GPWv4(Dataset):
 
         logger = self.get_logger()
 
-        logger.info(f"Downloading {src}")
-        if not self.only_unzip or not dst.exists():
+        if not dst.exists() or self.overwrite_download:
+            logger.info(f"Downloading {src}")
             response = requests.get(src, headers={'Cookie': f'sedac={self.sedac_cookie}'}, allow_redirects=True)
             with open(dst, 'wb') as dst_file:
                 dst_file.write(response.content)
+        else:
+            logger.info(f"Download Exists {src}")
 
-        logger.info(f"Extracting {dst}")
+
         with zipfile.ZipFile(dst, 'r') as zip_ref:
-            zip_ref.extract([member for member in zip_ref.namelist() if member.endswith('.tif')][0], path=extract_dir)
+            zip_member = [member for member in zip_ref.namelist() if member.endswith('.tif')][0]
+            if not (extract_dir / zip_member).exists() or self.overwrite_extract:
+                logger.info(f"Extracting {dst}")
+                zip_ref.extract(zip_member, path=extract_dir)
+            else:
+                logger.info(f"Extract Exists {dst}")
 
 
     def main(self):
@@ -121,7 +127,6 @@ def get_config_dict(config_file="config.ini"):
         "output_dir": Path(config["main"]["output_dir"]),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "sedac_cookie": config["main"]["sedac_cookie"],
-        "unzip_only": config["main"].getboolean("unzip_only"),
         "overwrite_download": config["main"].getboolean("overwrite_download"),
         "overwrite_extract": config["main"].getboolean("overwrite_extract"),
         "backend": config["run"]["backend"],
@@ -144,6 +149,6 @@ if __name__ == "__main__":
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
 
-    class_instance = GPWv4(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["sedac_cookie"], config_dict["unzip_only"], config_dict["overwrite_download"], config_dict["overwrite_extract"])
+    class_instance = GPWv4(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["sedac_cookie"], config_dict["overwrite_download"], config_dict["overwrite_extract"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
