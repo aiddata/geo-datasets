@@ -87,7 +87,7 @@ class GPWv4(Dataset):
         if not self.only_unzip or not dst.exists():
             response = requests.get(src, headers={'Cookie': f'sedac={self.sedac_cookie}'}, allow_redirects=True)
             with open(dst, 'wb') as dst:
-                dst.write_bytes(response.content)
+                dst.write(response.content)
 
         with zipfile.ZipFile(dst, 'r') as zip_ref:
             zip_ref.extractall(extract_dir, members=[member for member in zip_ref.namelist() if member.endswith('.tif')])
