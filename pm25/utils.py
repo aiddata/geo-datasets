@@ -11,12 +11,6 @@ import numpy as np
 from affine import Affine
 from netCDF4 import Dataset
 
-use_prefect = False
-
-def get_current_timestamp(format_str="'%Y_%m_%d_%H_%M"):
-    return datetime.datetime.fromtimestamp(int(time.time())).strftime(format_str)
-
-
 
 def convert_file(input_path, output_path):
     #converts nc file to tiff file, compatible with parallel processing system
