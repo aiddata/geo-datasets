@@ -226,9 +226,9 @@ class PM25(Dataset):
     #     self.download_folder(monthly_item, self.raw_dir / "Global" / "Monthly")
 
 
-    def download_all_files(self, file_list=None):
-        if not file_list:
-            file_list = self.build_file_download_list()
+    def download_all_files(self, file_list):
+        # if not file_list:
+        #     file_list = self.build_file_download_list()
 
         for item, dst_file in file_list:
             attempts = 0
