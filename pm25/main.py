@@ -274,15 +274,15 @@ class PM25(Dataset):
         logger = self.get_logger()
 
 
-        # logger.info("Building initial download list")
-        # dl_file_list = self.build_file_download_list()
+        logger.info("Building initial download list")
+        dl_file_list = self.build_file_download_list()
 
-        # (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
-        # (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
+        (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
+        (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
 
-        # logger.info("Downloading Data")
-        # dl = self.run_tasks(self.download_file, dl_file_list)
-        # self.log_run(dl)
+        logger.info("Downloading Data")
+        dl = self.run_tasks(self.download_file, dl_file_list)
+        self.log_run(dl)
 
 
 
