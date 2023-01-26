@@ -141,7 +141,7 @@ class PM25(Dataset):
         elif not monthly_item:
             raise KeyError("Could not find directory \"Global/Monthly\" in shared Box folder")
 
-        del client
+        del self.clientg
 
         return [annual_item, monthly_item]
 
