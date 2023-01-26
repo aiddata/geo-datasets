@@ -109,17 +109,18 @@ class Dataset(ABC):
         return [self.error_wrapper(func, i) for i in input_list]
 
 
-    def run_concurrent_tasks(self, name, func, input_list):
+    def run_concurrent_tasks(self, name, func, input_list, force_sequential):
         """
         Run tasks concurrently (locally), given a function a list of inputs
         This will always return a list of TaskResults!
         """
-        with multiprocessing.Pool(10) as pool:
+        pool_size = 1 if force_sequential else 10
+        with multiprocessing.Pool(pool_size) as pool:
             results = pool.starmap(self.error_wrapper, [(func, i) for i in input_list], chunksize=self.chunksize)
         return results
 
 
-    def run_prefect_tasks(self, name, func, input_list):
+    def run_prefect_tasks(self, name, func, input_list, force_sequential):
         """
         Run tasks using Prefect, using whichever task runner decided in self.run()
         This will always return a list of TaskResults!
@@ -129,7 +130,10 @@ class Dataset(ABC):
 
         task_wrapper = task(func, name=name, retries=self.retries, retry_delay_seconds=self.retry_delay)
 
-        futures =  [(i, task_wrapper.submit(*i, return_state=False)) for i in input_list]
+        futures = []
+        for i in input_list:
+            w = futures if force_sequential else None
+            futures.append(task_wrapper.submit(*i, wait_for=w, return_state=False))
 
         results = []
 
@@ -191,7 +195,8 @@ class Dataset(ABC):
                   allow_futures: bool=True,
                   name: Optional[str]=None,
                   retries: Optional[int]=3,
-                  retry_delay: Optional[int]=60):
+                  retry_delay: Optional[int]=60,
+                  force_sequential: bool=False):
         """
         Run a bunch of tasks, calling one of the above run_tasks functions
         This is the function that should be called most often from self.main()
@@ -221,9 +226,9 @@ class Dataset(ABC):
         if self.backend == "serial":
             results = self.run_serial_tasks(name, func, input_list)
         elif self.backend == "concurrent":
-            results = self.run_concurrent_tasks(name, func, input_list)
+            results = self.run_concurrent_tasks(name, func, input_list, force_sequential)
         elif self.backend == "prefect":
-            results = self.run_prefect_tasks(name, func, input_list)
+            results = self.run_prefect_tasks(name, func, input_list, force_sequential)
         elif self.backend == "mpi":
             results = self.run_mpi_tasks(name, func, input_list)
         else:
