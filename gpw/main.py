@@ -182,15 +182,15 @@ class GPWv4(Dataset):
 
         logger = self.get_logger()
 
-        # logger.info("Download documentation...")
-        # self.download_docs()
+        logger.info("Download documentation...")
+        self.download_docs()
 
-        # logger.info("Building download list...")
-        # dl_list = self.build_download_list()
+        logger.info("Building download list...")
+        dl_list = self.build_download_list()
 
-        # logger.info("Running download and extract...")
-        # dl = self.run_tasks(self.download, dl_list)
-        # self.log_run(dl)
+        logger.info("Running download and extract...")
+        dl = self.run_tasks(self.download, dl_list)
+        self.log_run(dl)
 
         logger.info("Building COG conversion list...")
         cog_list = self.create_process_list()
