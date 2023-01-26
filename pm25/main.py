@@ -134,7 +134,7 @@ class PM25(Dataset):
         return [annual_item, monthly_item]
 
 
-    def build_file_download_list(self, _):
+    def build_file_download_list(self):
 
         logger = self.get_logger()
 
@@ -145,39 +145,42 @@ class PM25(Dataset):
 
         tmp_download_item_list = annual_item_list + monthly_item_list
 
-        download_item_list = []
-
-        for item, dst_file in tmp_download_item_list:
-            file_timeframe = item.name.split(".")[3].split("-")
-            if len(file_timeframe) == 2:
-
-                first_year = str(file_timeframe[0])[:4]
-                second_year = str(file_timeframe[1])[:4]
-
-                if first_year == second_year and int(first_year) in self.years:
-
-                    if self.skip_existing_downloads and os.path.isfile(dst_file):
-                        if self.verify_existing_downloads:
-                            if sha1(dst_file) == item.sha1:
-                                logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
-                            else:
-                                logger.info(f"File already exists with incorrect hash, downloading again: {dst_file}")
-                        else:
-                            logger.info(f"File already downloaded, skipping: {dst_file}")
-                    else:
-                        logger.info(f"Adding to download list: {dst_file}")
-                        download_item_list.append([item, dst_file])
-
-                else:
-                    logger.debug(f"Skipping {item.name}, year not in range for this run")
-            else:
-                raise Exception(f"Unable to parse file name: {item.name}")
-
-
         (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
         (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
 
-        return download_item_list
+        return tmp_download_item_list
+
+
+    def check_file_download_list(self, item, dst_file):
+
+        logger = self.get_logger()
+
+        file_timeframe = item.name.split(".")[3].split("-")
+        if len(file_timeframe) == 2:
+
+            first_year = str(file_timeframe[0])[:4]
+            second_year = str(file_timeframe[1])[:4]
+
+            if first_year == second_year and int(first_year) in self.years:
+
+                if self.skip_existing_downloads and os.path.isfile(dst_file):
+                    if self.verify_existing_downloads:
+                        if sha1(dst_file) == item.sha1:
+                            logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
+                        else:
+                            logger.info(f"File already exists with incorrect hash, downloading again: {dst_file}")
+                    else:
+                        logger.info(f"File already downloaded, skipping: {dst_file}")
+                else:
+                    logger.info(f"Adding to download list: {dst_file}")
+                    return [item, dst_file]
+
+            else:
+                logger.debug(f"Skipping {item.name}, year not in range for this run")
+        else:
+            raise Exception(f"Unable to parse file name: {item.name}")
+
+        return None
 
 
     # def download_global_zip(self):
@@ -361,17 +364,18 @@ class PM25(Dataset):
         logger = self.get_logger()
 
 
-        logger.info("Building download list")
-        # dl_file_list = self.build_file_download_list()
-        dl_file_list = self.run_tasks(self.build_file_download_list, [[None]])
+        logger.info("Building initial download list")
+        init_dl_file_list = self.build_file_download_list()
 
+        logger.info("Checking download list")
+        checked_dl_file_list = self.run_tasks(self.check_file_download_list, init_dl_file_list)
+
+        logger.info("Creating final download list")
+        final_dl_file_list = [i for i in checked_dl_file_list if i is not None]
 
         logger.info("Downloading Data")
-        dl = self.run_tasks(self.download_file, dl_file_list)
+        dl = self.run_tasks(self.download_file, final_dl_file_list)
         self.log_run(dl)
-
-        # dl = self.run_tasks(self.download_all_files, [[None]])
-        # self.log_run(dl)
 
 
 
