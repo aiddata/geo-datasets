@@ -162,6 +162,8 @@ class PM25(Dataset):
 
     def download_file(self, item, dst_file):
 
+        self.client = create_box_client(self.box_config_path)
+
         logger = self.get_logger()
 
         file_timeframe = item.name.split(".")[3].split("-")
