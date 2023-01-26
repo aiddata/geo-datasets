@@ -244,7 +244,7 @@ class PM25(Dataset):
         # run annual data
         for year in self.years:
             filename = self.filename_template.format(YEAR = year, FIRST_MONTH = "01", LAST_MONTH = "12")
-            input_path = self.raw_dir / "Annual" / (filename + ".nc")
+            input_path = self.raw_dir / "Global" / "Annual" / (filename + ".nc")
             if os.path.exists(input_path):
                 input_path_list.append(input_path)
                 output_path = self.output_dir / "Global" / "Annual" / (filename + ".tif")
@@ -258,7 +258,7 @@ class PM25(Dataset):
             for i in range(1, 13):
                 month = str(i).zfill(2)
                 filename = self.filename_template.format(YEAR = year, FIRST_MONTH = month, LAST_MONTH = month)
-                input_path = self.raw_dir / "Monthly" / (filename + ".nc")
+                input_path = self.raw_dir / "Global" / "Monthly" / (filename + ".nc")
                 if os.path.exists(input_path):
                     input_path_list.append(input_path)
                     output_path = self.output_dir / "Global" / "Monthly" / (filename + ".tif")
