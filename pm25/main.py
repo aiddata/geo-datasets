@@ -281,7 +281,7 @@ class PM25(Dataset):
         (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
 
         logger.info("Downloading Data")
-        dl = self.run_tasks(self.download_file, dl_file_list)
+        dl = self.run_tasks(self.download_file, dl_file_list, force_sequential=True)
         self.log_run(dl)
 
 
