@@ -162,7 +162,7 @@ class PM25(Dataset):
 
     def download_file(self, item, dst_file):
 
-        client = create_box_client(self.box_config_path)
+        # client = create_box_client(self.box_config_path)
 
         logger = self.get_logger()
 
