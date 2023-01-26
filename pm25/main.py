@@ -65,6 +65,20 @@ def sha1(filename):
     return h.hexdigest()
 
 
+def create_box_client(box_config_path):
+    """
+    Creates a Box client using the provided JWT authentication JSON.
+    """
+
+    # load JWT authentication JSON (see README.md for how to set this up)
+    auth = JWTAuth.from_settings_file(box_config_path)
+
+    # create Box client
+    client = Client(auth)
+
+    return client
+
+
 class PM25(Dataset):
     name = "Surface PM2.5"
 
@@ -99,12 +113,8 @@ class PM25(Dataset):
         """
         Generates a task list of downloads from the Box shared folder for this dataset.
         """
-
-        # load JWT authentication JSON (see README.md for how to set this up)
-        auth = JWTAuth.from_settings_file(self.box_config_path)
-
         # create Box client
-        client = Client(auth)
+        client = create_box_client(self.box_config_path)
 
         # find shared folder
         shared_folder = client.get_shared_item("https://wustl.app.box.com/v/ACAG-V5GL02-GWRPM25")
@@ -131,6 +141,8 @@ class PM25(Dataset):
         elif not monthly_item:
             raise KeyError("Could not find directory \"Global/Monthly\" in shared Box folder")
 
+        del client
+
         return [annual_item, monthly_item]
 
 
@@ -145,13 +157,10 @@ class PM25(Dataset):
 
         tmp_download_item_list = annual_item_list + monthly_item_list
 
-        (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
-        (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
-
         return tmp_download_item_list
 
 
-    def check_file_download_list(self, item, dst_file):
+    def check_file(self, item, dst_file):
 
         logger = self.get_logger()
 
@@ -183,103 +192,13 @@ class PM25(Dataset):
         return None
 
 
-    # def download_global_zip(self):
-
-    #     items = [i[0] for i in self.build_file_download_list()]
-
-    #     # load JWT authentication JSON (see README.md for how to set this up)
-    #     auth = JWTAuth.from_settings_file(self.box_config_path)
-
-    #     # create Box client
-    #     client = Client(auth)
-
-    #     import time
-    #     with open(self.raw_dir / 'test_global_dl.zip', 'wb') as output_file:
-    #         status = client.download_zip('pm25_global_dl', items, output_file)
-    #         while status != 'done':
-    #             time.sleep(15)
-
-
-    # def download_folder(self, box_folder, dst_folder):
-    #     """
-    #     Generates a task list for download_item from a Box
-    #     folder
-
-    #     skip_existing will skip file names that already exist
-    #     in dst_folder verify_existing will verify the hashes
-    #     of existing files in dst_folder, if skip_existing is
-    #     True
-    #     """
-
-    #     dst_folder.mkdir(parents=True, exist_ok=True)
-
-    #     for i in box_folder.get_items():
-    #         dst_file = os.path.join(dst_folder, i.name)
-    #         self.download_file(i, dst_file)
-
-
-    # def download_folders(self):
-
-    #     annual_item, monthly_item = self.build_folder_download_list()
-
-    #     # generate Annual tasks
-    #     self.download_folder(annual_item, self.raw_dir / "Global" / "Annual")
-
-    #     # generate Monthly tasks
-    #     self.download_folder(monthly_item, self.raw_dir / "Global" / "Monthly")
-
-
-    # def download_all_files(self, *args, **kwargs):
-
-    #     logger = self.get_logger()
-
-    #     logger.info("Building file download list")
-    #     file_list = self.build_file_download_list()
-
-    #     for item, dst_file in file_list:
-    #         attempts = 0
-    #         logger.info(f"Initiating download attempt: {dst_file}")
-    #         while attempts < 5:
-    #             try:
-    #                 self.download_file(item, dst_file)
-    #                 logger.info(f"Downloaded: {dst_file}")
-    #                 break
-    #             except:
-    #                 attempts += 1
-    #                 logger.info(f"Retry attempt #{attempts}: {dst_file}")
-
-
-
     def download_file(self, item, dst_file):
 
         logger = self.get_logger()
 
-        file_timeframe = item.name.split(".")[3].split("-")
-        if len(file_timeframe) == 2:
-
-            first_year = str(file_timeframe[0])[:4]
-            second_year = str(file_timeframe[1])[:4]
-
-            if first_year == second_year and int(first_year) in self.years:
-
-                if self.skip_existing_downloads and os.path.isfile(dst_file):
-                    if self.verify_existing_downloads:
-                        if sha1(dst_file) == item.sha1:
-                            logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
-                        else:
-                            logger.info(f"File already exists with incorrect hash, downloading again: {dst_file}")
-                    else:
-                        logger.info(f"File already downloaded, skipping: {dst_file}")
-                else:
-                    logger.info(f"Downloading: {dst_file}")
-                    with open(dst_file, "wb") as dst:
-                        item.download_to(dst)
-
-            else:
-                logger.debug(f"Skipping {item.name}, year not in range for this run")
-        else:
-            raise Exception(f"Unable to parse file name: {item.name}")
-
+        logger.info(f"Downloading: {dst_file}")
+        with open(dst_file, "wb") as dst:
+            item.download_to(dst)
 
 
     def convert_file(self, input_path, output_path):
@@ -368,10 +287,14 @@ class PM25(Dataset):
         init_dl_file_list = self.build_file_download_list()
 
         logger.info("Checking download list")
-        checked_dl_file_list = self.run_tasks(self.check_file_download_list, init_dl_file_list)
+        checked_dl_file_list = self.run_tasks(self.check_file, init_dl_file_list)
+        self.log_run(checked_dl_file_list)
 
         logger.info("Creating final download list")
         final_dl_file_list = [i for i in checked_dl_file_list if i is not None]
+
+        (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
+        (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
 
         logger.info("Downloading Data")
         dl = self.run_tasks(self.download_file, final_dl_file_list)
@@ -383,8 +306,8 @@ class PM25(Dataset):
         conv_flist = self.build_process_list()
 
         # create output directories
-        os.makedirs(self.output_dir / "Annual", exist_ok=True)
-        os.makedirs(self.output_dir / "Monthly", exist_ok=True)
+        (self.output_dir / "Annual").mkdir(parents=True exist_ok=True)
+        (self.output_dir / "Monthly").mkdir(parents=True, exist_ok=True)
 
         logger.info("Running Data Conversion")
         conv = self.run_tasks(self.convert_file, conv_flist)
