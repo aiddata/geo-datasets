@@ -288,8 +288,8 @@ class PM25(Dataset):
 
         logger.info("Generating Task List")
         conv_flist = self.build_process_list()
-        print(conv_flist)
-        
+        logger.info(conv_flist)
+
         # create output directories
         (self.output_dir / "Annual").mkdir(parents=True, exist_ok=True)
         (self.output_dir / "Monthly").mkdir(parents=True, exist_ok=True)
