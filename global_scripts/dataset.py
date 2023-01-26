@@ -132,8 +132,8 @@ class Dataset(ABC):
 
         futures = []
         for i in input_list:
-            w = futures if force_sequential else None
-            futures.append(task_wrapper.submit(*i, wait_for=w, return_state=False))
+            w = [i[1] for i in futures] if force_sequential else None
+            futures.append((i, task_wrapper.submit(*i, wait_for=w, return_state=False)))
 
         results = []
 
