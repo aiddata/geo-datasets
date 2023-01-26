@@ -287,8 +287,8 @@ class PM25(Dataset):
         logger.info(conv_flist)
 
         # create output directories
-        (self.output_dir / "Annual").mkdir(parents=True, exist_ok=True)
-        (self.output_dir / "Monthly").mkdir(parents=True, exist_ok=True)
+        (self.output_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
+        (self.output_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
 
         logger.info("Running Data Conversion")
         conv = self.run_tasks(self.convert_file, conv_flist)
