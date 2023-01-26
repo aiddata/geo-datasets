@@ -162,8 +162,6 @@ class PM25(Dataset):
 
     def download_file(self, item, dst_file):
 
-        # client = create_box_client(self.box_config_path)
-
         logger = self.get_logger()
 
         file_timeframe = item.name.split(".")[3].split("-")
@@ -184,8 +182,8 @@ class PM25(Dataset):
                         logger.info(f"File already downloaded, skipping: {dst_file}")
                 else:
                     logger.info(f"Downloading: {dst_file}")
-                    # with open(dst_file, "wb") as dst:
-                    #     item.download_to(dst)
+                    with open(dst_file, "wb") as dst:
+                        item.download_to(dst)
 
             else:
                 logger.debug(f"Skipping {item.name}, year not in range for this run")
@@ -240,17 +238,15 @@ class PM25(Dataset):
 
     def build_process_list(self):
 
-        input_path_list = []
-        output_path_list = []
+        task_list = []
 
         # run annual data
         for year in self.years:
             filename = self.filename_template.format(YEAR = year, FIRST_MONTH = "01", LAST_MONTH = "12")
             input_path = self.raw_dir / "Global" / "Annual" / (filename + ".nc")
-            if os.path.exists(input_path):
-                input_path_list.append(input_path)
+            if input_path.exists():
                 output_path = self.output_dir / "Global" / "Annual" / (filename + ".tif")
-                output_path_list.append(output_path)
+                task_list.append((input_path, output_path))
             else:
                 warnings.warn(f"No annual data found for year {year}. Skipping...")
 
@@ -261,44 +257,42 @@ class PM25(Dataset):
                 month = str(i).zfill(2)
                 filename = self.filename_template.format(YEAR = year, FIRST_MONTH = month, LAST_MONTH = month)
                 input_path = self.raw_dir / "Global" / "Monthly" / (filename + ".nc")
-                if os.path.exists(input_path):
-                    input_path_list.append(input_path)
+                if input_path.exists():
                     output_path = self.output_dir / "Global" / "Monthly" / (filename + ".tif")
-                    output_path_list.append(output_path)
+                    task_list.append((input_path, output_path))
                 else:
                     warnings.warn(f"No monthly data found for year {year} month {month}. Skipping...")
 
-        return list(zip(input_path_list, output_path_list))
+        return task_list
 
 
     def main(self):
 
         logger = self.get_logger()
-        self.task = "all"
-        if self.task in ["download", "all"]:
-            logger.info("Building initial download list")
-            dl_file_list = self.build_file_download_list()
-
-            (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
-            (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
-
-            logger.info("Downloading Data")
-            dl = self.run_tasks(self.download_file, dl_file_list, force_serial=True)
-            self.log_run(dl)
 
 
-        if self.task in ["convert", "all"]:
-            logger.info("Generating Task List")
-            conv_flist = self.build_process_list()
-            logger.info(conv_flist)
+        logger.info("Building initial download list")
+        dl_file_list = self.build_file_download_list()
 
-            # create output directories
-            (self.output_dir / "Annual").mkdir(parents=True, exist_ok=True)
-            (self.output_dir / "Monthly").mkdir(parents=True, exist_ok=True)
+        (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
+        (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
 
-            logger.info("Running Data Conversion")
-            conv = self.run_tasks(self.convert_file, conv_flist)
-            self.log_run(conv)
+        logger.info("Downloading Data")
+        dl = self.run_tasks(self.download_file, dl_file_list, force_serial=True)
+        self.log_run(dl)
+
+
+        logger.info("Generating Task List")
+        conv_flist = self.build_process_list()
+        logger.info(conv_flist)
+
+        # create output directories
+        (self.output_dir / "Annual").mkdir(parents=True, exist_ok=True)
+        (self.output_dir / "Monthly").mkdir(parents=True, exist_ok=True)
+
+        logger.info("Running Data Conversion")
+        conv = self.run_tasks(self.convert_file, conv_flist)
+        self.log_run(conv)
 
 
 def get_config_dict(config_file="config.ini"):
