@@ -134,7 +134,7 @@ class Dataset(ABC):
         results = []
 
         for inputs, future in futures:
-            state = future.wait(timeout=60*60)
+            state = future.wait(timeout=None)
             if state.is_completed():
                 results.append(TaskResult(0, "Success", inputs, state.result()))
             elif state.is_failed() or state.is_crashed():
