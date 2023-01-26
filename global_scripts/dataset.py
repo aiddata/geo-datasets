@@ -175,7 +175,7 @@ class Dataset(ABC):
         return results
 
 
-    def run_mpi_tasks(self, name, func, input_list):
+    def run_mpi_tasks(self, name, func, input_list, force_sequential):
         """
         Run tasks using MPI, requiring the use of `mpirun`
         self.pool is an MPIPoolExecutor initialized by self.run()
@@ -185,7 +185,10 @@ class Dataset(ABC):
         with MPIPoolExecutor(max_workers=self.mpi_max_workers, chunksize=self.chunksize) as pool:
             futures = []
             for i in input_list:
-                futures.append(pool.submit(self.error_wrapper, func, i))
+                f = pool.submit(self.error_wrapper, func, i)
+                if force_sequential:
+                    f.wait()
+                futures.append(f)
         return [f.result() for f in futures]
 
 
@@ -230,7 +233,7 @@ class Dataset(ABC):
         elif self.backend == "prefect":
             results = self.run_prefect_tasks(name, func, input_list, force_sequential)
         elif self.backend == "mpi":
-            results = self.run_mpi_tasks(name, func, input_list)
+            results = self.run_mpi_tasks(name, func, input_list, force_sequential)
         else:
             raise ValueError("Requested backend not recognized. Have you called this Dataset's run function?")
 
