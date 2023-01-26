@@ -306,7 +306,7 @@ class PM25(Dataset):
         conv_flist = self.build_process_list()
 
         # create output directories
-        (self.output_dir / "Annual").mkdir(parents=True exist_ok=True)
+        (self.output_dir / "Annual").mkdir(parents=True, exist_ok=True)
         (self.output_dir / "Monthly").mkdir(parents=True, exist_ok=True)
 
         logger.info("Running Data Conversion")
