@@ -274,31 +274,31 @@ class PM25(Dataset):
     def main(self):
 
         logger = self.get_logger()
+        self.task = "all"
+        if self.task in ["download", "all"]:
+            logger.info("Building initial download list")
+            dl_file_list = self.build_file_download_list()
+
+            (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
+            (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
+
+            logger.info("Downloading Data")
+            dl = self.run_tasks(self.download_file, dl_file_list, force_serial=True)
+            self.log_run(dl)
 
 
-        logger.info("Building initial download list")
-        dl_file_list = self.build_file_download_list()
+        if self.task in ["convert", "all"]:
+            logger.info("Generating Task List")
+            conv_flist = self.build_process_list()
+            logger.info(conv_flist)
 
-        (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
-        (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
+            # create output directories
+            (self.output_dir / "Annual").mkdir(parents=True, exist_ok=True)
+            (self.output_dir / "Monthly").mkdir(parents=True, exist_ok=True)
 
-        logger.info("Downloading Data")
-        dl = self.run_tasks(self.download_file, dl_file_list, force_sequential=True)
-        self.log_run(dl)
-
-
-
-        logger.info("Generating Task List")
-        conv_flist = self.build_process_list()
-        logger.info(conv_flist)
-
-        # create output directories
-        (self.output_dir / "Annual").mkdir(parents=True, exist_ok=True)
-        (self.output_dir / "Monthly").mkdir(parents=True, exist_ok=True)
-
-        logger.info("Running Data Conversion")
-        conv = self.run_tasks(self.convert_file, conv_flist)
-        self.log_run(conv)
+            logger.info("Running Data Conversion")
+            conv = self.run_tasks(self.convert_file, conv_flist)
+            self.log_run(conv)
 
 
 def get_config_dict(config_file="config.ini"):

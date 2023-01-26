@@ -196,7 +196,8 @@ class Dataset(ABC):
                   name: Optional[str]=None,
                   retries: Optional[int]=3,
                   retry_delay: Optional[int]=60,
-                  force_sequential: bool=False):
+                  force_sequential: bool=False,
+                  force_serial: bool=False):
         """
         Run a bunch of tasks, calling one of the above run_tasks functions
         This is the function that should be called most often from self.main()
@@ -223,7 +224,7 @@ class Dataset(ABC):
         elif not isinstance(name, str):
             raise TypeError("Name of task run must be a string")
 
-        if self.backend == "serial":
+        if self.backend == "serial" or force_serial:
             results = self.run_serial_tasks(name, func, input_list)
         elif self.backend == "concurrent":
             results = self.run_concurrent_tasks(name, func, input_list, force_sequential)
