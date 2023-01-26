@@ -34,8 +34,8 @@ def gpwv4(raw_dir, output_dir, years, sedac_cookie, overwrite_download, overwrit
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
         "walltime": "2:00:00",
-        "cores": 10,
-        "processes": 10,
+        "cores": 5,
+        "processes": 5,
         "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [

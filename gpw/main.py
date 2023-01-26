@@ -124,7 +124,7 @@ class GPWv4(Dataset):
                 if year in self.years:
                     flist.append((i, var_final_dir / i.name))
 
-        # logger.info(f"COG conversion list: {flist}")
+        logger.info(f"COG conversion list: {flist}")
 
         return flist
 
@@ -182,18 +182,19 @@ class GPWv4(Dataset):
 
         logger = self.get_logger()
 
-        # logger.info("Download documentation")
+        # logger.info("Download documentation...")
         # self.download_docs()
 
-        # logger.info("Building download list")
+        # logger.info("Building download list...")
         # dl_list = self.build_download_list()
 
-        # logger.info("Running download and extract")
+        # logger.info("Running download and extract...")
         # dl = self.run_tasks(self.download, dl_list)
         # self.log_run(dl)
 
-        logger.info("Converting to COG")
+        logger.info("Building COG conversion list...")
         cog_list = self.create_process_list()
+        logger.info("Converting to COG...")
         cog = self.run_tasks(self.convert_to_cog, cog_list)
         self.log_run(cog)
 
