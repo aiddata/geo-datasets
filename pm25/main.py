@@ -114,10 +114,10 @@ class PM25(Dataset):
         Generates a task list of downloads from the Box shared folder for this dataset.
         """
         # create Box client
-        client = create_box_client(self.box_config_path)
+        self.client = create_box_client(self.box_config_path)
 
         # find shared folder
-        shared_folder = client.get_shared_item("https://wustl.app.box.com/v/ACAG-V5GL02-GWRPM25")
+        shared_folder = self.client.get_shared_item("https://wustl.app.box.com/v/ACAG-V5GL02-GWRPM25")
 
         # find Global folder
         for i in shared_folder.get_items():
@@ -141,7 +141,6 @@ class PM25(Dataset):
         elif not monthly_item:
             raise KeyError("Could not find directory \"Global/Monthly\" in shared Box folder")
 
-        del client
 
         return [annual_item, monthly_item]
 
@@ -155,12 +154,12 @@ class PM25(Dataset):
         annual_item_list = [(i, self.raw_dir / "Global" / "Annual" / i.name) for i in annual_item.get_items()]
         monthly_item_list = [(i, self.raw_dir / "Global" / "Monthly" / i.name) for i in monthly_item.get_items()]
 
-        tmp_download_item_list = annual_item_list + monthly_item_list
+        download_item_list = annual_item_list + monthly_item_list
 
-        return tmp_download_item_list
+        return download_item_list
 
 
-    def check_file(self, item, dst_file):
+    def download_file(self, item, dst_file):
 
         logger = self.get_logger()
 
@@ -181,24 +180,15 @@ class PM25(Dataset):
                     else:
                         logger.info(f"File already downloaded, skipping: {dst_file}")
                 else:
-                    logger.info(f"Adding to download list: {dst_file}")
-                    return [item, dst_file]
+                    logger.info(f"Downloading: {dst_file}")
+                    with open(dst_file, "wb") as dst:
+                        item.download_to(dst)
 
             else:
                 logger.debug(f"Skipping {item.name}, year not in range for this run")
         else:
             raise Exception(f"Unable to parse file name: {item.name}")
 
-        return None
-
-
-    def download_file(self, item, dst_file):
-
-        logger = self.get_logger()
-
-        logger.info(f"Downloading: {dst_file}")
-        with open(dst_file, "wb") as dst:
-            item.download_to(dst)
 
 
     def convert_file(self, input_path, output_path):
@@ -284,20 +274,13 @@ class PM25(Dataset):
 
 
         logger.info("Building initial download list")
-        init_dl_file_list = self.build_file_download_list()
-
-        logger.info("Checking download list")
-        checked_dl_file_list = self.run_tasks(self.check_file, init_dl_file_list)
-        self.log_run(checked_dl_file_list)
-
-        logger.info("Creating final download list")
-        final_dl_file_list = [i for i in checked_dl_file_list if i is not None]
+        dl_file_list = self.build_file_download_list()
 
         (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
         (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
 
         logger.info("Downloading Data")
-        dl = self.run_tasks(self.download_file, final_dl_file_list)
+        dl = self.run_tasks(self.download_file, dl_file_list)
         self.log_run(dl)
 
 
