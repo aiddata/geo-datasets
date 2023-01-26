@@ -247,7 +247,7 @@ class PM25(Dataset):
             input_path = self.raw_dir / "Annual" / (filename + ".nc")
             if os.path.exists(input_path):
                 input_path_list.append(input_path)
-                output_path = self.output_dir / "Annual" / (filename + ".tif")
+                output_path = self.output_dir / "Global" / "Annual" / (filename + ".tif")
                 output_path_list.append(output_path)
             else:
                 warnings.warn(f"No annual data found for year {year}. Skipping...")
@@ -261,7 +261,7 @@ class PM25(Dataset):
                 input_path = self.raw_dir / "Monthly" / (filename + ".nc")
                 if os.path.exists(input_path):
                     input_path_list.append(input_path)
-                    output_path = self.output_dir / "Monthly" / (filename + ".tif")
+                    output_path = self.output_dir / "Global" / "Monthly" / (filename + ".tif")
                     output_path_list.append(output_path)
                 else:
                     warnings.warn(f"No monthly data found for year {year} month {month}. Skipping...")
