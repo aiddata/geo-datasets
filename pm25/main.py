@@ -162,7 +162,7 @@ class PM25(Dataset):
 
     def download_file(self, item, dst_file):
 
-        self.client = create_box_client(self.box_config_path)
+        client = create_box_client(self.box_config_path)
 
         logger = self.get_logger()
 
@@ -184,8 +184,8 @@ class PM25(Dataset):
                         logger.info(f"File already downloaded, skipping: {dst_file}")
                 else:
                     logger.info(f"Downloading: {dst_file}")
-                    with open(dst_file, "wb") as dst:
-                        item.download_to(dst)
+                    # with open(dst_file, "wb") as dst:
+                    #     item.download_to(dst)
 
             else:
                 logger.debug(f"Skipping {item.name}, year not in range for this run")
