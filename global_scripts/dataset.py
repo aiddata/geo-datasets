@@ -8,6 +8,7 @@ from typing import Optional
 from datetime import datetime
 from collections import namedtuple
 from abc import ABC, abstractmethod
+from concurrent.futures import wait
 from collections.abc import Sequence
 
 
@@ -187,7 +188,7 @@ class Dataset(ABC):
             for i in input_list:
                 f = pool.submit(self.error_wrapper, func, i)
                 if force_sequential:
-                    f.wait()
+                    wait([f])
                 futures.append(f)
         return [f.result() for f in futures]
 
