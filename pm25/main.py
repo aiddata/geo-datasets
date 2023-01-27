@@ -88,7 +88,8 @@ class PM25(Dataset):
                  box_config_path: str,
                  years: list,
                  skip_existing_downloads=True,
-                 verify_existing_downloads=True):
+                 verify_existing_downloads=True,
+                 overwrite_processing=False,):
 
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
@@ -104,7 +105,7 @@ class PM25(Dataset):
         # (skip_existing_downloads must also be set to True)
         self.verify_existing_downloads = verify_existing_downloads
 
-        self.overwrite = False
+        self.overwrite_processing = False
 
         self.filename_template = "V5GL02.HybridPM25.Global.{YEAR}{FIRST_MONTH}-{YEAR}{LAST_MONTH}"
 
@@ -197,7 +198,7 @@ class PM25(Dataset):
 
         logger = self.get_logger()
 
-        if output_path.exists() and not self.overwrite:
+        if output_path.exists() and not self.overwrite_processing:
             logger.info(f"File already converted, skipping: {output_path}")
         else:
             rootgrp = NCDFDataset(input_path, "r", format="NETCDF4")
@@ -306,6 +307,7 @@ def get_config_dict(config_file="config.ini"):
         "box_config_path": Path(config["main"]["box_config_path"]),
         "skip_existing_downloads": config["main"].getboolean("skip_existing_downloads"),
         "verify_existing_downloads": config["main"].getboolean("verify_existing_downloads"),
+        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
         "backend": config["run"]["backend"],
         "task_runner": config["run"]["task_runner"],
         "run_parallel": config["run"].getboolean("run_parallel"),
@@ -326,6 +328,6 @@ if __name__ == "__main__":
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
 
-    class_instance = PM25(config_dict["raw_dir"], config_dict["output_dir"], config_dict["box_config_dict_path"], config_dict["years"], config_dict["skip_existing_downloads"], config_dict["verify_existing_downloads"])
+    class_instance = PM25(config_dict["raw_dir"], config_dict["output_dir"], config_dict["box_config_dict_path"], config_dict["years"], config_dict["skip_existing_downloads"], config_dict["verify_existing_downloads"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)

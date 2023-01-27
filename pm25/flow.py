@@ -21,7 +21,7 @@ tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def pm25(raw_dir, output_dir, box_config_path, years, skip_existing_downloads, verify_existing_downloads, backend, task_runner, run_parallel, max_workers, log_dir):
+def pm25(raw_dir, output_dir, box_config_path, years, skip_existing_downloads, verify_existing_downloads, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -50,7 +50,7 @@ def pm25(raw_dir, output_dir, box_config_path, years, skip_existing_downloads, v
         "log_directory": str(timestamp_log_dir),
     }
 
-    class_instance = PM25(raw_dir=raw_dir, output_dir=output_dir, box_config_path=box_config_path, years=years, skip_existing_downloads=skip_existing_downloads, verify_existing_downloads=verify_existing_downloads)
+    class_instance = PM25(raw_dir=raw_dir, output_dir=output_dir, box_config_path=box_config_path, years=years, skip_existing_downloads=skip_existing_downloads, verify_existing_downloads=verify_existing_downloads, overwrite_processing)
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
