@@ -138,7 +138,7 @@ class Dataset(ABC):
         results = []
 
 
-        states = [(i[0], i[1].wait()) for i in futures)]
+        states = [(i[0], i[1].wait()) for i in futures]
 
         while states:
             for ix, (inputs, state) in enumerate(states):
