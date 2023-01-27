@@ -425,7 +425,7 @@ class Dataset(ABC):
                     "n_workers": max_workers,
                     "threads_per_worker": threads_per_worker
                 }
-                tr = DaskTaskRunner(**dask_cluster_kwargs)
+                tr = DaskTaskRunner(cluster_kwargs=dask_cluster_kwargs)
             elif task_runner == "hpc":
                 from hpc import HPCDaskTaskRunner
                 job_name = "".join(self.name.split())
