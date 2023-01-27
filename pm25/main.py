@@ -197,6 +197,7 @@ class PM25(Dataset):
         # Converts nc file to tiff file
 
         logger = self.get_logger()
+        logger.info(f"Converting file: {input_path}")
 
         if output_path.exists() and not self.overwrite_processing:
             logger.info(f"File already converted, skipping: {output_path}")
