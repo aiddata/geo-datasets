@@ -169,7 +169,7 @@ class Dataset(ABC):
                     print('not ready', ix, inputs)
                     continue
                 _ = futures.pop(ix)
-                future.release()
+                # future.release()
             time.sleep(15)
 
         return results
