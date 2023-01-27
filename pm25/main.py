@@ -105,7 +105,7 @@ class PM25(Dataset):
         # (skip_existing_downloads must also be set to True)
         self.verify_existing_downloads = verify_existing_downloads
 
-        self.overwrite_processing = False
+        self.overwrite_processing = overwrite_processing
 
         self.filename_template = "V5GL02.HybridPM25.Global.{YEAR}{FIRST_MONTH}-{YEAR}{LAST_MONTH}"
 
