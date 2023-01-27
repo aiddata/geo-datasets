@@ -51,23 +51,12 @@ def pm25(raw_dir, output_dir, box_config_path, years, skip_existing_downloads, v
         "log_directory": str(timestamp_log_dir),
     }
 
-    dask_cluster_kwargs = {
-        "n_workers": max_workers,
-        "threads_per_worker": 1
-    }
 
     class_instance = PM25(raw_dir=raw_dir, output_dir=output_dir, box_config_path=box_config_path, years=years, skip_existing_downloads=skip_existing_downloads, verify_existing_downloads=verify_existing_downloads, overwrite_processing=overwrite_processing)
 
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
-
-
-    if task_runner == 'dask':
-        class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster_kwargs=dask_cluster_kwargs)
-
-    elif task_runner == 'hpc':
-        class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=hpc_cluster_kwargs)
-
-    else:
         class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+    else:
+        class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=hpc_cluster_kwargs)

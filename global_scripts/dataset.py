@@ -376,6 +376,7 @@ class Dataset(ABC):
         task_runner: Optional[str]=None,
         run_parallel: bool=False,
         max_workers: Optional[int]=None,
+        threads_per_worker: Optional[int]=1,
         # cores_per_process: Optional[int]=None,
         chunksize: int=1,
         log_dir: str="logs",
@@ -419,7 +420,12 @@ class Dataset(ABC):
                     # del kwargs["cluster"]
                 # if "cluster_kwargs" in kwargs:
                     # del kwargs["cluster_kwargs"]
-                tr = DaskTaskRunner(**kwargs)
+
+                dask_cluster_kwargs = {
+                    "n_workers": max_workers,
+                    "threads_per_worker": threads_per_worker
+                }
+                tr = DaskTaskRunner(**dask_cluster_kwargs)
             elif task_runner == "hpc":
                 from hpc import HPCDaskTaskRunner
                 job_name = "".join(self.name.split())
