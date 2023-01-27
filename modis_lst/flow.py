@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 from datetime import datetime
 from configparser import ConfigParser
+from typing import List, Literal
 
 from prefect import flow
 from prefect.filesystems import GitHub
@@ -21,7 +22,20 @@ tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def modis_lst(process_dir, raw_dir, output_dir, username, password, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
+def modis_lst(
+        process_dir: str,
+        raw_dir: str,
+        output_dir: str,
+        username: str,
+        password: str,
+        years: List[int],
+        overwrite_download: bool,
+        overwrite_processing: bool,
+        backend: Literal["local", "mpi", "prefect"],
+        task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
+        run_parallel: bool,
+        max_workers: int,
+        log_dir: str):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -41,6 +55,9 @@ def modis_lst(process_dir, raw_dir, output_dir, username, password, years, overw
             "-j oe",
         ],
         "job_script_prologue": [
+            "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+            "module load anaconda3/2021.05",
+            "conda activate geodata38",
             f"cd {tmp_dir}",
         ],
         "log_directory": str(timestamp_log_dir),
