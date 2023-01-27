@@ -415,10 +415,10 @@ class Dataset(ABC):
                 tr = ConcurrentTaskRunner
             elif task_runner == "dask":
                 from prefect_dask import DaskTaskRunner
-                if "cluster" in kwargs:
-                    del kwargs["cluster"]
-                if "cluster_kwargs" in kwargs:
-                    del kwargs["cluster_kwargs"]
+                # if "cluster" in kwargs:
+                    # del kwargs["cluster"]
+                # if "cluster_kwargs" in kwargs:
+                    # del kwargs["cluster_kwargs"]
                 tr = DaskTaskRunner(**kwargs)
             elif task_runner == "hpc":
                 from hpc import HPCDaskTaskRunner
