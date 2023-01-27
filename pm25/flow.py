@@ -50,7 +50,7 @@ def pm25(raw_dir, output_dir, box_config_path, years, skip_existing_downloads, v
         "log_directory": str(timestamp_log_dir),
     }
 
-    class_instance = PM25(raw_dir=raw_dir, output_dir=output_dir, box_config_path=box_config_path, years=years, skip_existing_downloads=skip_existing_downloads, verify_existing_downloads=verify_existing_downloads, overwrite_processing)
+    class_instance = PM25(raw_dir=raw_dir, output_dir=output_dir, box_config_path=box_config_path, years=years, skip_existing_downloads=skip_existing_downloads, verify_existing_downloads=verify_existing_downloads, overwrite_processing=overwrite_processing)
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
