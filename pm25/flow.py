@@ -52,7 +52,7 @@ def pm25(raw_dir, output_dir, box_config_path, years, skip_existing_downloads, v
     }
 
     dask_cluster_kwargs = {
-        "n_workers": 4,
+        "n_workers": max_workers,
         "threads_per_worker": 1
     }
 
