@@ -21,7 +21,7 @@ tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def udel_cliamte(
+def udel_climate(
         raw_dir: str,
         output_dir: str,
         methods: List[str],
