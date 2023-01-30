@@ -45,8 +45,8 @@ def udel_climate(
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 1,
-        "processes": 1,
+        "cores": 6,
+        "processes": 6,
         "memory": "32GB",
         "interface": "ib0",
         "job_extra_directives": [
