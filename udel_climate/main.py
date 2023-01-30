@@ -175,12 +175,18 @@ class UDelClimate(Dataset):
 
 
     def main(self):
+        logger = self.get_logger()
+        
+        logger.info('Running intial tasks...')
+
         self.test_connection()
         self.download()
         self.extract()
 
+        logger.info('Running conversion tasks...')
+
         conv_list = self.prepare_conversion_tasks()
-        conv = self.task_runner(self.convert_file, conv_list)
+        conv = self.run_tasks(self.convert_file, conv_list)
         self.log_run(conv)
 
 
