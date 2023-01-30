@@ -127,11 +127,10 @@ class UDelClimate(Dataset):
                 if self.build_monthly:
                     for m in months:
 
-                        out_path = self.output_dir / dataset / 'monthly' / year / f"{dataset}_{year}.tif"
+                        out_path = self.output_dir / dataset / 'monthly' / year / f"{dataset}_{year}_{m}.tif"
 
                         if out_path.exists() and not self.overwrite_processing:
                             print(f'\tmonthly {year}_{m} exists, skipping...')
-                            continue
 
                         else:
                             print(f'\tbuilding monthly {year}_{m}...')
@@ -148,7 +147,6 @@ class UDelClimate(Dataset):
 
                         if out_path.exists() and not self.overwrite_processing:
                             print(f'\tyearly {year}_{j} exists, skipping...')
-                            continue
 
                         else:
                             print(f'\tbuilding yearly {year}_{j}...')
