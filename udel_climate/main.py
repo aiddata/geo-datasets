@@ -120,7 +120,7 @@ class UDelClimate(Dataset):
         if self.build_monthly:
             for m in months:
 
-                out_path = self.output_dir / dataset / 'monthly' / year / f"{dataset}_{year}_{m}.tif"
+                out_path = self.output_dir / dataset / 'monthly' / year / f"{dataset[-5]}_{year}_{m}.tif"
 
                 if out_path.exists() and not self.overwrite_processing:
                     logger.info(f'\tmonthly {year}_{m} exists, skipping...')
@@ -136,7 +136,7 @@ class UDelClimate(Dataset):
         if self.build_yearly:
             for j in self.methods:
 
-                out_path = self.output_dir / dataset / 'yearly' / j / f"{dataset}_{year}.tif"
+                out_path = self.output_dir / dataset / 'yearly' / j / f"{dataset[-5]}_{year}.tif"
 
                 if out_path.exists() and not self.overwrite_processing:
                     logger.info(f'\tyearly {year}_{j} exists, skipping...')
@@ -176,7 +176,7 @@ class UDelClimate(Dataset):
 
     def main(self):
         logger = self.get_logger()
-        
+
         logger.info('Running intial tasks...')
 
         self.test_connection()
