@@ -171,7 +171,6 @@ def get_config_dict(config_file="config.ini"):
     config.read(config_file)
 
     return {
-        "dataset": config["main"]["dataset"],
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "methods": [m for m in config["main"]["methods"].split(", ")],
