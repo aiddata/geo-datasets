@@ -347,6 +347,50 @@ class Dataset(ABC):
         return retries, retry_delay
 
 
+    def _check_env_and_run(self, correct_env: str):
+        """
+        Check conda environment is set to correct_env, log warning if it isn't
+        Check if $TMPDIR is in /local, log warning if it is
+        Then, run self.main()
+        """
+        logger = self.get_logger()
+
+        try:
+            # CONDA_DEFAULT_ENV should just be the name of the current env
+            current_env = os.environ["CONDA_DEFAULT_ENV"]
+        except KeyError:
+            # KeyError if there is no such environment variable
+            logger.warning("No conda environment detected! Have you loaded the anaconda module and activated an environment?")
+        except:
+            # don't kill the program if something else goes wrong
+            logger.warning("Unable to detect current conda environment")
+        else:
+            # test if the current env is the one we wanted
+            if current_env != correct_env:
+                logger.warning(f"Your conda environment is {current_env} instead of the expected {correct_env}")
+
+        try:
+            # $TMPDIR is the default temporary directory that deployments use to store and execute code
+            # is $TMPDIR set, and can we resolve it (find it on the filesystem)?
+            tmp_dir = Path(os.environ["TMPDIR"]).resolve(strict=True)
+        except KeyError:
+            # KeyError if there is no such environment variable
+            logger.warning("No $TMPDIR environment variable found!")
+        except FileNotFoundError:
+            # when we tried to resolve the path, the folder wasn't found on filesystem
+            logger.warning("$TMPDIR path not found!")
+        else:
+            # /local points to local storage on W&M HPC
+            slash_local = Path("/local").resolve()
+            # is /local a parent dir of tmp_dir?
+            for p in tmp_dir.parents:
+                if p.resolve() == slash_local:
+                    logger.warning("$TMPDIR in /local, deployments won't be accessible to compute nodes.")
+
+        # run the dataset (self.main() should be defined in child class instance)
+        self.main()
+
+
     def run(
         self,
         backend: Optional[str]=None,
@@ -359,13 +403,19 @@ class Dataset(ABC):
         logger_level=logging.INFO,
         retries: int=3,
         retry_delay: int=5,
+        conda_env: str = "geodata38",
         **kwargs):
         """
         Run a dataset
-        Calls self.main() with a backend e.g. "prefect"
+        Initializes class variables and chosen backend
         This is how Datasets should usually be run
+        Eventually calls _check_env_and_run(), starting dataset (see below)
         """
 
+        # no matter what happens, this is our ticket to run the actual dataset
+        # every backend calls this after initializing
+        run = lambda: self._check_env_and_run(conda_env)
+        
         self.init_retries(retries, retry_delay, save_settings=True)
 
         self.log_dir = Path(log_dir)
@@ -406,7 +456,7 @@ class Dataset(ABC):
 
             @flow(task_runner=tr, name=self.name)
             def prefect_main_wrapper():
-                self.main()
+                run()
 
             prefect_main_wrapper()
 
@@ -425,14 +475,14 @@ class Dataset(ABC):
                 self.backend = "mpi"
                 self.mpi_max_workers = max_workers
 
-                self.main()
+                run()
 
             elif backend == "local" or backend is None:
                 if run_parallel:
                     self.backend = "concurrent"
                 else:
                     self.backend = "serial"
-                self.main()
+                run()
 
             else:
                 raise ValueError(f"Backend {backend} not recognized.")
