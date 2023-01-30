@@ -136,7 +136,7 @@ class UDelClimate(Dataset):
         if self.build_yearly:
             for j in self.methods:
 
-                out_path = self.output_dir / dataset / 'yearly' / j / f"{dataset[-5]}_{year}.tif"
+                out_path = self.output_dir / dataset / 'yearly' / j / f"{dataset[-5]}_{year}_{j}.tif"
 
                 if out_path.exists() and not self.overwrite_processing:
                     logger.info(f'\tyearly {year}_{j} exists, skipping...')
