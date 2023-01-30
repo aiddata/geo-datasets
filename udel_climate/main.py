@@ -34,12 +34,17 @@ class UDelClimate(Dataset):
 
 
     def test_connection(self):
+        logger = self.get_logger()
+        logger.info(f'Testing download connection...')
         # test connection
         test_request = requests.get("http://climate.geog.udel.edu/~climate/html_pages/Global2017", verify=True)
         test_request.raise_for_status()
 
 
     def download(self):
+        logger = self.get_logger()
+        logger.info('Downloading files...')
+
         tmp_readme_url = "http://climate.geog.udel.edu/~climate/html_pages/Global2017/README.GlobalTsT2017.html"
         tmp_data_url = "http://climate.geog.udel.edu/~climate/html_pages/Global2017/air_temp_2017.tar.gz"
         pre_readme_url = "http://climate.geog.udel.edu/~climate/html_pages/Global2017/README.GlobalTsP2017.html"
@@ -54,21 +59,22 @@ class UDelClimate(Dataset):
             fname = url.split('/')[-1]
             fpath = self.raw_dir / fname
             if not fpath.exists() or self.overwrite_download:
-                print(f'downloading {url}...')
+                logger.info(f'\tdownloading {url}...')
                 r = requests.get(url, allow_redirects=True)
                 with open(fpath, 'wb') as dst:
                     dst.write(r.content)
-                # wget.download(url, out=str(fpath))
 
 
     def extract(self):
+        logger = self.get_logger()
+        logger.info('Extracting files...')
 
         # extract
         extract_list = list(self.raw_dir.glob('*.tar.gz'))
 
         for fpath in extract_list:
             dirname = str(fpath).split('.')[0]
-            print(f'extracting {fpath}...')
+            logger.info(f'\textracting {fpath}...')
             with tarfile.open(fpath) as tar:
                 tar.extractall(path=self.raw_dir/dirname)
 
@@ -82,18 +88,9 @@ class UDelClimate(Dataset):
             dst.write(np.array([out]))
 
 
-    def convert(self):
-
-        extract_list = list(self.raw_dir.glob('*.tar.gz'))
-
-        # process
-        data_dirname_list = [str(i).split('/')[-1].split('.')[0] for i in extract_list]
-
-        flist = [(i, list((self.raw_dir / i).glob('*'))) for i in data_dirname_list]
-
-        if len(flist) == 0 or len(flist[0][1]) == 0 or len(flist[1][1]) == 0:
-            raise Exception(f'no files found ({self.raw_dir})')
-
+    def convert_file(self, dataset, fpath):
+        logger = self.get_logger()
+        logger.info(f'Converting {fpath}...')
 
         months = [f'{i:02d}' for i in range(1, 13)]
 
@@ -109,58 +106,82 @@ class UDelClimate(Dataset):
             'nodata': -9999.0,
         }
 
+        year = fpath.name.split('.')[1]
+
+        # load csv to gdf
+        data = pd.read_csv(fpath, sep='\s+', header=None)
+        data.columns = ['lon', 'lat'] + months + ["extra"]
+
+        gdf = gpd.GeoDataFrame(data, geometry=gpd.points_from_xy(data.lon, data.lat))
+        gdf = gdf.set_crs(epsg=4326)
+
+
+        # monthly
+        if self.build_monthly:
+            for m in months:
+
+                out_path = self.output_dir / dataset / 'monthly' / year / f"{dataset}_{year}_{m}.tif"
+
+                if out_path.exists() and not self.overwrite_processing:
+                    logger.info(f'\tmonthly {year}_{m} exists, skipping...')
+
+                else:
+                    logger.info(f'\tbuilding monthly {year}_{m}...')
+                    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+                    self.gdf_to_raster(gdf, out_path, meta, value_col=m)
+
+
+        # yearly
+        if self.build_yearly:
+            for j in self.methods:
+
+                out_path = self.output_dir / dataset / 'yearly' / j / f"{dataset}_{year}.tif"
+
+                if out_path.exists() and not self.overwrite_processing:
+                    logger.info(f'\tyearly {year}_{j} exists, skipping...')
+
+                else:
+                    logger.info(f'\tbuilding yearly {year}_{j}...')
+                    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+                    gdf[f"year_{j}"] = gdf[months].apply(j, axis=1)
+                    self.gdf_to_raster(gdf, out_path, meta, value_col=f"year_{j}")
+
+
+    def prepare_conversion_tasks(self):
+        logger = self.get_logger()
+        logger.info(f'Preparing conversion tasks...')
+
+        extract_list = list(self.raw_dir.glob('*.tar.gz'))
+
+        # process
+        data_dirname_list = [str(i).split('/')[-1].split('.')[0] for i in extract_list]
+
+        flist = [(i, list((self.raw_dir / i).glob('*'))) for i in data_dirname_list]
+
+        if len(flist) == 0 or len(flist[0][1]) == 0 or len(flist[1][1]) == 0:
+            raise Exception(f'no files found ({self.raw_dir})')
+
+
+        task_list = []
+
         for dataset, data_files in flist:
             for fpath in data_files:
 
-                print(f'processing {fpath}...')
-                year = fpath.name.split('.')[1]
+                task_list.append([dataset, fpath])
 
-                # load csv to gdf
-                data = pd.read_csv(fpath, sep='\s+', header=None)
-                data.columns = ['lon', 'lat'] + months + ["extra"]
-
-                gdf = gpd.GeoDataFrame(data, geometry=gpd.points_from_xy(data.lon, data.lat))
-                gdf = gdf.set_crs(epsg=4326)
-
-
-                # monthly
-                if self.build_monthly:
-                    for m in months:
-
-                        out_path = self.output_dir / dataset / 'monthly' / year / f"{dataset}_{year}_{m}.tif"
-
-                        if out_path.exists() and not self.overwrite_processing:
-                            print(f'\tmonthly {year}_{m} exists, skipping...')
-
-                        else:
-                            print(f'\tbuilding monthly {year}_{m}...')
-                            out_path.parent.mkdir(parents=True, exist_ok=True)
-
-                            self.gdf_to_raster(gdf, out_path, meta, value_col=m)
-
-
-                # yearly
-                if self.build_yearly:
-                    for j in self.methods:
-
-                        out_path = self.output_dir / dataset / 'yearly' / j / f"{dataset}_{year}.tif"
-
-                        if out_path.exists() and not self.overwrite_processing:
-                            print(f'\tyearly {year}_{j} exists, skipping...')
-
-                        else:
-                            print(f'\tbuilding yearly {year}_{j}...')
-                            out_path.parent.mkdir(parents=True, exist_ok=True)
-
-                            gdf[f"year_{j}"] = gdf[months].apply(j, axis=1)
-                            self.gdf_to_raster(gdf, out_path, meta, value_col=f"year_{j}")
+        return task_list
 
 
     def main(self):
         self.test_connection()
         self.download()
         self.extract()
-        self.convert()
+
+        conv_list = self.prepare_conversion_tasks()
+        conv = self.task_runner(self.convert_file, conv_list)
+        self.log_run(conv)
 
 
 
