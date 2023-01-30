@@ -7,14 +7,14 @@ These scripts download and unzip CRU TS data (download.sh), convert each month's
 ## Version Info
 
 Current version:
-CRU TS v. 4.05
+CRU TS v. 4.06
 
 Link to data source:
 https://crudata.uea.ac.uk/cru/data/hrg/
 
 ## Instructions
 
-*The previous version of code for processing this dataset can be found the archive folder.
+*The previous versions of code for processing this dataset can be found the archive folder.
 These instructions are for running the current Python 3 script.*
 
 1. Download and unzip the CRU TS data
@@ -22,25 +22,21 @@ These instructions are for running the current Python 3 script.*
    bash download.sh
    ```
 
-3. [Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), and the conda environment environment.yml
+3. [Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), and the conda environment, this should be the same as other datasets that use the shared Dataset class.
    ```
-   bash create_env.sh
-   ```
-   Conda will confirm that the environment was created, and give you the command to activate it:
-   ```
-   conda activate cru_ts_405
+   conda activate geodata38
    ```
    Alternatively, you can install the appropriate Python 3 version and packages yourself.
 
-4. Make sure your copy of the CRU TS data matches the version listed at the top of extract_data.py
-   If your copy is a newer version, all scripts will need to be udpated to support it.
+4. Make sure config.ini lists the version of CRU TS that you desire. If it doesn't, see below for instructions on updating the version
 
-5. Set the source/destination folders and the range of years you'd like to process near the top of extract_data.py (see comments)
+5. Set the source/destination folders and the range of years you'd like to process in `config.ini`. Note that all years will be downloaded regardless of how many you'd like to process.
 
-6. This script uses the Python multiprocessing library rather than MPI. It can therefor be run either locally or an HPC environment easily without modifications. If running in an HPC environment, do not use more than a single node as the multiprocessing library will not be able to use additional nodes.
+6. Run `python main.py`
 
-   - To run locally, simply use `python extract_data.py`
-   - To create a HPC job and run, edit the `jobscript` file if needed and `qsub jobscript`
+## Downloading new versions
+
+The download links for different versions are a bit complex, so you'll have to minorly revise the code to make the new version work properly. In `main.py`, look in the `CRU_TS.download()` function, and adjust the download link formation to point to the latest downloads.
 
 
 ## Reference
