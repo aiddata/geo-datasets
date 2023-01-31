@@ -25,14 +25,8 @@ def landscan_pop(
         raw_dir: str,
         output_dir: str,
         years: List[int],
-        run_download: bool,
         run_extract: bool,
         run_conversion: bool,
-        cookie_name: str,
-        cookie_value: str,
-        username: str,
-        password: str,
-        overwrite_download: bool,
         overwrite_extract: bool,
         overwrite_conversion: bool,
         backend: Literal["local", "mpi", "prefect"],
@@ -93,7 +87,7 @@ def landscan_pop(
     #     "log_directory": str(timestamp_log_dir)
     # }
 
-    class_instance = LandScanPop(raw_dir, output_dir, years, run_download, run_extract, run_conversion, cookie_name, cookie_value, username, password, overwrite_download, overwrite_extract, overwrite_conversion)
+    class_instance = LandScanPop(raw_dir, output_dir, years, run_extract, run_conversion, overwrite_extract, overwrite_conversion)
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
