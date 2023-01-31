@@ -1,19 +1,9 @@
 """
 
-1. Go to https://landscan.ornl.gov and register for account if you do not have one already (may take several days for them to approve)
-2. Then go to https://landscan.ornl.gov/landscan-datasets and open the Developer Tools for your browser (e.g., press F12 in Chrome)
-3. Select the "Application" tab in Developer Tools
-4. In the "Storage" section of the left hand side menu click "Cookies" and then select "https://landscan.ornl.gov"
-5. In the main area you should now see a table of cookies with a "Name" and "Value" column.
-6. Copy the "Name" that starts with "SESS" and replace the "cookie_name" variable value in the config
-7. Copy the "Value" corresponding to the above Name and replace the "cookie_value" variable value in the config
-8. This cookie has an expiration date (<1 month) so you will need to retrieve a new cookie at some point in the future
-9. Enter your username and password into the variables in the config
-
-10. Edit the years in the config if needed
-11. Set the raw and output data directories in the config
-
-Note: Do not share your username, password, or cookie combination.
+1. Set the raw and output data directories in the config
+2. Go to https://landscan.ornl.gov and manually download all desired years of the "LandScan Global" population dataset
+3. Make sure all files are downloaded to a folder named "compressed" within the raw_data directory path specified in your config
+4. Edit the years in the config if needed (if you only downloaded a subset of years, or only want to extract/process a subset of years)
 
 
 """
@@ -61,39 +51,66 @@ class LandScanPop(Dataset):
     def unzip_file(self, zip_file, out_dir):
         """Extract a zipfile"""
         logger = self.get_logger()
-        logger.info(f"Extracting {zip_file} to {out_dir}")
-        with zipfile.ZipFile(zip_file, "r") as zip_ref:
-            zip_ref.extractall(out_dir)
+        if os.path.isdir(out_dir) and not self.overwrite_extract:
+            logger.info(f"Extracted directory exists - skipping ({out_dir})")
+        else:
+            logger.info(f"Extracting {zip_file} to {out_dir}")
+            with zipfile.ZipFile(zip_file, "r") as zip_ref:
+                zip_ref.extractall(out_dir)
 
 
-    def convert_esri_grid_to_geotiff(self, esri_grid_path, cog_path):
+    def convert_to_cog(self, src, dst):
         """Convert a raster from ESRI grid format to COG format"""
         logger = self.get_logger()
 
-        if os.path.isfile(cog_path) and not self.overwrite_conversion:
-            logger.info(f"COG exists - skipping ({cog_path})")
+        if os.path.isfile(dst) and not self.overwrite_conversion:
+            logger.info(f"COG exists - skipping ({dst})")
         else:
-            logger.info(f"Converting to COG ({cog_path})")
-            with rasterio.open(esri_grid_path) as src:
+            logger.info(f"Converting to COG ({dst})")
+            with rasterio.open(src) as src:
                 assert len(set(src.block_shapes)) == 1
                 meta = src.meta.copy()
-                meta.update(driver="COG", compress="LZW")
-                with rasterio.open(cog_path, "w", **meta) as dst:
+                meta.update({
+                    'driver': 'COG',
+                    'compress': 'LZW',
+                })
+
+                with rasterio.open(dst, "w", **meta) as dst:
                     for ji, window in src.block_windows(1):
                         in_data = src.read(window=window)
                         dst.write(in_data, window=window)
 
+
+    def build_extract_list(self):
+        """Build a list of files to extract"""
+        flist = []
+        for x in self.download_dir.iterdir():
+            y = int(x.name.split("-")[2])
+            if x.name.endswith(".zip") and y in self.years:
+                flist.append(( self.download_dir / x, self.extract_dir / x[:-4] ))
+
+        return flist
+
+
+    def build_conversion_list(self):
+        """Build a list of files to convert"""
+        flist = []
+        for x in self.extract_dir.iterdir():
+            y = int(x.name.split("-")[2])
+            if os.path.isdir(x) and y in self.years:
+                flist.append(( x / f"{x.name}.tif" , self.data_dir / f"{x.name}.tif" ))
+
+        return flist
 
     def main(self):
         logger = self.get_logger()
 
         logger.info('Starting pipeline...')
 
-
         # unzip
         if self.run_extract:
             logger.info('Running extract tasks...')
-            ex_list = [ ( self.download_dir / x, self.extract_dir / x[:-4] ) for x in self.download_dir.iterdir() ]
+            ex_list = self.build_extract_list()
             extract = self.run_tasks(self.unzip_file, ex_list)
             self.log_run(extract)
 
@@ -101,12 +118,9 @@ class LandScanPop(Dataset):
         # convert from esri grid format to COG
         if self.run_conversion:
             logger.info('Running conversion tasks...')
-            conv_list = [ ( x, self.data_dir / os.path.basename(x)+'.tif' ) for x in glob.glob(self.extract_dir + '/**/lspop*', recursive=True) if os.path.isdir(x)]
-            conv = self.run_tasks(self.convert_esri_grid_to_geotiff, conv_list)
+            conv_list = self.build_conversion_list()
+            conv = self.run_tasks(self.convert_to_cog, conv_list)
             self.log_run(conv)
-
-
-
 
 
 def get_config_dict(config_file="config.ini"):
