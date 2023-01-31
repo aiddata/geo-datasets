@@ -2,10 +2,10 @@
 	"base": "/sciclone/aiddata10/REU/geo/data/rasters/landscan/population",
 	"type": "raster",
 	"file_extension": ".tif",
-	"file_mask": "lspopYYYY.tif",
+	"file_mask": "landscan-global-YYYY.tif",
 	"name": "landscan_global_population",
 	"title": "LandScan Population Count",
-	"description": "Estimated population count from LandScan. Underlying dataset provides number of people per 1km pixel, based on an ambient population (average over 24 hours) distribution. Note: This data should not be used for change detection or migration tool (see https://landscan.ornl.gov/frequently-asked-questions for details).",
+	"description": "Estimated population count from LandScan. Underlying dataset provides number of people per 1km pixel, based on an ambient population (average over 24 hours) distribution. Note: This data should not be used for change detection or migration tool (see https://landscan.ornl.gov/about for details).",
     "details": "No additional processing of raw data.",
 	"version": 1,
 	"options": {
@@ -19,7 +19,7 @@
         "variable_description": "number of people"
 	},
 	"extras": {
-	    "citation": "Please visit https://landscan.ornl.gov/node/183 for detailed citations when using LandScan data.",
+	    "citation": "Please visit https://landscan.ornl.gov/citations for detailed citations when using LandScan data.",
 	    "sources_web": "https://landscan.ornl.gov/",
 	    "sources_name": "Oak Ridge National Laboratory's LandScan",
 	    "tags": ["population", "count", "landscan", "economics"]
