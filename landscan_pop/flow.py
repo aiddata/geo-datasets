@@ -45,9 +45,9 @@ def landscan_pop(
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 6,
-        "processes": 6,
-        "memory": "32GB",
+        "cores": 4,
+        "processes": 4,
+        "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [
             "#PBS -j oe",
