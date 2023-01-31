@@ -176,10 +176,12 @@ class MODISLandSurfaceTemp(Dataset):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
 
+        self.process_dir.mkdir(parents=True, exist_ok=True)
         self.raw_dir.mkdir(parents=True, exist_ok=True)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.method = "mean"
+
 
 
     def test_connection(self):
