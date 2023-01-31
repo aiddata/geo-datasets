@@ -176,7 +176,6 @@ class MODISLandSurfaceTemp(Dataset):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
 
-        self.process_dir.mkdir(parents=True, exist_ok=True)
         self.raw_dir.mkdir(parents=True, exist_ok=True)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -202,6 +201,7 @@ class MODISLandSurfaceTemp(Dataset):
         """
 
         logger = self.get_logger()
+        self.process_dir.mkdir(parents=True, exist_ok=True)
 
         if dst_file.exists() and not self.overwrite_download:
             logger.info(f"File already exists: {dst_file}. Skipping...")
@@ -287,6 +287,7 @@ class MODISLandSurfaceTemp(Dataset):
     def process_hdf(self, input_path, layer, tmp_path, output_path, identifier):
 
         logger = self.get_logger()
+        self.process_dir.mkdir(parents=True, exist_ok=True)
 
         if self.overwrite_processing or not os.path.isfile(output_path):
             # read HDF data files
@@ -336,6 +337,7 @@ class MODISLandSurfaceTemp(Dataset):
 
     def run_yearly_data(self, year, year_files, method, tmp_path, out_path):
         logger = self.get_logger()
+        self.process_dir.mkdir(parents=True, exist_ok=True)
 
         if not os.path.isfile(out_path) or self.overwrite_processing:
             data, meta = aggregate_rasters(file_list=year_files, method=method)
