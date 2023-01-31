@@ -1,11 +1,11 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/MODIS/terra/MOLT/MOD11C3.006/annual/night/mean",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/MODIS/terra/MOLT/MOD11C3.006/monthly/day",
 	"type": "raster",
 	"file_extension": ".tif",
-	"file_mask": "modis_lst_night_cmg_YYYY.tif",
-	"name": "modis_lst_mod11c3_006_night_annual_mean",
-	"title": "Annual nighttime land surface temperature - MODIS",
-	"description": "Annual nighttime land surface temperature in Kelvins. Created by aggregating (mean) month data from MOD11C3.006 CMG LST product",
+	"file_mask": "modis_lst_day_cmg_YYYYMM.tif",
+	"name": "modis_lst_mod11c3_006_day_monthly",
+	"title": "Monthly daytime land surface temperature - MODIS",
+	"description": "Monthly daytime land surface temperature in Kelvins. Produced using MOD11C3.006 CMG LST product",
     "details": "",
 	"version": "MOD11C3.006",
 	"options": {
@@ -21,11 +21,9 @@
 	},
 	"extras": {
         "citation": "Wan, Z., Hook, S., Hulley, G. (2015). MOD11C3 MODIS/Terra Land Surface Temperature/Emissivity Monthly L3 Global 0.05Deg CMG V006 [Data set]. NASA EOSDIS LP DAAC. doi: 10.5067/MODIS/MOD11C3.006",
-	    "sources_web": "https://lpdaac.usgs.gov/dataset_discovery/modis/modis_products_table/mod11c3_v006",
+	    "sources_web": "https://lpdaac.usgs.gov/products/mod11c3v006/",
 	    "sources_name": "Land Processes Distributed Active Archive Center",
-	    "tags": ["nasa","earthdata", "modis", "lst", "land surface temperature", "environment", "yearly"]
+	    "tags": ["nasa","earthdata", "modis", "lst", "land surface temperature", "environment", "monthly"]
 	},
 	"active": 1
 }
-
-
