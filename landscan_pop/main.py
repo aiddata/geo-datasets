@@ -87,7 +87,7 @@ class LandScanPop(Dataset):
         for x in self.download_dir.iterdir():
             y = int(x.name.split("-")[2])
             if x.name.endswith(".zip") and y in self.years:
-                flist.append(( self.download_dir / x, self.extract_dir / x[:-4] ))
+                flist.append(( self.download_dir / x, self.extract_dir / x.name[:-4] ))
 
         return flist
 
