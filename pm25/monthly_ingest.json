@@ -1,0 +1,29 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/pm25/Global/Monthly",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "V5GL02.HybridPM25.Global.200504-YYYYMM.tif ",
+	"name": "surface_pm25_monthly",
+	"title": "Monthly Surface PM2.5",
+	"description": "Estimates of ground-level fine particulate matter (PM2.5) for 1998-2021 produced by combining Aerosol Optical Depth (AOD) retrievals from the NASA MODIS, MISR, and SeaWIFS instruments with the GEOS-Chem chemical transport model, and subsequently calibrating to global ground-based observations using a Geographically Weighted Regression (GWR).",
+    "details": "",
+	"version": "V5.GL.03",
+	"options": {
+	    "resolution": 0.01,
+        "extract_types": ["max", "mean", "min"],
+        "extract_types_info" : {
+            "max" : "maximum PM2.5 value per unit of analysis",
+            "mean" : "average PM2.5 value per unit of analysis",
+            "min" : "minimum PM2.5 value per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "PM2.5 in micrograms per meter cubed"
+	},
+	"extras": {
+        "citation": "Aaron van Donkelaar, Melanie S. Hammer, Liam Bindle, Michael Brauer, Jeffery R. Brook, Michael J. Garay, N. Christina Hsu, Olga V. Kalashnikova, Ralph A. Kahn, Colin Lee, Robert C. Levy, Alexei Lyapustin, Andrew M. Sayer and Randall V. Martin (2021). Monthly Global Estimates of Fine Particulate Matter and Their Uncertainty Environmental Science & Technology, 2021, doi:10.1021/acs.est.1c05309",
+	    "sources_web": "https://sites.wustl.edu/acag/datasets/surface-pm2-5/#V5.GL.03",
+	    "sources_name": "Washington University in St. Louis - Atmospheric Composition Analysis Group",
+	    "tags": ["air quality", "pollution", "pm25", "environment", "monthly"]
+	},
+	"active": 1
+}
