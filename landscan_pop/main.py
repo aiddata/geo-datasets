@@ -99,7 +99,7 @@ class LandScanPop(Dataset):
             y = int(x.name.split("-")[2])
             if os.path.isdir(x) and y in self.years:
                 fname = x.name.replace('-assets', '.tif')
-                flist.append(( x / f"{fname}.tif" , self.output_dir / f"{fname}.tif" ))
+                flist.append(( x / fname , self.output_dir / fname ))
 
         return flist
 
