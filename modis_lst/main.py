@@ -282,7 +282,7 @@ class MODISLandSurfaceTemp(Dataset):
         return flist
 
 
-    def process_hdf(self, input_path, layer, output_path, identifier):
+    def process_hdf(self, input_path, layer, tmp_path, output_path, identifier):
 
         logger = self.get_logger()
 
@@ -299,7 +299,12 @@ class MODISLandSurfaceTemp(Dataset):
                                   0, -0.05,   90)
             meta = {"transform": transform, "nodata": 0, "height": data.shape[0], "width": data.shape[1]}
             # need to wrap data in array so it is 3-dimensions to account for raster band
-            export_raster(np.array([data]), output_path, meta, quiet=True)
+            export_raster(np.array([data]), tmp_path, meta, quiet=True)
+
+            logger.info(f"Processed to tmp: {input_path} > {tmp_path}")
+            shutil.copyfile(tmp_path, output_path)
+            logger.info(f"Copied to dst: {tmp_path} > {output_path}")
+
         else:
             logger.info(f"{output_path} already exists, skipping...")
 
@@ -314,10 +319,12 @@ class MODISLandSurfaceTemp(Dataset):
                 if p.suffix == ".hdf":
                     temporal = p.name.split("_")[0]
                     output_path = self.output_dir / "monthly" / l_time / f"modis_lst_{l_time}_cmg_{temporal}.tif"
+                    tmp_path = self.process_dir / f"modis_lst_{l_time}_cmg_{temporal}.tif"
+
                     output_path_list.append(output_path)
                     layer = f"LST_{c_time}_CMG"
 
-                    flist.append((p.as_posix(), layer, output_path.as_posix(), temporal))
+                    flist.append((p.as_posix(), layer, tmp_path.as_posix(), output_path.as_posix(), temporal))
 
         for i in set(output_path_list):
             i.parent.mkdir(parents=True, exist_ok=True)
@@ -325,9 +332,16 @@ class MODISLandSurfaceTemp(Dataset):
         return flist
 
 
-    def run_yearly_data(self, year, year_files, method, out_path):
-        data, meta = aggregate_rasters(file_list=year_files, method=method)
-        export_raster(data, out_path, meta)
+    def run_yearly_data(self, year, year_files, method, tmp_path, out_path):
+        logger = self.get_logger()
+
+        if not os.path.isfile(out_path) or self.overwrite_processing:
+            data, meta = aggregate_rasters(file_list=year_files, method=method)
+            export_raster(data, tmp_path, meta)
+
+            logger.info(f"Processed to tmp: {year}_{method} > {tmp_path}")
+            shutil.copyfile(tmp_path, out_path)
+            logger.info(f"Copied to dst: {tmp_path} > {out_path}")
 
 
     def build_aggregation_list(self):
@@ -354,9 +368,11 @@ class MODISLandSurfaceTemp(Dataset):
 
             for year_group, month_paths in year_months.items():
                 output_path = dst_dir / data_class / self.method / f"modis_lst_{data_class}_cmg_{year_group}.tif"
+                tmp_path = self.process_dir / f"{self.method}_modis_lst_{data_class}_cmg_{year_group}.tif"
+
                 output_dir_list.append(output_path)
 
-                flist.append((year_group, month_paths, self.method, output_path.as_posix()))
+                flist.append((year_group, month_paths, self.method, tmp_path, output_path.as_posix()))
 
         for i in set(output_dir_list):
             os.makedirs(i.parent, exist_ok=True)
