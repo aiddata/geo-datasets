@@ -40,8 +40,8 @@ class LandScanPop(Dataset):
         self.overwrite_extract = overwrite_extract
         self.overwrite_conversion = overwrite_conversion
 
-        self.download_dir = raw_dir / "compressed"
-        self.extract_dir = raw_dir / "uncompressed"
+        self.download_dir = self.raw_dir / "compressed"
+        self.extract_dir = self.raw_dir / "uncompressed"
 
         self.extract_dir.mkdir(parents=True, exist_ok=True)
         self.output_dir.mkdir(parents=True, exist_ok=True)
