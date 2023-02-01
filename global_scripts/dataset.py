@@ -106,6 +106,7 @@ class Dataset(ABC):
         Run tasks in serial (locally), given a function and list of inputs
         This will always return a list of TaskResults!
         """
+        print(input_list)
         return [self.error_wrapper(func, i) for i in input_list]
 
 
