@@ -168,12 +168,12 @@ class PM25(Dataset):
                     if self.skip_existing_downloads and os.path.isfile(dst_file):
                         if self.verify_existing_downloads:
                             logger.info(f"File exists but adding to download list for verification: {dst_file}")
-                            download_item_list.append((item, dst_file))
+                            download_item_list.append((item.id, dst_file))
                         else:
                             logger.info(f"File already downloaded, skipping: {dst_file}")
                     else:
                         logger.info(f"Adding to download list: {dst_file}")
-                        download_item_list.append((item, dst_file))
+                        download_item_list.append((item.id, dst_file))
 
                 else:
                     logger.debug(f"Skipping {item.name}, year not in range for this run")
@@ -185,20 +185,25 @@ class PM25(Dataset):
         return download_item_list
 
 
-    def download_file(self, item, dst_file):
+    def download_file(self, item_id, dst_file):
 
         logger = self.get_logger()
 
-        if self.skip_existing_downloads and os.path.isfile(dst_file) and sha1(dst_file) == item.sha1:
-            logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
-            return
-        else:
-            logger.info(f"File already exists with incorrect hash, downloading again: {dst_file}")
+        client = create_box_client(self.box_config_path)
+        item = client.file(item_id)
 
+        run_download = True
+        if self.skip_existing_downloads and os.path.isfile(dst_file):
+            if sha1(dst_file) == item.sha1:
+                logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
+                run_download = False
+            else:
+                logger.info(f"File already exists with incorrect hash {dst_file}")
 
-        logger.info(f"Downloading: {dst_file}")
-        with open(dst_file, "wb") as dst:
-            item.download_to(dst)
+        if run_download:
+            logger.info(f"Downloading: {dst_file}")
+            with open(dst_file, "wb") as dst:
+                item.download_to(dst)
 
 
     def convert_file(self, input_path, output_path):
