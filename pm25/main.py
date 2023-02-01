@@ -190,7 +190,7 @@ class PM25(Dataset):
         logger = self.get_logger()
 
         client = create_box_client(self.box_config_path)
-        item = client.file(item_id)
+        item = client.file(item_id).get()
 
         run_download = True
         if self.skip_existing_downloads and os.path.isfile(dst_file):
@@ -204,6 +204,8 @@ class PM25(Dataset):
             logger.info(f"Downloading: {dst_file}")
             with open(dst_file, "wb") as dst:
                 item.download_to(dst)
+
+        del client
 
 
     def convert_file(self, input_path, output_path):
