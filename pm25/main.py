@@ -312,7 +312,7 @@ def get_config_dict(config_file="config.ini"):
     return {
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
-        "version": config["run"]["version"],
+        "version": config["main"]["version"],
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "box_config_path": Path(config["main"]["box_config_path"]),
         "skip_existing_downloads": config["main"].getboolean("skip_existing_downloads"),
