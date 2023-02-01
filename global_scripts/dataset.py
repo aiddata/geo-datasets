@@ -1,6 +1,7 @@
 import os
 import csv
 import time
+import shutil
 import logging
 import multiprocessing
 from pathlib import Path
@@ -9,6 +10,26 @@ from datetime import datetime
 from collections import namedtuple
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
+from contextlib import contextmanager
+from tempfile import TemporaryDirectory, mkstemp, _get_default_tempdir
+
+
+def find_tmp_dir():
+    """
+    Find a temporary directory based on environment variables
+    This function is called if a Dataset is run without a temporary directory specified
+    """
+    try:
+        tmp_dir = Path("/local/scr") / os.environ["USER"] / "TMPDIR"
+        if tmp_dir.exists():
+            return tmp_dir.as_posix()
+    except:
+        pass
+
+    try:
+        return _get_default_tempdir()
+    except FileNotFoundError:
+        raise FileNotFoundError("Unable to find a suitable temporary directory. Please specify tmp_dir when calling run")
 
 
 """
@@ -83,6 +104,21 @@ class Dataset(ABC):
             return get_run_logger()
         else:
             return logging.getLogger("dataset")
+
+
+    @contextmanager
+    def tmp_to_dst_file(self, final_dst):
+        logger = self.get_logger()
+        with TemporaryDirectory(dir=self.tmp_dir) as tmp_dir:
+            tmp_file = mkstemp(dir=self.tmp_dir)[1]
+            logger.debug(f"Created temporary file {tmp_file} with final destination {str(final_dst)}")
+            yield tmp_file
+            try:
+                shutil.move(tmp_file, final_dst)
+            except:
+                logger.exception(f"Failed to transfer temporary file {tmp_file} to final destination {str(final_dst)}")
+            else:
+                logger.debug(f"Successfully transferred {tmp_file} to final destination {str(final_dst)}")
 
 
     def error_wrapper(self, func, args):
@@ -356,6 +392,7 @@ class Dataset(ABC):
         # cores_per_process: Optional[int]=None,
         chunksize: int=1,
         log_dir: str="logs",
+        tmp_dir: Optional[str]=find_tmp_dir(),
         logger_level=logging.INFO,
         retries: int=3,
         retry_delay: int=5,
@@ -369,6 +406,8 @@ class Dataset(ABC):
         self.init_retries(retries, retry_delay, save_settings=True)
 
         self.log_dir = Path(log_dir)
+        self.tmp_dir = Path(tmp_dir).as_posix()
+
         self.chunksize = chunksize
         os.makedirs(self.log_dir, exist_ok=True)
 
