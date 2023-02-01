@@ -110,7 +110,7 @@ class CRU_TS(Dataset):
             final_gzip_path = self.raw_dir / f"{file_prefix}.{v}.dat.nc"
 
             if final_dl_path.exists() and not self.overwrite_download:
-                logger.info(f"Skipping {str(d_src)}, already downloaded")
+                logger.info(f"Skipping {str(final_dl_path)}, already downloaded")
             else:
                 with self.tmp_to_dst_file(final_dl_path) as dl_dst:
                     dl_src = parse.urljoin(base_url, f"{v}/{download_filename}")

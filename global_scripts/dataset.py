@@ -1,6 +1,7 @@
 import os
 import csv
 import time
+import shutil
 import logging
 import multiprocessing
 from pathlib import Path
@@ -9,6 +10,26 @@ from datetime import datetime
 from collections import namedtuple
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
+from contextlib import contextmanager
+from tempfile import TemporaryDirectory, mkstemp, _get_default_tempdir
+
+
+def find_tmp_dir():
+    """
+    Find a temporary directory based on environment variables
+    This function is called if a Dataset is run without a temporary directory specified
+    """
+    try:
+        tmp_dir = Path("/local/scr") / os.environ["USER"] / "TMPDIR"
+        if tmp_dir.exists():
+            return tmp_dir.as_posix()
+    except:
+        pass
+
+    try:
+        return _get_default_tempdir()
+    except FileNotFoundError:
+        raise FileNotFoundError("Unable to find a suitable temporary directory. Please specify tmp_dir when calling run")
 
 
 """
@@ -85,6 +106,21 @@ class Dataset(ABC):
             return logging.getLogger("dataset")
 
 
+    @contextmanager
+    def tmp_to_dst_file(self, final_dst):
+        logger = self.get_logger()
+        with TemporaryDirectory(dir=self.tmp_dir) as tmp_dir:
+            tmp_file = mkstemp(dir=self.tmp_dir)[1]
+            logger.debug(f"Created temporary file {tmp_file} with final destination {str(final_dst)}")
+            yield tmp_file
+            try:
+                shutil.move(tmp_file, final_dst)
+            except:
+                logger.exception(f"Failed to transfer temporary file {tmp_file} to final destination {str(final_dst)}")
+            else:
+                logger.debug(f"Successfully transferred {tmp_file} to final destination {str(final_dst)}")
+
+
     def error_wrapper(self, func, args):
         """
         This is the wrapper that is used when running individual tasks
@@ -109,17 +145,18 @@ class Dataset(ABC):
         return [self.error_wrapper(func, i) for i in input_list]
 
 
-    def run_concurrent_tasks(self, name, func, input_list):
+    def run_concurrent_tasks(self, name, func, input_list, force_sequential):
         """
         Run tasks concurrently (locally), given a function a list of inputs
         This will always return a list of TaskResults!
         """
-        with multiprocessing.Pool(10) as pool:
+        pool_size = 1 if force_sequential else 10
+        with multiprocessing.Pool(pool_size) as pool:
             results = pool.starmap(self.error_wrapper, [(func, i) for i in input_list], chunksize=self.chunksize)
         return results
 
 
-    def run_prefect_tasks(self, name, func, input_list):
+    def run_prefect_tasks(self, name, func, input_list, force_sequential):
         """
         Run tasks using Prefect, using whichever task runner decided in self.run()
         This will always return a list of TaskResults!
@@ -129,12 +166,15 @@ class Dataset(ABC):
 
         task_wrapper = task(func, name=name, retries=self.retries, retry_delay_seconds=self.retry_delay)
 
-        futures =  [(i, task_wrapper.submit(*i, return_state=False)) for i in input_list]
+        futures = []
+        for i in input_list:
+            w = [i[1] for i in futures] if force_sequential else None
+            futures.append((i, task_wrapper.submit(*i, wait_for=w, return_state=False)))
 
         results = []
 
         for inputs, future in futures:
-            state = future.wait(timeout=60*60)
+            state = future.wait(timeout=None)
             if state.is_completed():
                 results.append(TaskResult(0, "Success", inputs, state.result()))
             elif state.is_failed() or state.is_crashed():
@@ -191,7 +231,8 @@ class Dataset(ABC):
                   allow_futures: bool=True,
                   name: Optional[str]=None,
                   retries: Optional[int]=3,
-                  retry_delay: Optional[int]=60):
+                  retry_delay: Optional[int]=60,
+                  force_sequential: bool=False):
         """
         Run a bunch of tasks, calling one of the above run_tasks functions
         This is the function that should be called most often from self.main()
@@ -221,9 +262,9 @@ class Dataset(ABC):
         if self.backend == "serial":
             results = self.run_serial_tasks(name, func, input_list)
         elif self.backend == "concurrent":
-            results = self.run_concurrent_tasks(name, func, input_list)
+            results = self.run_concurrent_tasks(name, func, input_list, force_sequential)
         elif self.backend == "prefect":
-            results = self.run_prefect_tasks(name, func, input_list)
+            results = self.run_prefect_tasks(name, func, input_list, force_sequential)
         elif self.backend == "mpi":
             results = self.run_mpi_tasks(name, func, input_list)
         else:
@@ -351,6 +392,7 @@ class Dataset(ABC):
         # cores_per_process: Optional[int]=None,
         chunksize: int=1,
         log_dir: str="logs",
+        tmp_dir: Optional[str]=find_tmp_dir(),
         logger_level=logging.INFO,
         retries: int=3,
         retry_delay: int=5,
@@ -364,6 +406,8 @@ class Dataset(ABC):
         self.init_retries(retries, retry_delay, save_settings=True)
 
         self.log_dir = Path(log_dir)
+        self.tmp_dir = Path(tmp_dir).as_posix()
+
         self.chunksize = chunksize
         os.makedirs(self.log_dir, exist_ok=True)
 
