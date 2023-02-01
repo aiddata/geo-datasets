@@ -90,14 +90,18 @@ class Dataset(ABC):
         This is the wrapper that is used when running individual tasks
         It will always return a TaskResult!
         """
+        logger = self.get_logger()
+
         for try_no in range(self.retries + 1):
             try:
                 return TaskResult(0, "Success", args, func(*args))
             except Exception as e:
                 if try_no < self.retries:
+                    logger.error(f"Task failed with exception (retrying): {repr(e)}")
                     time.sleep(self.retry_delay)
                     continue
                 else:
+                    logger.error(f"Task failed with exception (giving up): {repr(e)}")
                     return TaskResult(1, repr(e), args, None)
 
 
@@ -106,9 +110,8 @@ class Dataset(ABC):
         Run tasks in serial (locally), given a function and list of inputs
         This will always return a list of TaskResults!
         """
-
         logger = self.get_logger()
-        logger.info(f"DEBUG ZZ: {input_list}")
+        logger.debug(f"run_serial_tasks - input_list: {input_list}")
         return [self.error_wrapper(func, i) for i in input_list]
 
 

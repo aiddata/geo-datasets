@@ -166,11 +166,11 @@ class PM25(Dataset):
 
                     if not os.path.isfile(dst_file) or self.overwrite_downloads:
                         logger.info(f"Adding to download list: {dst_file}")
-                        download_item_list.append((item, dst_file))
+                        download_item_list.append((item.id, dst_file))
 
                     elif os.path.isfile(dst_file) and self.verify_existing_downloads:
                         logger.info(f"File exists but adding to download list for verification: {dst_file}")
-                        download_item_list.append((item, dst_file))
+                        download_item_list.append((item.id, dst_file))
                     else:
                         logger.info(f"File already downloaded, skipping: {dst_file}")
 
@@ -184,10 +184,32 @@ class PM25(Dataset):
         return download_item_list
 
 
-    def download_file(self, item, dst_file):
+    def get_box_item(self, id: str):
+        client = create_box_client(self.box_config_path)
+        box_folder_url = 'https://wustl.app.box.com/v/ACAG-V5GL03-GWRPM25'
+
+        for i in client.get_shared_item(box_folder_url).get_items():
+            if i.name == 'Global':
+                for j in i.get_items():
+                    if j.name in ['Annual', 'Monthly']:
+                        for k in j.get_items():
+                            if k.id == id:
+                                return k
+
+        raise KeyError(f"Could not find file id: {id}")
+
+
+    def download_file(self, item_id, dst_file):
 
         logger = self.get_logger()
-        logger.info(f"DEBUG AA: {item} ---- {dst_file}")
+        # logger.info(f"DEBUG AA: {item} ---- {dst_file}")
+
+        try:
+            logger.info(f"Retrieving box file item for {item_id} - {dst_file}")
+            item = self.get_box_item(item_id)
+        except:
+            logger.error(f"Unable to find file id ({item_id}) for {dst_file}")
+            raise
 
         run_download = True
         if os.path.isfile(dst_file) and self.verify_existing_downloads:
@@ -199,12 +221,12 @@ class PM25(Dataset):
 
         if run_download:
             logger.info(f"Downloading: {dst_file}")
-            # with open(dst_file, "wb") as dst:
-            #     item.download_to(dst)
+            with open(dst_file, "wb") as dst:
+                item.download_to(dst)
 
-        del client
+        # del client
 
-        logger.info(f"DEBUG BB: {item} ---- {dst_file}")
+        # logger.info(f"DEBUG BB: {item} ---- {dst_file}")
 
 
     def build_process_list(self):
@@ -290,7 +312,7 @@ class PM25(Dataset):
         logger.info("Building initial download list")
         dl_file_list = self.build_file_download_list()
 
-        logger.info(dl_file_list)
+        logger.debug(dl_file_list)
 
         (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
         (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
