@@ -86,13 +86,16 @@ class PM25(Dataset):
                  raw_dir: str,
                  output_dir: str,
                  box_config_path: str,
+                 version: str,
                  years: list,
                  skip_existing_downloads=True,
                  verify_existing_downloads=True,
                  overwrite_processing=False,):
 
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
+        self.version = version
+
+        self.raw_dir = Path(raw_dir) / self.version
+        self.output_dir = Path(output_dir) / self.version
 
         self.years = [int(y) for y in years]
 
@@ -107,7 +110,7 @@ class PM25(Dataset):
 
         self.overwrite_processing = overwrite_processing
 
-        self.filename_template = "V5GL02.HybridPM25.Global.{YEAR}{FIRST_MONTH}-{YEAR}{LAST_MONTH}"
+        self.filename_template =  self.version + ".HybridPM25.Global.{YEAR}{FIRST_MONTH}-{YEAR}{LAST_MONTH}"
 
 
     def build_file_download_list(self):
@@ -120,7 +123,7 @@ class PM25(Dataset):
         self.client = create_box_client(self.box_config_path)
 
         # find shared folder
-        shared_folder = self.client.get_shared_item("https://wustl.app.box.com/v/ACAG-V5GL02-GWRPM25")
+        shared_folder = self.client.get_shared_item(f"https://wustl.app.box.com/v/ACAG-{self.version}-GWRPM25")
 
         # find Global folder
         for i in shared_folder.get_items():
@@ -309,6 +312,7 @@ def get_config_dict(config_file="config.ini"):
     return {
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
+        "version": config["run"]["version"],
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "box_config_path": Path(config["main"]["box_config_path"]),
         "skip_existing_downloads": config["main"].getboolean("skip_existing_downloads"),
@@ -334,6 +338,6 @@ if __name__ == "__main__":
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
 
-    class_instance = PM25(config_dict["raw_dir"], config_dict["output_dir"], config_dict["box_config_dict_path"], config_dict["years"], config_dict["skip_existing_downloads"], config_dict["verify_existing_downloads"], config_dict["overwrite_processing"])
+    class_instance = PM25(config_dict["raw_dir"], config_dict["output_dir"], config_dict["box_config_dict_path"], config_dict["version"], config_dict["years"], config_dict["skip_existing_downloads"], config_dict["verify_existing_downloads"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
