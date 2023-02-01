@@ -1,5 +1,5 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/MODIS/terra/MOLT/MOD11C3.061/annual/day/mean",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/MODIS/terra/MOLT/MOD11C3.061/yearly/day/mean",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "modis_lst_day_cmg_YYYY.tif",
