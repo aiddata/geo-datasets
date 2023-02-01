@@ -168,12 +168,12 @@ class PM25(Dataset):
                     if self.skip_existing_downloads and os.path.isfile(dst_file):
                         if self.verify_existing_downloads:
                             logger.info(f"File exists but adding to download list for verification: {dst_file}")
-                            download_item_list.append((item.id, dst_file))
+                            download_item_list.append((item, dst_file))
                         else:
                             logger.info(f"File already downloaded, skipping: {dst_file}")
                     else:
                         logger.info(f"Adding to download list: {dst_file}")
-                        download_item_list.append((item.id, dst_file))
+                        download_item_list.append((item, dst_file))
 
                 else:
                     logger.debug(f"Skipping {item.name}, year not in range for this run")
@@ -185,12 +185,9 @@ class PM25(Dataset):
         return download_item_list
 
 
-    def download_file(self, item_id, dst_file):
+    def download_file(self, item, dst_file):
 
         logger = self.get_logger()
-
-        client = create_box_client(self.box_config_path)
-        item = client.file(item_id).get()
 
         run_download = True
         if self.skip_existing_downloads and os.path.isfile(dst_file):
