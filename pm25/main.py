@@ -110,10 +110,12 @@ class PM25(Dataset):
         self.filename_template = "V5GL02.HybridPM25.Global.{YEAR}{FIRST_MONTH}-{YEAR}{LAST_MONTH}"
 
 
-    def build_folder_download_list(self):
+    def build_file_download_list(self):
         """
         Generates a task list of downloads from the Box shared folder for this dataset.
         """
+        logger = self.get_logger()
+
         # create Box client
         self.client = create_box_client(self.box_config_path)
 
@@ -142,21 +144,40 @@ class PM25(Dataset):
         elif not monthly_item:
             raise KeyError("Could not find directory \"Global/Monthly\" in shared Box folder")
 
-        del self.client
-
-        return [annual_item, monthly_item]
-
-
-    def build_file_download_list(self):
-
-        logger = self.get_logger()
-
-        annual_item, monthly_item = self.build_folder_download_list()
 
         annual_item_list = [(i, self.raw_dir / "Global" / "Annual" / i.name) for i in annual_item.get_items()]
         monthly_item_list = [(i, self.raw_dir / "Global" / "Monthly" / i.name) for i in monthly_item.get_items()]
 
-        download_item_list = annual_item_list + monthly_item_list
+        tmp_download_item_list = annual_item_list + monthly_item_list
+
+        download_item_list = []
+
+        for item, dst_file in tmp_download_item_list:
+
+            file_timeframe = item.name.split(".")[3].split("-")
+            if len(file_timeframe) == 2:
+
+                first_year = str(file_timeframe[0])[:4]
+                second_year = str(file_timeframe[1])[:4]
+
+                if first_year == second_year and int(first_year) in self.years:
+
+                    if self.skip_existing_downloads and os.path.isfile(dst_file):
+                        if self.verify_existing_downloads:
+                            logger.info(f"File exists but adding to download list for verification: {dst_file}")
+                            download_item_list.append((item, dst_file))
+                        else:
+                            logger.info(f"File already downloaded, skipping: {dst_file}")
+                    else:
+                        logger.info(f"Adding to download list: {dst_file}")
+                        download_item_list.append((item, dst_file))
+
+                else:
+                    logger.debug(f"Skipping {item.name}, year not in range for this run")
+            else:
+                raise Exception(f"Unable to parse file name: {item.name}")
+
+        del self.client
 
         return download_item_list
 
@@ -165,32 +186,16 @@ class PM25(Dataset):
 
         logger = self.get_logger()
 
-        file_timeframe = item.name.split(".")[3].split("-")
-        if len(file_timeframe) == 2:
-
-            first_year = str(file_timeframe[0])[:4]
-            second_year = str(file_timeframe[1])[:4]
-
-            if first_year == second_year and int(first_year) in self.years:
-
-                if self.skip_existing_downloads and os.path.isfile(dst_file):
-                    if self.verify_existing_downloads:
-                        if sha1(dst_file) == item.sha1:
-                            logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
-                        else:
-                            logger.info(f"File already exists with incorrect hash, downloading again: {dst_file}")
-                    else:
-                        logger.info(f"File already downloaded, skipping: {dst_file}")
-                else:
-                    logger.info(f"Downloading: {dst_file}")
-                    with open(dst_file, "wb") as dst:
-                        item.download_to(dst)
-
-            else:
-                logger.debug(f"Skipping {item.name}, year not in range for this run")
+        if self.skip_existing_downloads and os.path.isfile(dst_file) and sha1(dst_file) == item.sha1:
+            logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
+            return
         else:
-            raise Exception(f"Unable to parse file name: {item.name}")
+            logger.info(f"File already exists with incorrect hash, downloading again: {dst_file}")
 
+
+        logger.info(f"Downloading: {dst_file}")
+        with open(dst_file, "wb") as dst:
+            item.download_to(dst)
 
 
     def convert_file(self, input_path, output_path):
