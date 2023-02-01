@@ -287,7 +287,7 @@ class PM25(Dataset):
         logger.info("Building initial download list")
         dl_file_list = self.build_file_download_list()
 
-        logger.debug(dl_file_list)
+        logger.info(dl_file_list)
 
         (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
         (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
