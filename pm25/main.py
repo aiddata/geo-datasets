@@ -187,7 +187,7 @@ class PM25(Dataset):
     def download_file(self, item, dst_file):
 
         logger = self.get_logger()
-        logger.info(f"DEBUG: {item} ---- {dst_file}")
+        logger.info(f"DEBUG AA: {item} ---- {dst_file}")
 
         run_download = True
         if os.path.isfile(dst_file) and self.verify_existing_downloads:
@@ -203,6 +203,8 @@ class PM25(Dataset):
             #     item.download_to(dst)
 
         del client
+
+        logger.info(f"DEBUG BB: {item} ---- {dst_file}")
 
 
     def build_process_list(self):
