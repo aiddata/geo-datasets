@@ -88,7 +88,7 @@ class PM25(Dataset):
                  box_config_path: str,
                  version: str,
                  years: list,
-                 skip_existing_downloads=True,
+                 overwrite_downloads=True,
                  verify_existing_downloads=True,
                  overwrite_processing=False,):
 
@@ -102,10 +102,9 @@ class PM25(Dataset):
         self.box_config_path = Path(box_config_path)
 
         # skip existing files while downloading?
-        self.skip_existing_downloads = skip_existing_downloads
+        self.overwrite_downloads = overwrite_downloads
 
         # verify existing files' hashes while downloading?
-        # (skip_existing_downloads must also be set to True)
         self.verify_existing_downloads = verify_existing_downloads
 
         self.overwrite_processing = overwrite_processing
@@ -165,15 +164,15 @@ class PM25(Dataset):
 
                 if first_year == second_year and int(first_year) in self.years:
 
-                    if self.skip_existing_downloads and os.path.isfile(dst_file):
-                        if self.verify_existing_downloads:
-                            logger.info(f"File exists but adding to download list for verification: {dst_file}")
-                            download_item_list.append((item, dst_file))
-                        else:
-                            logger.info(f"File already downloaded, skipping: {dst_file}")
-                    else:
+                    if not os.path.isfile(dst_file) or self.overwrite_downloads:
                         logger.info(f"Adding to download list: {dst_file}")
                         download_item_list.append((item, dst_file))
+
+                    elif os.path.isfile(dst_file) and self.verify_existing_downloads:
+                        logger.info(f"File exists but adding to download list for verification: {dst_file}")
+                        download_item_list.append((item, dst_file))
+                    else:
+                        logger.info(f"File already downloaded, skipping: {dst_file}")
 
                 else:
                     logger.debug(f"Skipping {item.name}, year not in range for this run")
@@ -190,7 +189,7 @@ class PM25(Dataset):
         logger = self.get_logger()
 
         run_download = True
-        if self.skip_existing_downloads and os.path.isfile(dst_file):
+        if os.path.isfile(dst_file) and self.verify_existing_downloads:
             if sha1(dst_file) == item.sha1:
                 logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
                 run_download = False
@@ -203,6 +202,36 @@ class PM25(Dataset):
                 item.download_to(dst)
 
         del client
+
+
+    def build_process_list(self):
+
+        task_list = []
+
+        # run annual data
+        for year in self.years:
+            filename = self.filename_template.format(YEAR = year, FIRST_MONTH = "01", LAST_MONTH = "12")
+            input_path = self.raw_dir / "Global" / "Annual" / (filename + ".nc")
+            if input_path.exists():
+                output_path = self.output_dir / "Global" / "Annual" / (filename + ".tif")
+                task_list.append((input_path, output_path))
+            else:
+                warnings.warn(f"No annual data found for year {year}. Skipping...")
+
+        # run monthly data
+        # TODO: find a way to set each year's month range individually so if researcher wants different months for each year can adjust
+        for year in self.years:
+            for i in range(1, 13):
+                month = str(i).zfill(2)
+                filename = self.filename_template.format(YEAR = year, FIRST_MONTH = month, LAST_MONTH = month)
+                input_path = self.raw_dir / "Global" / "Monthly" / (filename + ".nc")
+                if input_path.exists():
+                    output_path = self.output_dir / "Global" / "Monthly" / (filename + ".tif")
+                    task_list.append((input_path, output_path))
+                else:
+                    warnings.warn(f"No monthly data found for year {year} month {month}. Skipping...")
+
+        return task_list
 
 
     def convert_file(self, input_path, output_path):
@@ -250,36 +279,6 @@ class PM25(Dataset):
         return str(output_path)
 
 
-    def build_process_list(self):
-
-        task_list = []
-
-        # run annual data
-        for year in self.years:
-            filename = self.filename_template.format(YEAR = year, FIRST_MONTH = "01", LAST_MONTH = "12")
-            input_path = self.raw_dir / "Global" / "Annual" / (filename + ".nc")
-            if input_path.exists():
-                output_path = self.output_dir / "Global" / "Annual" / (filename + ".tif")
-                task_list.append((input_path, output_path))
-            else:
-                warnings.warn(f"No annual data found for year {year}. Skipping...")
-
-        # run monthly data
-        # TODO: find a way to set each year's month range individually so if researcher wants different months for each year can adjust
-        for year in self.years:
-            for i in range(1, 13):
-                month = str(i).zfill(2)
-                filename = self.filename_template.format(YEAR = year, FIRST_MONTH = month, LAST_MONTH = month)
-                input_path = self.raw_dir / "Global" / "Monthly" / (filename + ".nc")
-                if input_path.exists():
-                    output_path = self.output_dir / "Global" / "Monthly" / (filename + ".tif")
-                    task_list.append((input_path, output_path))
-                else:
-                    warnings.warn(f"No monthly data found for year {year} month {month}. Skipping...")
-
-        return task_list
-
-
     def main(self):
 
         logger = self.get_logger()
@@ -319,7 +318,7 @@ def get_config_dict(config_file="config.ini"):
         "version": config["main"]["version"],
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "box_config_path": Path(config["main"]["box_config_path"]),
-        "skip_existing_downloads": config["main"].getboolean("skip_existing_downloads"),
+        "overwrite_downloads": config["main"].getboolean("overwrite_downloads"),
         "verify_existing_downloads": config["main"].getboolean("verify_existing_downloads"),
         "overwrite_processing": config["main"].getboolean("overwrite_processing"),
         "backend": config["run"]["backend"],
@@ -342,6 +341,6 @@ if __name__ == "__main__":
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
 
-    class_instance = PM25(config_dict["raw_dir"], config_dict["output_dir"], config_dict["box_config_dict_path"], config_dict["version"], config_dict["years"], config_dict["skip_existing_downloads"], config_dict["verify_existing_downloads"], config_dict["overwrite_processing"])
+    class_instance = PM25(config_dict["raw_dir"], config_dict["output_dir"], config_dict["box_config_dict_path"], config_dict["version"], config_dict["years"], config_dict["overwrite_downloads"], config_dict["verify_existing_downloads"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
