@@ -30,7 +30,8 @@ def modis_lst(
         password: str,
         years: List[int],
         overwrite_download: bool,
-        overwrite_processing: bool,
+        overwrite_monthly: bool,
+        overwrite_yearly: bool,
         backend: Literal["local", "mpi", "prefect"],
         task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
         run_parallel: bool,
@@ -64,7 +65,7 @@ def modis_lst(
     }
 
 
-    class_instance = MODISLandSurfaceTemp(process_dir=process_dir, raw_dir=raw_dir, output_dir=output_dir, username=username, password=password, years=years, overwrite_download=overwrite_download, overwrite_processing=overwrite_processing)
+    class_instance = MODISLandSurfaceTemp(process_dir=process_dir, raw_dir=raw_dir, output_dir=output_dir, username=username, password=password, years=years, overwrite_download=overwrite_download, overwrite_monthly=overwrite_monthly, overwrite_yearly=overwrite_yearly)
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
