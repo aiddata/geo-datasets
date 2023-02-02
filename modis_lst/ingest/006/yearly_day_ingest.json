@@ -4,7 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "modis_lst_day_cmg_YYYY.tif",
 	"name": "modis_lst_mod11c3_006_day_annual_mean",
-	"title": "Annual daytime land surface temperature - MODIS",
+	"title": "Annual daytime land surface temperature - MODIS v6.0",
 	"description": "Annual daytime land surface temperature in Kelvins. Created by aggregating (mean) month data from MOD11C3.006 CMG LST product",
     "details": "",
 	"version": "MOD11C3.006",

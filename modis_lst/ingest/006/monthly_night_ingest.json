@@ -4,7 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "modis_lst_night_cmg_YYYYMM.tif",
 	"name": "modis_lst_mod11c3_006_night_monthly",
-	"title": "Monthly nighttime land surface temperature - MODIS",
+	"title": "Monthly nighttime land surface temperature - MODIS v6.0",
 	"description": "Monthly nighttime land surface temperature in Kelvins. Produced using MOD11C3.006 CMG LST product",
     "details": "",
 	"version": "MOD11C3.006",
