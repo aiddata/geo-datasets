@@ -1,13 +1,13 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/pm25/V5GL02/Global/Annual",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/pm25/V5GL03/Global/Annual",
 	"type": "raster",
 	"file_extension": ".tif",
-	"file_mask": "V5GL02.HybridPM25.Global.201001-YYYY12.tif",
-	"name": "surface_pm25_annual_V5GL02",
-	"title": "Annual Surface PM2.5",
+	"file_mask": "V5GL03.HybridPM25.Global.201001-YYYY12.tif",
+	"name": "surface_pm25_annual_V5GL03",
+	"title": "Annual Surface PM2.5 Estimates (V5.GL.03)",
 	"description": "Yearly average of monthly estimates of ground-level fine particulate matter (PM2.5) for 1998-2021 produced by combining Aerosol Optical Depth (AOD) retrievals from the NASA MODIS, MISR, and SeaWIFS instruments with the GEOS-Chem chemical transport model, and subsequently calibrating to global ground-based observations using a Geographically Weighted Regression (GWR).",
     "details": "",
-	"version": "V5.GL.02",
+	"version": "V5.GL.03",
 	"options": {
 	    "resolution": 0.01,
         "extract_types": ["max", "mean", "min"],
