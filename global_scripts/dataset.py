@@ -133,6 +133,7 @@ class Dataset(ABC):
         """
 
         from prefect import task
+        logger = self.get_logger()
 
         task_wrapper = task(func, name=name, retries=self.retries, retry_delay_seconds=self.retry_delay, persist_result=True)
 
@@ -149,10 +150,14 @@ class Dataset(ABC):
         while states:
             for ix, (inputs, state) in enumerate(states):
                 if state.is_completed():
-                    print('complete', ix, inputs)
+                    # print('complete', ix, inputs)
+                    logger.info(f'complete - {ix} - {inputs}')
+
                     results.append(TaskResult(0, "Success", inputs, state.result()))
                 elif state.is_failed() or state.is_crashed() or state.is_cancelled():
-                    print('fail', ix, inputs)
+                    # print('fail', ix, inputs)
+                    logger.info(f'fail - {ix} - {inputs}')
+
                     try:
                         msg = repr(state.result(raise_on_failure=True))
                     except Exception as e:
