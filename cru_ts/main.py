@@ -33,6 +33,7 @@ from pathlib import Path
 from datetime import datetime
 from urllib import request, parse
 from configparser import ConfigParser
+from typing import List
 
 
 import rasterio
@@ -47,16 +48,13 @@ class CRU_TS(Dataset):
     name = "Climatic Research Unit gridded Time Series"
 
     def __init__(self,
-                 start_year,
-                 end_year,
-                 cru_vers: bool,
-                 raw_dir, output_dir,
+                 cru_vers: str,
+                 years: List[int],
+                 raw_dir,
+                 output_dir,
                  overwrite_download: bool,
                  overwrite_unzip: bool,
                  overwrite_processing: bool):
-
-        self.start_year = int(start_year)
-        self.end_year = int(end_year)
 
         self.cru_vers = cru_vers
         # note that later in the download URL, there is no second underscore
@@ -70,7 +68,7 @@ class CRU_TS(Dataset):
         self.overwrite_unzip = overwrite_unzip
         self.overwrite_process = overwrite_processing
 
-        self.years = range(start_year, end_year+1)
+        self.years = [int(y) for y in years]
         self.months = range(1, 13)
 
         temporal_list = ["{}{}".format(y, str(m).zfill(2)) for y in self.years for m in self.months]
@@ -264,8 +262,7 @@ def get_config_dict(config_file="config.ini"):
     config.read(config_file)
 
     return {
-        "start_year": int(config["main"]["start_year"]),
-        "end_year": int(config["main"]["end_year"]),
+        "years": [y for y in range(int(config["main"]["start_year"]), int(config["main"]["end_year"])+1)],
         "cru_vers": config["main"]["cru_vers"],
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
@@ -291,7 +288,6 @@ if __name__ == "__main__":
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-
-    class_instance = CRU_TS(config_dict["start_year"], config_dict["end_year"], config_dict["cru_vers"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["overwrite_unzip"], config_dict["overwrite_processing"])
+    class_instance = CRU_TS(config_dict["cru_vers"], config_dict["years"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["overwrite_unzip"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
