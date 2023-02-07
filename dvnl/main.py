@@ -129,7 +129,6 @@ def get_config_dict(config_file="config.ini"):
             "task_runner": config["run"]["task_runner"],
             "run_parallel": config["run"].getboolean("run_parallel"),
             "max_workers": int(config["run"]["max_workers"]),
-            "cores_per_process": int(config["run"]["cores_per_process"]),
             "overwrite_download": config["main"].getboolean("overwrite_download"),
             "overwrite_processing": config["main"].getboolean("overwrite_processing")
         }
