@@ -8,26 +8,27 @@ from prefect import flow
 from prefect.filesystems import GitHub
 
 
-config_file = "malaria_atlas_project/config.ini"
+config_file = "landscan_pop/config.ini"
 config = ConfigParser()
 config.read(config_file)
 
 block_name = config["deploy"]["storage_block"]
 GitHub.load(block_name).get_directory('global_scripts')
 
-from main import MalariaAtlasProject
+from main import LandScanPop
 
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def malaria_atlas_project(
+def landscan_pop(
         raw_dir: str,
         output_dir: str,
         years: List[int],
-        dataset: str,
-        overwrite_download: bool,
-        overwrite_processing: bool,
+        run_extract: bool,
+        run_conversion: bool,
+        overwrite_extract: bool,
+        overwrite_conversion: bool,
         backend: Literal["local", "mpi", "prefect"],
         task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
         run_parallel: bool,
@@ -44,9 +45,9 @@ def malaria_atlas_project(
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 6,
-        "processes": 6,
-        "memory": "32GB",
+        "cores": 4,
+        "processes": 4,
+        "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [
             "#PBS -j oe",
@@ -86,7 +87,7 @@ def malaria_atlas_project(
     #     "log_directory": str(timestamp_log_dir)
     # }
 
-    class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
+    class_instance = LandScanPop(raw_dir, output_dir, years, run_extract, run_conversion, overwrite_extract, overwrite_conversion)
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)

@@ -2,37 +2,26 @@ import os
 from pathlib import Path
 from datetime import datetime
 from configparser import ConfigParser
-from typing import List, Literal
 
 from prefect import flow
 from prefect.filesystems import GitHub
 
 
-config_file = "malaria_atlas_project/config.ini"
+config_file = "esa_landcover/config.ini"
 config = ConfigParser()
 config.read(config_file)
 
 block_name = config["deploy"]["storage_block"]
 GitHub.load(block_name).get_directory('global_scripts')
 
-from main import MalariaAtlasProject
+
+from main import ESALandcover
 
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def malaria_atlas_project(
-        raw_dir: str,
-        output_dir: str,
-        years: List[int],
-        dataset: str,
-        overwrite_download: bool,
-        overwrite_processing: bool,
-        backend: Literal["local", "mpi", "prefect"],
-        task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
-        run_parallel: bool,
-        max_workers: int,
-        log_dir: str):
+def esa_landcover(raw_dir, process_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel,  max_workers, log_dir):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -44,9 +33,10 @@ def malaria_atlas_project(
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 6,
-        "processes": 6,
-        "memory": "32GB",
+        "walltime": "02:00:00",
+        "cores": 2,
+        "processes": 2,
+        "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [
             "#PBS -j oe",
@@ -61,7 +51,6 @@ def malaria_atlas_project(
         ],
         "log_directory": str(timestamp_log_dir)
     }
-
 
     # cluster = "hima"
 
@@ -86,7 +75,7 @@ def malaria_atlas_project(
     #     "log_directory": str(timestamp_log_dir)
     # }
 
-    class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
+    class_instance = ESALandcover(raw_dir, process_dir, output_dir, years, overwrite_download, overwrite_processing)
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
