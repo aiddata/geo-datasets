@@ -52,9 +52,6 @@ def esa_landcover(raw_dir, process_dir, output_dir, years, overwrite_download, o
         "log_directory": str(timestamp_log_dir)
     }
 
-    if task_runner != "hpc":
-        os.chdir(tmp_dir)
-
     # cluster = "hima"
 
     # cluster_kwargs = {
@@ -80,4 +77,8 @@ def esa_landcover(raw_dir, process_dir, output_dir, years, overwrite_download, o
 
     class_instance = ESALandcover(raw_dir, process_dir, output_dir, years, overwrite_download, overwrite_processing)
 
-    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
+    if task_runner != 'hpc':
+        os.chdir(tmp_dir)
+        class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+    else:
+        class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)

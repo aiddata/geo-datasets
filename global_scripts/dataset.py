@@ -1,6 +1,7 @@
 import os
 import csv
 import time
+import shutil
 import logging
 import multiprocessing
 from pathlib import Path
@@ -9,6 +10,8 @@ from datetime import datetime
 from collections import namedtuple
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
+from contextlib import contextmanager
+from tempfile import TemporaryDirectory, mkstemp
 
 
 """
@@ -85,19 +88,38 @@ class Dataset(ABC):
             return logging.getLogger("dataset")
 
 
+    @contextmanager
+    def tmp_to_dst_file(self, final_dst, tmp_dir=None):
+        logger = self.get_logger()
+        with TemporaryDirectory(dir=tmp_dir) as tmp_sub_dir:
+            tmp_file = mkstemp(dir=tmp_sub_dir)[1]
+            logger.debug(f"Created temporary file {tmp_file} with final destination {str(final_dst)}")
+            yield tmp_file
+            try:
+                shutil.move(tmp_file, final_dst)
+            except:
+                logger.exception(f"Failed to transfer temporary file {tmp_file} to final destination {str(final_dst)}")
+            else:
+                logger.debug(f"Successfully transferred {tmp_file} to final destination {str(final_dst)}")
+
+
     def error_wrapper(self, func, args):
         """
         This is the wrapper that is used when running individual tasks
         It will always return a TaskResult!
         """
+        logger = self.get_logger()
+
         for try_no in range(self.retries + 1):
             try:
                 return TaskResult(0, "Success", args, func(*args))
             except Exception as e:
                 if try_no < self.retries:
+                    logger.error(f"Task failed with exception (retrying): {repr(e)}")
                     time.sleep(self.retry_delay)
                     continue
                 else:
+                    logger.error(f"Task failed with exception (giving up): {repr(e)}")
                     return TaskResult(1, repr(e), args, None)
 
 
@@ -106,51 +128,84 @@ class Dataset(ABC):
         Run tasks in serial (locally), given a function and list of inputs
         This will always return a list of TaskResults!
         """
+        logger = self.get_logger()
+        logger.debug(f"run_serial_tasks - input_list: {input_list}")
         return [self.error_wrapper(func, i) for i in input_list]
 
 
-    def run_concurrent_tasks(self, name, func, input_list):
+    def run_concurrent_tasks(self, name, func, input_list, force_sequential):
         """
         Run tasks concurrently (locally), given a function a list of inputs
         This will always return a list of TaskResults!
         """
-        with multiprocessing.Pool(10) as pool:
+        pool_size = 1 if force_sequential else 10
+        with multiprocessing.Pool(pool_size) as pool:
             results = pool.starmap(self.error_wrapper, [(func, i) for i in input_list], chunksize=self.chunksize)
         return results
 
 
-    def run_prefect_tasks(self, name, func, input_list):
+    def run_prefect_tasks(self, name, func, input_list, force_sequential):
         """
         Run tasks using Prefect, using whichever task runner decided in self.run()
         This will always return a list of TaskResults!
         """
 
         from prefect import task
+        logger = self.get_logger()
 
-        task_wrapper = task(func, name=name, retries=self.retries, retry_delay_seconds=self.retry_delay)
+        task_wrapper = task(func, name=name, retries=self.retries, retry_delay_seconds=self.retry_delay, persist_result=True)
 
-        futures =  [(i, task_wrapper.submit(*i, return_state=False)) for i in input_list]
+        futures = []
+        for i in input_list:
+            w = [i[1] for i in futures] if force_sequential else None
+            futures.append((i, task_wrapper.submit(*i, wait_for=w, return_state=False)))
 
         results = []
 
-        for inputs, future in futures:
-            state = future.wait(timeout=60*60)
-            if state.is_completed():
-                results.append(TaskResult(0, "Success", inputs, state.result()))
-            elif state.is_failed() or state.is_crashed():
-                try:
-                    msg = repr(state.result(raise_on_failure=False))
-                except:
-                    msg = "Unable to retrieve error message"
-                results.append(TaskResult(1, msg, inputs, None))
-            else:
-                pass
+
+        states = [(i[0], i[1].wait()) for i in futures]
+
+        while states:
+            for ix, (inputs, state) in enumerate(states):
+                if state.is_completed():
+                    # print('complete', ix, inputs)
+                    logger.info(f'complete - {ix} - {inputs}')
+
+                    results.append(TaskResult(0, "Success", inputs, state.result()))
+                elif state.is_failed() or state.is_crashed() or state.is_cancelled():
+                    # print('fail', ix, inputs)
+                    logger.info(f'fail - {ix} - {inputs}')
+
+                    try:
+                        msg = repr(state.result(raise_on_failure=True))
+                    except Exception as e:
+                        msg = f"Unable to retrieve error message - {e}"
+                    results.append(TaskResult(1, msg, inputs, None))
+                else:
+                    # print('not ready', ix, inputs)
+                    continue
+                _ = states.pop(ix)
+            time.sleep(5)
+
+
+        # for inputs, future in futures:
+        #     state = future.wait(60*60*2)
+        #     if state.is_completed():
+        #         results.append(TaskResult(0, "Success", inputs, state.result()))
+        #     elif state.is_failed() or state.is_crashed():
+        #         try:
+        #             msg = repr(state.result(raise_on_failure=False))
+        #         except:
+        #             msg = "Unable to retrieve error message"
+        #         results.append(TaskResult(1, msg, inputs, None))
+        #     else:
+        #         pass
 
         # while futures:
         #     for ix, (inputs, future) in enumerate(futures):
         #         state = future.get_state()
-        #         print(repr(state))
-        #         print(repr(future))
+        #         # print(repr(state))
+        #         # print(repr(future))
         #         if state.is_completed():
         #             print('complete', ix, inputs)
         #             results.append(TaskResult(0, "Success", inputs, future.result()))
@@ -158,15 +213,15 @@ class Dataset(ABC):
         #             print('fail', ix, inputs)
         #             try:
         #                 msg = repr(future.result(raise_on_failure=True))
-        #             except:
-        #                 msg = "Unable to retrieve error message"
+        #             except Exception as e:
+        #                 msg = f"Unable to retrieve error message - {e}"
         #             results.append(TaskResult(1, msg, inputs, None))
         #         else:
-        #             print('not ready', ix, inputs)
+        #             # print('not ready', ix, inputs)
         #             continue
         #         _ = futures.pop(ix)
-        #         future.release()
-        #     time.sleep(15)
+        #         # future.release()
+        #     time.sleep(5)
 
         return results
 
@@ -191,7 +246,9 @@ class Dataset(ABC):
                   allow_futures: bool=True,
                   name: Optional[str]=None,
                   retries: Optional[int]=3,
-                  retry_delay: Optional[int]=60):
+                  retry_delay: Optional[int]=60,
+                  force_sequential: bool=False,
+                  force_serial: bool=False):
         """
         Run a bunch of tasks, calling one of the above run_tasks functions
         This is the function that should be called most often from self.main()
@@ -218,12 +275,12 @@ class Dataset(ABC):
         elif not isinstance(name, str):
             raise TypeError("Name of task run must be a string")
 
-        if self.backend == "serial":
+        if self.backend == "serial" or force_serial:
             results = self.run_serial_tasks(name, func, input_list)
         elif self.backend == "concurrent":
-            results = self.run_concurrent_tasks(name, func, input_list)
+            results = self.run_concurrent_tasks(name, func, input_list, force_sequential)
         elif self.backend == "prefect":
-            results = self.run_prefect_tasks(name, func, input_list)
+            results = self.run_prefect_tasks(name, func, input_list, force_sequential)
         elif self.backend == "mpi":
             results = self.run_mpi_tasks(name, func, input_list)
         else:
@@ -348,6 +405,7 @@ class Dataset(ABC):
         task_runner: Optional[str]=None,
         run_parallel: bool=False,
         max_workers: Optional[int]=None,
+        threads_per_worker: Optional[int]=1,
         # cores_per_process: Optional[int]=None,
         chunksize: int=1,
         log_dir: str="logs",
@@ -364,6 +422,7 @@ class Dataset(ABC):
         self.init_retries(retries, retry_delay, save_settings=True)
 
         self.log_dir = Path(log_dir)
+
         self.chunksize = chunksize
         os.makedirs(self.log_dir, exist_ok=True)
 
@@ -387,11 +446,16 @@ class Dataset(ABC):
                 tr = ConcurrentTaskRunner
             elif task_runner == "dask":
                 from prefect_dask import DaskTaskRunner
-                if "cluster" in kwargs:
-                    del kwargs["cluster"]
-                if "cluster_kwargs" in kwargs:
-                    del kwargs["cluster_kwargs"]
-                tr = DaskTaskRunner(**kwargs)
+                # if "cluster" in kwargs:
+                    # del kwargs["cluster"]
+                # if "cluster_kwargs" in kwargs:
+                    # del kwargs["cluster_kwargs"]
+
+                dask_cluster_kwargs = {
+                    "n_workers": max_workers,
+                    "threads_per_worker": threads_per_worker
+                }
+                tr = DaskTaskRunner(cluster_kwargs=dask_cluster_kwargs)
             elif task_runner == "hpc":
                 from hpc import HPCDaskTaskRunner
                 job_name = "".join(self.name.split())

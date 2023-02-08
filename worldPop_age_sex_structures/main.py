@@ -7,6 +7,7 @@ worldpop: https://www.worldpop.org/geodata/listing?id=65
 import os
 import sys
 import requests
+import shutil
 from copy import copy
 from pathlib import Path
 from configparser import ConfigParser
@@ -20,8 +21,9 @@ from dataset import Dataset
 class WorldPopAgeSex(Dataset):
     name = "WorldPop Age Sex"
 
-    def __init__(self, raw_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
+    def __init__(self, process_dir, raw_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
 
+        self.process_dir = Path(process_dir)
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
         self.years = years
@@ -30,7 +32,7 @@ class WorldPopAgeSex(Dataset):
 
         self.template_url = "https://data.worldpop.org/GIS/AgeSex_structures/Global_2000_2020/{YEAR}/0_Mosaicked/global_mosaic_1km/global_{SEX}_{AGE}_{YEAR}_1km.tif"
 
-        self.template_download_dir = "{SEX}_{AGE}"
+        self.template_download_dir_basename = "{SEX}_{AGE}"
 
 
         self.age_list = [0, 1]
@@ -52,17 +54,17 @@ class WorldPopAgeSex(Dataset):
 
         for sex in self.sex_list:
             for age in self.age_list:
-                download_dir = self.template_download_dir.format(SEX = sex, AGE = age)
-                os.makedirs(os.path.join(self.raw_dir, download_dir), exist_ok=True)
+                download_dir = self.template_download_dir_basename.format(SEX = sex, AGE = age)
                 for year in self.years:
                     src_url = self.template_url.format(SEX = sex, AGE = age, YEAR = year)
-                    dst_path = os.path.join(self.raw_dir, download_dir, os.path.basename(src_url))
-                    flist.append((src_url, dst_path))
+                    tmp_path = self.process_dir / 'download' / download_dir / os.path.basename(src_url)
+                    dst_path = self.raw_dir / download_dir / os.path.basename(src_url)
+                    flist.append((src_url, tmp_path, dst_path))
 
         return flist
 
 
-    def manage_download(self, url, local_filename):
+    def manage_download(self, url, tmp_path, dst_path):
         """download individual file using session created
         this needs to be a standalone function rather than a method
         of SessionWithHeaderRedirection because we need to be able
@@ -71,49 +73,63 @@ class WorldPopAgeSex(Dataset):
         logger = self.get_logger()
 
         max_attempts = 5
-        if os.path.isfile(local_filename) and not self.overwrite_download:
+        if os.path.isfile(dst_path) and not self.overwrite_download:
             logger.info(f"Download Exists: {url}")
 
         else:
+            Path(tmp_path).parent.mkdir(parents=True, exist_ok=True)
+
             attempts = 1
             while attempts <= max_attempts:
                 try:
-                    self.download_file(url, local_filename)
+                    self.download_file(url, tmp_path)
                 except Exception as e:
                     attempts += 1
                     if attempts > max_attempts:
                         raise e
                 else:
-                    logger.info(f"Downloaded: {url}")
+                    logger.info(f"Downloaded to tmp: {url}")
+                    Path(dst_path).parent.mkdir(parents=True, exist_ok=True)
+                    self.move_file(tmp_path, dst_path)
+                    logger.info(f"Copied to dst: {url}")
+                    return
 
 
-    def download_file(self, url, local_filename):
-        """Download a file from url to local_filename
+    def download_file(self, url, tmp_path):
+        """Download a file from url to tmp_path
         Downloads in chunks
         """
         with requests.get(url, stream=True, verify=True) as r:
             r.raise_for_status()
-            with open(local_filename, 'wb') as f:
+            with open(tmp_path, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=1024*1024):
                     f.write(chunk)
+
+
+    def move_file(self, src, dst):
+        shutil.copyfile(src, dst)
 
 
     def create_process_list(self):
         logger = self.get_logger()
 
         flist = []
-        downloaded_files = [i for i in self.raw_dir.iterdir() if str(i).endswith('.tif')]
+        # downloaded_files = [i for i in self.raw_dir.iterdir() if str(i).endswith('.tif')]
+        downloaded_files = list(self.raw_dir.glob('**/*.tif'))
+
         for i in downloaded_files:
-            year = int(i.name.split('_')[1])
-            if year in self.years:
-                flist.append((i, self.output_dir / i.name))
+            sex = i.name.split('_')[1]
+            age = int(i.name.split('_')[2])
+            year = int(i.name.split('_')[3])
+            if sex in self.sex_list and age in self.age_list and year in self.years:
+                flist.append((i, self.process_dir / 'cog_tmp' / i.name, self.output_dir / f'{sex}_{age}' / i.name))
 
         logger.info(f"COG conversion list: {flist}")
 
         return flist
 
 
-    def convert_to_cog(self, src_path, dst_path):
+    def convert_to_cog(self, src_path, tmp_path, dst_path):
         """
         Convert GeoTIFF to Cloud Optimized GeoTIFF (COG)
         """
@@ -128,7 +144,10 @@ class WorldPopAgeSex(Dataset):
 
         else:
 
-            logger.info(f"Generating COG: {dst_path}")
+            (self.process_dir / 'cog_tmp').mkdir(parents=True, exist_ok=True)
+            (self.output_dir).mkdir(parents=True, exist_ok=True)
+
+            logger.info(f"Generating COG: {tmp_path} / {dst_path}")
 
             with rasterio.open(src_path, 'r') as src:
 
@@ -137,17 +156,21 @@ class WorldPopAgeSex(Dataset):
                 profile.update({
                     'driver': 'COG',
                     'compress': 'LZW',
+                    # 'BLOCKXSIZE': 512,
+                    # 'BLOCKYSIZE': 512,
+                    # 'TILED': True,
+                    # 'INTERLEAVE': 'BAND',
                 })
 
                 # These creation options are not supported by the COG driver
-                for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
-                    if k in profile:
-                        del profile[k]
+                # for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
+                #     if k in profile:
+                #         del profile[k]
 
                 print(profile)
                 logger.info(profile)
 
-                with rasterio.open(dst_path, 'w+', **profile) as dst:
+                with rasterio.open(tmp_path, 'w+', **profile) as dst:
 
                     for ji, src_window in src.block_windows(1):
                         # convert relative input window location to relative output window location
@@ -160,6 +183,10 @@ class WorldPopAgeSex(Dataset):
                         r = src.read(1, window=src_window)
                         # write data to output window
                         dst.write(r, 1, window=dst_window)
+
+
+            logger.info(f"Copying COG to final dst: {dst_path}")
+            self.move_file(tmp_path, dst_path)
 
 
     def main(self):
@@ -191,6 +218,7 @@ def get_config_dict(config_file="config.ini"):
     config.read(config_file)
 
     return {
+        "process_dir": Path(config["main"]["process_dir"]),
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
@@ -215,6 +243,6 @@ if __name__ == "__main__":
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
 
-    class_instance = WorldPopAgeSex(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
+    class_instance = WorldPopAgeSex(config_dict["process_dir"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)

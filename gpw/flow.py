@@ -3,40 +3,25 @@ import sys
 from pathlib import Path
 from datetime import datetime
 from configparser import ConfigParser
-from typing import List, Literal
 
 from prefect import flow
 from prefect.filesystems import GitHub
 
 
-config_file = "modis_lst/config.ini"
+config_file = "gpw/config.ini"
 config = ConfigParser()
 config.read(config_file)
 
 block_name = config["deploy"]["storage_block"]
-GitHub.load(block_name).get_directory('global_scripts')
+GitHub.load(block_name).get_directory("global_scripts")
 
-from main import MODISLandSurfaceTemp
+from main import GPWv4
 
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def modis_lst(
-        process_dir: str,
-        raw_dir: str,
-        output_dir: str,
-        username: str,
-        password: str,
-        years: List[int],
-        overwrite_download: bool,
-        overwrite_monthly: bool,
-        overwrite_yearly: bool,
-        backend: Literal["local", "mpi", "prefect"],
-        task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
-        run_parallel: bool,
-        max_workers: int,
-        log_dir: str):
+def gpwv4(raw_dir, output_dir, years, sedac_cookie, overwrite_download, overwrite_extract, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -48,9 +33,10 @@ def modis_lst(
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 4,
-        "processes": 4,
-        "memory": "32GB",
+        "walltime": "2:00:00",
+        "cores": 5,
+        "processes": 5,
+        "memory": "30GB",
         "interface": "ib0",
         "job_extra_directives": [
             "-j oe",
@@ -65,7 +51,7 @@ def modis_lst(
     }
 
 
-    class_instance = MODISLandSurfaceTemp(process_dir=process_dir, raw_dir=raw_dir, output_dir=output_dir, username=username, password=password, years=years, overwrite_download=overwrite_download, overwrite_monthly=overwrite_monthly, overwrite_yearly=overwrite_yearly)
+    class_instance = GPWv4(raw_dir, output_dir, years, sedac_cookie, overwrite_download, overwrite_extract, overwrite_processing)
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
