@@ -28,11 +28,15 @@ full file name - "AVH13C1.A1981181.N07.004.2013227210959.hdf"
 """
 
 import os
+import csv
+import sys
 import errno
 import shutil
 from io import StringIO
-from collections import OrderedDict
+from pathlib import Path
 from datetime import datetime
+from collections import OrderedDict
+from configparser import ConfigParser
 
 import rasterio
 import numpy as np
@@ -101,33 +105,31 @@ class LTDR_NDVI(Dataset):
                 logger.exception(f"Failed to make request: {e.reason}")
             return None
 
-        def sync(src, dest):
-            import csv
-            files = [ f for f in csv.DictReader(StringIO(geturl(f"{src}.csv")), skipinitialspace=True) ]
-
-            for f in files:
-                # currently we use filesize of 0 to indicate directory
-                filesize = int(f['size'])
-                path = os.path.join(dest, f['name'])
-                url = src + f['name']
-                if filesize == 0:
-                    os.makedirs(path, exist_ok=True)
-                    sync(src + '/' + f['name'], path)
-                else:
-                    if not os.path.exists(path):
-                        logger.info('downloading: ' , path)
-                        with open(path, 'w+b') as fh:
-                            geturl(url)
-                    else:
-                        logger.info(f"skipping: {path}")
-
-
 
         for s in sensors:
             src = base_url + s
             logger.info(f"Downloading {src}")
+
             os.makedirs(self.raw_dir, exist_ok=True)
-            sync(base_url, self.raw_dir.as_posix())
+
+            # sync(base_url, self.raw_dir.as_posix())
+            files = [ f for f in csv.DictReader(StringIO(geturl(f"{src}.csv")), skipinitialspace=True) ]
+
+            for f in files:
+                # currently we use filesize of 0 to indicate directory
+                filesize = int(f["size"])
+                path = self.raw_dir / f["name"]
+                url = src + f["name"]
+                if filesize == 0:
+                    os.makedirs(path, exist_ok=True)
+                    sync(src + "/" + f["name"], path)
+                else:
+                    if path.exists() and not self.overwrite_download:
+                        logger.info(f"Skipping, already downloaded: {path.as_posix()}")
+                    else:
+                        logger.info(f"Downloading: {path.as_posix()}")
+                        with open(path, 'w+b') as fh:
+                            geturl(url)
 
 
 
@@ -364,7 +366,7 @@ class LTDR_NDVI(Dataset):
 
 
 
-    def aggregate_rasters(file_list, method="mean"):
+    def aggregate_rasters(self, file_list, method="mean"):
         """Aggregate multiple rasters
 
         Aggregates multiple rasters with same features (dimensions, transform,
@@ -508,6 +510,7 @@ def get_config_dict(config_file="config.ini"):
     config.read(config_file)
 
     return {
+        "app_key": config["main"]["app_key"],
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
@@ -533,6 +536,6 @@ if __name__ == "__main__":
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
 
-    class_instance = LTDR_NDVI(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["dataset"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
+    class_instance = LTDR_NDVI(config_dict["app_key"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
