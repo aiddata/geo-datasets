@@ -20,10 +20,13 @@ These instructions are for running the current Python 3 script using the `Datase
 1. Download and unzip the CRU TS data
 
 2. [Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), and the conda environment, this should be the same as other datasets that use the shared Dataset class.
-   ```
+   ```sh
+   # env.yml is in root of repository
    cd geo-datasets
    conda env create -f env.yml
    conda activate geodata38
+   # config.ini and main.py, for example, are in cru_ts
+   cd cru_ts
    ```
    Alternatively, you can install the appropriate Python 3 version and packages yourself.
 
@@ -31,7 +34,10 @@ These instructions are for running the current Python 3 script using the `Datase
 
 4. Set the source/destination folders and the range of years you'd like to process in `config.ini`. Note that all years will be downloaded regardless of how many you'd like to process.
 
-5. Run `python main.py`
+5. Run `main.py`
+   ```
+   python main.py
+   ```
 
 ## Downloading new versions
 
