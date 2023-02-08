@@ -1,6 +1,7 @@
 import os
 import csv
 import time
+import shutil
 import logging
 import multiprocessing
 from pathlib import Path
@@ -9,6 +10,8 @@ from datetime import datetime
 from collections import namedtuple
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
+from contextlib import contextmanager
+from tempfile import TemporaryDirectory, mkstemp
 
 
 """
@@ -83,6 +86,21 @@ class Dataset(ABC):
             return get_run_logger()
         else:
             return logging.getLogger("dataset")
+
+
+    @contextmanager
+    def tmp_to_dst_file(self, final_dst, tmp_dir=None):
+        logger = self.get_logger()
+        with TemporaryDirectory(dir=tmp_dir) as tmp_sub_dir:
+            tmp_file = mkstemp(dir=tmp_sub_dir)[1]
+            logger.debug(f"Created temporary file {tmp_file} with final destination {str(final_dst)}")
+            yield tmp_file
+            try:
+                shutil.move(tmp_file, final_dst)
+            except:
+                logger.exception(f"Failed to transfer temporary file {tmp_file} to final destination {str(final_dst)}")
+            else:
+                logger.debug(f"Successfully transferred {tmp_file} to final destination {str(final_dst)}")
 
 
     def error_wrapper(self, func, args):
@@ -404,6 +422,7 @@ class Dataset(ABC):
         self.init_retries(retries, retry_delay, save_settings=True)
 
         self.log_dir = Path(log_dir)
+
         self.chunksize = chunksize
         os.makedirs(self.log_dir, exist_ok=True)
 
