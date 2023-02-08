@@ -159,7 +159,7 @@ class CRU_TS(Dataset):
                 dst.write(np.array([data]))
 
 
-    def aggregate_rasters(file_list, method="mean"):
+    def aggregate_rasters(self, file_list, method="mean"):
         """Aggregate multiple rasters
 
         Aggregates multiple rasters with same features (dimensions, transform,
@@ -175,12 +175,13 @@ class CRU_TS(Dataset):
         Return
             result: rasterio Raster instance
         """
+        logger = self.get_logger()
         store = None
         for ix, file_path in enumerate(file_list):
             try:
                 raster = rasterio.open(file_path)
             except:
-                print(f"Could not include file in aggregation ({file_path})")
+                logger.error(f"Could not include file in aggregation ({file_path})")
                 continue
             active = raster.read(masked=True)
             if store is None:
@@ -214,11 +215,11 @@ class CRU_TS(Dataset):
         logger.info(f"Running: {var}, {method}, {str(year)}")
         src_base = self.raw_dir / "data/rasters" / self.cru_label / "monthly" / var
         dst_base = self.raw_dir / "data/rasters" / self.cru_label / "yearly" / var / method
-        year_files = sorted([i for i in src_base.iterdir() if "cru.{var}.{year}" in i.name])
+        year_files = sorted([i for i in src_base.iterdir() if f"cru.{var}.{year}" in i.name])
         year_mask = f"cru.{var}.YYYY.tif"
         year_path = dst_base / year_mask.replace("YYYY", str(year))
         # aggregate
-        data, meta = aggregate_rasters(year_files, method)
+        data, meta = self.aggregate_rasters(year_files, method)
         # write geotiff
         meta["dtype"] = data.dtype
         with rasterio.open(year_path, "w", **meta) as result:
