@@ -51,17 +51,23 @@ from dataset import Dataset
 
 class LTDR_NDVI(Dataset):
 
-    def __init__(self, raw_dir, output_dir, app_key: str):
+    name = "Long-term Data Record NDVI"
 
-        build_list = [
+    def __init__(self, app_key:str, years, raw_dir, output_dir, overwrite_download: bool, overwrite_processing: bool):
+
+        self.build_list = [
             "daily",
             "monthly",
             "yearly"
         ]
 
+        self.app_key = app_key
+
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
-        self.app_key = app_key
+
+        self.overwrite_download = overwrite_download
+        self.overwrite_processing = overwrite_processing
 
         """
         src_base = "/sciclone/aiddata10/REU/geo/raw/ltdr/LAADS/465"
@@ -112,11 +118,10 @@ class LTDR_NDVI(Dataset):
 
             os.makedirs(self.raw_dir, exist_ok=True)
 
-            # sync(base_url, self.raw_dir.as_posix())
             files = [ f for f in csv.DictReader(StringIO(geturl(f"{src}.csv")), skipinitialspace=True) ]
 
             for f in files:
-                # currently we use filesize of 0 to indicate directory
+                # filesize of 0 to indicates a directory
                 filesize = int(f["size"])
                 path = self.raw_dir / f["name"]
                 url = src + f["name"]
@@ -140,7 +145,7 @@ class LTDR_NDVI(Dataset):
         # all values must be strings
         # do not enable/use both accept/deny for a given field
 
-        filter_options = {
+        ops = {
             "use_sensor_accept": False,
             "sensor_accept": [],
             "use_sensor_deny": False,
@@ -201,29 +206,26 @@ class LTDR_NDVI(Dataset):
         return df
 
 
-    def prep_daily_data(self, task):
+    def prep_daily_data(self, src, dst):
         logger = self.get_logger()
 
-        src, dst = task
-        year = os.path.basename(src).split(".")[1][1:5]
-        day = os.path.basename(src).split(".")[1][5:8]
-        sensor = os.path.basename(src).split(".")[2]
+        year = src.name.split(".")[1][1:5]
+        day = src.name.split(".")[1][5:8]
+        sensor = src.name.split(".")[2]
 
         logger.info(f"Processing Day {sensor} {year} {day}")
-        self.process_daily_data(src, dst)
+        self.process_daily_data(src.as_posix(), dst)
 
 
-    def prep_monthly_data(self, task):
+    def prep_monthly_data(self, year_month, month_files, month_path):
         logger = self.get_logger()
-        year_month, month_files, month_path = task
         logger.info(f"Processing Month {year_month}")
         data, meta = self.aggregate_rasters(file_list=month_files, method="max")
         self.write_raster(month_path, data, meta)
 
 
-    def prep_yearly_data(self, task):
+    def prep_yearly_data(self, year, year_files, year_path):
         logger = self.get_logger()
-        year, year_files, year_path = task
         print ("Processing Year {year}")
         data, meta = self.aggregate_rasters(file_list=year_files, method="mean")
         self.write_raster(year_path, data, meta)
@@ -263,6 +265,10 @@ class LTDR_NDVI(Dataset):
         be useful for future data prep scripts that can use this as startng point.
 
         """
+        logger = self.get_logger()
+
+        breakpoint()
+
         # open the dataset and subdataset
         hdf_ds = gdal.Open(input_path, gdal.GA_ReadOnly)
 
@@ -327,9 +333,9 @@ class LTDR_NDVI(Dataset):
         pixel_ysize = abs(src_gt[5])
 
         # extents
-        (ulx, uly, ulz ) = tx.TransformPoint(src_gt[0], src_gt[3])
+        (ulx, uly, ulz) = tx.TransformPoint(src_gt[0], src_gt[3])
 
-        (lrx, lry, lrz ) = tx.TransformPoint(
+        (lrx, lry, lrz) = tx.TransformPoint(
             src_gt[0] + src_gt[1]*ndvi_ds.RasterXSize,
             src_gt[3] + src_gt[5]*ndvi_ds.RasterYSize)
 
@@ -340,7 +346,7 @@ class LTDR_NDVI(Dataset):
         # -----------------
 
         # create new raster
-        driver = gdal.GetDriverByName('GTiff')
+        driver = gdal.GetDriverByName("COG")
         out_ds = driver.Create(
             output_path,
             int((lrx - ulx)/pixel_xsize),
@@ -445,7 +451,7 @@ class LTDR_NDVI(Dataset):
         # Build day, month, year dataframes
 
         # build day dataframe
-        day_df = build_data_list(self.raw_dir, self.output_dir)
+        day_df = self.build_data_list(self.raw_dir, self.output_dir)
 
         # build month dataframe
 
@@ -492,15 +498,15 @@ class LTDR_NDVI(Dataset):
         for _, row in year_df.iterrows():
             year_qlist.append([row["year"], row["month_path_list"], row["output_path"]])
 
-        if "daily" in build_list:
+        if "daily" in self.build_list:
             os.makedirs(self.output_dir / "daily", exist_ok=True)
             self.run_tasks(self.prep_daily_data, day_qlist)
 
-        if "monthly" in build_list:
+        if "monthly" in self.build_list:
             os.makedirs(self.output_dir / "monthly", exist_ok=True)
             self.run_tasks(self.prep_monthly_data, month_qlist)
 
-        if "yearly" in build_list:
+        if "yearly" in self.build_list:
             os.makedirs(self.output_dir / "yearly", exist_ok=True)
             self.run_tasks(self.prep_yearly_data, year_qlist)
 
@@ -535,7 +541,6 @@ if __name__ == "__main__":
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-
-    class_instance = LTDR_NDVI(config_dict["app_key"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
+    class_instance = LTDR_NDVI(config_dict["app_key"], config_dict["years"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
