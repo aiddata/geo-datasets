@@ -35,13 +35,13 @@ from urllib import request, parse
 from configparser import ConfigParser
 from typing import List
 
-
 import rasterio
 import numpy as np
 
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
+
 
 class CRU_TS(Dataset):
 

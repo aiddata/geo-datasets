@@ -89,7 +89,9 @@ def cru_ts(
 
     class_instance = CRU_TS(cru_vers, years, raw_dir, output_dir, overwrite_download, overwrite_unzip, overwrite_processing)
 
+
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
-
-    class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster_kwargs=cluster_kwargs)
+        class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+    else:
+        class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=hpc_cluster_kwargs)

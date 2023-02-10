@@ -1,8 +1,8 @@
 import os
-import sys
 from pathlib import Path
 from datetime import datetime
 from configparser import ConfigParser
+from typing import List, Literal
 
 from prefect import flow
 from prefect.filesystems import GitHub
@@ -21,7 +21,20 @@ tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def pm25(raw_dir, output_dir, box_config_path, version, years, overwrite_downloads, verify_existing_downloads, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
+def pm25(
+        raw_dir: str, 
+        output_dir: str, 
+        box_config_path: str, 
+        version: str, 
+        years: List[int], 
+        overwrite_downloads: bool, 
+        verify_existing_downloads: bool, 
+        overwrite_processing: bool, 
+        backend: Literal["local", "mpi", "prefect"],
+        task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
+        run_parallel: bool, 
+        max_workers: int, 
+        log_dir: str):
 
     timestamp = datetime.today()
     time_str = timestamp.strftime("%Y_%m_%d_%H_%M")

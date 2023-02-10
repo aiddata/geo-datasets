@@ -88,9 +88,9 @@ class PM25(Dataset):
                  box_config_path: str,
                  version: str,
                  years: list,
-                 overwrite_downloads=True,
-                 verify_existing_downloads=True,
-                 overwrite_processing=False,):
+                 overwrite_downloads: bool,
+                 verify_existing_downloads: bool,
+                 overwrite_processing: bool,):
 
         self.version = version
 
