@@ -155,7 +155,7 @@ class CRU_TS(Dataset):
             "height": src.meta["height"],
             "width": src.meta["width"],
             "nodata": src.meta["nodata"],
-            # "compress": "lzw"
+            "compress": "lzw"
         }
         with self.tmp_to_dst_file(out_path) as dst_path:
             with rasterio.open(dst_path, "w", **meta) as dst:
@@ -225,6 +225,8 @@ class CRU_TS(Dataset):
         data, meta = self.aggregate_rasters(year_files, method)
         # write geotiff
         meta["dtype"] = data.dtype
+        meta["driver"] = "COG"
+        meta["compress"] = "lzw"
         with rasterio.open(year_path, "w", **meta) as result:
             result.write(data)
 
