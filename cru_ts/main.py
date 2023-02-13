@@ -68,6 +68,8 @@ class CRU_TS(Dataset):
         self.raw_dir = Path(raw_dir) / self.cru_label
         self.output_dir = Path(output_dir) / self.cru_label
 
+        self.raw_dir.mkdir(parents=True, exist_ok=True)
+
         self.overwrite_download = overwrite_download
         self.overwrite_unzip = overwrite_unzip
         self.overwrite_process = overwrite_processing
@@ -95,7 +97,7 @@ class CRU_TS(Dataset):
         self.method_list = ["mean", "min", "max", "sum"]
 
     
-    def download(self):
+    def download(self, var):
         logger = self.get_logger()
 
         # these need to be edited for future versions!
@@ -103,37 +105,36 @@ class CRU_TS(Dataset):
 
         file_prefix = f"cru_ts{self.cru_version}.{self.dl_file_years_str}"
 
-        for v in self.var_list:
-            # determine final destinations of files
-            download_filename = f"{file_prefix}.{v}.dat.nc.gz"
-            final_dl_path = self.raw_dir / download_filename
-            final_gzip_path = self.raw_dir / f"{file_prefix}.{v}.dat.nc"
+        # determine final destinations of files
+        download_filename = f"{file_prefix}.{var}.dat.nc.gz"
+        final_dl_path = self.raw_dir / download_filename
+        final_gzip_path = self.raw_dir / f"{file_prefix}.{var}.dat.nc"
 
-            if final_dl_path.exists() and not self.overwrite_download:
-                logger.info(f"Skipping {str(final_dl_path)}, already downloaded")
-            else:
-                with self.tmp_to_dst_file(final_dl_path) as dl_dst:
-                    dl_src = parse.urljoin(base_url, f"{v}/{download_filename}")
-                    logger.debug(f"Attempting to download: {str(dl_src)}")
-                    try:
-                        request.urlretrieve(dl_src, dl_dst)
-                    except:
-                        logger.exception(f"Failed to download: {str(dl_src)}")
-                    else:
-                        logger.info(f"Successfully downloaded {str(dl_src)}")
+        if final_dl_path.exists() and not self.overwrite_download:
+            logger.info(f"Skipping {str(final_dl_path)}, already downloaded")
+        else:
+            with self.tmp_to_dst_file(final_dl_path) as dl_dst:
+                dl_src = parse.urljoin(base_url, f"{var}/{download_filename}")
+                logger.debug(f"Attempting to download: {str(dl_src)}")
+                try:
+                    request.urlretrieve(dl_src, dl_dst)
+                except:
+                    logger.exception(f"Failed to download: {str(dl_src)}")
+                else:
+                    logger.info(f"Successfully downloaded {str(dl_src)}")
 
-            if final_gzip_path.exists() and not self.overwrite_unzip:
-                logger.info(f"Skipping {str(final_gzip_path)}, already unzipped")
-            else:
-                with self.tmp_to_dst_file(final_gzip_path) as gzip_dst:
-                    logger.debug(f"Attempting to unzip {str(final_dl_path)} to {str(final_gzip_path)}")
-                    try:
-                        with gzip.open(final_dl_path.as_posix(), "rb") as src, open(gzip_dst, 'wb') as dst:
-                            dst.write(src.read())
-                    except:
-                        logger.exception(f"Failed to unzip {str(final_dl_path)} to {str(final_gzip_path)}")
-                    else:
-                        logger.info(f"Successfully unzipped {str(final_gzip_path)}")
+        if final_gzip_path.exists() and not self.overwrite_unzip:
+            logger.info(f"Skipping {str(final_gzip_path)}, already unzipped")
+        else:
+            with self.tmp_to_dst_file(final_gzip_path) as gzip_dst:
+                logger.debug(f"Attempting to unzip {str(final_dl_path)} to {str(final_gzip_path)}")
+                try:
+                    with gzip.open(final_dl_path.as_posix(), "rb") as src, open(gzip_dst, 'wb') as dst:
+                        dst.write(src.read())
+                except:
+                    logger.exception(f"Failed to unzip {str(final_dl_path)} to {str(final_gzip_path)}")
+                else:
+                    logger.info(f"Successfully unzipped {str(final_gzip_path)}")
 
 
     def extract_layer(self, input, out_path, band):
@@ -228,26 +229,40 @@ class CRU_TS(Dataset):
             result.write(data)
 
 
+    def run_monthly_data(self, var):
+        logger = self.get_logger()
+
+        logger.info(f"Running variable: {var}")
+        var_dir = self.output_dir / "monthly" / var
+        var_dir.mkdir(parents=True, exist_ok=True)
+        in_path = f"netcdf:{self.raw_dir.as_posix()}/cru_ts{self.cru_version}.1901.2021.{var}.dat.nc:{var}"
+
+        src = rasterio.open(in_path)
+
+        for band, temporal in self.band_temporal_list:
+            logger.debug(f"processing band {repr(band)}, temporal {repr(temporal)}")
+            fname = f"cru.{var}.{temporal}.tif"
+            out_path = var_dir / fname
+            self.extract_layer(src, out_path, band)
+
+        src.close()
+
+
     def main(self):
         logger = self.get_logger()
 
-        self.raw_dir.mkdir(parents=True, exist_ok=True)
         
-        self.download()
+        logger.info("Downloading and Extracting")
+        dl_results = self.run_tasks(self.download, self.var_list)
+        self.log_run(dl_results)
 
-        for var in self.var_list:
-            logger.info(f"Running variable: {var}")
-            var_dir = self.output_dir / "monthly" / var
-            var_dir.mkdir(parents=True, exist_ok=True)
-            in_path = f"netcdf:{self.raw_dir.as_posix()}/cru_ts{self.cru_version}.1901.2021.{var}.dat.nc:{var}"
-            src = rasterio.open(in_path)
-            for band, temporal in self.band_temporal_list:
-                logger.debug(f"processing band {repr(band)}, temporal {repr(temporal)}")
-                fname = f"cru.{var}.{temporal}.tif"
-                out_path = var_dir / fname
-                self.extract_layer(src, out_path, band)
-            src.close()
 
+        logger.info("Processing Monthly Data")
+        monthly_results = self.run_tasks(self.run_monthly_data, self.var_list)
+        self.log_run(monthly_results)
+
+
+        logger.info("Processing Yearly Data")
 
         qlist = []
         for var in self.var_list:
@@ -257,8 +272,8 @@ class CRU_TS(Dataset):
                 for year in self.years:
                     qlist.append([year, method, var])
 
-
-        self.run_tasks(self.run_yearly_data, qlist)
+        yearly_results = self.run_tasks(self.run_yearly_data, qlist)
+        self.log_run(yearly_results)
 
 
 def get_config_dict(config_file="config.ini"):
