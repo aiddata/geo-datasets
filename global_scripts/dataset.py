@@ -96,7 +96,7 @@ class Dataset(ABC):
             logger.debug(f"Created temporary file {tmp_file} with final destination {str(final_dst)}")
             yield tmp_file
             try:
-                shutil.move(tmp_file, final_dst)
+                shutil.copyfile(tmp_file, final_dst)
             except:
                 logger.exception(f"Failed to transfer temporary file {tmp_file} to final destination {str(final_dst)}")
             else:
