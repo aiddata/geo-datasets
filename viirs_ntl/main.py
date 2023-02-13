@@ -78,7 +78,7 @@ class VIIRS_NTL(Dataset):
         pass
 
     
-    def manage_download(self, year):
+    def manage_download(self, year, month = None):
         # consider doing separate directories for years when doing monthly data download
         """
         Download individual file
@@ -100,7 +100,6 @@ class VIIRS_NTL(Dataset):
         if local_filename.exists() and not self.overwrite_download:
             logger.info(f"Download Exists: {download_dest}")
         else:
-            logger.debug(f"Attempting to download: {str(download_dest)}")
             try:
                 # wget -c -m -np -nH --cut-dirs=1 --header "Authorization: Bearer ${access_token}" -P ${out_dir} "${year_url}/${y}" -R .html -A .tif.gz
                 temp_command = "wget -c -m -np -nH --cut-dirs=1 --header \"Authorization: Bearer {TOKEN}\" -P {OUT_DIR} \"{DWN_URL}\" -R .html -A .tif.gz"
@@ -126,6 +125,8 @@ class VIIRS_NTL(Dataset):
         logger.info("Running data download")
         if self.annual:
             download = self.run_tasks(self.manage_download, [[y] for y in self.years])
+        else:
+            download = self.run_tasks(self.manage_download, [[y] for y in self.years], [[m] for m in self.months])
         self.log_run(download)
 
 
