@@ -11,9 +11,6 @@ from typing import List
 import requests
 import json
 
-import rasterio
-import numpy as np
-
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
@@ -72,34 +69,67 @@ class VIIRS_NTL(Dataset):
         token = self.get_token()
         headers = {
         "Authorization": f"Bearer {token}",
-        }    
+        }
 
-        if self.annual:
-            if year < 2014:
-                download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c202101211500.cf_cvg.tif.gz"
+        flist = []
+        files = ["average", "cf_cvg", "cvg", "maximum", "median", "minimum", "average_masked", "lit_mask", "median_masked"]
+
+        for file in files:
+            if self.annual:
+                if year < 2014:
+                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
+                else:
+                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202101211500.{TYPE}.tif.gz"
+                download_dest = download_url.format(YEAR = year, TYPE = file)
+                local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
             else:
-                download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202101211500.average.tif.gz"
-            download_dest = download_url.format(YEAR = year)
-            local_filename = self.raw_dir / f"raw_viirs_ntl_{year}"
-        else:
-            # consider: make separate directories for each year's monthly data
-            download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/"
-            download_dest = download_url.format(YEAR = year, MONTH = month)
-            local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}"
+                # consider: make separate directories for each year's monthly data
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/"
+                download_dest = download_url.format(YEAR = year, MONTH = month)
+                local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}"
+            if local_filename.exists() and not self.overwrite_download:
+                logger.info(f"Download Exists: {local_filename}")
+            else:
+                try:
+                    with requests.get(download_dest, headers=headers, stream=True) as src:
+                        # raise an exception (fail this task) if HTTP response indicates that an error occured
+                        src.raise_for_status()
+                        with open(local_filename, "wb") as dst:
+                            dst.write(src.content)
+                except:
+                    logger.info(f"Failed to download: {str(download_dest)}")
+                else:
+                    logger.info(f"Downloaded {str(local_filename)}")
+                flist.append((download_dest, local_filename))
+        return flist
+
+
+        # if self.annual:
+        #     if year < 2014:
+        #         download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
+        #     else:
+        #         download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202101211500.{TYPE}.tif.gz"
+        #     download_dest = download_url.format(YEAR = year, TYPE = type)
+        #     local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{type}.tif.gz"
+        # else:
+        #     # consider: make separate directories for each year's monthly data
+        #     download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/"
+        #     download_dest = download_url.format(YEAR = year, MONTH = month)
+        #     local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}"
         
-        if local_filename.exists() and not self.overwrite_download:
-            logger.info(f"Download Exists: {local_filename}")
-        else:
-            try:
-                with requests.get(download_dest, headers=headers, stream=True) as src:
-                    # raise an exception (fail this task) if HTTP response indicates that an error occured
-                    src.raise_for_status()
-                    with open(local_filename, "wb") as dst:
-                        dst.write(src.content)
-            except:
-                logger.info(f"Failed to download: {str(download_dest)}")
-            else:
-                logger.info(f"Downloaded {str(local_filename)}")
+        # if local_filename.exists() and not self.overwrite_download:
+        #     logger.info(f"Download Exists: {local_filename}")
+        # else:
+        #     try:
+        #         with requests.get(download_dest, headers=headers, stream=True) as src:
+        #             # raise an exception (fail this task) if HTTP response indicates that an error occured
+        #             src.raise_for_status()
+        #             with open(local_filename, "wb") as dst:
+        #                 dst.write(src.content)
+        #     except:
+        #         logger.info(f"Failed to download: {str(download_dest)}")
+        #     else:
+        #         logger.info(f"Downloaded {str(local_filename)}")
 
         return (download_dest, local_filename)
 
