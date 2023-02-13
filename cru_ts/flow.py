@@ -22,9 +22,10 @@ tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 @flow
 def cru_ts(
+        start_year: int,
+        end_year: int,
         cru_version: str,
         cru_url_dir: str,
-        years: List[int],
         raw_dir: str,
         output_dir: str,
         overwrite_download: bool,
@@ -88,7 +89,7 @@ def cru_ts(
     #     "log_directory": str(timestamp_log_dir)
     # }
 
-    class_instance = CRU_TS(cru_version, cru_url_dir, years, raw_dir, output_dir, overwrite_download, overwrite_unzip, overwrite_processing)
+    class_instance = CRU_TS(start_year, end_year, cru_version, cru_url_dir, raw_dir, output_dir, overwrite_download, overwrite_unzip, overwrite_processing)
 
 
     if task_runner != 'hpc':
