@@ -19,9 +19,10 @@ class VIIRS_NTL(Dataset):
 
     name = "DVNL"
 
-    def __init__(self, raw_dir, output_dir, months, years, username, password, client_secret, annual=True, overwrite_download=False, overwrite_extract=False, overwrite_processing=False ):
+    def __init__(self, raw_dir, output_dir, files, months, years, username, password, client_secret, annual=True, overwrite_download=False, overwrite_extract=False, overwrite_processing=False ):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
+        self.files = files
         self.months = months
         self.years = years
         self.username = username
@@ -72,9 +73,8 @@ class VIIRS_NTL(Dataset):
         }
 
         flist = []
-        files = ["average", "cf_cvg", "cvg", "maximum", "median", "minimum", "average_masked", "lit_mask", "median_masked"]
 
-        for file in files:
+        for file in self.files:
             if self.annual:
                 if year < 2014:
                     download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
@@ -109,8 +109,8 @@ class VIIRS_NTL(Dataset):
         #         download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
         #     else:
         #         download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202101211500.{TYPE}.tif.gz"
-        #     download_dest = download_url.format(YEAR = year, TYPE = type)
-        #     local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{type}.tif.gz"
+        #     download_dest = download_url.format(YEAR = year, TYPE = file)
+        #     local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
         # else:
         #     # consider: make separate directories for each year's monthly data
         #     download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/"
@@ -131,7 +131,7 @@ class VIIRS_NTL(Dataset):
         #     else:
         #         logger.info(f"Downloaded {str(local_filename)}")
 
-        return (download_dest, local_filename)
+        # return (download_dest, local_filename)
 
         
 
@@ -160,6 +160,7 @@ def get_config_dict(config_file="config.ini"):
             "annual" :  config["main"].getboolean("annual"),
             "years": [int(y) for y in config["main"]["years"].split(", ")],
             "months": [int(y) for y in config["main"]["months"].split(", ")],
+            "files": [str(y) for y in config["main"]["files"].split(", ")],
             "raw_dir": Path(config["main"]["raw_dir"]),
             "output_dir": Path(config["main"]["output_dir"]),
             "log_dir": Path(config["main"]["raw_dir"]) / "logs",
@@ -181,6 +182,6 @@ def get_config_dict(config_file="config.ini"):
 if __name__ == "__main__":
     config_dict = get_config_dict()
 
-    class_instance = VIIRS_NTL(config_dict["raw_dir"], config_dict["output_dir"], config_dict["months"], config_dict["years"], config_dict["username"], config_dict["password"], config_dict["client_secret"], config_dict["annual"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_processing"])
+    class_instance = VIIRS_NTL(config_dict["raw_dir"], config_dict["output_dir"], config_dict["files"], config_dict["months"], config_dict["years"], config_dict["username"], config_dict["password"], config_dict["client_secret"], config_dict["annual"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
