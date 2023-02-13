@@ -22,7 +22,8 @@ tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 @flow
 def cru_ts(
-        cru_vers: str,
+        cru_version: str,
+        cru_url_dir: str,
         years: List[int],
         raw_dir: str,
         output_dir: str,
@@ -87,11 +88,11 @@ def cru_ts(
     #     "log_directory": str(timestamp_log_dir)
     # }
 
-    class_instance = CRU_TS(cru_vers, years, raw_dir, output_dir, overwrite_download, overwrite_unzip, overwrite_processing)
+    class_instance = CRU_TS(cru_version, cru_url_dir, years, raw_dir, output_dir, overwrite_download, overwrite_unzip, overwrite_processing)
 
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)
         class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
     else:
-        class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=hpc_cluster_kwargs)
+        class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)

@@ -48,7 +48,8 @@ class CRU_TS(Dataset):
     name = "Climatic Research Unit gridded Time Series"
 
     def __init__(self,
-                 cru_vers: str,
+                 cru_version: str,
+                 cru_url_dir: str,
                  years: List[int],
                  raw_dir,
                  output_dir,
@@ -56,13 +57,16 @@ class CRU_TS(Dataset):
                  overwrite_unzip: bool,
                  overwrite_processing: bool):
 
-        self.cru_vers = cru_vers
+        self.cru_version = cru_version
+        self.cru_url_dir = cru_url_dir
+        self.dl_file_years_str = "1901.2021"
+
         # note that later in the download URL, there is no second underscore
         # there is more code in self.download() to correct for this difference
-        self.cru_label = f"cru_ts_{self.cru_vers}"
+        self.cru_label = f"cru_ts_{self.cru_version}"
 
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
+        self.raw_dir = Path(raw_dir) / self.cru_label
+        self.output_dir = Path(output_dir) / self.cru_label
 
         self.overwrite_download = overwrite_download
         self.overwrite_unzip = overwrite_unzip
@@ -95,11 +99,9 @@ class CRU_TS(Dataset):
         logger = self.get_logger()
 
         # these need to be edited for future versions!
-        vers_url = "cruts.2205201912.v4.06"
-        base_url = f"https://crudata.uea.ac.uk/cru/data/hrg/{self.cru_label}/{vers_url}/"
+        base_url = f"https://crudata.uea.ac.uk/cru/data/hrg/{self.cru_label}/{self.cru_url_dir}/"
 
-        years_str = "1901.2021"
-        file_prefix = f"cru_ts{self.cru_vers}.{years_str}"
+        file_prefix = f"cru_ts{self.cru_version}.{self.dl_file_years_str}"
 
         for v in self.var_list:
             # determine final destinations of files
@@ -225,23 +227,24 @@ class CRU_TS(Dataset):
         with rasterio.open(year_path, "w", **meta) as result:
             result.write(data)
 
+
     def main(self):
         logger = self.get_logger()
 
-        os.makedirs(self.raw_dir, exist_ok=True)
-
+        self.raw_dir.mkdir(parents=True, exist_ok=True)
+        
         self.download()
 
         for var in self.var_list:
             logger.info(f"Running variable: {var}")
             var_dir = self.raw_dir / "data" / "rasters" / self.cru_label / "monthly" / var
-            os.makedirs(var_dir, exist_ok=True)
-            in_path = f"netcdf:{self.raw_dir.as_posix()}/cru_ts{self.cru_vers}.1901.2021.{var}.dat.nc:{var}"
+            var_dir.mkdir(parents=True, exist_ok=True)
+            in_path = f"netcdf:{self.raw_dir.as_posix()}/cru_ts{self.cru_version}.1901.2021.{var}.dat.nc:{var}"
             src = rasterio.open(in_path)
             for band, temporal in self.band_temporal_list:
                 logger.debug(f"processing band {repr(band)}, temporal {repr(temporal)}")
                 fname = f"cru.{var}.{temporal}.tif"
-                out_path = os.path.join(var_dir, fname)
+                out_path = var_dir / fname
                 self.extract_layer(src, out_path, band)
             src.close()
 
@@ -250,7 +253,7 @@ class CRU_TS(Dataset):
         for var in self.var_list:
             for method in self.method_list:
                 dst_base = self.raw_dir / "data" / "rasters" / self.cru_label / "yearly" / var / method
-                os.makedirs(dst_base, exist_ok=True)
+                dst_base.mkdir(parents=True, exist_ok=True)
                 for year in self.years:
                     qlist.append([year, method, var])
 
@@ -264,7 +267,8 @@ def get_config_dict(config_file="config.ini"):
 
     return {
         "years": [y for y in range(int(config["main"]["start_year"]), int(config["main"]["end_year"])+1)],
-        "cru_vers": config["main"]["cru_vers"],
+        "cru_version": config["main"]["cru_version"],
+        "cru_url_dir": config["main"]["cru_url_dir"],
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "overwrite_download": config["main"].getboolean("overwrite_download"),
@@ -289,6 +293,6 @@ if __name__ == "__main__":
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-    class_instance = CRU_TS(config_dict["cru_vers"], config_dict["years"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["overwrite_unzip"], config_dict["overwrite_processing"])
+    class_instance = CRU_TS(config_dict["cru_version"], config_dict["cru_url_dir"], config_dict["years"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["overwrite_unzip"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
