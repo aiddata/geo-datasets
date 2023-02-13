@@ -10,7 +10,6 @@ from configparser import ConfigParser
 from typing import List
 import requests
 import json
-import subprocess
 
 import rasterio
 import numpy as np
@@ -59,23 +58,7 @@ class VIIRS_NTL(Dataset):
         access_token = access_token_dict.get('access_token')
 
         return access_token
-    
-    def runcmd(cmd, verbose = False, *args, **kwargs):
-        """""
-        from: https://www.scrapingbee.com/blog/python-wget/
-        """""
 
-        process = subprocess.Popen(
-            cmd,
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE,
-            text = True,
-            shell = True
-        )
-        std_out, std_err = process.communicate()
-        if verbose:
-            print(std_out.strip(), std_err)
-        pass
 
     
     def manage_download(self, year, month = None):
@@ -87,30 +70,38 @@ class VIIRS_NTL(Dataset):
 
         logger.info("Retrieving token")
         token = self.get_token()
+        headers = {
+        "Authorization": f"Bearer {token}",
+        }    
 
         if self.annual:
-            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}"
+            if year < 2014:
+                download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c202101211500.cf_cvg.tif.gz"
+            else:
+                download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202101211500.average.tif.gz"
             download_dest = download_url.format(YEAR = year)
             local_filename = self.raw_dir / f"raw_viirs_ntl_{year}"
         else:
+            # consider: make separate directories for each year's monthly data
             download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/"
             download_dest = download_url.format(YEAR = year, MONTH = month)
             local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}"
         
         if local_filename.exists() and not self.overwrite_download:
-            logger.info(f"Download Exists: {download_dest}")
+            logger.info(f"Download Exists: {local_filename}")
         else:
             try:
-                # wget -c -m -np -nH --cut-dirs=1 --header "Authorization: Bearer ${access_token}" -P ${out_dir} "${year_url}/${y}" -R .html -A .tif.gz
-                temp_command = "wget -c -m -np -nH --cut-dirs=1 --header \"Authorization: Bearer {TOKEN}\" -P {OUT_DIR} \"{DWN_URL}\" -R .html -A .tif.gz"
-                command = temp_command.format(TOKEN = token, OUT_DIR = self.raw_dir, DWN_URL = download_dest)
-                self.runcmd(command, verbose = True)
+                with requests.get(download_dest, headers=headers, stream=True) as src:
+                    # raise an exception (fail this task) if HTTP response indicates that an error occured
+                    src.raise_for_status()
+                    with open(local_filename, "wb") as dst:
+                        dst.write(src.content)
             except:
                 logger.info(f"Failed to download: {str(download_dest)}")
             else:
-                logger.info(f"Downloaded {str(download_dest)}")
+                logger.info(f"Downloaded {str(local_filename)}")
 
-        return (download_dest, command)
+        return (download_dest, local_filename)
 
         
 
