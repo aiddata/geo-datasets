@@ -47,8 +47,8 @@ def cru_ts(
     cluster_kwargs = {
         "shebang": "#!/bin/tcsh",
         "resource_spec": "nodes=1:c18a:ppn=12",
-        "cores": 6,
-        "processes": 6,
+        "cores": 4,
+        "processes": 4,
         "memory": "32GB",
         "interface": "ib0",
         "job_extra_directives": [
