@@ -251,14 +251,15 @@ class CRU_TS(Dataset):
     def main(self):
         logger = self.get_logger()
 
+        var_tasks = [[i] for i in self.var_list]
         
         logger.info("Downloading and Extracting")
-        dl_results = self.run_tasks(self.download, self.var_list)
+        dl_results = self.run_tasks(self.download, var_tasks)
         self.log_run(dl_results)
 
 
         logger.info("Processing Monthly Data")
-        monthly_results = self.run_tasks(self.run_monthly_data, self.var_list)
+        monthly_results = self.run_tasks(self.run_monthly_data, var_tasks)
         self.log_run(monthly_results)
 
 
