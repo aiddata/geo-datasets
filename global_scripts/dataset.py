@@ -11,7 +11,7 @@ from collections import namedtuple
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from contextlib import contextmanager
-from tempfile import TemporaryDirectory, mkstemp
+from tempfile import mkdtemp, mkstemp
 
 
 """
@@ -91,16 +91,16 @@ class Dataset(ABC):
     @contextmanager
     def tmp_to_dst_file(self, final_dst, tmp_dir=None):
         logger = self.get_logger()
-        with TemporaryDirectory(dir=tmp_dir) as tmp_sub_dir:
-            tmp_file = mkstemp(dir=tmp_sub_dir)[1]
-            logger.debug(f"Created temporary file {tmp_file} with final destination {str(final_dst)}")
-            yield tmp_file
-            try:
-                shutil.copyfile(tmp_file, final_dst)
-            except:
-                logger.exception(f"Failed to transfer temporary file {tmp_file} to final destination {str(final_dst)}")
-            else:
-                logger.debug(f"Successfully transferred {tmp_file} to final destination {str(final_dst)}")
+        tmp_sub_dir = mkdtemp(dir=tmp_dir)
+        _, tmp_path = mkstemp(dir=tmp_sub_dir)
+        logger.debug(f"Created temporary file {tmp_path} with final destination {str(final_dst)}")
+        yield tmp_path
+        try:
+            shutil.move(tmp_path, final_dst)
+        except:
+            logger.exception(f"Failed to transfer temporary file {tmp_path} to final destination {str(final_dst)}")
+        else:
+            logger.debug(f"Successfully transferred {tmp_path} to final destination {str(final_dst)}")
 
 
     def error_wrapper(self, func, args):
