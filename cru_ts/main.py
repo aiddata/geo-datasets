@@ -215,8 +215,8 @@ class CRU_TS(Dataset):
     def run_yearly_data(self, year, method, var):
         logger = self.get_logger()
         logger.info(f"Running: {var}, {method}, {str(year)}")
-        src_base = self.raw_dir / "data/rasters" / self.cru_label / "monthly" / var
-        dst_base = self.raw_dir / "data/rasters" / self.cru_label / "yearly" / var / method
+        src_base = self.output_dir / "monthly" / var
+        dst_base = self.output_dir / "yearly" / var / method
         year_files = sorted([i for i in src_base.iterdir() if f"cru.{var}.{year}" in i.name])
         year_mask = f"cru.{var}.YYYY.tif"
         year_path = dst_base / year_mask.replace("YYYY", str(year))
@@ -237,7 +237,7 @@ class CRU_TS(Dataset):
 
         for var in self.var_list:
             logger.info(f"Running variable: {var}")
-            var_dir = self.raw_dir / "data" / "rasters" / self.cru_label / "monthly" / var
+            var_dir = self.output_dir / "monthly" / var
             var_dir.mkdir(parents=True, exist_ok=True)
             in_path = f"netcdf:{self.raw_dir.as_posix()}/cru_ts{self.cru_version}.1901.2021.{var}.dat.nc:{var}"
             src = rasterio.open(in_path)
@@ -252,7 +252,7 @@ class CRU_TS(Dataset):
         qlist = []
         for var in self.var_list:
             for method in self.method_list:
-                dst_base = self.raw_dir / "data" / "rasters" / self.cru_label / "yearly" / var / method
+                dst_base = self.output_dir / "yearly" / var / method
                 dst_base.mkdir(parents=True, exist_ok=True)
                 for year in self.years:
                     qlist.append([year, method, var])
