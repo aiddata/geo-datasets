@@ -414,7 +414,7 @@ class Dataset(ABC):
 
         # no matter what happens, this is our ticket to run the actual dataset
         # every backend calls this after initializing
-        run = lambda: self._check_env_and_run(conda_env)
+        launch = lambda: self._check_env_and_run(conda_env)
         
         self.init_retries(retries, retry_delay, save_settings=True)
 
@@ -456,7 +456,7 @@ class Dataset(ABC):
 
             @flow(task_runner=tr, name=self.name)
             def prefect_main_wrapper():
-                run()
+                launch()
 
             prefect_main_wrapper()
 
@@ -475,14 +475,14 @@ class Dataset(ABC):
                 self.backend = "mpi"
                 self.mpi_max_workers = max_workers
 
-                run()
+                launch()
 
             elif backend == "local" or backend is None:
                 if run_parallel:
                     self.backend = "concurrent"
                 else:
                     self.backend = "serial"
-                run()
+                launch()
 
             else:
                 raise ValueError(f"Backend {backend} not recognized.")
