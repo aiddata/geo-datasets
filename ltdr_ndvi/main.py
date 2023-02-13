@@ -28,17 +28,23 @@ full file name - "AVH13C1.A1981181.N07.004.2013227210959.hdf"
 """
 
 import os
+import re
 import csv
+import ssl
 import sys
-import errno
-import shutil
+import json
+import hashlib
 from io import StringIO
 from pathlib import Path
+from itertools import chain
 from datetime import datetime
+from urllib.parse import urljoin
 from collections import OrderedDict
 from configparser import ConfigParser
+from typing import Any, Generator, List, Tuple, Type, Union
 
 import rasterio
+import requests
 import numpy as np
 import pandas as pd
 from osgeo import gdal, osr
@@ -53,7 +59,14 @@ class LTDR_NDVI(Dataset):
 
     name = "Long-term Data Record NDVI"
 
-    def __init__(self, app_key:str, years, raw_dir, output_dir, overwrite_download: bool, overwrite_processing: bool):
+    def __init__(self,
+                 token:str,
+                 years: List[Union[int, str]],
+                 raw_dir: Union[str, os.PathLike],
+                 output_dir: Union[str, os.PathLike],
+                 overwrite_download: bool,
+                 validate_download: bool,
+                 overwrite_processing: bool):
 
         self.build_list = [
             "daily",
@@ -61,27 +74,21 @@ class LTDR_NDVI(Dataset):
             "yearly"
         ]
 
-        self.app_key = app_key
+        self.auth_headers = { "Authorization": f"Bearer {token}" }
 
-        self.raw_dir = Path(raw_dir)
+        self.years = [int(y) for y in years]
+
+        # TODO: warn if raw_dir already points to a directory named "465", it's probably one too deep
+        self.raw_dir = Path(raw_dir) / "465"
         self.output_dir = Path(output_dir)
 
         self.overwrite_download = overwrite_download
+        self.validate_download = validate_download
         self.overwrite_processing = overwrite_processing
 
-        """
-        src_base = "/sciclone/aiddata10/REU/geo/raw/ltdr/LAADS/465"
+        self.dataset_url = "https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/details/allData/465/"
 
-        dst_base = "/sciclone/aiddata10/REU/geo/data/rasters/ltdr/avhrr_ndvi_v5"
-        """
-
-    def download(self):
-
-        logger = self.get_logger()
-
-        base_url = "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/465/"
-
-        sensors = [
+        self.sensors = [
             "N07_AVH13C1",
             "N09_AVH13C1",
             "N11_AVH13C1",
@@ -91,55 +98,71 @@ class LTDR_NDVI(Dataset):
             "N19_AVH13C1",
         ]
 
-        # Adapted from https://ladsweb.modaps.eosdis.nasa.gov/tools-and-services/data-download-scripts/
 
-        def geturl(url, token=None, out=None):
-            headers = {"Authorization": "Bearer " + self.app_key }
-            import ssl
-            CTX = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-            from urllib.request import urlopen, Request, URLError, HTTPError
-            try:
-                fh = urlopen(Request(url, headers=headers), context=CTX)
-                if out is None:
-                    return fh.read().decode("utf-8")
-                else:
-                    shutil.copyfileobj(fh, out)
-            except HTTPError as e:
-                logger.exception(f"HTTP GET error code: {str(e.code())}")
-                logger.exception(f"HTTP GET error message: {e.message}")
-            except URLError as e:
-                logger.exception(f"Failed to make request: {e.reason}")
-            return None
+    def build_sensor_download_list(self, sensor: str):
+        logger = self.get_logger()
+
+        # generates dictionaries that represent each entry in a directory
+        def dir_contents(dir_url: str) -> List[dict]:
+            logger.debug(f"Fetching {dir_url}")
+            description: dict = json.loads(requests.get(dir_url).content)
+            return description["content"]
+
+        # validates md5 hash of a file
+        def validate(filepath: Union[str, os.PathLike], md5: str) -> bool:
+            with open(filepath, "rb") as chk:
+                data = chk.read()
+                return md5 == hashlib.md5(data).hexdigest()
+
+        # this is what we'll return
+        # list of tuples, each including:
+        #   1. a boolean "does the file need to be downloaded?"
+        #   2. another tuple: (url_of_download, dst_path_of_download)
+        download_list: List[Tuple[bool, Tuple[str, Type[Path]]]] = []
+
+        sensor_dir: str = urljoin(self.dataset_url, sensor)
+        # for each year the sensor collected data
+        for year_details in dir_contents(sensor_dir):
+            # is this a year we'd like data from?
+            if int(year_details["name"]) in self.years:
+                year_dir: str = "/".join([sensor_dir, year_details["name"]])
+                # for each day the sensor collected data in this year
+                for day_details in dir_contents(year_dir):
+                    day_dir: str = "/".join([year_dir, day_details["name"]])
+                    # for each file the sensor created for this day
+                    for file_detail in dir_contents(day_dir):
+                        day_download_url: str = file_detail["downloadsLink"]
+                        dst = self.raw_dir / sensor / year_details["name"] / day_details["name"] / file_detail["name"]
+                        # if file is already downloaded, and we aren't in overwrite mode
+                        if dst.exists() and not self.overwrite_download:
+                            if self.validate_download:
+                                if validate(dst, file_detail["md5sum"]):
+                                    print(f"INFO: File validated: {dst.as_posix()}")
+                                    download_list.append((False, (day_download_url, dst)))
+                                else:
+                                    print(f"INFO: File validation failed, queuing for download: {dst.as_posix()}")
+                                    download_list.append((True, (day_download_url, dst)))
+                            else:
+                                print(f"INFO: File exists, skipping: {dst.as_posix()}")
+                                download_list.append((False, (day_download_url, dst)))
+                        else:
+                            print(f"INFO: Queuing for download: {day_download_url}")
+                            download_list.append((True, (day_download_url, dst)))
+        return download_list
 
 
-        for s in sensors:
-            src = base_url + s
-            logger.info(f"Downloading {src}")
-
-            os.makedirs(self.raw_dir, exist_ok=True)
-
-            files = [ f for f in csv.DictReader(StringIO(geturl(f"{src}.csv")), skipinitialspace=True) ]
-
-            for f in files:
-                # filesize of 0 to indicates a directory
-                filesize = int(f["size"])
-                path = self.raw_dir / f["name"]
-                url = src + f["name"]
-                if filesize == 0:
-                    os.makedirs(path, exist_ok=True)
-                    sync(src + "/" + f["name"], path)
-                else:
-                    if path.exists() and not self.overwrite_download:
-                        logger.info(f"Skipping, already downloaded: {path.as_posix()}")
-                    else:
-                        logger.info(f"Downloading: {path.as_posix()}")
-                        with open(path, 'w+b') as fh:
-                            geturl(url)
+    def download(self, src_url: str, final_dst_path: Union[str, os.PathLike]) -> None:
+        logger = self.get_logger()
+        logger.info(f"Downloading {str(final_dst_path)}...")
+        with requests.get(src_url, headers=self.auth_headers, stream=True) as src:
+            src.raise_for_status()
+            with self.tmp_to_dst_file(final_dst_path) as dst_path:
+                with open(dst_path, "wb") as dst:
+                    for chunk in src.iter_content(chunk_size=8192):
+                        dst.write(chunk)
 
 
-
-    def build_data_list(self, input_base, output_base):
-        output_base = Path(output_base)
+    def build_process_list(self, downloaded_files):
 
         # filter options to accept/deny based on sensor, year
         # all values must be strings
@@ -156,23 +179,15 @@ class LTDR_NDVI(Dataset):
             "year_deny": ["2019"]
         }
 
-        f = []
-        # find all .hdf files under input_base in filesystem
-        for root, dirs, files in os.walk(input_base):
-            for file in files:
-                if file.endswith(".hdf"):
-                    # ...and add them to the f array
-                    f.append(os.path.join(root, file))
         df_dict_list = []
 
-        for input_path in f:
-            input_path = Path(input_path)
+        for input_path in downloaded_files:
             items = input_path.stem.split(".")
             year = items[1][1:5]
             day = items[1][5:8]
             sensor = items[2]
             month = "{0:02d}".format(datetime.strptime(f"{year}+{day}", "%Y+%j").month)
-            output_path = output_base / f"daily/avhrr_ndvi_v5_{sensor}_{year}_{day}.tif"
+            output_path = self.output_dir / "daily" / f"avhrr_ndvi_v5_{sensor}_{year}_{day}.tif"
             df_dict_list.append({
                 "input_path": input_path,
                 "sensor": sensor,
@@ -206,32 +221,8 @@ class LTDR_NDVI(Dataset):
         return df
 
 
-    def prep_daily_data(self, src, dst):
-        logger = self.get_logger()
-
-        year = src.name.split(".")[1][1:5]
-        day = src.name.split(".")[1][5:8]
-        sensor = src.name.split(".")[2]
-
-        logger.info(f"Processing Day {sensor} {year} {day}")
-        self.process_daily_data(src.as_posix(), dst)
-
-
-    def prep_monthly_data(self, year_month, month_files, month_path):
-        logger = self.get_logger()
-        logger.info(f"Processing Month {year_month}")
-        data, meta = self.aggregate_rasters(file_list=month_files, method="max")
-        self.write_raster(month_path, data, meta)
-
-
-    def prep_yearly_data(self, year, year_files, year_path):
-        logger = self.get_logger()
-        print ("Processing Year {year}")
-        data, meta = self.aggregate_rasters(file_list=year_files, method="mean")
-        self.write_raster(year_path, data, meta)
-
-
-    def create_mask(self, qa_array, mask_vals):
+    @staticmethod
+    def create_mask(qa_array, mask_vals):
         qa_mask_vals = [abs(x - 15) for x in mask_vals]
         mask_bin_array = [0] * 16
         for x in qa_mask_vals:
@@ -244,13 +235,14 @@ class LTDR_NDVI(Dataset):
         return qa_mask
 
 
-    def process_daily_data(self, input_path, output_path):
-        """Process input raster and create output in output directory
+    def process_daily_data(self, src, dst):
+        """
+        Process input raster and create output in output directory
 
         Unpack NDVI subdataset from a HDF container
         Reproject to EPSG:4326
         Set values <0 (other than nodata) to 0
-        Write to GeoTiff
+        Write to COG
 
         Parts of code pulled from:
 
@@ -265,9 +257,17 @@ class LTDR_NDVI(Dataset):
         be useful for future data prep scripts that can use this as startng point.
 
         """
+
         logger = self.get_logger()
 
-        breakpoint()
+        year = src.name.split(".")[1][1:5]
+        day = src.name.split(".")[1][5:8]
+        sensor = src.name.split(".")[2]
+
+        logger.info(f"Processing Day {sensor} {year} {day}")
+
+        input_path = src.as_posix()
+        output_path = dst
 
         # open the dataset and subdataset
         hdf_ds = gdal.Open(input_path, gdal.GA_ReadOnly)
@@ -371,9 +371,23 @@ class LTDR_NDVI(Dataset):
         ndvi_ds = None
 
 
+    def process_monthly_data(self, year_month, month_files, month_path):
+        logger = self.get_logger()
+        logger.info(f"Processing Month {year_month}")
+        data, meta = self.aggregate_rasters(file_list=month_files, method="max")
+        self.write_raster(month_path, data, meta)
+
+
+    def process_yearly_data(self, year, year_files, year_path):
+        logger = self.get_logger()
+        print ("Processing Year {year}")
+        data, meta = self.aggregate_rasters(file_list=year_files, method="mean")
+        self.write_raster(year_path, data, meta)
+
 
     def aggregate_rasters(self, file_list, method="mean"):
-        """Aggregate multiple rasters
+        """
+        Aggregate multiple rasters
 
         Aggregates multiple rasters with same features (dimensions, transform,
         pixel size, etc.) and creates single layer using aggregation method
@@ -448,10 +462,25 @@ class LTDR_NDVI(Dataset):
 
 
     def main(self):
-        # Build day, month, year dataframes
 
-        # build day dataframe
-        day_df = self.build_data_list(self.raw_dir, self.output_dir)
+        # Build download list
+        raw_file_list = self.run_tasks(self.build_sensor_download_list, [[s] for s in self.sensors])
+
+        # We have a list of lists (from each sensor), merge them into one
+        file_list = [i for i in chain(*raw_file_list.results())]
+
+        # Extract list of files to download from file_list
+        download_list = [i[1] for i in file_list if i[0]]
+
+        # Download data
+        if len(download_list) > 0:
+            self.run_tasks(self.download, download_list).results()
+
+        # Make a list of all daily files, regardless of how the downloads went
+        day_files = [i[1][1] for i in file_list]
+
+        # Build day dataframe
+        day_df = self.build_process_list(day_files)
 
         # build month dataframe
 
@@ -500,15 +529,15 @@ class LTDR_NDVI(Dataset):
 
         if "daily" in self.build_list:
             os.makedirs(self.output_dir / "daily", exist_ok=True)
-            self.run_tasks(self.prep_daily_data, day_qlist)
+            self.run_tasks(self.process_daily_data, day_qlist)
 
         if "monthly" in self.build_list:
             os.makedirs(self.output_dir / "monthly", exist_ok=True)
-            self.run_tasks(self.prep_monthly_data, month_qlist)
+            self.run_tasks(self.process_monthly_data, month_qlist)
 
         if "yearly" in self.build_list:
             os.makedirs(self.output_dir / "yearly", exist_ok=True)
-            self.run_tasks(self.prep_yearly_data, year_qlist)
+            self.run_tasks(self.process_yearly_data, year_qlist)
 
 
 def get_config_dict(config_file="config.ini"):
@@ -516,11 +545,12 @@ def get_config_dict(config_file="config.ini"):
     config.read(config_file)
 
     return {
-        "app_key": config["main"]["app_key"],
+        "token": config["main"]["token"],
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "overwrite_download": config["main"].getboolean("overwrite_download"),
+        "validate_download": config["main"].getboolean("validate_download"),
         "overwrite_processing": config["main"].getboolean("overwrite_processing"),
         "backend": config["run"]["backend"],
         "task_runner": config["run"]["task_runner"],
@@ -541,6 +571,6 @@ if __name__ == "__main__":
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-    class_instance = LTDR_NDVI(config_dict["app_key"], config_dict["years"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
+    class_instance = LTDR_NDVI(config_dict["token"], config_dict["years"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["validate_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
