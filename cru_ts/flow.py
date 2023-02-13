@@ -59,7 +59,7 @@ def cru_ts(
         "job_script_prologue": [
             "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
             "module load anaconda3/2021.05",
-            "conda activate geodata38",
+            "conda activate geodata38_plus1",
             f"cd {tmp_dir}",
         ],
         "log_directory": str(timestamp_log_dir)
