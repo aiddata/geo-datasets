@@ -319,12 +319,12 @@ class LTDR_NDVI(Dataset):
                     "count": 1,
                     "driver": "COG",
                     "compress": "LZW",
+                    "dtype": "int16",
+                    "nodata": -9999,
                     "height": 3600,
                     "width": 7200,
                     "crs": CRS.from_epsg(4326),
-                    "dtype": "int16",
-                    "height": 3600,
-                    "nodata": -9999,
+                    "transform": ndvi_src.transform,
                 }
 
                 with rasterio.open(output_path, "w", **profile) as dst:
