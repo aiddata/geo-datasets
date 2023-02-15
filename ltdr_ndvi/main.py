@@ -44,6 +44,7 @@ from configparser import ConfigParser
 from typing import Any, Generator, List, Tuple, Type, Union
 
 import rasterio
+from rasterio.crs import CRS
 import requests
 import numpy as np
 import pandas as pd
@@ -137,16 +138,16 @@ class LTDR_NDVI(Dataset):
                         if dst.exists() and not self.overwrite_download:
                             if self.validate_download:
                                 if validate(dst, file_detail["md5sum"]):
-                                    print(f"INFO: File validated: {dst.as_posix()}")
+                                    logger.info(f"File validated: {dst.as_posix()}")
                                     download_list.append((False, (day_download_url, dst)))
                                 else:
-                                    print(f"INFO: File validation failed, queuing for download: {dst.as_posix()}")
+                                    logger.info(f"File validation failed, queuing for download: {dst.as_posix()}")
                                     download_list.append((True, (day_download_url, dst)))
                             else:
-                                print(f"INFO: File exists, skipping: {dst.as_posix()}")
+                                logger.info(f"File exists, skipping: {dst.as_posix()}")
                                 download_list.append((False, (day_download_url, dst)))
                         else:
-                            print(f"INFO: Queuing for download: {day_download_url}")
+                            logger.info(f"Queuing for download: {day_download_url}")
                             download_list.append((True, (day_download_url, dst)))
         return download_list
 
@@ -196,7 +197,7 @@ class LTDR_NDVI(Dataset):
                 "day": day,
                 "year_month": year+"_"+month,
                 "year_day": year+"_"+day,
-                "output_path": output_path.as_posix()
+                "output_path": output_path
             })
 
         df = pd.DataFrame(df_dict_list).sort_values(by=["input_path"])
@@ -235,7 +236,7 @@ class LTDR_NDVI(Dataset):
         return qa_mask
 
 
-    def process_daily_data(self, src, dst):
+    def process_daily_data(self, src, output_path):
         """
         Process input raster and create output in output directory
 
@@ -264,125 +265,91 @@ class LTDR_NDVI(Dataset):
         day = src.name.split(".")[1][5:8]
         sensor = src.name.split(".")[2]
 
-        logger.info(f"Processing Day {sensor} {year} {day}")
+        if output_path.exists() and not self.overwrite_processing:
+            logger.info(f"Skipping day, already processed: {sensor} {year} {day}")
+        else:
+            logger.info(f"Processing day: {sensor} {year} {day}")
 
-        input_path = src.as_posix()
-        output_path = dst
+            # list of qa fields and bit numbers
+            # https://ltdr.modaps.eosdis.nasa.gov/ltdr/docs/AVHRR_LTDR_V5_Document.pdf
 
-        # open the dataset and subdataset
-        hdf_ds = gdal.Open(input_path, gdal.GA_ReadOnly)
+            qa_bits = {
+                15: "Polar flag: latitude > 60deg (land) or > 50deg (ocean)",
+                14: "BRDF-correction issues",
+                13: "RHO3 value is invalid",
+                12: "Channel 5 value is invalid",
+                11: "Channel 4 value is invalid",
+                10: "Channel 3 value is invalid",
+                9: "Channel 2 (NIR) value is invalid",
+                8: "Channel 1 (visible) value is invalid",
+                7: "Channel 1-5 are invalid",
+                6: "Pixel is at night (high solar zenith angle)",
+                5: "Pixel is over dense dark vegetation",
+                4: "Pixel is over sun glint",
+                3: "Pixel is over water",
+                2: "Pixel contains cloud shadow",
+                1: "Pixel is cloudy",
+                0: "Unused"
+            }
 
-        layers = hdf_ds.GetSubDatasets()
+            # qa_mask_vals = [15, 9, 8, 6, 4, 3, 2, 1]
+            qa_mask_vals = [15, 9, 8, 1]
 
-        # ndvi
-        ndvi_ds = gdal.Open(layers[0][0], gdal.GA_ReadOnly)
-        # qa
-        qa_ds = gdal.Open(layers[1][0], gdal.GA_ReadOnly)
+            ndvi_gdal_path = f"HDF4_EOS:EOS_GRID:\"{src.as_posix()}\":Grid:NDVI"
+            qa_gdal_path = f"HDF4_EOS:EOS_GRID:\"{src.as_posix()}\":Grid:QA"
 
-        # clean data
-        ndvi_array = ndvi_ds.ReadAsArray().astype(np.int16)
+            # open data subdataset
+            with rasterio.open(ndvi_gdal_path) as ndvi_src:
+                ndvi_array = ndvi_src.read(1)
 
-        qa_array = qa_ds.ReadAsArray().astype(np.int16)
+                # open quality assurance subdataset
+                with rasterio.open(qa_gdal_path) as qa_src:
+                    qa_array = qa_src.read(1)
 
-        # list of qa fields and bit numbers
-        # https://ltdr.modaps.eosdis.nasa.gov/ltdr/docs/AVHRR_LTDR_V5_Document.pdf
-        # MSB first (invert for Python list lookip)
+                    # create mask array using our chosen mask values
+                    qa_mask = self.create_mask(qa_array, qa_mask_vals)
 
-        qa_bits = {
-            15: "Polar flag: latitude > 60deg (land) or > 50deg (ocean)",
-            14: "BRDF-correction issues",
-            13: "RHO3 value is invalid",
-            12: "Channel 5 value is invalid",
-            11: "Channel 4 value is invalid",
-            10: "Channel 3 value is invalid",
-            9: "Channel 2 (NIR) value is invalid",
-            8: "Channel 1 (visible) value is invalid",
-            7: "Channel 1-5 are invalid",
-            6: "Pixel is at night (high solar zenith angle)",
-            5: "Pixel is over dense dark vegetation",
-            4: "Pixel is over sun glint",
-            3: "Pixel is over water",
-            2: "Pixel contains cloud shadow",
-            1: "Pixel is cloudy",
-            0: "Unused"
-        }
+                    # apply mask to dataset
+                    ndvi_array[qa_mask] = -9999
 
-        # qa_mask_vals = [15, 9, 8, 6, 4, 3, 2, 1]
-        qa_mask_vals = [15, 9, 8, 1]
+                ndvi_array[np.where((ndvi_array < 0) & (ndvi_array > -9999))] = 0
+                ndvi_array[np.where(ndvi_array > 10000)] = 10000
 
-        qa_mask = self.create_mask(qa_array, qa_mask_vals)
+                profile = {
+                    "count": 1,
+                    "driver": "COG",
+                    "compress": "LZW",
+                    "height": 3600,
+                    "width": 7200,
+                    "crs": CRS.from_epsg(4326),
+                    "dtype": "int16",
+                    "height": 3600,
+                    "nodata": -9999,
+                }
 
-        ndvi_array[qa_mask] = -9999
-
-        ndvi_array[np.where((ndvi_array < 0) & (ndvi_array > -9999))] = 0
-        ndvi_array[np.where(ndvi_array > 10000)] = 10000
-
-        # -----------------
-
-        # prep projections and transformations
-        src_proj = osr.SpatialReference()
-        src_proj.ImportFromWkt(ndvi_ds.GetProjection())
-
-        dst_proj = osr.SpatialReference()
-        dst_proj.ImportFromEPSG(4326)
-
-        tx = osr.CoordinateTransformation(src_proj, dst_proj)
-
-        src_gt = ndvi_ds.GetGeoTransform()
-        pixel_xsize = src_gt[1]
-        pixel_ysize = abs(src_gt[5])
-
-        # extents
-        (ulx, uly, ulz) = tx.TransformPoint(src_gt[0], src_gt[3])
-
-        (lrx, lry, lrz) = tx.TransformPoint(
-            src_gt[0] + src_gt[1]*ndvi_ds.RasterXSize,
-            src_gt[3] + src_gt[5]*ndvi_ds.RasterYSize)
-
-        # new geotransform
-        dst_gt = (ulx, pixel_xsize, src_gt[2],
-                    uly, src_gt[4], -pixel_ysize)
-
-        # -----------------
-
-        # create new raster
-        driver = gdal.GetDriverByName("COG")
-        out_ds = driver.Create(
-            output_path,
-            int((lrx - ulx)/pixel_xsize),
-            int((uly - lry)/pixel_ysize),
-            1,
-            gdal.GDT_Int16
-        )
-
-        # set transform and projection
-        out_ds.SetGeoTransform(dst_gt)
-        out_ds.SetProjection(dst_proj.ExportToWkt())
-
-        out_band = out_ds.GetRasterBand(1)
-        out_band.WriteArray(ndvi_array)
-        out_band.SetNoDataValue(-9999)
-
-        # complete write
-        out_ds = None
-
-        # close out datasets
-        hdf_ds = None
-        ndvi_ds = None
+                with rasterio.open(output_path, "w", **profile) as dst:
+                    # for some reason rasterio raises an exception if we don't specify that there is one index
+                    dst.write(ndvi_array, indexes=1)
 
 
     def process_monthly_data(self, year_month, month_files, month_path):
         logger = self.get_logger()
-        logger.info(f"Processing Month {year_month}")
-        data, meta = self.aggregate_rasters(file_list=month_files, method="max")
-        self.write_raster(month_path, data, meta)
+        if os.path.exists(month_path) and not self.overwrite_processing:
+            logger.info(f"Skipping month, already processed: {year_month}")
+        else:
+            logger.info(f"Processing month: {year_month}")
+            data, meta = self.aggregate_rasters(file_list=month_files, method="max")
+            self.write_raster(month_path, data, meta)
 
 
     def process_yearly_data(self, year, year_files, year_path):
         logger = self.get_logger()
-        print ("Processing Year {year}")
-        data, meta = self.aggregate_rasters(file_list=year_files, method="mean")
-        self.write_raster(year_path, data, meta)
+        if os.path.exists(year_path) and not self.overwrite_processing:
+            logger.info(f"Skipping year, already processed: {year}")
+        else:
+            logger.info(f"Processing year: {year}")
+            data, meta = self.aggregate_rasters(file_list=year_files, method="mean")
+            self.write_raster(year_path, data, meta)
 
 
     def aggregate_rasters(self, file_list, method="mean"):
@@ -402,13 +369,14 @@ class LTDR_NDVI(Dataset):
         Return
             result: rasterio Raster instance
         """
+        logger = self.get_logger()
         store = None
         for ix, file_path in enumerate(file_list):
 
             try:
                 raster = rasterio.open(file_path)
             except:
-                print (f"Could not include file in aggregation ({str(file_path)})")
+                logger.error(f"Could not include file in aggregation ({str(file_path)})")
                 continue
 
             active = raster.read(masked=True)
@@ -449,16 +417,14 @@ class LTDR_NDVI(Dataset):
 
 
     def write_raster(self, path, data, meta):
-        make_dir(os.path.dirname(path))
+        logger = self.get_logger()
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         meta["dtype"] = data.dtype
         with rasterio.open(path, "w", **meta) as result:
             try:
                 result.write(data)
             except:
-                print(path)
-                print(meta)
-                print(data.shape)
-                raise
+                logger.exception("Error writing raster to {path}")
 
 
     def main(self):
@@ -499,7 +465,7 @@ class LTDR_NDVI(Dataset):
         month_df = month_df.loc[month_df["count"] >= minimum_days_in_month]
 
         month_df["output_path"] = month_df.apply(
-            lambda x: os.path.join(self.output_dir, "monthly/avhrr_ndvi_v5_{}.tif".format(x["year_month"])), axis=1
+            lambda x: (self.output_dir / "monthly/avhrr_ndvi_v5_{}.tif".format(x["year_month"])).as_posix(), axis=1
         )
 
         # build year dataframe
