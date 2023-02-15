@@ -327,9 +327,10 @@ class LTDR_NDVI(Dataset):
                     "transform": ndvi_src.transform,
                 }
 
-                with rasterio.open(output_path, "w", **profile) as dst:
-                    # for some reason rasterio raises an exception if we don't specify that there is one index
-                    dst.write(ndvi_array, indexes=1)
+                with self.tmp_to_dst_file(output_path) as dst_path:
+                    with rasterio.open(dst_path, "w", **profile) as dst:
+                        # for some reason rasterio raises an exception if we don't specify that there is one index
+                        dst.write(ndvi_array, indexes=1)
 
 
     def process_monthly_data(self, year_month, month_files, month_path):
@@ -420,11 +421,12 @@ class LTDR_NDVI(Dataset):
         logger = self.get_logger()
         os.makedirs(os.path.dirname(path), exist_ok=True)
         meta["dtype"] = data.dtype
-        with rasterio.open(path, "w", **meta) as result:
-            try:
-                result.write(data)
-            except:
-                logger.exception("Error writing raster to {path}")
+        with self.tmp_to_dst_file(path) as write_path:
+            with rasterio.open(write_path, "w", **meta) as result:
+                try:
+                    result.write(data)
+                except:
+                    logger.exception("Error writing raster to {path}")
 
 
     def main(self):
