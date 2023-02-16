@@ -7,7 +7,6 @@ pandas
 geopandas
 
 dask-jobqueue == 0.8.1
-prefect == 2.7.3
 netcdf4 == 1.5.7
 numpy == 1.23.3
 prefect-dask == 0.2.2
