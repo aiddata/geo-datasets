@@ -40,6 +40,12 @@ podman build --tag geodata-container .
    podman --remote build -t geodata-container .
    ```
 
+6. Check that the image made it into minikube
+   ```shell
+   minikube image ls
+   ```
+   In the list, you'll hopefully see `localhost/geodata-container:latest`
+
 ## Deploy container to Kubernetes
 
 1. Storage persistence is achieved in Kubernetes through the use of [Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).

@@ -12,7 +12,7 @@ from prefect.settings import (
 manifest_vars = {
     "api_url": PREFECT_API_URL.value(),
     "api_key": PREFECT_API_KEY.value(),
-    "image_name": "geodata-container",
+    "image_name": "localhost/geodata-container",
     "namespace": "geodata",
     "work_queue": "geodata",
 }
