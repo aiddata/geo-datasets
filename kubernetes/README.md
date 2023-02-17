@@ -63,7 +63,7 @@ podman build --tag geodata-container .
    ```shell
    conda activate geodata38
    # review generate_manifest.py and change any necessary variables
-   python generate_manifest.py # WARNING: this overwrites orion.yaml
+   python generate_manifest.py > orion.yaml
    kubectl apply -f orion.yaml
    ```
 
