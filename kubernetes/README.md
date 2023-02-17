@@ -78,3 +78,21 @@ podman build --tag geodata-container .
    ```shell
    kubectl describe deployment prefect-agent
    ```
+
+## Using minikube
+
+- Pausing minikube
+  ```shell
+  minikube pause
+  ```
+
+- Resuming minikube
+  ```shell
+  minikube resume
+  ```
+
+- Resetting minkube
+  ```shell
+  minikube delete
+  ```
+  Doing this really deletes everything, so you'll have to start from scratch again.
