@@ -17,12 +17,13 @@ from dataset import Dataset
 
 class VIIRS_NTL(Dataset):
 
-    name = "DVNL"
+    name = "VIIRS_NTL"
 
-    def __init__(self, raw_dir, output_dir, files, months, years, username, password, client_secret, annual=True, overwrite_download=False, overwrite_extract=False, overwrite_processing=False ):
+    def __init__(self, raw_dir, output_dir, annual_files, monthly_files, months, years, username, password, client_secret, annual=True, overwrite_download=False, overwrite_extract=False, overwrite_processing=False ):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
-        self.files = files
+        self.annual_files = annual_files
+        self.monthly_files = monthly_files
         self.months = months
         self.years = years
         self.username = username
@@ -59,7 +60,7 @@ class VIIRS_NTL(Dataset):
 
 
     
-    def manage_download(self, year, month = None):
+    def manage_download(self, year, file, month=None):
         # consider doing separate directories for years when doing monthly data download
         """
         Download individual file
@@ -72,66 +73,47 @@ class VIIRS_NTL(Dataset):
         "Authorization": f"Bearer {token}",
         }
 
-        flist = []
-
-        for file in self.files:
-            if self.annual:
-                if year < 2014:
+        if self.annual:
+            if year == 2012:
+                if (type == "average_masked") | (type == "lit_mask") | (type =="median_masked"):
+                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}04-201303_global_vcmcfg_c20210121150000.{TYPE}.tif.gz"
+                else:
+                    download_url = download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}04-201303_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
+            elif year == 2013:
+                if (type == "average_masked") | (type == "lit_mask") | (type =="median_masked"):
+                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c20210121150000.{TYPE}.tif.gz"
+                else:
                     download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
+            elif year == 2021:
+                download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/2021/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202203152300.{TYPE}.tif.gz"
+            else:
+                if (type == "average_masked") | (type == "lit_mask") | (type =="median_masked"):
+                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c20210121150000.{TYPE}.tif.gz"
                 else:
                     download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202101211500.{TYPE}.tif.gz"
-                download_dest = download_url.format(YEAR = year, TYPE = file)
-                local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
-            else:
-                # consider: make separate directories for each year's monthly data
-                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/"
-                download_dest = download_url.format(YEAR = year, MONTH = month)
-                local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}"
-            if local_filename.exists() and not self.overwrite_download:
-                logger.info(f"Download Exists: {local_filename}")
-            else:
-                try:
-                    with requests.get(download_dest, headers=headers, stream=True) as src:
-                        # raise an exception (fail this task) if HTTP response indicates that an error occured
-                        src.raise_for_status()
-                        with open(local_filename, "wb") as dst:
-                            dst.write(src.content)
-                except:
-                    logger.info(f"Failed to download: {str(download_dest)}")
-                else:
-                    logger.info(f"Downloaded {str(local_filename)}")
-                flist.append((download_dest, local_filename))
-        return flist
-
-
-        # if self.annual:
-        #     if year < 2014:
-        #         download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
-        #     else:
-        #         download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202101211500.{TYPE}.tif.gz"
-        #     download_dest = download_url.format(YEAR = year, TYPE = file)
-        #     local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
-        # else:
-        #     # consider: make separate directories for each year's monthly data
-        #     download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/"
-        #     download_dest = download_url.format(YEAR = year, MONTH = month)
-        #     local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}"
+            download_dest = download_url.format(YEAR = year, TYPE = file)
+            local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
+        else:
+            # consider: make separate directories for each year's monthly data
+            download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/"
+            download_dest = download_url.format(YEAR = year, MONTH = month)
+            local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}"
         
-        # if local_filename.exists() and not self.overwrite_download:
-        #     logger.info(f"Download Exists: {local_filename}")
-        # else:
-        #     try:
-        #         with requests.get(download_dest, headers=headers, stream=True) as src:
-        #             # raise an exception (fail this task) if HTTP response indicates that an error occured
-        #             src.raise_for_status()
-        #             with open(local_filename, "wb") as dst:
-        #                 dst.write(src.content)
-        #     except:
-        #         logger.info(f"Failed to download: {str(download_dest)}")
-        #     else:
-        #         logger.info(f"Downloaded {str(local_filename)}")
+        if local_filename.exists() and not self.overwrite_download:
+            logger.info(f"Download Exists: {local_filename}")
+        else:
+            try:
+                with requests.get(download_dest, headers=headers, stream=True) as src:
+                    # raise an exception (fail this task) if HTTP response indicates that an error occured
+                    src.raise_for_status()
+                    with open(local_filename, "wb") as dst:
+                        dst.write(src.content)
+            except:
+                logger.info(f"Failed to download: {str(download_dest)}")
+            else:
+                logger.info(f"Downloaded {str(local_filename)}")
 
-        # return (download_dest, local_filename)
+        return (download_dest, local_filename)
 
         
 
@@ -143,11 +125,13 @@ class VIIRS_NTL(Dataset):
 
         os.makedirs(self.raw_dir, exist_ok=True)
 
+        # add iterative loop to prep tuple for imput parameter
+
         logger.info("Running data download")
         if self.annual:
-            download = self.run_tasks(self.manage_download, [[y] for y in self.years])
+            download = self.run_tasks(self.manage_download, [[y, f] for y in self.years for f in self.annual_files])
         else:
-            download = self.run_tasks(self.manage_download, [[y] for y in self.years], [[m] for m in self.months])
+            download = self.run_tasks(self.manage_download, [[y, f, m] for y in self.years for f in self.monthly_files for m in self.months])
         self.log_run(download)
 
 
@@ -160,7 +144,8 @@ def get_config_dict(config_file="config.ini"):
             "annual" :  config["main"].getboolean("annual"),
             "years": [int(y) for y in config["main"]["years"].split(", ")],
             "months": [int(y) for y in config["main"]["months"].split(", ")],
-            "files": [str(y) for y in config["main"]["files"].split(", ")],
+            "annual_files": [str(y) for y in config["main"]["annual_files"].split(", ")],
+            "monthly_files": [str(y) for y in config["main"]["monthly_files"].split(", ")],
             "raw_dir": Path(config["main"]["raw_dir"]),
             "output_dir": Path(config["main"]["output_dir"]),
             "log_dir": Path(config["main"]["raw_dir"]) / "logs",
@@ -182,6 +167,6 @@ def get_config_dict(config_file="config.ini"):
 if __name__ == "__main__":
     config_dict = get_config_dict()
 
-    class_instance = VIIRS_NTL(config_dict["raw_dir"], config_dict["output_dir"], config_dict["files"], config_dict["months"], config_dict["years"], config_dict["username"], config_dict["password"], config_dict["client_secret"], config_dict["annual"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_processing"])
+    class_instance = VIIRS_NTL(config_dict["raw_dir"], config_dict["output_dir"], config_dict["annual_files"], config_dict["monthly_files"], config_dict["months"], config_dict["years"], config_dict["username"], config_dict["password"], config_dict["client_secret"], config_dict["annual"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
