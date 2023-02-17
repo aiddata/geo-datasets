@@ -1,3 +1,4 @@
+import sys
 from string import Template
 
 import yaml
@@ -16,26 +17,31 @@ manifest_vars = {
     "work_queue": "geodata",
 }
 
+# retrieve deployment manifest template from Prefect
 template = Template(
     (
         prefect.__module_path__ / "cli" / "templates" / "kubernetes-agent.yaml"
     ).read_text()
 )
 
+# fill out template from Prefect with our values
 manifest = template.substitute(manifest_vars)
 
 volume_mounts_injection = [{"mountPath": "/sciclone", "name": "sciclone"}]
 
 volume_injection = [{"name": "sciclone", "persistentVolumeClaim": {"claimName": "pvc0001"}}]
 
+# generator that injects our custom config into YAMLs
 def gen_docs():
+    # for each YAML document in Prefect's template
     for doc in yaml.load_all(manifest, Loader=yaml.FullLoader):
+        # if it's the deployment document, we're going to inject some stuff
         if doc["kind"] == "Deployment":
+            # inject volumeMounts
             doc["spec"]["template"]["spec"]["containers"][0]["volumeMounts"] = volume_mounts_injection
+            # inject volumes
             doc["spec"]["template"]["spec"]["volumes"] = volume_injection
-            print("this is the deployment")
         yield doc
 
-
-with open("orion.yaml", "w") as dst:
-    yaml.dump_all(gen_docs(), dst)
+# write generated YAML to stdout
+yaml.dump_all(gen_docs(), sys.stdout)
