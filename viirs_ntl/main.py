@@ -93,11 +93,557 @@ class VIIRS_NTL(Dataset):
                     download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202101211500.{TYPE}.tif.gz"
             download_dest = download_url.format(YEAR = year, TYPE = file)
             local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
+
         else:
             # consider: make separate directories for each year's monthly data
-            download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/"
-            download_dest = download_url.format(YEAR = year, MONTH = month)
-            local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}"
+            if year == 2012:
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+
+                if month == 4:
+                    end_day = 30
+                    file_code = 201605121456
+                    month = "04"
+                elif month == 5:
+                    end_day = 31
+                    file_code = 201605121458
+                    month = "05"
+                elif month == 6:
+                    end_day = 30
+                    file_code = 201605121459
+                    month = "06"
+                elif month == 7:
+                    end_day = 31
+                    file_code = 201605121509
+                    month = "07"
+                elif month == 8:
+                    end_day = 31
+                    file_code = 201602121348
+                    month = "08"
+                elif month == 9:
+                    end_day = 30
+                    file_code = 201602090953
+                    month = "09"
+                elif month == 10:
+                    end_day = 31
+                    file_code = 201602051401
+                elif month == 11:
+                    end_day = 30
+                    file_code = 201601270845
+                elif month == 12:
+                    end_day = 31
+                    file_code = 201601041440
+                else: 
+                    # for file types that don't exist
+                    end_day = "invalid"
+                    file_code = "invalid"
+                    download_dest = download_url.format(YEAR = year, MONTH = month,TYPE = file, MED = end_day, FCODE = file_code)
+                    logger.info(f"Download File Does Not Exist: {download_dest}")
+                    local_filename = "Download File Does Not Exist"
+
+            elif year == 2013:
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+
+                if month == 1:
+                    end_day = 31
+                    file_code = 201605121529
+                    month = "01"
+                elif month == 2:
+                    end_day = 28
+                    file_code = 201605131247
+                    month = "02"
+                elif month == 3:
+                    end_day = 31
+                    file_code = 201605131250
+                    month = "03"
+                elif month == 4:
+                    end_day = 30
+                    file_code = 201605131251
+                    month = "04"
+                elif month == 5:
+                    end_day = 31
+                    file_code = 201605131256
+                    month = "05"
+                elif month == 6:
+                    end_day = 30
+                    file_code = 201605131304
+                    month = "06"
+                elif month == 7:
+                    end_day = 31
+                    file_code = 201605131305
+                    month = "07"
+                elif month == 8:
+                    end_day = 31
+                    file_code = 201605131312
+                    month = "08"
+                elif month == 9:
+                    end_day = 30
+                    file_code = 201605131325
+                    month = "09"
+                elif month == 10:
+                    end_day = 31
+                    file_code = 201605131331
+                elif month == 11:
+                    end_day = 30
+                    file_code = 201605131332
+                elif month == 12:
+                    end_day = 31
+                    file_code = 201605131341
+                    
+            elif year == 2014:
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+
+                if month == 1:
+                    end_day = 31
+                    file_code = 2015006171539
+                    month = "01"
+                elif month == 2:
+                    end_day = 28
+                    file_code = 201507201053
+                    month = "02"
+                elif month == 3:
+                    end_day = 31
+                    file_code = 201506121552
+                    month = "03"
+                elif month == 4:
+                    end_day = 30
+                    file_code = 201507201613
+                    month = "04"
+                elif month == 5:
+                    end_day = 31
+                    file_code = 201502061154
+                    month = "05"
+                elif month == 6:
+                    end_day = 30
+                    file_code = 201502121209
+                    month = "06"
+                elif month == 7:
+                    end_day = 31
+                    file_code = 2015006231100
+                    month = "07"
+                elif month == 8:
+                    end_day = 31
+                    file_code = 201508131500
+                    month = "08"
+                elif month == 9:
+                    end_day = 30
+                    file_code = 201502251402
+                    month = "09"
+                elif month == 10:
+                    end_day = 31
+                    file_code = 201502200936
+                elif month == 11:
+                    end_day = 30
+                    file_code = 201502231456
+                elif month == 12:
+                    end_day = 31
+                    file_code = 201502231126
+            
+            elif year == 2015:
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+
+                if month == 1:
+                    end_day = 31
+                    file_code = 201505111710
+                    month = "01"
+                elif month == 2:
+                    end_day = 28
+                    file_code = 201504281527
+                    month = "02"
+                elif month == 3:
+                    end_day = 31
+                    file_code = 201505191919
+                    month = "03"
+                elif month == 4:
+                    end_day = 30
+                    file_code = 201506011709
+                    month = "04"
+                elif month == 5:
+                    end_day = 31
+                    file_code = 201506161326
+                    month = "05"
+                elif month == 6:
+                    end_day = 30
+                    file_code = 201508141523
+                    month = "06"
+                elif month == 7:
+                    end_day = 31
+                    file_code = 201509151840
+                    month = "07"
+                elif month == 8:
+                    end_day = 31
+                    file_code = 201509301759
+                    month = "08"
+                elif month == 9:
+                    end_day = 30
+                    file_code = 201511121210
+                    month = "09"
+                elif month == 10:
+                    end_day = 31
+                    file_code = 201511181405
+                elif month == 11:
+                    end_day = 30
+                    file_code = 201512121649
+                elif month == 12:
+                    end_day = 31
+                    file_code = 201601251413
+            
+            elif year == 2016:
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+
+                if month == 1:
+                    end_day = 31
+                    file_code = 201603132032
+                    month = "01"
+                elif month == 2:
+                    end_day = 29
+                    file_code = 201603152010
+                    month = "02"
+                elif month == 3:
+                    end_day = 31
+                    file_code = 201604191144
+                    month = "03"
+                elif month == 4:
+                    end_day = 30
+                    file_code = 201606140957
+                    month = "04"
+                elif month == 5:
+                    end_day = 31
+                    file_code = 201606281430
+                    month = "05"
+                elif month == 6:
+                    end_day = 30
+                    file_code = 201608101833
+                    month = "06"
+                elif month == 7:
+                    end_day = 31
+                    file_code = 201609121310
+                    month = "07"
+                elif month == 8:
+                    end_day = 31
+                    file_code = 201610041111
+                    month = "08"
+                elif month == 9:
+                    end_day = 30
+                    file_code = 201610280945
+                    month = "09"
+                elif month == 10:
+                    end_day = 31
+                    file_code = 201612011125
+                elif month == 11:
+                    end_day = 30
+                    file_code = 201612191237
+                elif month == 12:
+                    end_day = 31
+                    file_code = 201701271138
+            
+            elif year == 2017:
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+
+                if month == 1:
+                    end_day = 31
+                    file_code = 201702241225
+                    month = "01"
+                elif month == 2:
+                    end_day = 28
+                    file_code = 201703012030
+                    month = "02"
+                elif month == 3:
+                    end_day = 31
+                    file_code = 201705020851
+                    month = "03"
+                elif month == 4:
+                    end_day = 30
+                    file_code = 201705011300
+                    month = "04"
+                elif month == 5:
+                    end_day = 31
+                    file_code = 201706021300
+                    month = "05"
+                elif month == 6:
+                    end_day = 30
+                    file_code = 201707021700
+                    month = "06"
+                elif month == 7:
+                    end_day = 31
+                    file_code = 201708061200
+                    month = "07"
+                elif month == 8:
+                    end_day = 31
+                    file_code = 201709051000
+                    month = "08"
+                elif month == 9:
+                    end_day = 30
+                    file_code = 201710041620
+                    month = "09"
+                elif month == 10:
+                    end_day = 31
+                    file_code = 201711021230
+                elif month == 11:
+                    end_day = 30
+                    file_code = 201712040930
+                elif month == 12:
+                    end_day = 31
+                    file_code = 201801021747
+            
+            elif year == 2018:
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+
+                if month == 1:
+                    end_day = 31
+                    file_code = 201805221252
+                    month = "01"
+                elif month == 2:
+                    end_day = 28
+                    file_code = 201803012000
+                    month = "02"
+                elif month == 3:
+                    end_day = 31
+                    file_code = 201804022005
+                    month = "03"
+                elif month == 4:
+                    end_day = 30
+                    file_code = 201805021400
+                    month = "04"
+                elif month == 5:
+                    end_day = 31
+                    file_code = 201806061100
+                    month = "05"
+                elif month == 6:
+                    end_day = 30
+                    file_code = 201904251200
+                    month = "06"
+                elif month == 7:
+                    end_day = 31
+                    file_code = 201812111300
+                    month = "07"
+                elif month == 8:
+                    end_day = 31
+                    file_code = 201809070900
+                    month = "08"
+                elif month == 9:
+                    end_day = 30
+                    file_code = 201810250900
+                    month = "09"
+                elif month == 10:
+                    end_day = 31
+                    file_code = 201811131000
+                elif month == 11:
+                    end_day = 30
+                    file_code = 201812081230
+                elif month == 12:
+                    end_day = 31
+                    file_code = 201902122100
+            
+            elif year == 2019:
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+
+                if month == 1:
+                    end_day = 31
+                    file_code = 201905201300
+                    month = "01"
+                elif month == 2:
+                    end_day = 28
+                    file_code = 201903110900
+                    month = "02"
+                elif month == 3:
+                    end_day = 31
+                    file_code = 201904071900
+                    month = "03"
+                elif month == 4:
+                    end_day = 30
+                    file_code = 201905191000
+                    month = "04"
+                elif month == 5:
+                    end_day = 31
+                    file_code = 201906130930
+                    month = "05"
+                elif month == 6:
+                    end_day = 30
+                    file_code = 201907091100
+                    month = "06"
+                elif month == 7:
+                    end_day = 31
+                    file_code = 201908090900
+                    month = "07"
+                elif month == 8:
+                    end_day = 31
+                    file_code = 201909051300
+                    month = "08"
+                elif month == 9:
+                    end_day = 30
+                    file_code = 201910062300
+                    month = "09"
+                elif month == 10:
+                    end_day = 31
+                    file_code = 201911061400
+                elif month == 11:
+                    end_day = 30
+                    file_code = 201912131600
+                elif month == 12:
+                    end_day = 31
+                    file_code = 202001140900
+            
+            elif year == 2020:
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+
+                if month == 1:
+                    end_day = 31
+                    file_code = 202002111500
+                    month = "01"
+                elif month == 2:
+                    end_day = 29
+                    file_code = 202003021200
+                    month = "02"
+                elif month == 3:
+                    end_day = 31
+                    file_code = 202007042300
+                    month = "03"
+                elif month == 4:
+                    end_day = 30
+                    file_code = 202006121200
+                    month = "04"
+                elif month == 5:
+                    end_day = 31
+                    file_code = 202006221000
+                    month = "05"
+                elif month == 6:
+                    end_day = 30
+                    file_code = 202008012300
+                    month = "06"
+                elif month == 7:
+                    end_day = 31
+                    file_code = 202008142300
+                    month = "07"
+                elif month == 8:
+                    end_day = 31
+                    file_code = 202009111000
+                    month = "08"
+                elif month == 9:
+                    end_day = 30
+                    file_code = 202010082300
+                    month = "09"
+                elif month == 10:
+                    end_day = 31
+                    file_code = 202011050900
+                elif month == 11:
+                    end_day = 30
+                    file_code = 202012092300
+                elif month == 12:
+                    end_day = 31
+                    file_code = 202101130900
+            
+            elif year == 2021:
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+
+                if file == "avg_rade9h.masked":
+                    end_day = "invalid"
+                    file_code = "invalid"
+                    download_dest = download_url.format(YEAR = year, MONTH = month,TYPE = file, MED = end_day, FCODE = file_code)
+                    logger.info(f"Download File Does Not Exist: {download_dest}")
+                    local_filename = "Download File Does Not Exist"                   
+                elif month == 1:
+                    end_day = 31
+                    file_code = 202102062300
+                    month = "01"
+                elif month == 2:
+                    end_day = 28
+                    file_code = 202103091200
+                    month = "02"
+                elif month == 3:
+                    end_day = 31
+                    file_code = 202104061200
+                    month = "03"
+                elif month == 4:
+                    end_day = 30
+                    file_code = 202105062200
+                    month = "04"
+                elif month == 5:
+                    end_day = 31
+                    file_code = 202106060700
+                    month = "05"
+                elif month == 6:
+                    end_day = 30
+                    file_code = 202106060700
+                    month = "06"
+                elif month == 7:
+                    end_day = 31
+                    file_code = 202108071200
+                    month = "07"
+                elif month == 8:
+                    end_day = 31
+                    file_code = 202109141100
+                    month = "08"
+                elif month == 9:
+                    end_day = 30
+                    file_code = 202110112300
+                    month = "09"
+                elif month == 10:
+                    end_day = 31
+                    file_code = 202111062300
+                elif month == 11:
+                    end_day = 30
+                    file_code = 202112060900
+                elif month == 12:
+                    end_day = 31
+                    file_code = 202201100700
+
+            else: # year = 2022
+                
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+
+                if file == "avg_rade9h.masked":
+                    end_day = "invalid"
+                    file_code = "invalid"
+                    download_dest = download_url.format(YEAR = year, MONTH = month,TYPE = file, MED = end_day, FCODE = file_code)
+                    logger.info(f"Download File Does Not Exist: {download_dest}")
+                    local_filename = "Download File Does Not Exist"
+
+                elif month == 1:
+                    end_day = 31
+                    file_code = 202202041600
+                    month = "01"
+                elif month == 2:
+                    end_day = 28
+                    file_code = 202203052300
+                    month = "02"
+                elif month == 3:
+                    end_day = 31
+                    file_code = 202204080900
+                    month = "03"
+                elif month == 4:
+                    end_day = 30
+                    file_code = 202205051100
+                    month = "04"
+                elif month == 5:
+                    end_day = 31
+                    file_code = 202206071200
+                    month = "05"
+                elif month == 6:
+                    end_day = 30
+                    file_code = 202207141300
+                    month = "06"
+                elif month == 7:
+                    end_day = 31
+                    file_code = 202208102300
+                    month = "07"
+                elif month == 8:
+                    # this file has unique download link
+                    download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/NOAA-20/vcmslcfg/SVDNB_j01_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
+                    end_day = 31
+                    file_code = 202209231200
+                    month = "08"
+                elif month == 9:
+                    end_day = 30
+                    file_code = 202210122300
+                    month = "09"
+                else:
+                    # for file types that don't exist
+                    download_dest = download_url.format(YEAR = year, MONTH = month, TYPE = file, MED = "invalid", FCODE = "invalid")
+                    logger.info(f"Download File Does Not Exist: {download_dest}")
+                    local_filename = "Download File Does Not Exist"
+
+            download_dest = download_url.format(YEAR = year, MONTH = month,TYPE = file, MED = end_day, FCODE = file_code)
+            local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}_{file}"
         
         if local_filename.exists() and not self.overwrite_download:
             logger.info(f"Download Exists: {local_filename}")
