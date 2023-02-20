@@ -134,11 +134,8 @@ class VIIRS_NTL(Dataset):
                     file_code = 201601041440
                 else: 
                     # for file types that don't exist
-                    end_day = "invalid"
-                    file_code = "invalid"
-                    download_dest = download_url.format(YEAR = year, MONTH = month,TYPE = file, MED = end_day, FCODE = file_code)
-                    logger.info(f"Download File Does Not Exist: {download_dest}")
-                    local_filename = "Download File Does Not Exist"
+                    logger.info("Download option does not exist yet: " + str(year) + "/" + str(month) + "/ " + file)
+                    raise Exception("Download option does not exist yet: " + str(year) + "/" + str(month) + "/" + file)
 
             elif year == 2013:
                 download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmcfg_v10_c{FCODE}.{TYPE}.tif.gz"
@@ -536,11 +533,9 @@ class VIIRS_NTL(Dataset):
                 download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
 
                 if file == "avg_rade9h.masked":
-                    end_day = "invalid"
-                    file_code = "invalid"
-                    download_dest = download_url.format(YEAR = year, MONTH = month,TYPE = file, MED = end_day, FCODE = file_code)
-                    logger.info(f"Download File Does Not Exist: {download_dest}")
-                    local_filename = "Download File Does Not Exist"                   
+                    logger.info("Download option does not exist yet: " + str(year) + "/" + str(month) + "/ " + file)
+                    raise Exception("Download option does not exist yet: " + str(year) + "/" + str(month) + "/" + file)
+
                 elif month == 1:
                     end_day = 31
                     file_code = 202102062300
@@ -592,11 +587,8 @@ class VIIRS_NTL(Dataset):
                 download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/SVDNB_npp_{YEAR}{MONTH}01-{YEAR}{MONTH}{MED}_global_vcmslcfg_v10_c{FCODE}.{TYPE}.tif.gz"
 
                 if file == "avg_rade9h.masked":
-                    end_day = "invalid"
-                    file_code = "invalid"
-                    download_dest = download_url.format(YEAR = year, MONTH = month,TYPE = file, MED = end_day, FCODE = file_code)
-                    logger.info(f"Download File Does Not Exist: {download_dest}")
-                    local_filename = "Download File Does Not Exist"
+                    logger.info("Download option does not exist yet: " + str(year) + "/" + str(month) + "/ " + file)
+                    raise Exception("Download option does not exist yet: " + str(year) + "/" + str(month) + "/" + file)
 
                 elif month == 1:
                     end_day = 31
@@ -637,10 +629,8 @@ class VIIRS_NTL(Dataset):
                     file_code = 202210122300
                     month = "09"
                 else:
-                    # for file types that don't exist
-                    download_dest = download_url.format(YEAR = year, MONTH = month, TYPE = file, MED = "invalid", FCODE = "invalid")
-                    logger.info(f"Download File Does Not Exist: {download_dest}")
-                    local_filename = "Download File Does Not Exist"
+                    logger.info("Download option does not exist yet: " + str(year) + "/" + str(month) + "/ " + file)
+                    raise Exception("Download option does not exist yet: " + str(year) + "/" + str(month) + "/" + file)
 
             download_dest = download_url.format(YEAR = year, MONTH = month,TYPE = file, MED = end_day, FCODE = file_code)
             local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}_{file}"
@@ -654,8 +644,9 @@ class VIIRS_NTL(Dataset):
                     src.raise_for_status()
                     with open(local_filename, "wb") as dst:
                         dst.write(src.content)
-            except:
+            except Exception as e:
                 logger.info(f"Failed to download: {str(download_dest)}")
+                raise e
             else:
                 logger.info(f"Downloaded {str(local_filename)}")
 
