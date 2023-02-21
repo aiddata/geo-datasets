@@ -4,10 +4,7 @@
 import os
 import sys
 from pathlib import Path
-from datetime import datetime
-from urllib import request, parse
 from configparser import ConfigParser
-from typing import List
 import requests
 import json
 
@@ -38,6 +35,7 @@ class VIIRS_NTL(Dataset):
         # test connection
         test_request = requests.get("https://eogdata.mines.edu/nighttime_light/", verify=True)
         test_request.raise_for_status()
+
     
     def get_token(self):
         """
@@ -424,24 +422,26 @@ class VIIRS_NTL(Dataset):
                     end_day = 28
             else:
                 end_day = 30
+            
+            
 
             download_dest = download_url.format(YEAR = year, MONTH = month,TYPE = file, MED = end_day, FCODE = file_code)
             local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}_{file}"
         
         if local_filename.exists() and not self.overwrite_download:
             logger.info(f"Download Exists: {local_filename}")
-        # else:
-        #     try:
-        #         with requests.get(download_dest, headers=headers, stream=True) as src:
-        #             # raise an exception (fail this task) if HTTP response indicates that an error occured
-        #             src.raise_for_status()
-        #             with open(local_filename, "wb") as dst:
-        #                 dst.write(src.content)
-        #     except Exception as e:
-        #         logger.info(f"Failed to download: {str(download_dest)}")
-        #         raise e
-        #     else:
-        #         logger.info(f"Downloaded {str(local_filename)}")
+        else:
+            try:
+                with requests.get(download_dest, headers=headers, stream=True) as src:
+                    # raise an exception (fail this task) if HTTP response indicates that an error occured
+                    src.raise_for_status()
+                    with open(local_filename, "wb") as dst:
+                        dst.write(src.content)
+            except Exception as e:
+                logger.info(f"Failed to download: {str(download_dest)}")
+                raise e
+            else:
+                logger.info(f"Downloaded {str(local_filename)}")
 
         return (download_dest, local_filename)
 
