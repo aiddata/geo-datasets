@@ -17,7 +17,8 @@ podman build --tag geodata-container .
 
    The cri-o container runtime is only necessary [if you like using podman-env](https://minikube.sigs.k8s.io/docs/handbook/pushing/#comparison-table-for-different-methods) (as we do in steps 4 and 5 below)
    ```shell
-   minikube start --container-runtime=cri-o
+   minikube config set container-runtime crio
+   minikube start
    ```
 
 2. Create the namespace "geodata" if it doesn't already exist
