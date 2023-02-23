@@ -87,6 +87,11 @@ podman build --tag geodata-container .
    kubectl describe deployment prefect-agent
    ```
 
+## Create kubernetes-job infrastructure block in Prefect
+```shell
+python create-k8s-job-block.py
+```
+
 ## Using minikube
 
 - Pausing minikube
