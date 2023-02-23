@@ -41,6 +41,8 @@ def gen_docs():
             doc["spec"]["template"]["spec"]["containers"][0]["volumeMounts"] = volume_mounts_injection
             # inject volumes
             doc["spec"]["template"]["spec"]["volumes"] = volume_injection
+            # inject serviceaccount
+            doc["spec"]["template"]["spec"]["serviceAccountName"] = "geodata-launcher"
         yield doc
 
 # write generated YAML to stdout

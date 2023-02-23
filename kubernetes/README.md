@@ -66,7 +66,14 @@ podman build --tag geodata-container .
    kubectl apply -f pvc.yaml
    ```
 
-3. Now it's time to deploy our container
+3. Pods running within Kubernetes can be assigned Service Accounts, which can then be given role-based access to other resources in the cluster.
+   Prefect agent pods need a variety of permissions in order to launch and monitor jobs for each deployment run.
+   `serviceaccount.yaml` includes definitions for a Service Account, and a few Roles and Role Bindings for it.
+   ```shell
+   kubectl apply -f serviceaccount.yaml
+   ```
+
+4. Now it's time to deploy our container
    ```shell
    conda activate geodata38
    # review generate_manifest.py and change any necessary variables
