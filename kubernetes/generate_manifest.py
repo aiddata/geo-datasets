@@ -24,23 +24,12 @@ template = Template(
     ).read_text()
 )
 
-# fill out template from Prefect with our values
-manifest = template.substitute(manifest_vars)
-
-volume_mounts_injection = [{"mountPath": "/sciclone", "name": "sciclone"}]
-
-volume_injection = [{"name": "sciclone", "persistentVolumeClaim": {"claimName": "pvc0001"}}]
-
 # generator that injects our custom config into YAMLs
 def gen_docs():
     # for each YAML document in Prefect's template
     for doc in yaml.load_all(manifest, Loader=yaml.FullLoader):
         # if it's the deployment document, we're going to inject some stuff
         if doc["kind"] == "Deployment":
-            # inject volumeMounts
-            doc["spec"]["template"]["spec"]["containers"][0]["volumeMounts"] = volume_mounts_injection
-            # inject volumes
-            doc["spec"]["template"]["spec"]["volumes"] = volume_injection
             # inject serviceaccount
             doc["spec"]["template"]["spec"]["serviceAccountName"] = "geodata-launcher"
         yield doc
