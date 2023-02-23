@@ -2,7 +2,7 @@ FROM prefecthq/prefect:2.7.3-python3.8
 
 # install gdal
 RUN apt-get update
-RUN apt-get install -y gdal-bin libgdal-dev
+RUN apt-get install -y gdal-bin libgdal-dev openssh-client
 
 # install python packages
 COPY requirements.txt requirements.txt
