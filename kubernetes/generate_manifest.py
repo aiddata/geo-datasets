@@ -24,6 +24,10 @@ template = Template(
     ).read_text()
 )
 
+
+# fill out template from Prefect with our values
+manifest = template.substitute(manifest_vars)
+
 # generator that injects our custom config into YAMLs
 def gen_docs():
     # for each YAML document in Prefect's template
