@@ -2,21 +2,15 @@
 
 In this document I use `podman`, but `docker` should work similarly
 
-## Building Image
-
-Do this if you'd like to develop the image itself, have a copy of it, and/or upload it to a registry.
-Instructions for building into minikube are described below in "Local development instructions".
-```
-cd container
-podman build --tag geodata-container .
-```
 
 ## Installing the helm chart
 
 If you're installing this on minikube for local development, skip down to "Local development instructions" instead.
 This section is for installing the helm chart for production needs, with an image already available from a registry somewhere.
 
-1. Edit `helm_chart/values.yaml` with your Prefect API info, and the location of the image.
+1. Edit `helm_chart/values.yaml` with your Prefect API info.
+
+   If you want to use your own image, follow the instructions in "Creating the image" section below to build the image yourself.
 
 2. Here is an example command for installing the helm chart with 
    ```shell
@@ -28,6 +22,7 @@ This section is for installing the helm chart for production needs, with an imag
    - `geodata-release` is the name of the release (basically, installed instance of this chart)
    - `./helm_chart` points helm to the directory where the chart lives
 
+
 ## Building helm chart
 
 This isn't necessary unless you want to update the agent deployment manifest using Prefect's template.
@@ -38,7 +33,36 @@ cd helm_chart
 make
 ```
 
+
+## Creating the image
+Follow these instructions if you'd like to develop the image itself, have a copy of it, and/or upload it to a registry.
+If you just want to get going, skip this section and use [jacobwhall/geodata-container](https://hub.docker.com/repository/docker/jacobwhall/geodata-container) as your image.
+
+### Building the image
+
+Instructions for building into minikube are described below in "Local development instructions"
+```shell
+cd container
+podman build --tag geodata-container .
+```
+
+### Pushing the image to Docker Hub
+
+1. Log in to docker in podman
+   ```shell
+   podman login docker.io
+   ```
+   It will prompt you for your username and password
+
+2. Push image to docker
+   ```shell
+   podman push geodata-container docker.io/your-username/geodata-container:latest
+   ```
+
+
 ## Local development instructions (using minikube)
+
+### Quickstart
 
 1. Install minikube and install helm if you haven't already.
 
@@ -50,23 +74,6 @@ make
    minikube start
    ```
 
-3. Set up podman to access minikube
-   ```shell
-   eval $(minikube podman-env)
-   ```
-   Note that this just `export`s some environment variables, so you'll have to re-run this each time you open a new terminal session
-
-4. Build container into minikube, this makes it available to the deployment we're about to make
-   ```shell
-   podman --remote build -t geodata-container .
-   ```
-
-5. Check that the image made it into minikube
-   ```shell
-   minikube image ls
-   ```
-   In the list, you'll hopefully see `localhost/geodata-container:latest`
-
 6. Adjust the values in `helm_chart/values.yaml` to meet your needs.
    In particular, make sure to set the correct URL and key to access the Prefect API.
 
@@ -77,6 +84,28 @@ make
    See "Installing the helm chart" above for more info about what this command does.
 
 That's it! You now have everything up and running in your minikube cluster.
+
+### Custom local images in minikube
+
+If you'd rather not use an external image registry (for rapid development, for example), here are instructions for building images directly from podman into minikube.
+
+1. Set up podman to access minikube
+   ```shell
+   eval $(minikube podman-env)
+   ```
+   Note that this just `export`s some environment variables, so you'll have to re-run this each time you open a new terminal session
+
+2. Build container into minikube, this makes it available to the deployment we're about to make
+   ```shell
+   podman --remote build -t geodata-container .
+   ```
+
+3. Check that the image made it into minikube
+   ```shell
+   minikube image ls
+   ```
+   In the list, you'll hopefully see `localhost/geodata-container:latest`
+   You can use that as the name of your image in the helm `values.yaml`.
 
 
 ## Peeking inside the cluster
@@ -136,6 +165,7 @@ Here's how you use it:
 conda activate geodata38
 python utilities/create-k8s-job-block.py
 ```
+
 
 ## Useful minikube commands
 

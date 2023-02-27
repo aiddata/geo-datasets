@@ -1,5 +1,5 @@
 namespace: "geodata"
-container: "localhost/geodata-container"
+container: "jacobwhall/geodata-container"
 persistentVolumeName: "sciclone"
 volumeInternalMountpoint: "/sciclone"
 prefect:
