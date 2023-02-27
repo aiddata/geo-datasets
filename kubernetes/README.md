@@ -1,9 +1,11 @@
-# A prototype container for geo-datasets
+# Tools for running [geo-datasets](https://github.com/aiddata/geo-datasets) in Kubernetes
 
 In this document I use `podman`, but `docker` should work similarly
 
 
-## Installing the helm chart
+## The helm chart
+
+### Installation
 
 If you're installing this on minikube for local development, skip down to "Local development instructions" instead.
 This section is for installing the helm chart for production needs, with an image already available from a registry somewhere.
@@ -23,7 +25,7 @@ This section is for installing the helm chart for production needs, with an imag
    - `./helm_chart` points helm to the directory where the chart lives
 
 
-## Building helm chart
+### Building
 
 This isn't necessary unless you want to update the agent deployment manifest using Prefect's template.
 Otherwise, don't worry about it. It's all ready to go.
@@ -31,6 +33,12 @@ Otherwise, don't worry about it. It's all ready to go.
 pip install prefect
 cd helm_chart
 make
+```
+
+It's a good idea to lint your chart before use.
+```shell
+# adjust path depending on your current directory
+helm lint .
 ```
 
 
