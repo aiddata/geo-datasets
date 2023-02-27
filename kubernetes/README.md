@@ -68,8 +68,9 @@ podman build --tag geodata-container .
 
 2. Start minikube, a local Kubernetes cluster to test everything
 
-   The cri-o container runtime is only necessary [if you like using podman-env](https://minikube.sigs.k8s.io/docs/handbook/pushing/#comparison-table-for-different-methods) (as we do in steps 4 and 5 below)
+   The cri-o container runtime is only necessary [if you plan to use podman-env](https://minikube.sigs.k8s.io/docs/handbook/pushing/#comparison-table-for-different-methods), as described in "Custom local images in minikube" below.
    ```shell
+   # this is unnecessary unless you are developing local images
    minikube config set container-runtime crio
    minikube start
    ```
