@@ -41,6 +41,18 @@ It's a good idea to lint your chart before use.
 helm lint .
 ```
 
+### Upgrading
+
+If you have a previous release (helm lingo for an installation), you can "upgrade" it in-place with an updated chart.
+This is useful for developing the chart.
+```shell
+# list helm releases to get the name of the one you want to upgrade
+helm list
+# change "geodata-release" to be the correct release name
+helm upgrade geodata-release ./helm_chart
+```
+If the output includes the phrase, "Happy Helming!" you're in the clear :smile:
+
 
 ## Creating the image
 Follow these instructions if you'd like to develop the image itself, have a copy of it, and/or upload it to a registry.
