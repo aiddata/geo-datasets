@@ -6,7 +6,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: geodata
+  namespace: {{.Values.namespace}}
   name: agent-create
 rules:
 - apiGroups: ["batch"]
@@ -16,7 +16,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: geodata
+  namespace: {{.Values.namespace}}
   name: agent-watch
 rules:
 - apiGroups: [""]
@@ -27,11 +27,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: watch-pods
-  namespace: geodata
+  namespace: {{.Values.namespace}}
 subjects:
 - kind: ServiceAccount
   name: geodata-launcher
-  namespace: geodata
+  namespace: {{.Values.namespace}}
 roleRef:
   kind: Role
   name: agent-watch
@@ -40,11 +40,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: launch-jobs
-  namespace: geodata
+  namespace: {{.Values.namespace}}
 subjects:
 - kind: ServiceAccount
   name: geodata-launcher
-  namespace: geodata
+  namespace: {{.Values.namespace}}
 roleRef:
   kind: Role
   name: agent-create
@@ -67,7 +67,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: geodata-launcher
-  namespace: geodata
+  namespace: {{.Values.namespace}}
 roleRef:
   kind: Role
   name: agent-system

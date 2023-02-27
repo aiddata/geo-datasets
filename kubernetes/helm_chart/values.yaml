@@ -1,0 +1,8 @@
+namespace: "geodata"
+container: "localhost/geodata-container"
+persistentVolumeName: "sciclone"
+volumeInternalMountpoint: "/sciclone"
+prefect:
+  apiURL: "YOUR_URL_HERE"
+  apiKey: "YOUR_API_KEY_HERE"
+  workQueue: "geodata"

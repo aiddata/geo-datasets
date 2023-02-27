@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: prefect-agent
+  name: prefect-agent
+  namespace: {{.Values.namespace}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prefect-agent
+  template:
+    metadata:
+      labels:
+        app: prefect-agent
+    spec:
+      containers:
+      - command:
+        - prefect
+        - agent
+        - start
+        - -q
+        - {{.Values.prefect.workQueue}}
+        env:
+        - name: PREFECT_API_URL
+          value: {{.Values.prefect.apiURL}}
+        - name: PREFECT_API_KEY
+          value: {{.Values.prefect.apiKey}}
+        image: {{.Values.container}}
+        imagePullPolicy: IfNotPresent
+        name: agent
+      serviceAccountName: geodata-launcher
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prefect-agent
+  namespace: {{.Values.namespace}}
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  - pods/log
+  - pods/status
+  verbs:
+  - get
+  - watch
+  - list
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prefect-agent-role-binding
+  namespace: {{.Values.namespace}}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prefect-agent
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: {{.Values.namespace}}
+

@@ -2,31 +2,19 @@ import sys
 from string import Template
 
 import yaml
-
 import prefect
-from prefect.settings import (
-    PREFECT_API_KEY,
-    PREFECT_API_URL,
-)
 
 manifest_vars = {
-    "api_url": PREFECT_API_URL.value(),
-    "api_key": PREFECT_API_KEY.value(),
-    "image_name": "localhost/geodata-container",
-    "namespace": "geodata",
-    "work_queue": "geodata",
+    "namespace": "{{.Values.namespace}}",
+    "image_name": "{{.Values.container}}",
+    "api_url": "{{.Values.prefect.apiURL}}",
+    "api_key": "{{.Values.prefect.apiKey}}",
+    "work_queue": "{{.Values.prefect.workQueue}}",
 }
 
-# retrieve deployment manifest template from Prefect
-template = Template(
-    (
+manifest = (
         prefect.__module_path__ / "cli" / "templates" / "kubernetes-agent.yaml"
     ).read_text()
-)
-
-
-# fill out template from Prefect with our values
-manifest = template.substitute(manifest_vars)
 
 # generator that injects our custom config into YAMLs
 def gen_docs():
@@ -38,5 +26,10 @@ def gen_docs():
             doc["spec"]["template"]["spec"]["serviceAccountName"] = "geodata-launcher"
         yield doc
 
-# write generated YAML to stdout
-yaml.dump_all(gen_docs(), sys.stdout)
+# retrieve deployment manifest template from Prefect
+template = Template(
+    yaml.dump_all(gen_docs())
+)
+
+# fill out template from Prefect with our values
+print(template.substitute(manifest_vars))
