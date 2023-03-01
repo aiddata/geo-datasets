@@ -1,5 +1,5 @@
 namespace: "geodata"
-container: "jacobwhall/geodata-container"
+agent_container: "prefecthq/prefect:2.7.3-python3.8"
 
 prefect:
   apiURL: "https://api.prefect.cloud/api/accounts/fc66a61a-778f-4c1b-9bef-1c11e5eea98a/workspaces/aeb7021b-a2aa-4c1c-9bab-91980697cdc1"

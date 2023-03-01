@@ -6,7 +6,7 @@ import prefect
 
 manifest_vars = {
     "namespace": "{{.Values.namespace}}",
-    "image_name": "{{.Values.container}}",
+    "image_name": "{{.Values.agent_container}}",
     "api_url": "{{.Values.prefect.apiURL}}",
     "api_key": "{{.Values.prefect.apiKey}}",
     "work_queue": "{{.Values.prefect.workQueue}}",
