@@ -18,7 +18,7 @@ class VIIRS_NTL(Dataset):
 
     name = "VIIRS_NTL"
 
-    def __init__(self, raw_dir, output_dir, annual_files, monthly_files, months, years, username, password, client_secret, annual=True, overwrite_download=False, overwrite_extract=False, overwrite_processing=False ):
+    def __init__(self, raw_dir, output_dir, annual_files, monthly_files, months, years, username, password, client_secret, max_retries, annual=True, overwrite_download=False, overwrite_extract=False, overwrite_processing=False):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
         self.annual_files = annual_files
@@ -28,6 +28,7 @@ class VIIRS_NTL(Dataset):
         self.username = username
         self.password = password
         self.client_secret = client_secret
+        self.max_retries = max_retries
         self.annual = annual
         self.overwrite_download = overwrite_download
         self.overwrite_extract = overwrite_extract
@@ -96,35 +97,43 @@ class VIIRS_NTL(Dataset):
 
         else:
             # consider: make separate directories for each year's monthly data
-            if (year == 2012) | (year == 2013):
-                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmcfg/"
-            elif (year == 2022) & (month == 8):
-                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/NOAA-20/vcmslcfg/"
+            if (year == 2022) & (month == 8):
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/NOAA-20/vcmcfg/"
             else:
-                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmslcfg/"
+                download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmcfg/"
             
             if month < 10:
                 # file directory formatting
                 month = "0" + str(month)
-
-            download_url = download_url.format(YEAR = year, MONTH = month)
-
-            session = requests.Session()
-            r = session.get(download_url, headers={'User-Agent': 'Mozilla/5.0'})
-            soup = BeautifulSoup(r.content, 'html.parser')
-
-            items = soup.find_all("tr", {"class": "odd"})
-            link_list = []
-
-            for i in items:
-                link = str(i.findChild("a")['href'])
-                link_list.append(link)
             
-            file_type = file + ".tif.gz"
-            file_code = ""
-            for link in link_list:
-                if file_type in link:
-                    file_code = link
+            download_url = download_url.format(YEAR = year, MONTH = month)
+            
+            attempts = 1
+            while attempts <= self.max_retries:
+                try:
+                    session = requests.Session()
+                    r = session.get(download_url, headers={'User-Agent': 'Mozilla/5.0'})
+                    soup = BeautifulSoup(r.content, 'html.parser')
+
+                    items = soup.find_all("tr", {"class": "odd"})
+                    link_list = []
+
+                    for i in items:
+                        link = str(i.findChild("a")['href'])
+                        link_list.append(link)
+                    
+                    file_type = file + ".tif.gz"
+                    file_code = ""
+                    for link in link_list:
+                        if file_type in link:
+                            file_code = link
+                except Exception as e:
+                    attempts += 1
+                    if attempts > self.max_retries:
+                        raise e
+                else:
+                    logger.info(f"Retrieved: {file_code}")
+                    break
                 
             if len(file_code) == 0:
                 logger.info("Download option does not exist yet: " + str(year) + "/" + str(month) + "/ " + file)
@@ -187,6 +196,7 @@ def get_config_dict(config_file="config.ini"):
             "overwrite_download": config["main"].getboolean("overwrite_download"),
             "overwrite_extract": config["main"].getboolean("overwrite_extract"),
             "overwrite_processing": config["main"].getboolean("overwrite_processing"),
+            "max_retries": config["main"].getint("max_retries"),
 
             "username" : config["download"]["username"],
             "password" : config["download"]["password"],
@@ -202,6 +212,6 @@ def get_config_dict(config_file="config.ini"):
 if __name__ == "__main__":
     config_dict = get_config_dict()
 
-    class_instance = VIIRS_NTL(config_dict["raw_dir"], config_dict["output_dir"], config_dict["annual_files"], config_dict["monthly_files"], config_dict["months"], config_dict["years"], config_dict["username"], config_dict["password"], config_dict["client_secret"], config_dict["annual"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_processing"])
+    class_instance = VIIRS_NTL(config_dict["raw_dir"], config_dict["output_dir"], config_dict["annual_files"], config_dict["monthly_files"], config_dict["months"], config_dict["years"], config_dict["username"], config_dict["password"], config_dict["client_secret"], config_dict["max_retries"], config_dict["annual"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
