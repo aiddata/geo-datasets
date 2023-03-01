@@ -1,8 +1,7 @@
 namespace: "geodata"
 container: "jacobwhall/geodata-container"
-persistentVolumeName: "sciclone"
-volumeInternalMountpoint: "/sciclone"
+
 prefect:
-  apiURL: "YOUR_URL_HERE"
-  apiKey: "YOUR_API_KEY_HERE"
+  apiURL: "https://api.prefect.cloud/api/accounts/fc66a61a-778f-4c1b-9bef-1c11e5eea98a/workspaces/aeb7021b-a2aa-4c1c-9bab-91980697cdc1"
+  apiKey: "pnu_R67DsWXz2MyuEBRHYfaPfd9sbRHYtO15V57D"
   workQueue: "geodata"
