@@ -15,6 +15,11 @@ cpu_limit: int = 5
 memory_request: int = 1
 memory_limit: int = 3
 
+# whether or not to use volume
+use_volume = False
+
+
+
 # patches
 
 json_patches = []
@@ -40,23 +45,24 @@ if requests_and_limits:
         ]
     )
 
-# add volume
-json_patches.extend(
-    [
-        {
-            "op": "add",
-            "path": "/spec/template/spec/volumes",
-            "value": [
-                {"name": "sciclone", "persistentVolumeClaim": {"claimName": "pvc0001"}}
-            ],
-        },
-        {
-            "op": "add",
-            "path": "/spec/template/spec/containers/0/volumeMounts",
-            "value": [{"mountPath": "/sciclone", "name": "sciclone"}],
-        },
-    ]
-)
+if use_volume:
+    # add volume
+    json_patches.extend(
+        [
+            {
+                "op": "add",
+                "path": "/spec/template/spec/volumes",
+                "value": [
+                    {"name": "sciclone", "persistentVolumeClaim": {"claimName": "pvc0001"}}
+                ],
+            },
+            {
+                "op": "add",
+                "path": "/spec/template/spec/containers/0/volumeMounts",
+                "value": [{"mountPath": "/sciclone", "name": "sciclone"}],
+            },
+        ]
+    )
 
 k8s_job = KubernetesJob(
     name="dataset-run",
