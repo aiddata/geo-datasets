@@ -106,9 +106,9 @@ This is a brief tutorial for viewing the resources inside Kubernetes using `kube
 
 1. Set "geodata" as our default namespace using `kubectl`.
    If you decided to use a different namespace when running `helm install` above, adjust this command accordingly.
-  ```shell
-  kubectl config set-context --current --namespace=geodata
-  ```
+   ```shell
+   kubectl config set-context --current --namespace=geodata
+   ```
 
 2. The primary resource of interest that always runs is called "prefect-agent".
    It is a deployment that always keeps a container alive running Prefect agent.
@@ -123,11 +123,11 @@ This is a brief tutorial for viewing the resources inside Kubernetes using `kube
    kubectl describe deployment prefect-agent
    ```
 
-4. In the description from step 3, read the bottom few lines.
+4. In the command output from the last step, read the bottom few lines.
    You should see info about a replica set that Kubernetes has created for this deployment.
-   A replica set can hold many identical pods so that there is always one available, even if one dies.
-   However, in our situation the replica set only has one replica (pod) in it.
-   You can see the list of pods in the replica set by describing it:
+   A replica set can hold many identical pods, so that there is always more than one available at any given time.
+   However, in our situation the replica set only has one "replica" (pod) in it.
+   You can see the list of pods in the replica set by describing the replica set:
    ```shell
    # adjust the name of the replica set to match yours
    kubectl describe replicaset prefect-agent-58f85d6c6
@@ -138,7 +138,7 @@ This is a brief tutorial for viewing the resources inside Kubernetes using `kube
    kubectl get pods
    ```
    You should see a list of pods that includes one that starts with "prefect-agent-".
-   When deployments are run, new pods will appear to run each job, which were created by the prefect-agent pod.
+   When deployments are run, new pods are created by the prefect-agent pod.
 
 6. To see the logs (output) of a pod, use this command:
    ```shell

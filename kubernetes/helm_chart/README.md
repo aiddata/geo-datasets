@@ -2,21 +2,26 @@
 
 ## Installation
 
-If you're installing this on minikube for local development, skip down to "Local development instructions" instead.
+If you're installing this helm chart on a local cluster, see `dev.md` in the parent directory for instructions.
 This section is for installing the helm chart for production needs, with an image already available from a registry somewhere.
 
-1. Edit `helm_chart/values.yaml` with your Prefect API info.
+1. Edit `values.yaml` with your Prefect API info.
 
-   If you want to use your own image, follow the instructions in "Creating the image" section below to build the image yourself.
+   The image set in `values.yaml` is only for the Prefect Agent.
+   If you'd like to set which image runs the Prefect run, you must edit the appropriate Prefect infrastructure block.
+   Instructions for doing so are in `../utilities/README.md`
 
-2. Here is an example command for installing the helm chart with 
+   If you want to build your own image, follow the instructions in "Creating the image" section below to build the image yourself.
+
+2. Here is an example command for installing the helm chart from the parent directory.
+   Please review it carefully before running!
    ```shell
    cd geodata-container
    helm install --create-namespace --namespace geodata geodata-release ./helm_chart
    ```
-   - `--create-namespace` tells helm to create the namespace if it doesn't already exist
-   - `--namespace geodata` sets the name of the namespace to use
-   - `geodata-release` is the name of the release (basically, installed instance of this chart)
+   - `--namespace geodata` sets which namespace to install the chart in
+   - `--create-namespace` tells helm to create the namespace if it doesn't already exist. If the namespace already exists, helm will likely throw an error.
+   - `geodata-release` is the name of the release (installed instance of this chart). You will use this name to upgrade or uninstall this release in the future.
    - `./helm_chart` points helm to the directory where the chart lives
 
 

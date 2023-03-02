@@ -5,7 +5,7 @@ It uses images from prefect, and adds the dependencies required to run most data
 
 ## Building the image
 
-Follow these instructions if you'd like to develop the image itself, have a copy of it, and/or upload it to a registry.
+Run these commands if you'd like to develop the image itself, have a copy of it, and/or upload it to a registry.
 If you just want to get going, use [jacobwhall/geodata-container](https://hub.docker.com/repository/docker/jacobwhall/geodata-container) as your image.
 
 ```shell
