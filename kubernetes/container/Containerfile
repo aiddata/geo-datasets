@@ -6,7 +6,7 @@ RUN apt-get install -y --no-install-recommends gdal-bin libgdal-dev openssh-clie
 
 # install python packages
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt --no-binary rasterio
+RUN pip install -r requirements.txt --no-cache-dir --no-binary rasterio
 
 # run prefect agent
 CMD ["prefect", "agent", "start", "-q", "geodata"]
