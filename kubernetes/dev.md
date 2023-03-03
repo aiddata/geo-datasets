@@ -15,7 +15,7 @@
 6. Install the helm chart into the local cluster.
    If there is already a namespace called "geodata", remove `--create-namespace`
    ```shell
-   helm install --create-namespace --namespace geodata geodata-release ./helm_chart
+   helm install --create-namespace --namespace geodata geodata-release ./helm_chart -f values.yaml
    ```
    See "Installing the helm chart" above for more info about what this command does.
 
