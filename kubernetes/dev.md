@@ -8,8 +8,8 @@
 3. [Install podman](https://podman.io/getting-started/installation)
 4. Follow steps for setting up local cluster using kind or minikube below
 5. Set helm `values.yaml`
-   - Copy `helm_chart/values_template.yaml` to `helm_chart/values.yaml`
-   - Adjust the values in `helm_chart/values.yaml` to meet your needs.
+   - In the root of repo, copy `values_template.yaml` to `values.yaml`
+   - Adjust the values in `values.yaml` to meet your needs.
       - In particular, make sure to set the correct URL and key to access the Prefect API. (You can get these by running `prefect config view` within your Prefect environment)
 
 6. Install the helm chart into the local cluster.
