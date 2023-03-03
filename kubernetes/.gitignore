@@ -1,2 +1,5 @@
 __pycache__
 values.yaml
+get_helm.sh
+kubectl
+kubectl.sha256
