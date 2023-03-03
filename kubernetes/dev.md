@@ -1,8 +1,26 @@
 # Local development instructions
 
 **The instructions in this document require you to install kubectl and helm. Please do that first!**
+## General Steps
 
-## Using kind
+1. [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+2. [Install helm](https://helm.sh/docs/intro/install/)
+3. [Install podman](https://podman.io/getting-started/installation)
+4. Follow steps for setting up local cluster using kind or minikube below
+5. Set helm `values.yaml`
+   - Copy `helm_chart/values_template.yaml` to `helm_chart/values.yaml`
+   - Adjust the values in `helm_chart/values.yaml` to meet your needs.
+      - In particular, make sure to set the correct URL and key to access the Prefect API. (You can get these by running `prefect config view` within your Prefect environment)
+
+6. Install the helm chart into the local cluster.
+   If there is already a namespace called "geodata", remove `--create-namespace`
+   ```shell
+   helm install --create-namespace --namespace geodata geodata-release ./helm_chart
+   ```
+   See "Installing the helm chart" above for more info about what this command does.
+
+
+## Setup local cluster using kind
 
 [kind](https://kind.sigs.k8s.io/) is cool because it runs a Kubernetes cluster all in containers.
 
@@ -15,21 +33,13 @@
    # the env variable tells kind to use podman instead of docker
    KIND_EXPERIMENTAL_PROVIDER=podman kind create cluster
    ```
+   - You may need to set kind to run with rootless. [See instructions](https://kind.sigs.k8s.io/docs/user/rootless/)
 
-3. Adjust the values in `helm_chart/values.yaml` to meet your needs.
-   In particular, make sure to set the correct URL and key to access the Prefect API.
-
-4. Install the helm chart into the minikube cluster.
-   If there is already a namespace called "geodata", remove `--create-namespace`
-   ```shell
-   helm install --create-namespace --namespace geodata geodata-release ./helm_chart
-   ```
-   See "Installing the helm chart" above for more info about what this command does.
 
 That's it! You now have everything up and running in your minikube cluster.
 See the "Peeking inside the cluster" section below for what to do next.
 
-## Using minikube
+## Setup local cluster using minikube
 
 [minikube](https://minikube.sigs.k8s.io) is cool because it runs a local Kubernetes cluster in VMs.
 
@@ -46,18 +56,6 @@ See the "Peeking inside the cluster" section below for what to do next.
    minikube start
    ```
 
-6. Adjust the values in `helm_chart/values.yaml` to meet your needs.
-   In particular, make sure to set the correct URL and key to access the Prefect API.
-
-7. Install the helm chart into the minikube cluster.
-   If there is already a namespace called "geodata", remove `--create-namespace`
-   ```shell
-   helm install --create-namespace --namespace geodata geodata-release ./helm_chart
-   ```
-   See "Installing the helm chart" above for more info about what this command does.
-
-That's it! You now have everything up and running in your minikube cluster.
-See the "Peeking inside the cluster" section below for what to do next.
 
 ### Custom local images in minikube
 
