@@ -2,4 +2,4 @@ __pycache__
 get_helm.sh
 kubectl
 kubectl.sha256
-./values.yaml
+/values.yaml
