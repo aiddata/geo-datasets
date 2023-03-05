@@ -7,6 +7,8 @@ from pathlib import Path
 from configparser import ConfigParser
 import requests
 import json
+import gzip
+import shutil
 
 from bs4 import BeautifulSoup
 
@@ -130,7 +132,7 @@ class VIIRS_NTL(Dataset):
                 except Exception as e:
                     attempts += 1
                     if attempts > self.max_retries:
-                        raise e
+                        raise Exception(str(e) + f": Failed to download: {str(download_dest)}" )
                 else:
                     logger.info(f"Retrieved: {file_code}")
                     break
@@ -153,11 +155,36 @@ class VIIRS_NTL(Dataset):
                         dst.write(src.content)
             except Exception as e:
                 logger.info(f"Failed to download: {str(download_dest)}")
-                raise e
+                raise Exception(str(e) + f": Failed to download: {str(download_dest)}" )
             else:
                 logger.info(f"Downloaded {str(local_filename)}")
 
         return (download_dest, local_filename)
+    
+    def extract_files(self, year, file, month=None):
+        """
+        Extract individual file
+        """
+        logger = self.get_logger()
+        if self.annual:
+            raw_local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
+            output_filename = self.output_dir / f"raw_extracted_viirs_ntl_{year}_{file}.tif.gz"
+        else:
+            raw_local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}_{file}"
+            output_filename = self.output_dir / f"raw_extracted_viirs_ntl_{year}_{month}_{file}"
+        if output_filename.exists() and not self.overwrite_extract:
+            logger.info(f"Extracted File Exists: {output_filename}")
+            return (raw_local_filename, output_filename)
+        else:
+            try:
+                with gzip.open(raw_local_filename, 'rb') as f_in:
+                    with open(output_filename, 'wb') as f_out:
+                        shutil.copyfileobj(f_in, f_out)
+                return (raw_local_filename, output_filename)
+            except Exception as e:
+                logger.info(f"Failed to extract: {str(raw_local_filename)}")
+                raise Exception(str(e) + ": " f"Failed to extract: {str(raw_local_filename)}")
+
 
         
 
@@ -168,9 +195,6 @@ class VIIRS_NTL(Dataset):
         self.test_connection()
 
         os.makedirs(self.raw_dir, exist_ok=True)
-
-        # add iterative loop to prep tuple for imput parameter
-
         logger.info("Running data download")
         if self.annual:
             download = self.run_tasks(self.manage_download, [[y, f] for y in self.years for f in self.annual_files])
@@ -178,6 +202,13 @@ class VIIRS_NTL(Dataset):
             download = self.run_tasks(self.manage_download, [[y, f, m] for y in self.years for f in self.monthly_files for m in self.months])
         self.log_run(download)
 
+        os.makedirs(self.output_dir, exist_ok=True)
+        logger.info("Extracting raw files")
+        if self.annual:
+            extraction = self.run_tasks(self.extract_files, [[y, f] for y in self.years for f in self.annual_files])
+        else:
+            extraction = self.run_tasks(self.extract_files, [[y, f, m] for y in self.years for f in self.monthly_files for m in self.months])
+        self.log_run(extraction)
 
     
 def get_config_dict(config_file="config.ini"):
