@@ -78,20 +78,20 @@ class VIIRS_NTL(Dataset):
 
         if self.annual:
             if year == 2012:
-                if (type == "average_masked") | (type == "lit_mask") | (type =="median_masked"):
-                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}04-201303_global_vcmcfg_c20210121150000.{TYPE}.tif.gz"
+                if (file == "average_masked") | (file == "lit_mask") | (file =="median_masked"):
+                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}04-201303_global_vcmcfg_c202102150000.{TYPE}.tif.gz"
                 else:
-                    download_url = download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}04-201303_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
+                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}04-201303_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
             elif year == 2013:
-                if (type == "average_masked") | (type == "lit_mask") | (type =="median_masked"):
-                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c20210121150000.{TYPE}.tif.gz"
+                if (file == "average_masked") | (file == "lit_mask") | (file =="median_masked"):
+                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_cc202102150000..{TYPE}.tif.gz"
                 else:
                     download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
             elif year == 2021:
                 download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/2021/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202203152300.{TYPE}.tif.gz"
             else:
-                if (type == "average_masked") | (type == "lit_mask") | (type =="median_masked"):
-                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c20210121150000.{TYPE}.tif.gz"
+                if (file == "average_masked") | (file == "lit_mask") | (file == "median_masked"):
+                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202102150000.{TYPE}.tif.gz"
                 else:
                     download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202101211500.{TYPE}.tif.gz"
             download_dest = download_url.format(YEAR = year, TYPE = file)
