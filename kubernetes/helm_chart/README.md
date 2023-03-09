@@ -5,7 +5,12 @@
 If you're installing this helm chart on a local cluster, see `dev.md` in the parent directory for instructions.
 This section is for installing the helm chart for production needs, with an image already available from a registry somewhere.
 
-1. Edit `values.yaml` with your Prefect API info.
+1. Create a custom `values.yaml` with your Prefect API info.
+
+   The `values.yaml` file in this directory is meant to stay as-is.
+   To override values for your own installation, please create a copy of `values.yaml` with your own settings.
+   A template, `/values_template.yaml`, is provided in the root directory of this repository.
+   For more information about value overrides, please see [the helm docs](https://helm.sh/docs/chart_template_guide/values_files/).
 
    The image set in `values.yaml` is only for the Prefect Agent.
    If you'd like to set which image runs the Prefect run, you must edit the appropriate Prefect infrastructure block.
@@ -17,10 +22,11 @@ This section is for installing the helm chart for production needs, with an imag
    Please review it carefully before running!
    ```shell
    cd geodata-container
-   helm install --create-namespace --namespace geodata geodata-release ./helm_chart
+   helm install --create-namespace --namespace geodata --values my-values.yaml geodata-release ./helm_chart
    ```
    - `--namespace geodata` sets which namespace to install the chart in
    - `--create-namespace` tells helm to create the namespace if it doesn't already exist. If the namespace already exists, helm will likely throw an error.
+   - `--values my-values.yaml` loads in a custom values file to override defaults in the helm chart.
    - `geodata-release` is the name of the release (installed instance of this chart). You will use this name to upgrade or uninstall this release in the future.
    - `./helm_chart` points helm to the directory where the chart lives
 
