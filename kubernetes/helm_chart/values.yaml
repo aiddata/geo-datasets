@@ -5,3 +5,12 @@ prefect:
   apiURL: "[YOUR_API_URL]"
   apiKey: "[YOUR_API_KEY]"
   workQueue: "geodata"
+
+prod:
+  nfs:
+    address: 128.239.59.130
+    mountPath: /sciclone/nova/test
+
+dev:
+  enabled: false
+  localDir: /tmp/data/

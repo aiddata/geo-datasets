@@ -5,3 +5,7 @@ prefect:
   apiURL: "[YOUR_API_URL]"
   apiKey: "[YOUR_API_KEY]"
   workQueue: "geodata"
+
+dev:
+  enabled: false
+  localDir: /tmp/data/

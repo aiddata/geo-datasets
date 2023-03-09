@@ -1,7 +1,11 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
+  {{- if .Values.dev.enabled }}
+  name: local-geodata-dev-pv
+  {{- else }}
   name: nova-geodata-prod-pv
+  {{- end }}
 spec:
   capacity:
     storage: 100Gi
@@ -9,13 +13,19 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
+  {{- if .Values.dev.enabled }}
+  storageClassName: manual
+  hostPath:
+    path: {{ .Values.dev.localDir }}
+  {{- else }}
   storageClassName: nfs
   mountOptions:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /sciclone/nova/test
-    server: 128.239.59.130
+    path: {{ .Values.prod.nfs.mountPath }}
+    server: {{ .Values.prod.nfs.address }}
+  {{- end }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
