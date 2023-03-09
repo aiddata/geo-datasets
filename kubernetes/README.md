@@ -2,7 +2,7 @@
 
 ## Getting started
 
-Please see [`dev.md`](dev.md) for documentation on how to set up a local development environment and run these tools.
+Please see [`dev/README.md`](dev/README.md) for documentation on how to set up a local development environment and run these tools.
 
 
 ## Helm Chart
