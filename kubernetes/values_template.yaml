@@ -1,5 +1,5 @@
 namespace: "geodata"
-agent_container: "prefecthq/prefect:2.7.3-python3.8"
+agentContainer: "prefecthq/prefect:2.7.3-python3.8"
 
 prefect:
   apiURL: "[YOUR_API_URL]"
