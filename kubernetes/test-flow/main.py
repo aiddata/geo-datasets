@@ -23,6 +23,8 @@ def greet_everyone():
     names = ["Bob", "Carol", "Steve", "Jacob", "Julia"]
     for n in names:
         greet.submit(n)
+        with open(f'/sciclone/{n}.txt', 'w') as f:
+            f.write(n)
 
 if __name__ == "__main__":
     greet_everyone()

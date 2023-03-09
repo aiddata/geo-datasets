@@ -16,7 +16,7 @@ memory_request: int = 1
 memory_limit: int = 3
 
 # whether or not to use volume
-use_volume = False
+use_volume = True
 
 
 
@@ -53,7 +53,7 @@ if use_volume:
                 "op": "add",
                 "path": "/spec/template/spec/volumes",
                 "value": [
-                    {"name": "sciclone", "persistentVolumeClaim": {"claimName": "pvc0001"}}
+                    {"name": "sciclone", "persistentVolumeClaim": {"claimName": "nova-geodata-prod"}}
                 ],
             },
             {
