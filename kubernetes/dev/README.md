@@ -1,6 +1,5 @@
 # Local development instructions
 
-**The instructions in this document require you to install kubectl and helm. Please do that first!**
 ## General Steps
 
 1. [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
@@ -11,6 +10,7 @@
    - In the root of repo, copy `values_template.yaml` to `values.yaml`
    - Adjust the values in `values.yaml` to meet your needs.
       - In particular, make sure to set the correct URL and key to access the Prefect API. (You can get these by running `prefect config view` within your Prefect environment)
+      - For a local cluster, enable dev mode and set an appropriate data path
 
 6. Install the helm chart into the local cluster.
    If there is already a namespace called "geodata", remove `--create-namespace`
@@ -28,16 +28,20 @@
 
 1. [Install kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 
-2. Start your kind cluster
+2. Adjust location of local data directory in `kind-config.yaml`
+   - Change `./data` to your preferred location **for all worker nodes**.
+
+3. Start your kind cluster
    ```shell
+   cd dev
    # the env variable tells kind to use podman instead of docker
-   KIND_EXPERIMENTAL_PROVIDER=podman kind create cluster
+   KIND_EXPERIMENTAL_PROVIDER=podman kind create cluster --config kind-config.yaml
    ```
    - You may need to set kind to run with rootless. [See instructions](https://kind.sigs.k8s.io/docs/user/rootless/)
 
-
 That's it! You now have everything up and running in your minikube cluster.
 See the "Peeking inside the cluster" section below for what to do next.
+
 
 ## Setup local cluster using minikube
 

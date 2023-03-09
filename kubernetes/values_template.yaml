@@ -8,4 +8,5 @@ prefect:
 
 dev:
   enabled: false
+  # likely no need to change this. see info in /dev/README.md
   localDir: /tmp/data/
