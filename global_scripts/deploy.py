@@ -28,8 +28,9 @@ import sys
 from configparser import ConfigParser
 
 import click
-from prefect.deployments import Deployment
 from prefect.filesystems import GitHub
+from prefect.deployments import Deployment
+from prefect.infrastucture.kubernetes import KubernetesJob
 
 def flow_import(module_name, flow_name):
     module = __import__(module_name)
@@ -40,10 +41,15 @@ def flow_import(module_name, flow_name):
 @click.command()
 @click.argument("dataset", help="Shortname of dataset to deploy")
 @click.option("--kubernetes-job-block", default=None, help="Name of Kubernetes Job block to use")
-def deploy(dataset, kjb):
+def deploy(dataset, kubernetes_job_block):
+    # find dataset directory
     dataset_dir = dataset.strip("/")
     if dataset_dir not in os.listdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))):
         raise Exception("dataset directory provided not found in current directory")
+
+    # find Kubernetes Job Block, if one was specified
+    if kubernetes_job_block is not None:
+        kubernetes_job_block = KubernetesJob.load(kubernetes_job_block)
 
     # find and import the get_config_dict function for the dataset
     sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), dataset_dir))
@@ -78,6 +84,7 @@ def deploy(dataset, kjb):
     # # load a pre-defined block and specify a subfolder of repo
     storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
 
+    """
     # add CPU and RAM request and limit amounts
     infra_overrides = {
         "customizations": [
@@ -97,6 +104,7 @@ def deploy(dataset, kjb):
             }
         ]
     }
+    """
 
     # build deployment
     deployment = Deployment.build_from_flow(
@@ -107,6 +115,7 @@ def deploy(dataset, kjb):
         work_queue_name=config["deploy"]["work_queue"],
         storage=storage,
         path=block_repo_dir,
+        infrastructure=kubernetes_job_block,
         # skip_upload=True,
         parameters=get_config_dict(config_file),
         apply=True
