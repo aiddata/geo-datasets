@@ -23,80 +23,95 @@ prefect agent start -q 'work_queue_name'
 
 """
 
-import sys
 import os
+import sys
 from configparser import ConfigParser
 
+import click
 from prefect.deployments import Deployment
 from prefect.filesystems import GitHub
-
-
-
-if len(sys.argv) != 2:
-    raise Exception("deploy.py requires input defining which dataset directory to obtain the config.ini from")
-
-dataset_dir = sys.argv[1].strip("/")
-
-if dataset_dir not in os.listdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))):
-    raise Exception("dataset directory provided not found in current directory")
-
-
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), dataset_dir))
-
-from main import get_config_dict
-
-
-config_file = dataset_dir + "/config.ini"
-config = ConfigParser()
-config.read(config_file)
-
-
-# load flow
-module_name = config["deploy"]["flow_file_name"]
-flow_name = config["deploy"]["flow_name"]
-
-
-# create and load storage block
-
-block_name = config["deploy"]["storage_block"]
-block_repo = config["github"]["repo"]
-block_reference = config["github"]["branch"] # branch or tag
-block_repo_dir = config["github"]["directory"]
-
-block = GitHub(
-    repository=block_repo,
-    reference=block_reference,
-    #access_token=<my_access_token> # only required for private repos
-)
-# block.get_directory(block_repo_dir)
-block.save(block_name, overwrite=True)
-
-# -------------------------------------
 
 def flow_import(module_name, flow_name):
     module = __import__(module_name)
     import_flow = getattr(module, flow_name)
     return import_flow
 
-# Driver Code
-flow = flow_import(module_name, flow_name)
 
-# # load a pre-defined block and specify a subfolder of repo
-storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
+@click.command()
+@click.argument("dataset", help="Shortname of dataset to deploy")
+@click.option("--kubernetes-job-block", default=None, help="Name of Kubernetes Job block to use")
+def deploy(dataset, kjb):
+    dataset_dir = dataset.strip("/")
+    if dataset_dir not in os.listdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))):
+        raise Exception("dataset directory provided not found in current directory")
 
-# build deployment
-deployment = Deployment.build_from_flow(
-    flow=flow,
-    name=config["deploy"]["deployment_name"],
-    version=config["deploy"]["version"],
-    # work_queue_name="geo-datasets",
-    work_queue_name=config["deploy"]["work_queue"],
-    storage=storage,
-    path=block_repo_dir,
-    # skip_upload=True,
-    parameters=get_config_dict(config_file),
-    apply=True
-)
+    # find and import the get_config_dict function for the dataset
+    sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), dataset_dir))
+    from main import get_config_dict
 
-# alternative to apply deployment after creating build
-# deployment.apply()
+    # find and parse dataset config file
+    config_file = dataset_dir + "/config.ini"
+    config = ConfigParser()
+    config.read(config_file)
+
+    # load flow
+    module_name = config["deploy"]["flow_file_name"]
+    flow_name = config["deploy"]["flow_name"]
+
+    # create and load storage block
+    block_name = config["deploy"]["storage_block"]
+    block_repo = config["github"]["repo"]
+    block_reference = config["github"]["branch"] # branch or tag
+    block_repo_dir = config["github"]["directory"]
+
+    block = GitHub(
+        repository=block_repo,
+        reference=block_reference,
+        #access_token=<my_access_token> # only required for private repos
+    )
+    # block.get_directory(block_repo_dir)
+    block.save(block_name, overwrite=True)
+
+    # Driver Code
+    flow = flow_import(module_name, flow_name)
+
+    # # load a pre-defined block and specify a subfolder of repo
+    storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
+
+    # add CPU and RAM request and limit amounts
+    infra_overrides = {
+        "customizations": [
+            {
+                "op": "replace",
+                "path": "/spec/template/spec/containers/0/resources",
+                "value": {
+                    "limits": {
+                        "cpu": str(cpu_limit),
+                        "memory": str(memory_limit) + "Gi",
+                    },
+                    "requests": {
+                        "cpu": str(cpu_request),
+                        "memory": str(memory_request) + "Gi",
+                    },
+                },
+            }
+        ]
+    }
+
+    # build deployment
+    deployment = Deployment.build_from_flow(
+        flow=flow,
+        name=config["deploy"]["deployment_name"],
+        version=config["deploy"]["version"],
+        # work_queue_name="geo-datasets",
+        work_queue_name=config["deploy"]["work_queue"],
+        storage=storage,
+        path=block_repo_dir,
+        # skip_upload=True,
+        parameters=get_config_dict(config_file),
+        apply=True
+    )
+
+
+if __name__ == "__main__":
+    deploy()
