@@ -60,16 +60,18 @@ def deploy(dataset, kubernetes_job_block):
     config = ConfigParser()
     config.read(config_file)
 
-    # load flow
+    click.echo("Finding flow to deploy...")
     module_name = config["deploy"]["flow_file_name"]
     flow_name = config["deploy"]["flow_name"]
 
     # create and load storage block
+    click.echo("Loading storage block configuration...")
     block_name = config["deploy"]["storage_block"]
     block_repo = config["github"]["repo"]
     block_reference = config["github"]["branch"] # branch or tag
     block_repo_dir = config["github"]["directory"]
 
+    click.echo("Saving GitHub storage block to Prefect...")
     block = GitHub(
         repository=block_repo,
         reference=block_reference,
@@ -78,11 +80,12 @@ def deploy(dataset, kubernetes_job_block):
     # block.get_directory(block_repo_dir)
     block.save(block_name, overwrite=True)
 
-    # Driver Code
-    flow = flow_import(module_name, flow_name)
+    click.echo("Retrieving block from Prefect")
+    storage = GitHub.load(block_name)
 
-    # load a pre-defined block and specify a subfolder of repo
-    storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
+    # import flow from dataset folder
+    click.echo("Loading flow...")
+    flow = flow_import(module_name, flow_name)
 
     """
     # add CPU and RAM request and limit amounts
@@ -106,6 +109,7 @@ def deploy(dataset, kubernetes_job_block):
     }
     """
 
+    click.echo("Deciding deployment options...")
     deployment_options = {
         "flow": flow,
         "name": config["deploy"]["deployment_name"],
@@ -127,6 +131,7 @@ def deploy(dataset, kubernetes_job_block):
         deployment_options["infrastructure"] = KubernetesJob.load(kubernetes_job_block)
 
     # build deployment
+    click.echo("Deploying...")
     deployment = Deployment.build_from_flow(**deployment_options)
 
     click.echo("Done!")
