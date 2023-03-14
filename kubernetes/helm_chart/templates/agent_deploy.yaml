@@ -27,7 +27,7 @@ spec:
           value: {{.Values.prefect.apiURL}}
         - name: PREFECT_API_KEY
           value: {{.Values.prefect.apiKey}}
-        image: {{.Values.agent_container}}
+        image: {{.Values.agentContainer}}
         imagePullPolicy: IfNotPresent
         name: agent
       serviceAccountName: geodata-launcher
