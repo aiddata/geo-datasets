@@ -30,7 +30,7 @@ from configparser import ConfigParser
 import click
 from prefect.filesystems import GitHub
 from prefect.deployments import Deployment
-from prefect.infrastucture.kubernetes import KubernetesJob
+from prefect.infrastructure.kubernetes import KubernetesJob
 
 def flow_import(module_name, flow_name):
     module = __import__(module_name)
@@ -39,23 +39,23 @@ def flow_import(module_name, flow_name):
 
 
 @click.command()
-@click.argument("dataset", help="Shortname of dataset to deploy")
+@click.argument("dataset")
 @click.option("--kubernetes-job-block", default=None, help="Name of Kubernetes Job block to use")
 def deploy(dataset, kubernetes_job_block):
     # find dataset directory
     dataset_dir = dataset.strip("/")
     if dataset_dir not in os.listdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))):
         raise Exception("dataset directory provided not found in current directory")
-
-    # find Kubernetes Job Block, if one was specified
-    if kubernetes_job_block is not None:
-        kubernetes_job_block = KubernetesJob.load(kubernetes_job_block)
+    else:
+        click.echo(f"Found dataset {dataset}")
 
     # find and import the get_config_dict function for the dataset
+    click.echo("Finding get_config_dict function for dataset...")
     sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), dataset_dir))
     from main import get_config_dict
 
     # find and parse dataset config file
+    click.echo("Finding config.ini file for dataset...")
     config_file = dataset_dir + "/config.ini"
     config = ConfigParser()
     config.read(config_file)
@@ -81,7 +81,7 @@ def deploy(dataset, kubernetes_job_block):
     # Driver Code
     flow = flow_import(module_name, flow_name)
 
-    # # load a pre-defined block and specify a subfolder of repo
+    # load a pre-defined block and specify a subfolder of repo
     storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
 
     """
@@ -106,20 +106,30 @@ def deploy(dataset, kubernetes_job_block):
     }
     """
 
+    deployment_options = {
+        "flow": flow,
+        "name": config["deploy"]["deployment_name"],
+        "version": config["deploy"]["version"],
+        # "work_queue_name": "geo-datasets",
+        "work_queue_name": config["deploy"]["work_queue"],
+        "storage": storage,
+        "path": block_repo_dir,
+        # "skip_upload": True,
+        "parameters": get_config_dict(config_file),
+        "apply": True,
+    }
+
+    # find Kubernetes Job Block, if one was specified
+    if kubernetes_job_block is None:
+        click.echo("No Kubernetes Job Block will be used.")
+    else:
+        click.echo(f"Using Kubernetes Job Block: {kubernetes_job_block}")
+        deployment_options["infrastructure"] = KubernetesJob.load(kubernetes_job_block)
+
     # build deployment
-    deployment = Deployment.build_from_flow(
-        flow=flow,
-        name=config["deploy"]["deployment_name"],
-        version=config["deploy"]["version"],
-        # work_queue_name="geo-datasets",
-        work_queue_name=config["deploy"]["work_queue"],
-        storage=storage,
-        path=block_repo_dir,
-        infrastructure=kubernetes_job_block,
-        # skip_upload=True,
-        parameters=get_config_dict(config_file),
-        apply=True
-    )
+    deployment = Deployment.build_from_flow(**deployment_options)
+
+    click.echo("Done!")
 
 
 if __name__ == "__main__":
