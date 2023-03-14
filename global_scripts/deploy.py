@@ -1,25 +1,34 @@
 """
-This script is intended to build and deploy a Prefect flow using settings/parameters defined in an
-accompany config.ini for the dataset.
+This script deploys a dataset to Prefect, using the settings from its config.ini file.
+
+Basic usage:
+
+`python global_scripts/deploy.py [DATASET]`
+
+You can specify a Kubernetes Job infrastructure block as well.
+Run the following command for more detailed information:
+
+`python global_scripts/deploy.py --help`
 
 ---------------------------------------
 
-Roughly equivalent actions via cli
-#
-# *** the below commands are just a general starting point, and not meant to run as is. note that there
-#     are no parameters specified or storage block creation
+# Roughly equivalent actions via CLI
 
-# to deploy:
-prefect deployment build flow.py:flow_function_name -n "deployment_name" -sb github/existing_storage_block_name -q work_queue_name --apply
+*** the below commands are just a general starting point, and not meant to run as is. note that there
+    are no parameters specified or storage block creation
 
-# to not immediately deploy remove `--apply` from the above line, then use the build yaml to run the following:
-# prefect deployment apply build-deployment.yaml
+## to deploy:
+`prefect deployment build flow.py:flow_function_name -n "deployment_name" -ib infra_block_name -sb github/existing_storage_block_name -q work_queue_name --apply`
 
-# to run the deployment
-prefect deployment run flow_function_name/deployment_name
+- you can remove "-ib infra_block_name" if you'd like Prefect agent to run the flow locally (rather than on Kubernetes, for example)
+- to not immediately deploy remove `--apply` from the above line, then use the build yaml to run the following:
+  `prefect deployment apply build-deployment.yaml`
 
-# start workqueue
-prefect agent start -q 'work_queue_name'
+## to run the deployment
+`prefect deployment run flow_function_name/deployment_name`
+
+## start agent with correct work queue
+`prefect agent start -q 'work_queue_name'`
 
 """
 
