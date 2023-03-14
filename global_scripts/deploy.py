@@ -60,18 +60,16 @@ def deploy(dataset, kubernetes_job_block):
     config = ConfigParser()
     config.read(config_file)
 
-    click.echo("Finding flow to deploy...")
+    # load flow
     module_name = config["deploy"]["flow_file_name"]
     flow_name = config["deploy"]["flow_name"]
 
     # create and load storage block
-    click.echo("Loading storage block configuration...")
     block_name = config["deploy"]["storage_block"]
     block_repo = config["github"]["repo"]
     block_reference = config["github"]["branch"] # branch or tag
     block_repo_dir = config["github"]["directory"]
 
-    click.echo("Saving GitHub storage block to Prefect...")
     block = GitHub(
         repository=block_repo,
         reference=block_reference,
@@ -80,36 +78,32 @@ def deploy(dataset, kubernetes_job_block):
     # block.get_directory(block_repo_dir)
     block.save(block_name, overwrite=True)
 
-    click.echo("Retrieving block from Prefect")
-    storage = GitHub.load(block_name)
-
-    # import flow from dataset folder
-    click.echo("Loading flow...")
+    # Driver Code
     flow = flow_import(module_name, flow_name)
 
-    """
-    # add CPU and RAM request and limit amounts
-    infra_overrides = {
-        "customizations": [
-            {
-                "op": "replace",
-                "path": "/spec/template/spec/containers/0/resources",
-                "value": {
-                    "limits": {
-                        "cpu": str(cpu_limit),
-                        "memory": str(memory_limit) + "Gi",
-                    },
-                    "requests": {
-                        "cpu": str(cpu_request),
-                        "memory": str(memory_request) + "Gi",
-                    },
-                },
-            }
-        ]
-    }
-    """
+    # load a pre-defined block and specify a subfolder of repo
+    storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
 
-    click.echo("Deciding deployment options...")
+    infra_overrides = {
+        "customizations": [],
+    }
+
+    for request_type in ("limit", "request"):
+        for resource in ("cpu", "memory"): 
+            config_key = f"{resource}_{request_type}"
+            if config.has_option("run", config_key):
+                click.echo(f"Adding resource {request_type}: {amount} for {resouce}")
+                amount = str(config["run"][config_key])
+                if resource == "memory":
+                    amount += "Gi"
+                
+                infra_overrides["customizations"].append({
+                    "op": "replace",
+                    "path": f"/spec/template/spec/containers/0/resources/{request_type}s/{resource}",
+                    "value": amount,
+                })
+                    
+
     deployment_options = {
         "flow": flow,
         "name": config["deploy"]["deployment_name"],
@@ -118,6 +112,7 @@ def deploy(dataset, kubernetes_job_block):
         "work_queue_name": config["deploy"]["work_queue"],
         "storage": storage,
         "path": block_repo_dir,
+        "infra_overrides": infra_overrides,
         # "skip_upload": True,
         "parameters": get_config_dict(config_file),
         "apply": True,
@@ -131,7 +126,6 @@ def deploy(dataset, kubernetes_job_block):
         deployment_options["infrastructure"] = KubernetesJob.load(kubernetes_job_block)
 
     # build deployment
-    click.echo("Deploying...")
     deployment = Deployment.build_from_flow(**deployment_options)
 
     click.echo("Done!")
