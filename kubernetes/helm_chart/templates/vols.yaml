@@ -32,7 +32,11 @@ kind: PersistentVolumeClaim
 metadata:
   name: nova-geodata-prod
 spec:
+  {{- if .Values.dev.enabled }}
+  storageClassName: manual
+  {{- else }}
   storageClassName: nfs
+  {{- end }}
   accessModes:
     - ReadWriteMany
   resources:
