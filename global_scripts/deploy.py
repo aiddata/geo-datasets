@@ -23,80 +23,111 @@ prefect agent start -q 'work_queue_name'
 
 """
 
-import sys
 import os
+import sys
+from pathlib import Path
 from configparser import ConfigParser
 
-from prefect.deployments import Deployment
+import click
 from prefect.filesystems import GitHub
+from prefect.deployments import Deployment
+from prefect.infrastructure.kubernetes import KubernetesJob
 
 
+@click.command()
+@click.argument("dataset")
+@click.option("--kubernetes-job-block", default=None, help="Name of Kubernetes Job block to use")
+def deploy(dataset, kubernetes_job_block):
+    # find dataset directory
+    dataset_dir = Path(dataset)
+    if dataset_dir.is_dir():
+        click.echo(f"Found dataset {dataset}")
+    else:
+        raise Exception("dataset directory provided not found in current directory")
 
-if len(sys.argv) != 2:
-    raise Exception("deploy.py requires input defining which dataset directory to obtain the config.ini from")
+    # find and import the get_config_dict function for the dataset
+    click.echo("Finding get_config_dict function for dataset...")
+    sys.path.insert(1, dataset_dir.as_posix())
+    from main import get_config_dict
 
-dataset_dir = sys.argv[1].strip("/")
+    # find and parse dataset config file
+    click.echo("Finding config.ini file for dataset...")
+    config_file = dataset_dir / "config.ini"
+    config = ConfigParser()
+    config.read(config_file)
 
-if dataset_dir not in os.listdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))):
-    raise Exception("dataset directory provided not found in current directory")
+    # load flow
+    module_name = config["deploy"]["flow_file_name"]
+    flow_name = config["deploy"]["flow_name"]
 
+    # create and load storage block
+    block_name = config["deploy"]["storage_block"]
+    block_repo = config["github"]["repo"]
+    block_reference = config["github"]["branch"] # branch or tag
+    block_repo_dir = config["github"]["directory"]
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), dataset_dir))
+    block = GitHub(
+        repository=block_repo,
+        reference=block_reference,
+        #access_token=<my_access_token> # only required for private repos
+    )
+    # block.get_directory(block_repo_dir)
+    block.save(block_name, overwrite=True)
 
-from main import get_config_dict
-
-
-config_file = dataset_dir + "/config.ini"
-config = ConfigParser()
-config.read(config_file)
-
-
-# load flow
-module_name = config["deploy"]["flow_file_name"]
-flow_name = config["deploy"]["flow_name"]
-
-
-# create and load storage block
-
-block_name = config["deploy"]["storage_block"]
-block_repo = config["github"]["repo"]
-block_reference = config["github"]["branch"] # branch or tag
-block_repo_dir = config["github"]["directory"]
-
-block = GitHub(
-    repository=block_repo,
-    reference=block_reference,
-    #access_token=<my_access_token> # only required for private repos
-)
-# block.get_directory(block_repo_dir)
-block.save(block_name, overwrite=True)
-
-# -------------------------------------
-
-def flow_import(module_name, flow_name):
+    # TODO: prevent flow.py from overwriting this file during import
     module = __import__(module_name)
-    import_flow = getattr(module, flow_name)
-    return import_flow
+    flow = getattr(module, flow_name)
 
-# Driver Code
-flow = flow_import(module_name, flow_name)
+    # load a pre-defined block and specify a subfolder of repo
+    storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
 
-# # load a pre-defined block and specify a subfolder of repo
-storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
+    customizations = []
 
-# build deployment
-deployment = Deployment.build_from_flow(
-    flow=flow,
-    name=config["deploy"]["deployment_name"],
-    version=config["deploy"]["version"],
-    # work_queue_name="geo-datasets",
-    work_queue_name=config["deploy"]["work_queue"],
-    storage=storage,
-    path=block_repo_dir,
-    # skip_upload=True,
-    parameters=get_config_dict(config_file),
-    apply=True
-)
+    for request_type in ("limit", "request"):
+        for resource in ("cpu", "memory"): 
+            config_key = f"{resource}_{request_type}"
+            if config.has_option("run", config_key):
+                amount = str(config["run"][config_key])
+                click.echo(f"Adding resource {request_type}: {amount} for {resource}")
+                if resource == "memory":
+                    amount += "Gi"
+                
+                customizations.append({
+                    "op": "replace",
+                    "path": f"/spec/template/spec/containers/0/resources/{request_type}s/{resource}",
+                    "value": amount,
+                })
+                    
 
-# alternative to apply deployment after creating build
-# deployment.apply()
+    deployment_options = {
+        "flow": flow,
+        "name": config["deploy"]["deployment_name"],
+        "version": config["deploy"]["version"],
+        # "work_queue_name": "geo-datasets",
+        "work_queue_name": config["deploy"]["work_queue"],
+        "storage": storage,
+        "path": block_repo_dir,
+        # "skip_upload": True,
+        "parameters": get_config_dict(config_file),
+        "apply": True,
+    }
+
+    # find Kubernetes Job Block, if one was specified
+    if kubernetes_job_block is None:
+        click.echo("No Kubernetes Job Block will be used.")
+    else:
+        click.echo(f"Using Kubernetes Job Block: {kubernetes_job_block}")
+        infra_block = KubernetesJob.load(kubernetes_job_block)
+        deployment_options["infrastructure"] = infra_block
+        if len(customizations) > 1:
+            infra_block.customizations.patch.extend(customizations)
+            deployment_options["infra_overrides"] = { "customizations": infra_block.customizations.patch }
+
+    # build deployment
+    deployment = Deployment.build_from_flow(**deployment_options)
+
+    click.echo("Done!")
+
+
+if __name__ == "__main__":
+    deploy()
