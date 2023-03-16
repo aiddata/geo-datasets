@@ -119,7 +119,7 @@ def deploy(dataset, kubernetes_job_block):
         click.echo(f"Using Kubernetes Job Block: {kubernetes_job_block}")
         infra_block = KubernetesJob.load(kubernetes_job_block)
         deployment_options["infrastructure"] = infra_block
-        if len(customizations) > 1:
+        if len(customizations) > 0:
             infra_block.customizations.patch.extend(customizations)
             deployment_options["infra_overrides"] = { "customizations": infra_block.customizations.patch }
 
