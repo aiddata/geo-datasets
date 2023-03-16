@@ -5,7 +5,7 @@ namespace = "geodata"
 run_image = "jacobwhall/geodata-container"
 
 # should we have requests and limits?
-requests_and_limits: bool = True
+requests_and_limits: bool = False
 
 # CPU request and limit
 cpu_request: int = 3
@@ -63,6 +63,13 @@ if use_volume:
             },
         ]
     )
+
+# add service account to jod pods
+json_patches.append({
+    "op": "add",
+    "path": "/spec/serviceAccountName",
+    "value": "dask-job",
+})
 
 k8s_job = KubernetesJob(
     name="dataset-run",
