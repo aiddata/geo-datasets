@@ -12,7 +12,10 @@
       - In particular, make sure to set the correct URL and key to access the Prefect API. (You can get these by running `prefect config view` within your Prefect environment)
       - For a local cluster, enable dev mode and set an appropriate data path
 
-6. Install the helm chart into the local cluster.
+6. Build dependencies (dask) for helm cluster
+   `helm dependency build ./helm_chart`
+
+7. Install the helm chart into the local cluster.
    If there is already a namespace called "geodata", remove `--create-namespace`
    ```shell
    helm install --create-namespace --namespace geodata geodata-release ./helm_chart -f values.yaml
