@@ -30,9 +30,12 @@
 
 2. Adjust location of local data directory in `kind-config.yaml`
    - Change `./data` to your preferred location **for all worker nodes**.
+   - Make the directory, e.g. `mkdir data`
 
 3. Start your kind cluster
    ```shell
+   # delete any existing cluster you may have
+   kind delete cluster
    cd dev
    # the env variable tells kind to use podman instead of docker
    KIND_EXPERIMENTAL_PROVIDER=podman kind create cluster --config kind-config.yaml
