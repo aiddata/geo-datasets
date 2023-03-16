@@ -18,7 +18,10 @@ This section is for installing the helm chart for production needs, with an imag
 
    If you want to build your own image, follow the instructions in "Creating the image" section below to build the image yourself.
 
-2. Here is an example command for installing the helm chart from the parent directory.
+2. Build dependencies (dask) for helm cluster
+   `helm dependency build ./helm_chart`
+
+3. Here is an example command for installing the helm chart from the parent directory.
    Please review it carefully before running!
    ```shell
    cd geodata-container

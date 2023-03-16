@@ -4,3 +4,5 @@ kubectl
 kubectl.sha256
 /values.yaml
 .prefectignore
+/helm_chart/charts
+Chart.lock

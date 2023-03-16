@@ -6,6 +6,12 @@ prefect:
   apiKey: "[YOUR_API_KEY]"
   workQueue: "geodata"
 
+dask:
+  worker:
+    replicas: 4
+  jupyter:
+    enabled: false
+
 prod:
   nfs:
     address: 128.239.59.130

@@ -2,6 +2,10 @@ apiVersion: v2
 name: geodata
 version: 0.0.1
 description: A chart for GeoQuery's ingest infrastructure
+dependencies:
+- name: dask
+  version: "2023.1.0"
+  repository: "https://helm.dask.org/"
 maintainers:
   - name: Jacob Hall
     email: jwhall@wm.edu
