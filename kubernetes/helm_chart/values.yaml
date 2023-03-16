@@ -9,6 +9,9 @@ prefect:
 dask:
   worker:
     replicas: 4
+    image:
+      repository: "docker.io/jacobwhall/geodata-dask"
+      tag: "latest"
   jupyter:
     enabled: false
 
