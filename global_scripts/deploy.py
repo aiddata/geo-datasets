@@ -81,9 +81,7 @@ def deploy(dataset, kubernetes_job_block):
     # load a pre-defined block and specify a subfolder of repo
     storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
 
-    infra_overrides = {
-        "customizations": [],
-    }
+    customizations = []
 
     for request_type in ("limit", "request"):
         for resource in ("cpu", "memory"): 
@@ -94,7 +92,7 @@ def deploy(dataset, kubernetes_job_block):
                 if resource == "memory":
                     amount += "Gi"
                 
-                infra_overrides["customizations"].append({
+                customizations.append({
                     "op": "replace",
                     "path": f"/spec/template/spec/containers/0/resources/{request_type}s/{resource}",
                     "value": amount,
@@ -109,7 +107,6 @@ def deploy(dataset, kubernetes_job_block):
         "work_queue_name": config["deploy"]["work_queue"],
         "storage": storage,
         "path": block_repo_dir,
-        "infra_overrides": infra_overrides,
         # "skip_upload": True,
         "parameters": get_config_dict(config_file),
         "apply": True,
@@ -120,7 +117,11 @@ def deploy(dataset, kubernetes_job_block):
         click.echo("No Kubernetes Job Block will be used.")
     else:
         click.echo(f"Using Kubernetes Job Block: {kubernetes_job_block}")
-        deployment_options["infrastructure"] = KubernetesJob.load(kubernetes_job_block)
+        infra_block = KubernetesJob.load(kubernetes_job_block)
+        deployment_options["infrastructure"] = infra_block
+        if len(customizations) > 1:
+            infra_block.customizations.patch.extend(customizations)
+            deployment_options["infra_overrides"] = { "customizations": infra_block.customizations.patch }
 
     # build deployment
     deployment = Deployment.build_from_flow(**deployment_options)
