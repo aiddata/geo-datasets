@@ -521,11 +521,11 @@ class Dataset(ABC):
                 dask_task_runner_kwargs = {
                     "cluster_class": KubeCluster,
                     "cluster_kwargs": {
-                        "cluster_name": "".join(self.name.split()).lower(),
+                        "name": "".join(self.name.split()).lower(),
                     },
                     "adapt_kwargs": {
-                        "miniumum": 1,
-                        "maxiumum": max_workers,
+                        "minimum": 1,
+                        "maximum": max_workers,
                     },
                 }
 
