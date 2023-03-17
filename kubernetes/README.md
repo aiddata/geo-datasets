@@ -1,20 +1,20 @@
 # Tools for running [geo-datasets](https://github.com/aiddata/geo-datasets) in Kubernetes
 
-## Getting started
+## Running in Local Cluster
 
-Please see [`dev/README.md`](dev/README.md) for documentation on how to set up a local development environment and run these tools.
+Please see [`dev/README.md`](dev/README.md) for documentation on how to set up a local development environment.
 
 
 ## Helm Chart
 
 There is a helm chart that lives in the [`helm_chart`](helm_chart) directory.
-See [`helm_chart/README.md`](helm_chart/README.md) for instructions on how to develop and use it.
+See [`helm_chart/README.md`](helm_chart/README.md) for documentation on developing and installing it.
 
 
-## Container
+## Containers
 
-There is a Containerfile and its dependencies that live in the [`container`](container) directory.
-See [`container/README.md`](container/README.md) for instructions on how to build it and push it to a registry.
+The [`containers`](containers) directory holds container definitions needed to build the custom images used by the helm chart.
+See [`containers/README.md`](containers/README.md) for documentation on how to build them and push them to a registry.
 
 
 ## Utilities
