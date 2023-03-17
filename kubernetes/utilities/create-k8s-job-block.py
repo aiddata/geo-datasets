@@ -64,10 +64,10 @@ if use_volume:
         ]
     )
 
-# add service account to jod pods
+# add service account to job pods
 json_patches.append({
     "op": "add",
-    "path": "/spec/serviceAccountName",
+    "path": "/spec/template/spec/serviceAccountName",
     "value": "dask-job",
 })
 
