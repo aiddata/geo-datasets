@@ -518,7 +518,11 @@ class Dataset(ABC):
                 from prefect_dask import DaskTaskRunner
                 from dask_kubernetes.operator import KubeCluster
 
-                tr = DaskTaskRunner(cluster_class=KubeCluster, cluster_kwargs={ "name": "geodatacluster"})
+                cluster_name = "".join(self.name.split()).lower()
+                cluster = KubeCluster(name=cluster_name)
+                cluster.scale(max_workers)
+
+                tr = DaskTaskRunner(cluster_class=cluster)
             else:
                 raise ValueError("Prefect task runner not recognized")
 
