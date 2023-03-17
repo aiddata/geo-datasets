@@ -45,8 +45,15 @@
    ```
    - You may need to set kind to run with rootless. [See instructions](https://kind.sigs.k8s.io/docs/user/rootless/)
 
+4. Set "geodata" as our default namespace using `kubectl`.
+   To work with the newly-created resources in Kubernetes, set your kubectl context use the same namespace.
+   If you decided to use a different namespace when running `helm install` above, adjust this command accordingly.
+   ```shell
+   kubectl config set-context --current --namespace=geodata
+   ```
+
 That's it! You now have everything up and running in your minikube cluster.
-See the "Peeking inside the cluster" section below for what to do next.
+See the "Peeking inside the cluster" section below for more on how to use kubectl to manipulate cluster resources.
 
 
 ## Setup local cluster using minikube
@@ -112,8 +119,7 @@ If you'd rather not use an external image registry (for rapid development, for e
 
 This is a brief tutorial for viewing the resources inside Kubernetes using `kubectl` and observing their behavior.
 
-1. Set "geodata" as our default namespace using `kubectl`.
-   If you decided to use a different namespace when running `helm install` above, adjust this command accordingly.
+1. Sour default namespace using `kubectl`.
    ```shell
    kubectl config set-context --current --namespace=geodata
    ```
