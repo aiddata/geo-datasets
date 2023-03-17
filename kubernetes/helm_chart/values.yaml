@@ -4,16 +4,14 @@ agentContainer: "prefecthq/prefect:2.7.3-python3.8"
 prefect:
   apiURL: "[YOUR_API_URL]"
   apiKey: "[YOUR_API_KEY]"
-  workQueue: "geodata"
+  workQueue: "geodata-k8-local"
 
 dask:
   worker:
     replicas: 4
-    image:
-      repository: "docker.io/jacobwhall/geodata-dask"
-      tag: "latest"
-  jupyter:
-    enabled: false
+    image: "docker.io/jacobwhall/geodata-dask:latest"
+  scheduler:
+    image: "ghcr.io/dask/dask:latest"
 
 prod:
   nfs:
