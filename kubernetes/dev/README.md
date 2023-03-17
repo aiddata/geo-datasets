@@ -5,7 +5,7 @@
 1. [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
 2. [Install helm](https://helm.sh/docs/intro/install/)
 3. [Install podman](https://podman.io/getting-started/installation)
-4. Follow steps for setting up local cluster using kind or minikube below
+4. Follow steps for setting up local cluster using kind below
 5. Set helm `values.yaml`
    - In the root of repo, copy `values_template.yaml` to `values.yaml`
    - Adjust the values in `values.yaml` to meet your needs.
@@ -56,7 +56,57 @@ That's it! You now have everything up and running in your minikube cluster.
 See the "Peeking inside the cluster" section below for more on how to use kubectl to manipulate cluster resources.
 
 
-## Setup local cluster using minikube
+## Peeking inside the cluster
+
+This is a brief tutorial for viewing the resources inside Kubernetes using `kubectl` and observing their behavior.
+
+1. Sour default namespace using `kubectl`.
+   ```shell
+   kubectl config set-context --current --namespace=geodata
+   ```
+
+2. The primary resource of interest that always runs is called "prefect-agent".
+   It is a deployment that always keeps a container alive running Prefect agent.
+   ```shell
+   kubectl get deployments
+   ```
+   You should now see "prefect-agent" in this list of deployments.
+
+3. You can get more info about a Kubernetes resource using the `kubectl describe [RESOURCE TYPE] [RESOURCE NAME]` command.
+   See the details of "prefect-agent" by running the following command:
+   ```shell
+   kubectl describe deployment prefect-agent
+   ```
+
+4. In the command output from the last step, read the bottom few lines.
+   You should see info about a replica set that Kubernetes has created for this deployment.
+   A replica set can hold many identical pods, so that there is always more than one available at any given time.
+   However, in our situation the replica set only has one "replica" (pod) in it.
+   You can see the list of pods in the replica set by describing the replica set:
+   ```shell
+   # adjust the name of the replica set to match yours
+   kubectl describe replicaset prefect-agent-58f85d6c6
+   ```
+
+5. To get a list of pods in this namespace, use the following command:
+   ```shell
+   kubectl get pods
+   ```
+   You should see a list of pods that includes one that starts with "prefect-agent-".
+   When deployments are run, new pods are created by the prefect-agent pod.
+
+6. To see the logs (output) of a pod, use this command:
+   ```shell
+   # adjust the name of the pod to match the one you'd like to inspect
+   kubectl logs prefect-agent-58f85d6c6-2j5l7
+   ```
+   If you used a valid Prefect API URL and key to install the helm chart, you should see that the Prefect agent is running.
+
+
+
+## ⚠️ Setup local cluster using minikube ⚠️
+
+**warning: these instructions are out-of-date. please use the kind instructions above.**
 
 [minikube](https://minikube.sigs.k8s.io) is cool because it runs a local Kubernetes cluster in VMs.
 
@@ -115,48 +165,3 @@ If you'd rather not use an external image registry (for rapid development, for e
   Doing this really deletes everything, so you'll have to start from scratch again.
 
 
-## Peeking inside the cluster
-
-This is a brief tutorial for viewing the resources inside Kubernetes using `kubectl` and observing their behavior.
-
-1. Sour default namespace using `kubectl`.
-   ```shell
-   kubectl config set-context --current --namespace=geodata
-   ```
-
-2. The primary resource of interest that always runs is called "prefect-agent".
-   It is a deployment that always keeps a container alive running Prefect agent.
-   ```shell
-   kubectl get deployments
-   ```
-   You should now see "prefect-agent" in this list of deployments.
-
-3. You can get more info about a Kubernetes resource using the `kubectl describe [RESOURCE TYPE] [RESOURCE NAME]` command.
-   See the details of "prefect-agent" by running the following command:
-   ```shell
-   kubectl describe deployment prefect-agent
-   ```
-
-4. In the command output from the last step, read the bottom few lines.
-   You should see info about a replica set that Kubernetes has created for this deployment.
-   A replica set can hold many identical pods, so that there is always more than one available at any given time.
-   However, in our situation the replica set only has one "replica" (pod) in it.
-   You can see the list of pods in the replica set by describing the replica set:
-   ```shell
-   # adjust the name of the replica set to match yours
-   kubectl describe replicaset prefect-agent-58f85d6c6
-   ```
-
-5. To get a list of pods in this namespace, use the following command:
-   ```shell
-   kubectl get pods
-   ```
-   You should see a list of pods that includes one that starts with "prefect-agent-".
-   When deployments are run, new pods are created by the prefect-agent pod.
-
-6. To see the logs (output) of a pod, use this command:
-   ```shell
-   # adjust the name of the pod to match the one you'd like to inspect
-   kubectl logs prefect-agent-58f85d6c6-2j5l7
-   ```
-   If you used a valid Prefect API URL and key to install the helm chart, you should see that the Prefect agent is running.
