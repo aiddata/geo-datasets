@@ -1,58 +1,50 @@
 # Local development instructions
 
-## General Steps
+## Getting Started
 
 1. [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
 2. [Install helm](https://helm.sh/docs/intro/install/)
 3. [Install podman](https://podman.io/getting-started/installation)
-4. Follow steps for setting up local cluster using kind below
-5. Set helm `values.yaml`
-   - In the root of repo, copy `values_template.yaml` to `values.yaml`
-   - Adjust the values in `values.yaml` to meet your needs.
-      - In particular, make sure to set the correct URL and key to access the Prefect API. (You can get these by running `prefect config view` within your Prefect environment)
-      - For a local cluster, enable dev mode and set an appropriate data path
+4. [Install kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 
-6. Build dependencies (dask) for helm cluster
-   `helm dependency build ./helm_chart`
-
-7. Install the helm chart into the local cluster.
-   If there is already a namespace called "geodata", remove `--create-namespace`
-   ```shell
-   helm install --create-namespace --namespace geodata geodata-release ./helm_chart -f values.yaml
-   ```
-   See "Installing the helm chart" above for more info about what this command does.
-
-
-## Setup local cluster using kind
-
-[kind](https://kind.sigs.k8s.io/) is cool because it runs a Kubernetes cluster all in containers.
-
-### Quickstart
-
-1. [Install kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
-
-2. Adjust location of local data directory in `kind-config.yaml`
+5. Adjust location of local data directory in `kind-config.yaml`
    - Change `./data` to your preferred location **for all worker nodes**.
    - Make the directory, e.g. `mkdir data`
 
-3. Start your kind cluster
+6. Start your kind cluster
    ```shell
    # delete any existing cluster you may have
    kind delete cluster
+   # cd to the correct directory if you used a relative path in step 5
    cd dev
    # the env variable tells kind to use podman instead of docker
    KIND_EXPERIMENTAL_PROVIDER=podman kind create cluster --config kind-config.yaml
    ```
    - You may need to set kind to run with rootless. [See instructions](https://kind.sigs.k8s.io/docs/user/rootless/)
 
-4. Set "geodata" as our default namespace using `kubectl`.
+7. Set "geodata" as our default namespace using `kubectl`.
    To work with the newly-created resources in Kubernetes, set your kubectl context use the same namespace.
    If you decided to use a different namespace when running `helm install` above, adjust this command accordingly.
    ```shell
    kubectl config set-context --current --namespace=geodata
    ```
+8. Set helm `values.yaml`
+   - In the root of repo, copy `values_template.yaml` to `values.yaml`
+   - Adjust the values in `values.yaml` to meet your needs.
+      - In particular, make sure to set the correct URL and key to access the Prefect API. (You can get these by running `prefect config view` within your Prefect environment)
+      - For a local cluster, enable dev mode and set an appropriate data path
 
-That's it! You now have everything up and running in your minikube cluster.
+9. Build dependencies (dask) for helm cluster
+   `helm dependency build ./helm_chart`
+
+10. Install the helm chart into the local cluster.
+   If there is already a namespace called "geodata", remove `--create-namespace`
+   ```shell
+   helm install --create-namespace --namespace geodata geodata-release ./helm_chart -f values.yaml
+   ```
+   See "Installing the helm chart" above for more info about what this command does.
+
+You now have everything up and running in a local kind cluster.
 See the "Peeking inside the cluster" section below for more on how to use kubectl to manipulate cluster resources.
 
 
