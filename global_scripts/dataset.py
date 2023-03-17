@@ -516,9 +516,9 @@ class Dataset(ABC):
                 tr = HPCDaskTaskRunner(num_procs=max_workers, job_name=job_name, log_dir=self.log_dir, **kwargs)
             elif task_runner == "kubernetes":
                 from prefect_dask import DaskTaskRunner
-                from dask_kubernetes import HelmCluster
+                from dask_kubernetes.operator import KubeCluster
 
-                tr = DaskTaskRunner(cluster_class=HelmCluster, cluster_kwargs={ "release_name": "geodata-release"})
+                tr = DaskTaskRunner(cluster_class=KubeCluster, cluster_kwargs={ "name": "geodatacluster"})
             else:
                 raise ValueError("Prefect task runner not recognized")
 
