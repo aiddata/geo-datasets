@@ -8,8 +8,8 @@
 4. [Install kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 
 5. Adjust location of local data directory in `kind-config.yaml`
-   - Change `./data` to your preferred location **for all worker nodes**.
-   - Make the directory, e.g. `mkdir data`
+   - Change `./data` to your preferred location **for all worker nodes** (see comments)
+   - Make the directory if needed, e.g. `mkdir data`
 
 6. Start your kind cluster
    ```shell
@@ -20,7 +20,7 @@
    # the env variable tells kind to use podman instead of docker
    KIND_EXPERIMENTAL_PROVIDER=podman kind create cluster --config kind-config.yaml
    ```
-   - You may need to set kind to run with rootless. [See instructions](https://kind.sigs.k8s.io/docs/user/rootless/)
+   - If you run into issues, there may be additional steps to run kind rootless. [See this documentation page](https://kind.sigs.k8s.io/docs/user/rootless/)
 
 7. Set "geodata" as our default namespace using `kubectl`.
    To work with the newly-created resources in Kubernetes, set your kubectl context use the same namespace.
@@ -52,7 +52,7 @@ See the "Peeking inside the cluster" section below for more on how to use kubect
 
 This is a brief tutorial for viewing the resources inside Kubernetes using `kubectl` and observing their behavior.
 
-1. Sour default namespace using `kubectl`.
+1. If you haven't yet, set the default namespace for `kubectl`.
    ```shell
    kubectl config set-context --current --namespace=geodata
    ```
