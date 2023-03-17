@@ -41,17 +41,17 @@ def deploy(dataset, kubernetes_job_block):
     # find dataset directory
     dataset_dir = Path(dataset)
     if dataset_dir.is_dir():
-        click.echo(f"Found dataset {dataset}")
+        click.echo(f"👍 Found dataset {dataset}")
     else:
         raise Exception("dataset directory provided not found in current directory")
 
     # find and import the get_config_dict function for the dataset
-    click.echo("Finding get_config_dict function for dataset...")
+    click.echo("🔎 Finding get_config_dict function for dataset...")
     sys.path.insert(1, dataset_dir.as_posix())
     from main import get_config_dict
 
     # find and parse dataset config file
-    click.echo("Finding config.ini file for dataset...")
+    click.echo("⚙️ Finding config.ini file for dataset...")
     config_file = dataset_dir / "config.ini"
     config = ConfigParser()
     config.read(config_file)
@@ -60,6 +60,7 @@ def deploy(dataset, kubernetes_job_block):
     module_name = config["deploy"]["flow_file_name"]
     flow_name = config["deploy"]["flow_name"]
 
+    click.echo("🐙 Creating GitHub storage block...")
     # create and load storage block
     block_name = config["deploy"]["storage_block"]
     block_repo = config["github"]["repo"]
@@ -74,6 +75,7 @@ def deploy(dataset, kubernetes_job_block):
     # block.get_directory(block_repo_dir)
     block.save(block_name, overwrite=True)
 
+    click.echo("⬇️ Loading up flow and storage block...")
     # TODO: prevent flow.py from overwriting this file during import
     module = __import__(module_name)
     flow = getattr(module, flow_name)
@@ -82,13 +84,15 @@ def deploy(dataset, kubernetes_job_block):
     storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
 
     customizations = []
+    emoji_ord = 128179
 
     for request_type in ("limit", "request"):
         for resource in ("cpu", "memory"): 
             config_key = f"{resource}_{request_type}"
             if config.has_option("run", config_key):
                 amount = str(config["run"][config_key])
-                click.echo(f"Adding resource {request_type}: {amount} for {resource}")
+                emoji_ord += 1
+                click.echo(f"{chr(emoji_ord)} Adding resource {request_type}: {amount} for {resource}")
                 if resource == "memory":
                     amount += "Gi"
                 
@@ -114,9 +118,9 @@ def deploy(dataset, kubernetes_job_block):
 
     # find Kubernetes Job Block, if one was specified
     if kubernetes_job_block is None:
-        click.echo("No Kubernetes Job Block will be used.")
+        click.echo("⛰️ No Kubernetes Job Block will be used.")
     else:
-        click.echo(f"Using Kubernetes Job Block: {kubernetes_job_block}")
+        click.echo(f"🚢 Using Kubernetes Job Block: {kubernetes_job_block}")
         infra_block = KubernetesJob.load(kubernetes_job_block)
         deployment_options["infrastructure"] = infra_block
         if len(customizations) > 0:
@@ -126,7 +130,7 @@ def deploy(dataset, kubernetes_job_block):
     # build deployment
     deployment = Deployment.build_from_flow(**deployment_options)
 
-    click.echo("Done!")
+    click.echo("✨ Done!")
 
 
 if __name__ == "__main__":
