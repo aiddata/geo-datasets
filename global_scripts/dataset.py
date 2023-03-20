@@ -516,20 +516,8 @@ class Dataset(ABC):
                 tr = HPCDaskTaskRunner(num_procs=max_workers, job_name=job_name, log_dir=self.log_dir, **kwargs)
             elif task_runner == "kubernetes":
                 from prefect_dask import DaskTaskRunner
-                from dask_kubernetes.operator import KubeCluster
 
-                dask_task_runner_kwargs = {
-                    "cluster_class": KubeCluster,
-                    "cluster_kwargs": {
-                        "name": "".join(self.name.split()).lower(),
-                    },
-                    "adapt_kwargs": {
-                        "minimum": 1,
-                        "maximum": max_workers,
-                    },
-                }
-
-                tr = DaskTaskRunner(**dask_task_runner_kwargs)
+                tr = DaskTaskRunner(address="geodata-scheduler.geodata.svc.cluster.local:8786")
             else:
                 raise ValueError("Prefect task runner not recognized")
 
