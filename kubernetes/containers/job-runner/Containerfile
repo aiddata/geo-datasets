@@ -6,14 +6,15 @@ RUN apt-get install -y --no-install-recommends \
     gdal-bin \
     libgdal-dev \
     openssh-client \
+    git \
 && rm -rf /var/lib/apt/lists/*
 
 # install python packages
 COPY job-runner/requirements.txt requirements.txt
 RUN pip install -r requirements.txt --no-cache-dir --no-binary rasterio
 
-COPY geo_datasets geo_datasets
-RUN pip install ./geo_datasets
+COPY job-runner/prepare.sh /usr/bin/prepare.sh
+ENTRYPOINT ["/usr/bin/prepare.sh"]
 
 # run prefect agent
-CMD ["prefect", "agent", "start", "-q", "geodata"]
+CMD ["prefect", "agent", "start", "-q", "geodata`"]

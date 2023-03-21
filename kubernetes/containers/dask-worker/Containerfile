@@ -19,11 +19,11 @@ RUN apt-get install -y --no-install-recommends \
     gdal-bin \
     libgdal-dev \
     openssh-client \
+    git \
 && rm -rf /var/lib/apt/lists/*
+
+COPY dask-worker/prepare.sh /usr/bin/prepare.sh
 
 # install python packages
 COPY dask-worker/requirements.txt requirements.txt
 RUN /opt/conda/bin/pip install -r requirements.txt --no-cache-dir --no-binary rasterio
-
-COPY geo_datasets geo_datasets
-RUN /opt/conda/bin/pip install ./geo_datasets
