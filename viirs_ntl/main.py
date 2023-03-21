@@ -252,14 +252,14 @@ class VIIRS_NTL(Dataset):
                     else:
                         format_month = month
 
-                    monthly_avg_glob_str = self.output_dir / f"raw_extracted_viirs_ntl_{year}_{format_month}_avg_rade9h.masked"
+                    monthly_avg_glob_str = self.output_dir / f"raw_extracted_viirs_ntl_{year}_{format_month}_avg_rade9h.masked.tif"
                     output_avg_glob = self.output_dir / f"viirs_ntl_monthly_{year}_{format_month}_avg_masked.tif"
                     if annual_avg_glob_str.exists():
                         task_list.append((monthly_avg_glob_str, output_avg_glob))
                     else:
                         logger.info(f"Failed to find extracted raw file: {str(monthly_avg_glob_str)}")
 
-                    monthly_cloud_glob_str = self.output_dir / f"raw_extracted_viirs_ntl_{year}_{format_month}_cf_cvg"
+                    monthly_cloud_glob_str = self.output_dir / f"raw_extracted_viirs_ntl_{year}_{format_month}_cf_cvg.tif."
                     output_cloud_glob = self.output_dir / f"viirs_ntl_monthly_{year}_{month}_cf_cvg.tif"
                     if annual_cloud_glob_str.exists():
                         task_list.append((monthly_cloud_glob_str, output_cloud_glob))
@@ -344,7 +344,7 @@ class VIIRS_NTL(Dataset):
         extraction = self.run_tasks(self.extract_files, extract_list)
         self.log_run(extraction)
 
-        logger.info("Building extract list...")
+        logger.info("Building processing list...")
         process_list = self.build_process_list()
 
         logger.info("Processing raw files")
