@@ -9,8 +9,11 @@ RUN apt-get install -y --no-install-recommends \
 && rm -rf /var/lib/apt/lists/*
 
 # install python packages
-COPY requirements.txt requirements.txt
+COPY job-runner/requirements.txt requirements.txt
 RUN pip install -r requirements.txt --no-cache-dir --no-binary rasterio
+
+COPY geo_datasets geo_datasets
+RUN pip install ./geo_datasets
 
 # run prefect agent
 CMD ["prefect", "agent", "start", "-q", "geodata"]
