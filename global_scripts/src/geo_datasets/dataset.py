@@ -517,7 +517,7 @@ class Dataset(ABC):
             elif task_runner == "kubernetes":
                 from prefect_dask import DaskTaskRunner
 
-                tr = DaskTaskRunner(address="geodata-scheduler.geodata.svc.cluster.local:8786")
+                tr = DaskTaskRunner(address="localhost:8786")
             else:
                 raise ValueError("Prefect task runner not recognized")
 
