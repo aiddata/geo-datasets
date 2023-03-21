@@ -1,4 +1,4 @@
-FROM ghcr.io/dask/dask:latest-py3.8
+FROM ghcr.io/dask/dask:2023.3.1-py3.8
 
 # install gdal
 RUN apt-get update
