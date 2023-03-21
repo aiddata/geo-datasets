@@ -11,7 +11,7 @@ metadata:
 rules:
 - apiGroups: ["batch"]
   resources: ["jobs"]
-  verbs: ["create", "get", "watch"]
+  verbs: ["create", "get", "watch", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
