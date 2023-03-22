@@ -516,8 +516,37 @@ class Dataset(ABC):
                 tr = HPCDaskTaskRunner(num_procs=max_workers, job_name=job_name, log_dir=self.log_dir, **kwargs)
             elif task_runner == "kubernetes":
                 from prefect_dask import DaskTaskRunner
+                from dask_kubernetes.operator import KubeCluster, make_cluster_spec
 
-                tr = DaskTaskRunner(address="localhost:8786")
+                spec = make_cluster_spec(name="selector-example", n_workers=2)
+                spec["spec"]["worker"]["spec"]["containers"][0]["image"] = "docker.io/jacobwhall/geodata-dask"
+                spec["spec"]["worker"]["spec"]["containers"][0]["volumeMounts"] = [
+                    {
+                        "name": "sciclone",
+                        "mountPath": "/sciclone"
+                    }
+                ]
+
+                spec["spec"]["worker"]["spec"]["volumes"] = [
+                    {
+                        "name": "sciclone",
+                        "persistentVolumeClaim": {
+                            "claimName": "nova-geodata-prod"
+                        }
+                    }
+                ]
+
+                dask_task_runner_kwargs = {
+                    "cluster_class": KubeCluster,
+                    "cluster_kwargs": {
+                        "custom_cluster_spec": spec,
+                    },
+                    "adapt_kwargs": {
+                        "minimum": 1,
+                        "maximum": max_workers,
+                    },
+                }
+                tr = DaskTaskRunner(**dask_task_runner_kwargs)
             else:
                 raise ValueError("Prefect task runner not recognized")
 
