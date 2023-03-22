@@ -136,11 +136,10 @@ class VIIRS_NTL(Dataset):
                             
                         if len(file_code) == 0:
                             logger.info("Download option does not exist yet: " + str(year) + "/" + str(month) + "/" + file)
-                            
-                        download_dest = download_url + str(file_code)
-                        local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}_{file}"
-
-                        task_list.append((download_dest, local_filename))
+                        else:
+                            download_dest = download_url + str(file_code)
+                            local_filename = self.raw_dir / f"raw_viirs_ntl_{year}_{month}_{file}.tif.gz"
+                            task_list.append((download_dest, local_filename))
 
         return task_list
 
@@ -259,16 +258,17 @@ class VIIRS_NTL(Dataset):
                     else:
                         logger.info(f"Failed to find extracted raw file: {str(monthly_avg_glob_str)}")
 
-                    monthly_cloud_glob_str = self.output_dir / f"raw_extracted_viirs_ntl_{year}_{format_month}_cf_cvg.tif."
+                    monthly_cloud_glob_str = self.output_dir / f"raw_extracted_viirs_ntl_{year}_{format_month}_cf_cvg.tif"
                     output_cloud_glob = self.output_dir / f"viirs_ntl_monthly_{year}_{month}_cf_cvg.tif"
                     if annual_cloud_glob_str.exists():
                         task_list.append((monthly_cloud_glob_str, output_cloud_glob))
                     else:
                         logger.info(f"Failed to find extracted raw file: {str(monthly_cloud_glob_str)}")
         
+        logger.info(f"{str(task_list)}")
         return task_list
 
-    def raster_calc(input_path, output_path, function, **kwargs):
+    def raster_calc(self, input_path, output_path, function, **kwargs):
         """
         Calculate raster values using rasterio based on function provided
 
@@ -277,7 +277,7 @@ class VIIRS_NTL(Dataset):
         :param function: function to apply to input raster values
         :param kwargs: additional meta args used to write output raster
         """
-        with rasterio.Env(GDAL_CACHEMAX="100"):
+        with rasterio.Env(GDAL_CACHEMAX=100, CHECK_DISK_FREE_SPACE=False):
             # GDAL_CACHEMAX value in MB
             # https://trac.osgeo.org/gdal/wiki/ConfigOptions#GDAL_CACHEMAX
             # See: https://github.com/mapbox/rasterio/issues/1281
@@ -292,7 +292,7 @@ class VIIRS_NTL(Dataset):
                         out_data = out_data.astype(meta["dtype"])
                         dst.write(out_data, window=window)
     
-    def remove_negative(x):
+    def remove_negative(self, x):
         """
         remove negative values from array
         """
@@ -307,20 +307,19 @@ class VIIRS_NTL(Dataset):
 
     def process_files(self, raw_file, output_dst):
         logger = self.get_logger()
-
-        if output_dst.exists and not self.overwrite_extract:
-            logger.info(f"Processed File Exists: {raw_file}")
+        if output_dst.exists() and not self.overwrite_processing:
+            logger.info(f"Processed File Exists: {str(raw_file)}")
             return (raw_file, output_dst)
         try:
-            if "cf_cvg" in raw_file:
+            if "cf_cvg" in str(raw_file):
                 self.raster_calc(raw_file, output_dst, self.make_binary)
             else:
                 self.raster_calc(raw_file, output_dst, self.remove_negative)
-            logger.info(f"File Processed: {output_dst}")
+            logger.info(f"File Processed: {str(output_dst)}")
             return (raw_file, output_dst)
         except Exception as e:
             logger.info(f"Failed to process: {str(raw_file)}")
-            raise Exception(str(e) + ": " f"Failed to process: {str(raw_file)}")
+            raise Exception(str(e) + f": Failed to process: {str(raw_file)}")
 
     def main(self):
         logger = self.get_logger()
