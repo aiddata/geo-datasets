@@ -1,4 +1,4 @@
-from prefect.infrastructure import KubernetesJob
+from prefect.infrastructure import KubernetesJob, KubernetesImagePullPolicy
 
 # config
 namespace = "geodata"
@@ -76,5 +76,6 @@ k8s_job = KubernetesJob(
     namespace=namespace,
     image=run_image,
     customizations=json_patches,
+    image_pull_policy=KubernetesImagePullPolicy.ALWAYS,
 )
 k8s_job.save("geodata-k8s", overwrite=True)
