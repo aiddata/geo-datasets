@@ -24,7 +24,7 @@
 
 7. Set "geodata" as our default namespace using `kubectl`.
    To work with the newly-created resources in Kubernetes, set your kubectl context use the same namespace.
-   If you decided to use a different namespace when running `helm install` above, adjust this command accordingly.
+   If you decided to use a different namespace when running `helm install` below, adjust this command accordingly.
    ```shell
    kubectl config set-context --current --namespace=geodata
    ```
@@ -40,6 +40,8 @@
 10. Install the helm chart into the local cluster.
    If there is already a namespace called "geodata", remove `--create-namespace`
    ```shell
+   # cd to the root of this repository
+   cd ..
    helm install --create-namespace --namespace geodata geodata-release ./helm_chart -f values.yaml
    ```
    See "Installing the helm chart" above for more info about what this command does.
