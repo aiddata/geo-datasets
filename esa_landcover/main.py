@@ -12,25 +12,31 @@ import cdsapi
 import rasterio
 import numpy as np
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-
-from dataset import Dataset
+import geo_datasets
+from geo_datasets import Dataset
 
 
 class ESALandcover(Dataset):
     name = "ESA Landcover"
 
-    def __init__(self, raw_dir, process_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
+    def __init__(self, raw_dir, process_dir, output_dir, years, api_key, api_uid, overwrite_download=False, overwrite_processing=False):
 
         self.raw_dir = Path(raw_dir)
         self.process_dir = Path(process_dir)
         self.output_dir = Path(output_dir)
+        self.api_key = api_key
+        self.api_uid = api_uid
         self.overwrite_download = overwrite_download
         self.overwrite_processing = overwrite_processing
         self.years = [int(y) for y in years]
 
         self.v207_years = range(1992, 2016)
         self.v211_years = range(2016, 2021)
+
+        cdsapi_path = Path.home() / ".cdsapirc"
+        with open(cdsapi_path, "w") as f:
+            f.write(f"url: https://cds.climate.copernicus.eu/api/v2 \nkey: {api_uid}:{api_key}")
+
 
         self.cdsapi_client = cdsapi.Client()
 
@@ -172,6 +178,8 @@ def get_config_dict(config_file="config.ini"):
         "process_dir": Path(config["main"]["process_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
+        "api_uid": config["main"].getboolean("api_uid"),
+        "api_key": config["main"].getboolean("api_key"),
         "overwrite_download": config["main"].getboolean("overwrite_download"),
         "overwrite_processing": config["main"].getboolean("overwrite_processing"),
         "backend": config["run"]["backend"],
