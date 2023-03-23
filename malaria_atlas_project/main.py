@@ -28,8 +28,7 @@ from configparser import ConfigParser
 from datetime import datetime
 from typing import List, Literal
 
-import geo_datasets
-from geo_datasets import Dataset
+from data_manager import Dataset
 
 
 class MalariaAtlasProject(Dataset):

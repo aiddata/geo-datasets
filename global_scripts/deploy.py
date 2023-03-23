@@ -101,6 +101,18 @@ def deploy(dataset, kubernetes_job_block):
                     "path": f"/spec/template/spec/containers/0/resources/{request_type}s/{resource}",
                     "value": amount,
                 })
+
+    if config.has_option("deploy", "data_manager_version"):
+        customizations.append({
+            "op": "add",
+            "path": "/spec/template/spec/containers/0/env/-",
+            "value": {
+                "name": "DATA_MANAGER_VERSION",
+                "value": config["deploy"]["data_manager_version"],
+            },
+        })
+    else:
+        raise ValueError("config.ini must include a data manager version")
                     
 
     deployment_options = {
