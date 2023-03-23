@@ -19,7 +19,6 @@ Unless otherwise specified, all datasets are:
 """
 
 import os
-import sys
 import shutil
 import requests
 from copy import copy
@@ -27,8 +26,11 @@ from pathlib import Path
 from zipfile import ZipFile
 from configparser import ConfigParser
 from datetime import datetime
+from typing import List, Literal
 
-from geo_datasets.dataset import Dataset
+import geo_datasets
+from geo_datasets import Dataset
+
 
 class MalariaAtlasProject(Dataset):
     name = "Malaria Atlas Project"
@@ -252,11 +254,7 @@ if __name__ == "__main__":
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
 
-import os
-from pathlib import Path
-from datetime import datetime
-from configparser import ConfigParser
-from typing import List, Literal
+
 
 try:
     from prefect import flow
