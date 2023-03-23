@@ -520,6 +520,7 @@ class Dataset(ABC):
 
                 spec = make_cluster_spec(name="selector-example", n_workers=2)
                 spec["spec"]["worker"]["spec"]["containers"][0]["image"] = "docker.io/jacobwhall/geodata-dask"
+                spec["spec"]["worker"]["spec"]["containers"][0]["imagePullPolicy"] = "Always"
                 spec["spec"]["worker"]["spec"]["containers"][0]["volumeMounts"] = [
                     {
                         "name": "sciclone",
