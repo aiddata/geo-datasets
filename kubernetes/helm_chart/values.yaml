@@ -6,13 +6,6 @@ prefect:
   apiKey: "[YOUR_API_KEY]"
   workQueue: "geodata-k8-local"
 
-dask:
-  worker:
-    replicas: 4
-    image: "docker.io/jacobwhall/geodata-dask:latest"
-  scheduler:
-    image: "ghcr.io/dask/dask:latest"
-
 prod:
   nfs:
     address: 128.239.59.130
