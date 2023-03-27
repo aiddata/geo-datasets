@@ -3,11 +3,14 @@
 
 import os
 import sys
+import json
 import hashlib
 import warnings
-from datetime import datetime
 from pathlib import Path
+from datetime import datetime
+from typing import List, Literal
 from configparser import ConfigParser
+
 
 import rasterio
 import numpy as np
@@ -15,9 +18,7 @@ from affine import Affine
 from netCDF4 import Dataset as NCDFDataset
 from boxsdk import JWTAuth, Client
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-
-from dataset import Dataset
+from data_manager import Dataset
 
 
 def export_raster(data, path, meta, **kwargs):
@@ -65,13 +66,13 @@ def sha1(filename):
     return h.hexdigest()
 
 
-def create_box_client(box_config_path):
+def create_box_client(box_config):
     """
     Creates a Box client using the provided JWT authentication JSON.
     """
 
     # load JWT authentication JSON (see README.md for how to set this up)
-    auth = JWTAuth.from_settings_file(box_config_path)
+    auth = JWTAuth.from_settings_dictionary(box_config)
 
     # create Box client
     client = Client(auth)
@@ -85,7 +86,7 @@ class PM25(Dataset):
     def __init__(self,
                  raw_dir: str,
                  output_dir: str,
-                 box_config_path: str,
+                 box_config: dict,
                  version: str,
                  years: list,
                  overwrite_downloads: bool,
@@ -99,7 +100,7 @@ class PM25(Dataset):
 
         self.years = [int(y) for y in years]
 
-        self.box_config_path = Path(box_config_path)
+        self.box_config = box_config
 
         # skip existing files while downloading?
         self.overwrite_downloads = overwrite_downloads
@@ -119,7 +120,7 @@ class PM25(Dataset):
         logger = self.get_logger()
 
         # create Box client
-        self.client = create_box_client(self.box_config_path)
+        self.client = create_box_client(self.box_config)
 
         # find shared folder
         shared_folder = self.client.get_shared_item(f"https://wustl.app.box.com/v/ACAG-{self.version}-GWRPM25")
@@ -185,7 +186,7 @@ class PM25(Dataset):
 
 
     def get_box_item(self, id: str):
-        client = create_box_client(self.box_config_path)
+        client = create_box_client(self.box_config)
         box_folder_url = 'https://wustl.app.box.com/v/ACAG-V5GL03-GWRPM25'
 
         for i in client.get_shared_item(box_folder_url).get_items():
@@ -339,12 +340,16 @@ def get_config_dict(config_file="config.ini"):
     config = ConfigParser()
     config.read(config_file)
 
+    box_config_path = Path(config["main"]["box_config_path"])
+    with open(box_config_path) as box_config_src:
+        box_config = json.load(box_config_src)
+
     return {
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "version": config["main"]["version"],
         "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "box_config_path": Path(config["main"]["box_config_path"]),
+        "box_config": box_config,
         "overwrite_downloads": config["main"].getboolean("overwrite_downloads"),
         "verify_existing_downloads": config["main"].getboolean("verify_existing_downloads"),
         "overwrite_processing": config["main"].getboolean("overwrite_processing"),
@@ -368,6 +373,78 @@ if __name__ == "__main__":
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
 
-    class_instance = PM25(config_dict["raw_dir"], config_dict["output_dir"], config_dict["box_config_dict_path"], config_dict["version"], config_dict["years"], config_dict["overwrite_downloads"], config_dict["verify_existing_downloads"], config_dict["overwrite_processing"])
+    class_instance = PM25(config_dict["raw_dir"], config_dict["output_dir"], config_dict["box_config"], config_dict["version"], config_dict["years"], config_dict["overwrite_downloads"], config_dict["verify_existing_downloads"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
+
+
+try:
+    from prefect import flow
+    from prefect.filesystems import GitHub
+except:
+    pass
+else:
+    config_file = "pm25/config.ini"
+    config = ConfigParser()
+    config.read(config_file)
+
+    block_name = config["deploy"]["storage_block"]
+    GitHub.load(block_name).get_directory("global_scripts")
+
+    from main import PM25
+
+    tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+
+    @flow
+    def pm25(
+        raw_dir: str, 
+        output_dir: str, 
+        box_config: dict, 
+        version: str, 
+        years: List[int], 
+        overwrite_downloads: bool, 
+        verify_existing_downloads: bool, 
+        overwrite_processing: bool, 
+        backend: Literal["local", "mpi", "prefect"],
+        task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
+        run_parallel: bool, 
+        max_workers: int, 
+        log_dir: str):
+
+        timestamp = datetime.today()
+        time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
+        timestamp_log_dir = Path(log_dir) / time_str
+        timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+        cluster = "vortex"
+
+
+        hpc_cluster_kwargs = {
+            "shebang": "#!/bin/tcsh",
+            "resource_spec": "nodes=1:c18a:ppn=12",
+            "walltime": "4:00:00",
+            "cores": 3,
+            "processes": 3,
+            "memory": "30GB",
+            "interface": "ib0",
+            "job_extra_directives": [
+                "-j oe",
+            ],
+            "job_script_prologue": [
+                "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+                "module load anaconda3/2021.05",
+                "conda activate geodata38",
+                f"cd {tmp_dir}",
+            ],
+            "log_directory": str(timestamp_log_dir),
+        }
+
+
+        class_instance = PM25(raw_dir=raw_dir, output_dir=output_dir, box_config=box_config, version=version, years=years, overwrite_downloads=overwrite_downloads, verify_existing_downloads=verify_existing_downloads, overwrite_processing=overwrite_processing)
+
+
+        if task_runner != 'hpc':
+            os.chdir(tmp_dir)
+            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+        else:
+            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=hpc_cluster_kwargs)
