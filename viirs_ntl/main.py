@@ -13,9 +13,7 @@ import numpy as np
 from bs4 import BeautifulSoup
 import rasterio
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-
-from dataset import Dataset
+from data_manager import Dataset
 
 class VIIRS_NTL(Dataset):
 
@@ -61,7 +59,7 @@ class VIIRS_NTL(Dataset):
         access_token_dict = json.loads(response.text)
         access_token = access_token_dict.get('access_token')
 
-        return access_token
+        self.token = access_token
 
     def build_download_list(self):
 
@@ -151,10 +149,8 @@ class VIIRS_NTL(Dataset):
         """
         logger = self.get_logger()
 
-        logger.info("Retrieving token")
-        token = self.get_token()
         headers = {
-        "Authorization": f"Bearer {token}",
+        "Authorization": f"Bearer {self.token}",
         }
         
         if local_filename.exists() and not self.overwrite_download:
@@ -166,9 +162,8 @@ class VIIRS_NTL(Dataset):
                     src.raise_for_status()
                     with open(local_filename, "wb") as dst:
                         dst.write(src.content)
-            except Exception as e:
-                logger.info(f"Failed to download: {str(download_dest)}")
-                raise Exception(str(e) + f": Failed to download: {str(download_dest)}" )
+            except Exception:
+                logger.exception(f"Failed to download: {str(download_dest)}")
             else:
                 logger.info(f"Downloaded {str(local_filename)}")
 
@@ -220,8 +215,7 @@ class VIIRS_NTL(Dataset):
                         shutil.copyfileobj(f_in, f_out)
                 return (raw_local_filename, output_filename)
             except Exception as e:
-                logger.info(f"Failed to extract: {str(raw_local_filename)}")
-                raise Exception(str(e) + ": " f"Failed to extract: {str(raw_local_filename)}")
+                logger.exception(f"Failed to extract: {str(raw_local_filename)}")
     
     def build_process_list(self):
         task_list = []
@@ -315,14 +309,18 @@ class VIIRS_NTL(Dataset):
                 self.raster_calc(raw_file, output_dst, self.make_binary)
             else:
                 self.raster_calc(raw_file, output_dst, self.remove_negative)
+        except Exception as e:
+            logger.exception(f"Failed to process: {str(raw_file)}")
+        else:
             logger.info(f"File Processed: {str(output_dst)}")
             return (raw_file, output_dst)
-        except Exception as e:
-            logger.info(f"Failed to process: {str(raw_file)}")
-            raise Exception(str(e) + f": Failed to process: {str(raw_file)}")
+
 
     def main(self):
         logger = self.get_logger()
+
+        logger.info("Retrieving token")
+        self.get_token()
 
         logger.info("Testing Connection...")
         self.test_connection()
