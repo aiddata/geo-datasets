@@ -141,7 +141,7 @@ class VIIRS_NTL(Dataset):
 
         return task_list
 
-    
+ 
     def manage_download(self, download_dest, local_filename):
         # consider doing separate directories for years when doing monthly data download
         """
@@ -259,7 +259,7 @@ class VIIRS_NTL(Dataset):
                     else:
                         logger.info(f"Failed to find extracted raw file: {str(monthly_cloud_glob_str)}")
         
-        logger.info(f"{str(task_list)}")
+        logger.debug(f"{str(task_list)}")
         return task_list
 
     def raster_calc(self, input_path, output_path, function, **kwargs):
@@ -309,7 +309,7 @@ class VIIRS_NTL(Dataset):
                 self.raster_calc(raw_file, output_dst, self.make_binary)
             else:
                 self.raster_calc(raw_file, output_dst, self.remove_negative)
-        except Exception as e:
+        except Exception:
             logger.exception(f"Failed to process: {str(raw_file)}")
         else:
             logger.info(f"File Processed: {str(output_dst)}")
