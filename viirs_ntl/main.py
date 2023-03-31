@@ -5,6 +5,7 @@ import os
 import sys
 from pathlib import Path
 from configparser import ConfigParser
+from typing import List, Literal
 import requests
 import json
 import gzip
@@ -385,3 +386,75 @@ if __name__ == "__main__":
     class_instance = VIIRS_NTL(config_dict["raw_dir"], config_dict["output_dir"], config_dict["annual_files"], config_dict["monthly_files"], config_dict["months"], config_dict["years"], config_dict["username"], config_dict["password"], config_dict["client_secret"], config_dict["max_retries"], config_dict["cf_minimum"], config_dict["annual"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
+
+try:
+    from prefect import flow
+    from prefect.filesystems import GitHub
+except:
+    pass
+else:
+    config_file = "viirs_ntl/config.ini"
+    config = ConfigParser()
+    config.read(config_file)
+
+    block_name = config["deploy"]["storage_block"]
+    tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+
+    @flow
+    def viirs_ntl(
+        raw_dir: str,
+        output_dir: str,
+        annual_files: List[str],
+        monthly_files: List[str],
+        months: List[int],
+        years: List[int],
+        username: str,
+        password: str,
+        client_secret: str,
+        max_retries: int,
+        cf_minimum: int,
+        annual: bool,
+        overwrite_download: bool,
+        overwrite_extract: bool,
+        overwrite_processing: bool,
+        backend: Literal["local", "mpi", "prefect"],
+        task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
+        run_parallel: bool,
+        max_workers: int,
+        log_dir: str):
+
+        timestamp = datetime.today()
+        time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
+        timestamp_log_dir = Path(log_dir) / time_str
+        timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+        cluster = "vortex"
+
+        cluster_kwargs = {
+            "shebang": "#!/bin/tcsh",
+            "resource_spec": "nodes=1:c18a:ppn=12",
+            "cores": 6,
+            "processes": 6,
+            "memory": "32GB",
+            "interface": "ib0",
+            "job_extra_directives": [
+                "#PBS -j oe",
+                # "#PBS -o ",
+                # "#PBS -e ",
+            ],
+            "job_script_prologue": [
+                "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+                "module load anaconda3/2021.05",
+                "conda activate geodata38",
+                f"cd {tmp_dir}",
+            ],
+            "log_directory": str(timestamp_log_dir)
+        }
+
+        class_instance = VIIRS_NTL(raw_dir, output_dir, annual_files, monthly_files, months, years, username, password, client_secret, max_retries, cf_minimum, annual, overwrite_download, overwrite_extract, overwrite_processing)
+
+        if task_runner != 'hpc':
+            os.chdir(tmp_dir)
+            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+        else:
+            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
