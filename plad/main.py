@@ -42,6 +42,16 @@ class PLAD(Dataset):
         if os.path.isfile(local_filename) and not self.overwrite_download:
             logger.info(f"Download Exists: {local_filename}")
         else:
+            # try:
+            #     with requests.get(download_dest, stream=True, verify=True) as r:
+            #         r.raise_for_status()
+            #         with open(local_filename, 'wb') as f:
+            #             for chunk in r.iter_content(chunk_size=1024*1024):
+            #                 f.write(chunk)
+            #         logger.info(f"Downloaded: {download_dest}")
+            # except Exception as e:
+            #     logger.info(str(e) + f": Failed to download: {str(download_dest)}")
+
             attempts = 1
             while attempts <= self.max_retries:
                 try:
@@ -51,15 +61,14 @@ class PLAD(Dataset):
                             for chunk in r.iter_content(chunk_size=1024*1024):
                                 f.write(chunk)
                     logger.info(f"Downloaded: {download_dest}")
+                    return (download_dest, local_filename)
                 except Exception as e:
                     attempts += 1
                     if attempts > self.max_retries:
                         logger.info(str(e) + f": Failed to download: {str(download_dest)}")
+                        return (download_dest, local_filename)
                     else:
                         logger.info(f"Attempt " + {str(attempts)} + ": "+ {str(download_dest)})
-        
-        logger.info(f"Downloaded: {download_dest}")
-        return (download_dest, local_filename)
 
     def main(self):
 
@@ -92,6 +101,7 @@ def get_config_dict(config_file="config.ini"):
             "task_runner": config["run"]["task_runner"],
             "run_parallel": config["run"].getboolean("run_parallel"),
             "max_workers": int(config["run"]["max_workers"]),
+            "max_retries": config["main"].getint("max_retries"),
             "cores_per_process": int(config["run"]["cores_per_process"]),
             "overwrite_download": config["main"].getboolean("overwrite_download"),
             "overwrite_sorting": config["main"].getboolean("overwrite_sorting"),
@@ -100,6 +110,6 @@ def get_config_dict(config_file="config.ini"):
 if __name__ == "__main__":
     config_dict = get_config_dict()
 
-    class_instance = PLAD(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_sorting"])
+    class_instance = PLAD(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["max_retries"], config_dict["overwrite_download"], config_dict["overwrite_sorting"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
