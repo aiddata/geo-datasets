@@ -4,7 +4,7 @@ metadata:
   labels:
     app: prefect-agent
   name: prefect-agent
-  namespace: {{.Values.namespace}}
+  namespace: {{.Release.namespace}}
 spec:
   replicas: 1
   selector:
@@ -36,7 +36,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: prefect-agent
-  namespace: {{.Values.namespace}}
+  namespace: {{.Release.namespace}}
 rules:
 - apiGroups:
   - ''
@@ -65,7 +65,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: prefect-agent-role-binding
-  namespace: {{.Values.namespace}}
+  namespace: {{.Release.namespace}}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -73,5 +73,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: default
-  namespace: {{.Values.namespace}}
+  namespace: {{.Release.namespace}}
 
