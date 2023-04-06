@@ -35,7 +35,10 @@
       - For a local cluster, enable dev mode and set an appropriate data path
 
 9. Build dependencies (dask) for helm cluster
-   `helm dependency build ./helm_chart`
+   ```
+   helm repo add dask https://helm.dask.org/
+   helm dependency build ./helm_chart
+   ```
 
 10. Install the helm chart into the local cluster.
    If there is already a namespace called "geodata", remove `--create-namespace`
