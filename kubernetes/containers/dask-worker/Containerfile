@@ -14,12 +14,14 @@ RUN apt-get install -y --no-install-recommends \
 
 RUN add-apt-repository ppa:ubuntugis/ppa
 
+# install gdal, git, wget
 RUN apt-get install -y --no-install-recommends \
     build-essential \
     gdal-bin \
     libgdal-dev \
     openssh-client \
     git \
+    wget \
 && rm -rf /var/lib/apt/lists/*
 
 COPY dask-worker/prepare.sh /usr/bin/prepare.sh
