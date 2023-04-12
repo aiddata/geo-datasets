@@ -8,7 +8,7 @@ metadata:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: dask-cluster-role
+  name: {{ include "geodata_release.name" . }}-role-cluster
 rules:
   # Application: watching & handling for the custom resource we declare.
   - apiGroups: [kubernetes.dask.org]
@@ -37,11 +37,11 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: dask-cluster-role-binding
+  name: {{ include "geodata_release.name" . }}-dask-rolebinding-cluster
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: dask-cluster-role
+  name: {{ include "geodata_release.name" . }}-role-cluster
 subjects:
   - kind: ServiceAccount
     namespace: {{ .Release.Namespace }}
