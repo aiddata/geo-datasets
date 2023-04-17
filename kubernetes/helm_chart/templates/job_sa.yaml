@@ -12,7 +12,7 @@ metadata:
 rules:
   # Application: watching & handling for the custom resource we declare.
   - apiGroups: [kubernetes.dask.org]
-    resources: [daskclusters, daskworkergroups, daskworkergroups/scale, daskjobs, daskautoscalers]
+    resources: [daskclusters, daskworkergroups, daskworkergroups/scale, daskjobs, daskautoscalers, daskautoscalers/scale]
     verbs: [get, list, watch, patch, create, delete]
 
   # Application: other resources it needs to watch and get information from.
