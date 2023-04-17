@@ -2,6 +2,12 @@
 
 # takes one argument, number of seconds ago before which to delete jobs
 
+if [ -z "$1" ]
+  then
+    echo "No argument supplied"
+    exit 1
+fi
+
 # timestamp before which we delete jobs matching dataset-run-*
 # in unix time, of course
 AGO="$((`date +%s` - $1))"
