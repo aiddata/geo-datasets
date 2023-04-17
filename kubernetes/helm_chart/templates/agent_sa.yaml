@@ -2,23 +2,17 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: geodata-launcher
+  namespace: {{.Release.Namespace}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: {{.Release.namespace}}
-  name: agent-create
+  namespace: {{.Release.Namespace}}
+  name: geodata-prefect-agent
 rules:
 - apiGroups: ["batch"]
   resources: ["jobs"]
   verbs: ["create", "get", "watch", "delete"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  namespace: {{.Release.namespace}}
-  name: agent-watch
-rules:
 - apiGroups: [""]
   resources: ["pods", "pods/log", "pods/status"]
   verbs: ["watch", "get"]
@@ -26,28 +20,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: watch-pods
-  namespace: {{.Release.namespace}}
-subjects:
-- kind: ServiceAccount
-  name: geodata-launcher
-  namespace: {{.Release.namespace}}
-roleRef:
-  kind: Role
-  name: agent-watch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
   name: launch-jobs
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
 subjects:
 - kind: ServiceAccount
   name: geodata-launcher
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
 roleRef:
   kind: Role
-  name: agent-create
+  name: geodata-prefect-agent
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -56,8 +37,8 @@ metadata:
   name: {{ include "geodata_release.name" . }}-agent-system
 rules:
 - apiGroups: [""]
-  resources: ["namespaces", "pods"]
-  verbs: ["get", "watch"]
+  resources: ["namespaces"]
+  verbs: ["get"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -67,7 +48,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: geodata-launcher
-  namespace: {{.Release.namespace}}
+  namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role
-  name: agent-system
+  name: {{ include "geodata_release.name" . }}-agent-system
