@@ -9,7 +9,7 @@ from affine import Affine
 import numpy as np
 
 
-shorelines_path = "/sciclone/aiddata10/REU/geo/raw/gshhg/gshhg-shp-2.3.6/GSHHS_shp/f/GSHHS_f_L1.shp"
+shorelines_path = "/sciclone/aiddata10/REU/geo/raw/gshhg/gshhg-shp-2.3.7/GSHHS_shp/f/GSHHS_f_L1.shp"
 
 
 pixel_size = 0.01
@@ -25,12 +25,12 @@ affine = Affine(pixel_size, 0, xmin,
 
 shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
 
-print "Rasterizing"
+print("Rasterizing")
 shorelines, _ = rasterize(shorelines_path, affine=affine, shape=shape)
 shorelines = np.logical_not(shorelines).astype(int)
 
 
-water_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast_236/binary/coast_binary.tif"
+water_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast_237/binary/coast_binary.tif"
 
 export_raster(shorelines, affine, water_output_raster_path)
 
@@ -42,9 +42,9 @@ export_raster(shorelines, affine, water_output_raster_path)
 # water = water_src.read()[0]
 # affine = water_src.affine
 
-distance_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast_236/coast_distance.tif"
+distance_output_raster_path = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast_237/coast_distance.tif"
 
-print "Generating distance raster"
+print("Generating distance raster")
 
 def raster_conditional(rarray):
     return (rarray == 1)
