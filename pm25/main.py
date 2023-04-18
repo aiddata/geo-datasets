@@ -11,7 +11,6 @@ from datetime import datetime
 from typing import List, Literal
 from configparser import ConfigParser
 
-
 import rasterio
 import numpy as np
 from affine import Affine
@@ -66,20 +65,6 @@ def sha1(filename):
     return h.hexdigest()
 
 
-def create_box_client(box_config):
-    """
-    Creates a Box client using the provided JWT authentication JSON.
-    """
-
-    # load JWT authentication JSON (see README.md for how to set this up)
-    auth = JWTAuth.from_settings_dictionary(box_config)
-
-    # create Box client
-    client = Client(auth)
-
-    return client
-
-
 class PM25(Dataset):
     name = "Surface PM2.5"
 
@@ -113,6 +98,21 @@ class PM25(Dataset):
         self.filename_template =  self.version + ".HybridPM25.Global.{YEAR}{FIRST_MONTH}-{YEAR}{LAST_MONTH}"
 
 
+    def create_box_client(self):
+        """
+        Creates a Box client using the provided JWT authentication JSON.
+        """
+        
+        logger = self.get_logger()
+
+        # load JWT authentication JSON (see README.md for how to set this up)
+        auth = JWTAuth.from_settings_dictionary(self.box_config)
+
+        # create Box client
+        client = Client(auth)
+
+        return client
+
     def build_file_download_list(self):
         """
         Generates a task list of downloads from the Box shared folder for this dataset.
@@ -120,7 +120,7 @@ class PM25(Dataset):
         logger = self.get_logger()
 
         # create Box client
-        self.client = create_box_client(self.box_config)
+        self.client = self.create_box_client()
 
         # find shared folder
         shared_folder = self.client.get_shared_item(f"https://wustl.app.box.com/v/ACAG-{self.version}-GWRPM25")
@@ -186,7 +186,7 @@ class PM25(Dataset):
 
 
     def get_box_item(self, id: str):
-        client = create_box_client(self.box_config)
+        client = self.create_box_client()
         box_folder_url = 'https://wustl.app.box.com/v/ACAG-V5GL03-GWRPM25'
 
         for i in client.get_shared_item(box_folder_url).get_items():
@@ -313,26 +313,26 @@ class PM25(Dataset):
         logger.info("Building initial download list")
         dl_file_list = self.build_file_download_list()
 
-        logger.debug(dl_file_list)
-
         (self.raw_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
         (self.raw_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
 
-        logger.info("Downloading Data")
-        dl = self.run_tasks(self.download_file, dl_file_list)#, force_serial=True)
-        self.log_run(dl)
+        if len(dl_file_list) > 0:
+            logger.info("Downloading Data")
+            dl = self.run_tasks(self.download_file, dl_file_list, force_sequential=True)
+            self.log_run(dl)
+        else:
+            logger.info("Skipping download, no files queued for download")
 
 
         logger.info("Generating Task List")
         conv_flist = self.build_process_list()
-        logger.info(conv_flist)
 
         # create output directories
         (self.output_dir / "Global" / "Annual").mkdir(parents=True, exist_ok=True)
         (self.output_dir / "Global" / "Monthly").mkdir(parents=True, exist_ok=True)
 
         logger.info("Running Data Conversion")
-        conv = self.run_tasks(self.convert_file, conv_flist)
+        conv = self.run_tasks(self.convert_file, conv_flist, force_sequential=True)
         self.log_run(conv)
 
 
@@ -377,74 +377,74 @@ if __name__ == "__main__":
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
 
-
-try:
-    from prefect import flow
-    from prefect.filesystems import GitHub
-except:
-    pass
 else:
-    config_file = "pm25/config.ini"
-    config = ConfigParser()
-    config.read(config_file)
+    try:
+        from prefect import flow
+        from prefect.filesystems import GitHub
+    except:
+        pass
+    else:
+        config_file = "pm25/config.ini"
+        config = ConfigParser()
+        config.read(config_file)
 
-    block_name = config["deploy"]["storage_block"]
-    GitHub.load(block_name).get_directory("global_scripts")
+        block_name = config["deploy"]["storage_block"]
+        GitHub.load(block_name).get_directory("global_scripts")
 
-    from main import PM25
+        from main import PM25
 
-    tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
-    @flow
-    def pm25(
-        raw_dir: str, 
-        output_dir: str, 
-        box_config: dict, 
-        version: str, 
-        years: List[int], 
-        overwrite_downloads: bool, 
-        verify_existing_downloads: bool, 
-        overwrite_processing: bool, 
-        backend: Literal["local", "mpi", "prefect"],
-        task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
-        run_parallel: bool, 
-        max_workers: int, 
-        log_dir: str):
+        @flow
+        def pm25(
+            raw_dir: str, 
+            output_dir: str, 
+            box_config: dict, 
+            version: str, 
+            years: List[int], 
+            overwrite_downloads: bool, 
+            verify_existing_downloads: bool, 
+            overwrite_processing: bool, 
+            backend: Literal["local", "mpi", "prefect"],
+            task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
+            run_parallel: bool, 
+            max_workers: int, 
+            log_dir: str):
 
-        timestamp = datetime.today()
-        time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
-        timestamp_log_dir = Path(log_dir) / time_str
-        timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+            timestamp = datetime.today()
+            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
+            timestamp_log_dir = Path(log_dir) / time_str
+            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-        cluster = "vortex"
-
-
-        hpc_cluster_kwargs = {
-            "shebang": "#!/bin/tcsh",
-            "resource_spec": "nodes=1:c18a:ppn=12",
-            "walltime": "4:00:00",
-            "cores": 3,
-            "processes": 3,
-            "memory": "30GB",
-            "interface": "ib0",
-            "job_extra_directives": [
-                "-j oe",
-            ],
-            "job_script_prologue": [
-                "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-                "module load anaconda3/2021.05",
-                "conda activate geodata38",
-                f"cd {tmp_dir}",
-            ],
-            "log_directory": str(timestamp_log_dir),
-        }
+            cluster = "vortex"
 
 
-        class_instance = PM25(raw_dir=raw_dir, output_dir=output_dir, box_config=box_config, version=version, years=years, overwrite_downloads=overwrite_downloads, verify_existing_downloads=verify_existing_downloads, overwrite_processing=overwrite_processing)
+            hpc_cluster_kwargs = {
+                "shebang": "#!/bin/tcsh",
+                "resource_spec": "nodes=1:c18a:ppn=12",
+                "walltime": "4:00:00",
+                "cores": 3,
+                "processes": 3,
+                "memory": "30GB",
+                "interface": "ib0",
+                "job_extra_directives": [
+                    "-j oe",
+                ],
+                "job_script_prologue": [
+                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+                    "module load anaconda3/2021.05",
+                    "conda activate geodata38",
+                    f"cd {tmp_dir}",
+                ],
+                "log_directory": str(timestamp_log_dir),
+            }
 
 
-        if task_runner != 'hpc':
-            os.chdir(tmp_dir)
-            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
-        else:
-            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=hpc_cluster_kwargs)
+            class_instance = PM25(raw_dir=raw_dir, output_dir=output_dir, box_config=box_config, version=version, years=years, overwrite_downloads=overwrite_downloads, verify_existing_downloads=verify_existing_downloads, overwrite_processing=overwrite_processing)
+
+
+            if task_runner != 'hpc':
+                os.chdir(tmp_dir)
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+            else:
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=hpc_cluster_kwargs)
