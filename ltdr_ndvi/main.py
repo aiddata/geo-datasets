@@ -41,7 +41,7 @@ from datetime import datetime
 from urllib.parse import urljoin
 from collections import OrderedDict
 from configparser import ConfigParser
-from typing import Any, Generator, List, Tuple, Type, Union
+from typing import Any, Generator, List, Literal, Tuple, Type, Union
 
 import rasterio
 from rasterio.crs import CRS
@@ -50,10 +50,7 @@ import numpy as np
 import pandas as pd
 from osgeo import gdal, osr
 
-
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-
-from dataset import Dataset
+from data_manager import Dataset
 
 
 class LTDR_NDVI(Dataset):
@@ -542,3 +539,70 @@ if __name__ == "__main__":
     class_instance = LTDR_NDVI(config_dict["token"], config_dict["years"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["validate_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
+
+else:
+    try:
+        from prefect import flow
+        from prefect.filesystems import GitHub
+    except:
+        pass
+    else:
+        config = ConfigParser()
+        config.read(config_file)
+
+        block_name = config["deploy"]["storage_block"]
+        GitHub.load(block_name).get_directory('global_scripts')
+
+        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+
+        @flow
+        def ltdr_ndvi(
+                token: str,
+                years: List[int],
+                raw_dir: str,
+                output_dir: str,
+                overwrite_download: bool,
+                validate_download: bool,
+                overwrite_processing: bool,
+                backend: Literal["local", "mpi", "prefect"],
+                task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
+                run_parallel: bool,
+                max_workers: int,
+                log_dir: str):
+
+            timestamp = datetime.today()
+            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
+            timestamp_log_dir = Path(log_dir) / time_str
+            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+            cluster = "vortex"
+
+            cluster_kwargs = {
+                "shebang": "#!/bin/tcsh",
+                "resource_spec": "nodes=1:c18a:ppn=12",
+                "cores": 6,
+                "processes": 6,
+                "memory": "32GB",
+                "interface": "ib0",
+                "job_extra_directives": [
+                    "#PBS -j oe",
+                    # "#PBS -o ",
+                    # "#PBS -e ",
+                ],
+                "job_script_prologue": [
+                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+                    "module load anaconda3/2021.05",
+                    "conda activate geodata38",
+                    f"cd {tmp_dir}",
+                ],
+                "log_directory": str(timestamp_log_dir)
+            }
+
+
+            class_instance = LTDR_NDVI(token, years, raw_dir, output_dir, overwrite_download, validate_download, overwrite_processing)
+
+            if task_runner != 'hpc':
+                os.chdir(tmp_dir)
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+            else:
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
