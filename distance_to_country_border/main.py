@@ -1,5 +1,3 @@
-
-import distancerasters as dr
 import os
 import sys
 import requests
@@ -9,9 +7,9 @@ import shutil
 from zipfile import ZipFile
 from configparser import ConfigParser
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+import distancerasters as dr
 
-from dataset import Dataset
+from data_manager import Dataset
 
 class DISTANCE_TO_BORDERS(Dataset):
     name = "DISTANCE_TO_BORDERS"
@@ -194,6 +192,7 @@ def get_config_dict(config_file="config.ini"):
             "overwrite_distance_raster": config["main"].getboolean("overwrite_distance_raster")
         }
 
+
 if __name__ == "__main__":
     config_dict = get_config_dict()
 
@@ -201,3 +200,66 @@ if __name__ == "__main__":
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
 
+else:
+    try:
+        from prefect import flow
+        from prefect.filesystems import GitHub
+    except:
+        pass
+    else:
+        config_file = "distance_to_country_border/config.ini"
+        config = ConfigParser()
+        config.read(config_file)
+
+        block_name = config["deploy"]["storage_block"]
+        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+
+        @flow
+        def distance_to_country_border(
+                raw_dir: str,
+                output_dir: str,
+                overwrite_download: bool,
+                overwrite_extract: bool,
+                overwrite_binary_raster: bool,
+                overwrite_distance_raster: bool,
+                backend: Literal["local", "mpi", "prefect"],
+                task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
+                run_parallel: bool,
+                max_workers: int,
+                log_dir: str):
+
+            timestamp = datetime.today()
+            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
+            timestamp_log_dir = Path(log_dir) / time_str
+            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+            cluster = "vortex"
+
+            cluster_kwargs = {
+                "shebang": "#!/bin/tcsh",
+                "resource_spec": "nodes=1:c18a:ppn=12",
+                "cores": 6,
+                "processes": 6,
+                "memory": "32GB",
+                "interface": "ib0",
+                "job_extra_directives": [
+                    "#PBS -j oe",
+                    # "#PBS -o ",
+                    # "#PBS -e ",
+                ],
+                "job_script_prologue": [
+                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+                    "module load anaconda3/2021.05",
+                    "conda activate geodata38",
+                    f"cd {tmp_dir}",
+                ],
+                "log_directory": str(timestamp_log_dir)
+            }
+
+            class_instance = DISTANCE_TO_BORDERS(raw_dir, output_dir, overwrite_download, overwrite_extract, overwrite_binary_raster, overwrite_distance_raster)
+
+            if task_runner != 'hpc':
+                os.chdir(tmp_dir)
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+            else:
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
