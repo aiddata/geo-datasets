@@ -8,24 +8,25 @@ from prefect import flow
 from prefect.filesystems import GitHub
 
 
-config_file = "malaria_atlas_project/config.ini"
+config_file = "udel_climate/config.ini"
 config = ConfigParser()
 config.read(config_file)
 
 block_name = config["deploy"]["storage_block"]
 GitHub.load(block_name).get_directory('global_scripts')
 
-from main import MalariaAtlasProject
+from main import UDelClimate
 
 tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
 
 @flow
-def malaria_atlas_project(
+def udel_climate(
         raw_dir: str,
         output_dir: str,
-        years: List[int],
-        dataset: str,
+        methods: List[str],
+        build_monthly: bool,
+        build_yearly: bool,
         overwrite_download: bool,
         overwrite_processing: bool,
         backend: Literal["local", "mpi", "prefect"],
@@ -86,7 +87,7 @@ def malaria_atlas_project(
     #     "log_directory": str(timestamp_log_dir)
     # }
 
-    class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
+    class_instance = UDelClimate(raw_dir, output_dir, methods, build_monthly, build_yearly, overwrite_download, overwrite_processing)
 
     if task_runner != 'hpc':
         os.chdir(tmp_dir)

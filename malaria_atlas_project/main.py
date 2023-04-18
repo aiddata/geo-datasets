@@ -26,11 +26,9 @@ from copy import copy
 from pathlib import Path
 from zipfile import ZipFile
 from configparser import ConfigParser
+from datetime import datetime
 
-import rasterio
-from rasterio import windows
-
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
 from dataset import Dataset
 
@@ -38,13 +36,14 @@ from dataset import Dataset
 class MalariaAtlasProject(Dataset):
     name = "Malaria Atlas Project"
 
-    def __init__(self, raw_dir, output_dir, years, dataset="pf_incidence_rate", overwrite=False):
+    def __init__(self, raw_dir, output_dir, years, dataset="pf_incidence_rate", overwrite_download=False, overwrite_processing=False):
 
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
         self.years = years
         self.dataset = dataset
-        self.overwrite = overwrite
+        self.overwrite_download = overwrite_download
+        self.overwrite_processing = overwrite_processing
 
         dataset_lookup = {
             "pf_incidence_rate": {
@@ -56,15 +55,14 @@ class MalariaAtlasProject(Dataset):
         self.data_info = dataset_lookup[self.dataset]
 
 
-
     def test_connection(self):
         # test connection
         test_request = requests.get("https://data.malariaatlas.org", verify=True)
         test_request.raise_for_status()
 
 
-    def copy_files(self, zip_path, zip_file, dst_path, cog_path, overwrite=False):
-        if not os.path.isfile(dst_path) or self.overwrite:
+    def copy_files(self, zip_path, zip_file, dst_path, cog_path):
+        if not os.path.isfile(dst_path) or self.overwrite_processing:
             with ZipFile(zip_path) as myzip:
                 with myzip.open(zip_file) as src:
                     with open(dst_path, "wb") as dst:
@@ -80,6 +78,18 @@ class MalariaAtlasProject(Dataset):
         """
         Convert GeoTIFF to Cloud Optimized GeoTIFF (COG)
         """
+
+        import rasterio
+        from rasterio import windows
+
+        logger = self.get_logger()
+
+        if not self.overwrite_processing and dst_path.exists():
+            logger.info(f"COG Exists: {dst_path}")
+            return
+
+        logger.info(f"Generating COG: {dst_path}")
+
         with rasterio.open(src_path, 'r') as src:
 
             profile = copy(src.profile)
@@ -88,6 +98,14 @@ class MalariaAtlasProject(Dataset):
                 'driver': 'COG',
                 'compress': 'LZW',
             })
+
+            # These creation options are not supported by the COG driver
+            for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
+                if k in profile:
+                    del profile[k]
+
+            print(profile)
+            logger.info(profile)
 
             with rasterio.open(dst_path, 'w+', **profile) as dst:
 
@@ -103,6 +121,7 @@ class MalariaAtlasProject(Dataset):
                     # write data to output window
                     dst.write(r, 1, window=dst_window)
 
+
     def copy_data_files(self, zip_file_local_name):
 
         logger = self.get_logger()
@@ -111,7 +130,7 @@ class MalariaAtlasProject(Dataset):
         try:
             dataZip = ZipFile(zip_file_local_name)
         except:
-            print("Could not read downloaded zipfile")
+            logger.warning(f"Could not read downloaded zipfile: {zip_file_local_name}")
             raise
 
         raw_geotiff_dir = self.raw_dir / "geotiff" / self.dataset
@@ -130,11 +149,12 @@ class MalariaAtlasProject(Dataset):
             year_file_name = self.data_info["data_name"] + f"_{year}.tif"
 
             tif_path = raw_geotiff_dir / year_file_name
-            cog_path = self.output_dir / year_file_name
+            cog_path = self.output_dir / self.dataset / year_file_name[7:]
 
             flist.append((zip_file_local_name, year_file_name, tif_path, cog_path))
 
         return flist
+
 
     def download_file(self, url, local_filename):
         """Download a file from url to local_filename
@@ -146,7 +166,8 @@ class MalariaAtlasProject(Dataset):
                 for chunk in r.iter_content(chunk_size=1024*1024):
                     f.write(chunk)
 
-    def manage_download(self, url, local_filename, overwrite=False):
+
+    def manage_download(self, url, local_filename):
         """download individual file using session created
         this needs to be a standalone function rather than a method
         of SessionWithHeaderRedirection because we need to be able
@@ -155,7 +176,7 @@ class MalariaAtlasProject(Dataset):
         logger = self.get_logger()
 
         max_attempts = 5
-        if os.path.isfile(local_filename) and not overwrite:
+        if os.path.isfile(local_filename) and not self.overwrite_download:
             logger.info(f"Download Exists: {url}")
         else:
             attempts = 1
@@ -186,12 +207,16 @@ class MalariaAtlasProject(Dataset):
         downloads = self.run_tasks(self.manage_download, [(self.data_info["data_zipFile_url"], zip_file_local_name)])
         self.log_run(downloads)
 
+        dataset_output_dir = self.output_dir / self.dataset
+        dataset_output_dir.mkdir(parents=True, exist_ok=True)
+
         logger.info("Copying data files")
         file_copy_list = self.copy_data_files(zip_file_local_name)
         copy_futures = self.run_tasks(self.copy_files, file_copy_list)
         self.log_run(copy_futures)
 
-        conversions = self.run_tasks(self.convert_to_cog, copy_futures)
+        logger.info("Converting raw tifs to COGs")
+        conversions = self.run_tasks(self.convert_to_cog, copy_futures.results())
         self.log_run(conversions)
 
 
@@ -200,22 +225,32 @@ def get_config_dict(config_file="config.ini"):
     config.read(config_file)
 
     return {
-        "dataset": config["Config"]["dataset"],
-        "years": [int(y) for y in config["Config"]["years"].split(", ")],
-        "raw_dir": Path(config["Config"]["raw_dir"]),
-        "output_dir": Path(config["Config"]["output_dir"]),
-        "overwrite": config["Config"].getboolean("overwrite"),
-        "backend": config["Config"]["backend"],
-        "task_runner": config["Config"]["task_runner"],
-        "run_parallel": config["Config"].getboolean("run_parallel"),
-        "max_workers": int(config["Config"]["max_workers"]),
-        "log_dir": Path(config["Config"]["raw_dir"]) / "logs"
+        "dataset": config["main"]["dataset"],
+        "years": [int(y) for y in config["main"]["years"].split(", ")],
+        "raw_dir": Path(config["main"]["raw_dir"]),
+        "output_dir": Path(config["main"]["output_dir"]),
+        "overwrite_download": config["main"].getboolean("overwrite_download"),
+        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
+        "backend": config["run"]["backend"],
+        "task_runner": config["run"]["task_runner"],
+        "run_parallel": config["run"].getboolean("run_parallel"),
+        "max_workers": int(config["run"]["max_workers"]),
+        "log_dir": Path(config["main"]["raw_dir"]) / "logs"
     }
+
 
 if __name__ == "__main__":
 
     config_dict = get_config_dict()
 
-    class_instance = MalariaAtlasProject(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["dataset"], config_dict["overwrite"])
+    log_dir = config_dict["log_dir"]
+    timestamp = datetime.today()
+    time_format_str: str="%Y_%m_%d_%H_%M"
+    time_str = timestamp.strftime(time_format_str)
+    timestamp_log_dir = Path(log_dir) / time_str
+    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
+
+    class_instance = MalariaAtlasProject(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["dataset"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
+
+    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
