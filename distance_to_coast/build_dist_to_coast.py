@@ -18,9 +18,10 @@ from dataset import Dataset
 class DISTANCE_TO_COASTS(Dataset):
     name = "DISTANCE_TO_COASTS"
 
-    def __init__(self, raw_dir, output_dir, overwrite_download=False, overwrite_extract=False, overwrite_binary_raster=False, overwrite_distance_raster=False):
+    def __init__(self, raw_dir, output_dir, pixel_size, overwrite_download=False, overwrite_extract=False, overwrite_binary_raster=False, overwrite_distance_raster=False):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
+        self.pixel_size = pixel_size
         self.overwrite_download = overwrite_download
         self.overwrite_extract = overwrite_extract
         self.overwrite_binary_raster = overwrite_binary_raster
@@ -85,6 +86,13 @@ class DISTANCE_TO_COASTS(Dataset):
         else:
             task_list.append((zip_name, zip_prj_file, output_prj_file))
         
+        zip_shx_file = "GSHHS_shp/c/GSHHS_c_L1.dbf"
+        output_shx_file = self.raw_dir / "GSHHS_c_L1.dbf"
+        if os.path.isfile(output_shx_file) and not self.overwrite_extract:
+            logger.info(f"File previously extracted: {output_shx_file}")
+        else:
+            task_list.append((zip_name, zip_shx_file, output_shx_file))
+        
         return task_list
 
     def extract_files(self, zip_path, zip_file, dst_path):
@@ -116,7 +124,7 @@ class DISTANCE_TO_COASTS(Dataset):
         return_list = []
         
         logger.info("Preparing rasterization")
-        pixel_size = 0.01
+        pixel_size = self.pixel_size
         xmin = -180
         xmax = 180
         ymin = -90            
@@ -185,6 +193,7 @@ def get_config_dict(config_file="config.ini"):
             "raw_dir": Path(config["main"]["raw_dir"]),
             "output_dir": Path(config["main"]["output_dir"]),
             "log_dir": Path(config["main"]["output_dir"]) / "logs",
+            "pixel_size": config["main"].getfloat("pixel_size"),
             "backend": config["run"]["backend"],
             "task_runner": config["run"]["task_runner"],
             "run_parallel": config["run"].getboolean("run_parallel"),
@@ -199,7 +208,7 @@ def get_config_dict(config_file="config.ini"):
 if __name__ == "__main__":
     config_dict = get_config_dict()
 
-    class_instance = DISTANCE_TO_COASTS(config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
+    class_instance = DISTANCE_TO_COASTS(config_dict["raw_dir"], config_dict["output_dir"], config_dict["pixel_size"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
 
