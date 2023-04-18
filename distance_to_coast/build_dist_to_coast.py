@@ -41,7 +41,7 @@ class DISTANCE_TO_COASTS(Dataset):
 
         logger = self.get_logger()
 
-        download_dest = "ftp://ftp.soest.hawaii.edu/gshhg/gshhg-shp-2.3.7.zip"
+        download_dest = "http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-shp-2.3.7.zip"
         local_filename = self.raw_dir / "gshhg-shp-2.3.7.zip"
 
         if os.path.isfile(local_filename) and not self.overwrite_download:
