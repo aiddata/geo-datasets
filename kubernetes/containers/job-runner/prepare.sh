@@ -3,8 +3,14 @@
 # print all executed commands
 set -x
 
-git clone -b develop-k8s https://github.com/jacobwhall/geo-datasets.git --depth 1
-pip install ./geo-datasets/global_scripts/geo_datasets
+if [ $DATA_MANAGER_VERSION = "latest" ] ; then
+	branch=develop-k8s
+else
+	branch=data_manager_$DATA_MANAGER_VERSION
+fi
+
+git clone --branch $branch https://github.com/aiddata/geo-datasets.git --depth 1
+pip install ./geo-datasets/global_scripts/data_manager
 
 # run args
 exec "$@"
