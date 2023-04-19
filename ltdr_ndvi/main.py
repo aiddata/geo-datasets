@@ -547,6 +547,7 @@ else:
     except:
         pass
     else:
+        config_file = "ltdr_ndvi/config.ini"
         config = ConfigParser()
         config.read(config_file)
 
