@@ -1,11 +1,13 @@
 import os
 import sys
-import requests
-from affine import Affine
-from pathlib import Path
 import shutil
+import requests
+from pathlib import Path
+from typing import Literal
 from zipfile import ZipFile
 from configparser import ConfigParser
+
+from affine import Affine
 
 import distancerasters as dr
 
