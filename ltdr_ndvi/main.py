@@ -566,7 +566,7 @@ else:
                 validate_download: bool,
                 overwrite_processing: bool,
                 backend: Literal["local", "mpi", "prefect"],
-                task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
+                task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
                 run_parallel: bool,
                 max_workers: int,
                 log_dir: str):
