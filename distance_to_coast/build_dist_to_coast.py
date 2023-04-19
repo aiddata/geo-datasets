@@ -18,10 +18,12 @@ from dataset import Dataset
 class DISTANCE_TO_COASTS(Dataset):
     name = "DISTANCE_TO_COASTS"
 
-    def __init__(self, raw_dir, output_dir, pixel_size, overwrite_download=False, overwrite_extract=False, overwrite_binary_raster=False, overwrite_distance_raster=False):
+    def __init__(self, raw_dir, output_dir, pixel_size, download_dest, raster_type, overwrite_download=False, overwrite_extract=False, overwrite_binary_raster=False, overwrite_distance_raster=False):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
         self.pixel_size = pixel_size
+        self.download_dest = download_dest
+        self.raster_type = raster_type
         self.overwrite_download = overwrite_download
         self.overwrite_extract = overwrite_extract
         self.overwrite_binary_raster = overwrite_binary_raster
@@ -35,14 +37,11 @@ class DISTANCE_TO_COASTS(Dataset):
         test_request = requests.get("https://www.soest.hawaii.edu/pwessel/gshhg/", verify=True)
         test_request.raise_for_status()
     
-    def manage_download(self):
+    def manage_download(self, download_dest):
         """
         Download individual file
         """
-
         logger = self.get_logger()
-
-        download_dest = "http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-shp-2.3.7.zip"
         local_filename = self.raw_dir / "gshhg-shp-2.3.7.zip"
 
         if os.path.isfile(local_filename) and not self.overwrite_download:
@@ -86,12 +85,12 @@ class DISTANCE_TO_COASTS(Dataset):
         else:
             task_list.append((zip_name, zip_prj_file, output_prj_file))
         
-        zip_shx_file = "GSHHS_shp/c/GSHHS_c_L1.dbf"
-        output_shx_file = self.raw_dir / "GSHHS_c_L1.dbf"
-        if os.path.isfile(output_shx_file) and not self.overwrite_extract:
-            logger.info(f"File previously extracted: {output_shx_file}")
+        zip_dbf_file = "GSHHS_shp/c/GSHHS_c_L1.dbf"
+        output_dbf_file = self.raw_dir / "GSHHS_c_L1.dbf"
+        if os.path.isfile(output_dbf_file) and not self.overwrite_extract:
+            logger.info(f"File previously extracted: {output_dbf_file}")
         else:
-            task_list.append((zip_name, zip_shx_file, output_shx_file))
+            task_list.append((zip_name, zip_dbf_file, output_dbf_file))
         
         return task_list
 
@@ -116,7 +115,7 @@ class DISTANCE_TO_COASTS(Dataset):
         file_path = zip_path / zip_file
         return (file_path, dst_path)
 
-    def create_raster(self):
+    def create_raster(self, type):
         """
         Create binary and distance raster for borders
         """
@@ -134,31 +133,33 @@ class DISTANCE_TO_COASTS(Dataset):
         borders_path = str(self.raw_dir) + "/GSHHS_c_L1.shp"
         borders, _ = dr.rasterize(borders_path, affine=affine, shape=shape)
 
-        logger.info("Creating binary borders raster")
-        borders_output_raster_path = self.output_dir / "binary" / "coasts_binary.tif"
-        if os.path.isfile(borders_output_raster_path) and not self.overwrite_binary_raster:
-            logger.info(f"Raster previously created: {borders_output_raster_path}")
-        else:
-            try:
-                dr.export_raster(borders, affine, borders_output_raster_path)
-                logger.info(f"Binary raster created: {borders_output_raster_path}")
-                return_list.append(("Success", str(borders_output_raster_path)))
-            except Exception as e:
-                logger.info(f"Error creating binary raster {borders_output_raster_path}: {e}")
-                return_list.append((str(e), str(borders_output_raster_path)))
+        if type == "binary":
+            logger.info("Creating binary borders raster")
+            borders_output_raster_path = self.output_dir / "binary" / "GSHHS_coasts_binary.tif"
+            if os.path.isfile(borders_output_raster_path) and not self.overwrite_binary_raster:
+                logger.info(f"Raster previously created: {borders_output_raster_path}")
+            else:
+                try:
+                    dr.export_raster(borders, affine, borders_output_raster_path)
+                    logger.info(f"Binary raster created: {borders_output_raster_path}")
+                    return_list.append(("Success", str(borders_output_raster_path)))
+                except Exception as e:
+                    logger.info(f"Error creating binary raster {borders_output_raster_path}: {e}")
+                    return_list.append((str(e), str(borders_output_raster_path)))
 
-        logger.info("Creating distance raster")
-        distance_output_raster_path = self.output_dir / "coasts_distance.tif"
-        if os.path.isfile(distance_output_raster_path) and not self.overwrite_distance_raster:
-            logger.info(f"Raster previously created: {distance_output_raster_path}")
-        else:
-            try:
-                dr.DistanceRaster(borders, affine=affine, output_path=distance_output_raster_path, conditional=self.raster_conditional)
-                logger.info(f"Distance raster created: {distance_output_raster_path}")
-                return_list.append(("Success", str(distance_output_raster_path)))
-            except Exception as e:
-                logger.info(f"Error creating distance raster {distance_output_raster_path}: {e}")
-                return_list.append((str(e), str(distance_output_raster_path)))
+        elif type == "distance":
+            logger.info("Creating distance raster")
+            distance_output_raster_path = self.output_dir / "GSHHS_coasts_distance.tif"
+            if os.path.isfile(distance_output_raster_path) and not self.overwrite_distance_raster:
+                logger.info(f"Raster previously created: {distance_output_raster_path}")
+            else:
+                try:
+                    dr.DistanceRaster(borders, affine=affine, output_path=distance_output_raster_path, conditional=self.raster_conditional)
+                    logger.info(f"Distance raster created: {distance_output_raster_path}")
+                    return_list.append(("Success", str(distance_output_raster_path)))
+                except Exception as e:
+                    logger.info(f"Error creating distance raster {distance_output_raster_path}: {e}")
+                    return_list.append((str(e), str(distance_output_raster_path)))
         return return_list
     
     
@@ -167,11 +168,9 @@ class DISTANCE_TO_COASTS(Dataset):
 
         os.makedirs(self.raw_dir, exist_ok=True)
 
-        logger.info("Testing Connection...")
-        self.test_connection()
-
         logger.info("Running data download")
-        download = self.manage_download()
+        download = self.run_tasks(self.manage_download, [[f] for f in self.download_dest])
+        self.log_run(download)
 
         logger.info("Building extract list...")
         extract_list = self.build_extract_list()
@@ -183,7 +182,9 @@ class DISTANCE_TO_COASTS(Dataset):
             self.log_run(extraction)
 
         logger.info("Creating rasters")
-        create_raster = self.create_raster()
+        create_raster = self.run_tasks(self.create_raster, [[f] for f in self.raster_type])
+        self.log_run(create_raster)
+
 
 def get_config_dict(config_file="config.ini"):
     config = ConfigParser()
@@ -194,6 +195,8 @@ def get_config_dict(config_file="config.ini"):
             "output_dir": Path(config["main"]["output_dir"]),
             "log_dir": Path(config["main"]["output_dir"]) / "logs",
             "pixel_size": config["main"].getfloat("pixel_size"),
+            "download_dest": [str(y) for y in config["main"]["download_dest"].split(", ")],
+            "raster_type": [str(y) for y in config["main"]["raster_type"].split(", ")],
             "backend": config["run"]["backend"],
             "task_runner": config["run"]["task_runner"],
             "run_parallel": config["run"].getboolean("run_parallel"),
@@ -208,7 +211,7 @@ def get_config_dict(config_file="config.ini"):
 if __name__ == "__main__":
     config_dict = get_config_dict()
 
-    class_instance = DISTANCE_TO_COASTS(config_dict["raw_dir"], config_dict["output_dir"], config_dict["pixel_size"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
+    class_instance = DISTANCE_TO_COASTS(config_dict["raw_dir"], config_dict["output_dir"], config_dict["pixel_size"], config_dict["download_dest"], config_dict["raster_type"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
 
