@@ -5,6 +5,7 @@ shapely
 fiona
 pandas
 geopandas
+distancerasters
 
 dask-jobqueue == 0.8.1
 dask-kubernetes

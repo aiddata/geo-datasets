@@ -5,6 +5,7 @@ shapely
 fiona
 pandas
 geopandas
+distancerasters
 
 netcdf4 == 1.5.7
 numpy == 1.23.3
