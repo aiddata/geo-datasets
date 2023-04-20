@@ -11,8 +11,6 @@ from configparser import ConfigParser
 
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
-shorelines_path = "/sciclone/aiddata10/REU/geo/raw/gshhg/gshhg-shp-2.3.7/GSHHS_shp/f/GSHHS_f_L1.shp"
-
 from dataset import Dataset
 
 class DISTANCE_TO_COASTS(Dataset):
@@ -64,29 +62,29 @@ class DISTANCE_TO_COASTS(Dataset):
         
         zip_name = self.raw_dir / "gshhg-shp-2.3.7.zip" 
         task_list = []
-        zip_shp_file = "GSHHS_shp/c/GSHHS_c_L1.shp"
-        output_shp_file = self.raw_dir / "GSHHS_c_L1.shp"
+        zip_shp_file = "GSHHS_shp/f/GSHHS_f_L1.shp"
+        output_shp_file = self.raw_dir / "GSHHS_f_L1.shp"
         if os.path.isfile(output_shp_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_shp_file}")
         else:
             task_list.append((zip_name, zip_shp_file, output_shp_file))
 
-        zip_shx_file = "GSHHS_shp/c/GSHHS_c_L1.shx"
-        output_shx_file = self.raw_dir / "GSHHS_c_L1.shx"
+        zip_shx_file = "GSHHS_shp/f/GSHHS_f_L1.shx"
+        output_shx_file = self.raw_dir / "GSHHS_f_L1.shx"
         if os.path.isfile(output_shx_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_shx_file}")
         else:
             task_list.append((zip_name, zip_shx_file, output_shx_file))
         
-        zip_prj_file = "GSHHS_shp/c/GSHHS_c_L1.prj"
-        output_prj_file = self.raw_dir / "GSHHS_c_L1.prj"
+        zip_prj_file = "GSHHS_shp/f/GSHHS_f_L1.prj"
+        output_prj_file = self.raw_dir / "GSHHS_f_L1.prj"
         if os.path.isfile(output_prj_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_prj_file}")
         else:
             task_list.append((zip_name, zip_prj_file, output_prj_file))
         
-        zip_dbf_file = "GSHHS_shp/c/GSHHS_c_L1.dbf"
-        output_dbf_file = self.raw_dir / "GSHHS_c_L1.dbf"
+        zip_dbf_file = "GSHHS_shp/f/GSHHS_f_L1.dbf"
+        output_dbf_file = self.raw_dir / "GSHHS_f_L1.dbf"
         if os.path.isfile(output_dbf_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_dbf_file}")
         else:
@@ -130,7 +128,7 @@ class DISTANCE_TO_COASTS(Dataset):
         ymax = 90
         affine = Affine(pixel_size, 0, xmin, 0, -pixel_size, ymax)
         shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
-        borders_path = str(self.raw_dir) + "/GSHHS_c_L1.shp"
+        borders_path = str(self.raw_dir) + "/GSHHS_f_L1.shp"
         borders, _ = dr.rasterize(borders_path, affine=affine, shape=shape)
 
         if type == "binary":
