@@ -16,10 +16,11 @@ from dataset import Dataset
 class DISTANCE_TO_WATER(Dataset):
     name = "DISTANCE_TO_WATER"
 
-    def __init__(self, raw_dir, output_dir, pixel_size, raster_type, overwrite_download=False, overwrite_extract=False, overwrite_binary_raster=False, overwrite_distance_raster=False):
+    def __init__(self, raw_dir, output_dir, pixel_size, download_files, raster_type, overwrite_download=False, overwrite_extract=False, overwrite_binary_raster=False, overwrite_distance_raster=False):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
         self.pixel_size = pixel_size
+        self.download_list = download_files
         self.raster_type = raster_type
         self.overwrite_download = overwrite_download
         self.overwrite_extract = overwrite_extract
@@ -40,9 +41,13 @@ class DISTANCE_TO_WATER(Dataset):
         """
         logger = self.get_logger()
         if download_dest == "http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-shp-2.3.7.zip":
+            dir_name = self.raw_dir / "gshhg"
+            os.makedirs(dir_name, exist_ok=True)
             local_filename = self.raw_dir / "gshhg" / "gshhg-shp-2.3.7.zip"
         elif download_dest == "https://github.com/nvkelso/natural-earth-vector/archive/d4533efe3715c55b51f49bc2bde9694bff2bf7b1.zip":
-            local_filename = self.raw_dir / "natural-earth-vector" / "natural_earth_vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1.zip"
+            dir_name = self.raw_dir / "natural-earth-vector"
+            os.makedirs(dir_name, exist_ok=True)
+            local_filename = self.raw_dir / "natural-earth-vector" / "natural-earth-vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1.zip"
 
         if os.path.isfile(local_filename) and not self.overwrite_download:
             logger.info(f"Download Exists: {local_filename}")
@@ -53,8 +58,7 @@ class DISTANCE_TO_WATER(Dataset):
                     for chunk in r.iter_content(chunk_size=1024*1024):
                         f.write(chunk)
             logger.info(f"Downloaded: {download_dest}")
-
-        return (self, download_dest, local_filename)
+        return (download_dest, local_filename)
     
     def build_extract_list(self):
         """
@@ -64,7 +68,7 @@ class DISTANCE_TO_WATER(Dataset):
         
         gshhg_zip_name = self.raw_dir / "gshhg" / "gshhg-shp-2.3.7.zip" 
         task_list = []
-        zip_shore_shp_file = "GSHHS_shp/f/GSHHG_f_L1.shp"
+        zip_shore_shp_file = "GSHHS_shp/f/GSHHS_f_L1.shp"
         output_shore_shp_file = self.raw_dir / "gshhg" / "GSHHS_f_L1.shp"
         if os.path.isfile(output_shore_shp_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_shore_shp_file}")
@@ -92,63 +96,63 @@ class DISTANCE_TO_WATER(Dataset):
         else:
             task_list.append((gshhg_zip_name, zip_shore_dbf_file, output_shore_dbf_file))
         
-        ne_zip_name = self.raw_dir / "natural-earth-vector" / "natural_earth_vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1.zip"
+        ne_zip_name = self.raw_dir / "natural-earth-vector" / "natural-earth-vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1.zip"
 
-        zip_lakes_shp_file = "10m_physical/ne_10m_lakes.shp"
+        zip_lakes_shp_file = "natural-earth-vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_lakes.shp"
         output_lakes_shp_file = self.raw_dir / "natural-earth-vector" / "ne_10m_lakes.shp"
         if os.path.isfile(output_lakes_shp_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_lakes_shp_file}")
         else:
-            task_list.append(ne_zip_name, zip_lakes_shp_file, output_lakes_shp_file)
+            task_list.append((ne_zip_name, zip_lakes_shp_file, output_lakes_shp_file))
 
-        zip_lakes_shx_file = "10m_physical/ne_10m_lakes.shx"
+        zip_lakes_shx_file = "natural-earth-vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_lakes.shx"
         output_lakes_shx_file = self.raw_dir / "natural-earth-vector" / "ne_10m_lakes.shx"
         if os.path.isfile(output_lakes_shx_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_lakes_shx_file}")
         else:
-            task_list.append(ne_zip_name, zip_lakes_shx_file, output_lakes_shx_file)
+            task_list.append((ne_zip_name, zip_lakes_shx_file, output_lakes_shx_file))
         
-        zip_lakes_prj_file = "10m_physical/ne_10m_lakes.prj"
+        zip_lakes_prj_file = "natural-earth-vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_lakes.prj"
         output_lakes_prj_file = self.raw_dir / "natural-earth-vector" / "ne_10m_lakes.prj"
         if os.path.isfile(output_lakes_prj_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_lakes_prj_file}")
         else:
-            task_list.append(ne_zip_name, zip_lakes_prj_file, output_lakes_prj_file)
+            task_list.append((ne_zip_name, zip_lakes_prj_file, output_lakes_prj_file))
         
-        zip_lakes_dbf_file = "10m_physical/ne_10m_lakes.dbf"
+        zip_lakes_dbf_file = "natural-earth-vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_lakes.dbf"
         output_lakes_dbf_file = self.raw_dir / "natural-earth-vector" / "ne_10m_lakes.dbf"
         if os.path.isfile(output_lakes_dbf_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_lakes_dbf_file}")
         else:
-            task_list.append(ne_zip_name, zip_lakes_dbf_file, output_lakes_dbf_file)
+            task_list.append((ne_zip_name, zip_lakes_dbf_file, output_lakes_dbf_file))
         
-        zip_rivers_shp_file = "10m_physical/ne_10m_rivers_lake_centerlines.shp"
+        zip_rivers_shp_file = "natural-earth-vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_rivers_lake_centerlines.shp"
         output_rivers_shp_file = self.raw_dir / "natural-earth-vector" / "ne_10m_rivers_lake_centerlines.shp"
         if os.path.isfile(output_rivers_shp_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_rivers_shp_file}")
         else:
-            task_list.append(ne_zip_name, zip_rivers_shp_file, output_rivers_shp_file)
+            task_list.append((ne_zip_name, zip_rivers_shp_file, output_rivers_shp_file))
 
-        zip_rivers_shx_file = "10m_physical/ne_10m_rivers_lake_centerlines.shx"
+        zip_rivers_shx_file = "natural-earth-vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_rivers_lake_centerlines.shx"
         output_rivers_shx_file = self.raw_dir / "natural-earth-vector" / "ne_10m_rivers_lake_centerlines.shx"
         if os.path.isfile(output_rivers_shx_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_rivers_shx_file}")
         else:
-            task_list.append(ne_zip_name, zip_rivers_shx_file, output_rivers_shx_file)
+            task_list.append((ne_zip_name, zip_rivers_shx_file, output_rivers_shx_file))
         
-        zip_rivers_prj_file = "10m_physical/ne_10m_rivers_lake_centerlines.prj"
+        zip_rivers_prj_file = "natural-earth-vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_rivers_lake_centerlines.prj"
         output_rivers_prj_file = self.raw_dir / "natural-earth-vector" / "ne_10m_rivers_lake_centerlines.prj"
         if os.path.isfile(output_rivers_prj_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_rivers_prj_file}")
         else:
-            task_list.append(ne_zip_name, zip_rivers_prj_file, output_rivers_prj_file)
+            task_list.append((ne_zip_name, zip_rivers_prj_file, output_rivers_prj_file))
         
-        zip_rivers_dbf_file = "10m_physical/ne_10m_rivers_lake_centerlines.dbf"
+        zip_rivers_dbf_file = "natural-earth-vector-d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_rivers_lake_centerlines.dbf"
         output_rivers_dbf_file = self.raw_dir / "natural-earth-vector" / "ne_10m_rivers_lake_centerlines.dbf"
         if os.path.isfile(output_rivers_dbf_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_rivers_dbf_file}")
         else:
-            task_list.append(ne_zip_name, zip_rivers_dbf_file, output_rivers_dbf_file)
+            task_list.append((ne_zip_name, zip_rivers_dbf_file, output_rivers_dbf_file))
         
         return task_list
 
@@ -196,7 +200,7 @@ class DISTANCE_TO_WATER(Dataset):
         lakes_path = str(self.raw_dir) + "/natural-earth-vector/ne_10m_lakes.shp"
         lakes, _ = dr.rasterize(lakes_path, affine=affine, shape=shape)
 
-        rivers_path = str(self.raw_dir) + "/natural-earth-vector/ne_10m_rivers_lake_centerline.shp"
+        rivers_path = str(self.raw_dir) + "/natural-earth-vector/ne_10m_rivers_lake_centerlines.shp"
         rivers, _ = dr.rasterize(rivers_path, affine=affine, shape=shape)
 
         water = shorelines + lakes + rivers
@@ -210,7 +214,7 @@ class DISTANCE_TO_WATER(Dataset):
                 try:
                     dr.export_raster(water, affine, water_output_raster_path)
                     logger.info(f"Water raster created: {water_output_raster_path}")
-                    return (("Success", str(distance_output_raster_path)))
+                    return (("Success", str(water_output_raster_path)))
                 except Exception as e:
                     logger.info(f"Error creating distance raster {water_output_raster_path}: {e}")
                     return ((str(e), str(water_output_raster_path)))
@@ -222,7 +226,7 @@ class DISTANCE_TO_WATER(Dataset):
                 logger.info(f"Raster previously created: {distance_output_raster_path}")
             else:
                 try:
-                    dr.DistanceRaster(water, affine=affine, output=distance_output_raster_path, conditional=self.raster_conditional)
+                    dr.DistanceRaster(water, affine=affine, output_path=distance_output_raster_path, conditional=self.raster_conditional)
                     logger.info(f"Distance raster created: {distance_output_raster_path}")
                     return_list.append(("Success", str(distance_output_raster_path)))
                 except Exception as e:
@@ -235,10 +239,8 @@ class DISTANCE_TO_WATER(Dataset):
 
         os.makedirs(self.raw_dir, exist_ok=True)
 
-        download_list = ["http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-shp-2.3.7.zip", "https://github.com/nvkelso/natural-earth-vector/archive/d4533efe3715c55b51f49bc2bde9694bff2bf7b1.zip"]
-
         logger.info("Running data download")
-        download = self.run_tasks(self.manage_download, download_list)
+        download = self.run_tasks(self.manage_download, [[f] for f in self.download_list])
         self.log_run(download)
 
         logger.info("Building extract list...")
@@ -264,6 +266,7 @@ def get_config_dict(config_file="config.ini"):
             "output_dir": Path(config["main"]["output_dir"]),
             "log_dir": Path(config["main"]["output_dir"]) / "logs",
             "pixel_size": config["main"].getfloat("pixel_size"),
+            "download_files": [str(y) for y in config["main"]["download_files"].split(", ")],
             "raster_type": [str(y) for y in config["main"]["raster_type"].split(", ")],
             "backend": config["run"]["backend"],
             "task_runner": config["run"]["task_runner"],
@@ -279,6 +282,6 @@ def get_config_dict(config_file="config.ini"):
 if __name__ == "__main__":
     config_dict = get_config_dict()
 
-    class_instance = DISTANCE_TO_WATER(config_dict["raw_dir"], config_dict["output_dir"], config_dict["pixel_size"], config_dict["raster_type"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
+    class_instance = DISTANCE_TO_WATER(config_dict["raw_dir"], config_dict["output_dir"], config_dict["pixel_size"], config_dict["download_files"], config_dict["raster_type"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
