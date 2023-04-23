@@ -1,6 +1,5 @@
 ## Distance to Water
 
-Data from [Earth Observation Group](https://payneinstitute.mines.edu/eog/)
 Distance to water, measured in meters. Derived using World Vector Shorelines from [GSHHG](http://www.soest.hawaii.edu/pwessel/gshhg/) combined with rivers and lakes from World Data Bank 2 (via [Natural Earth](https://github.com/nvkelso/natural-earth-vector)).
 
 To run:
