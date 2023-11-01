@@ -41,7 +41,7 @@ If you have a previous release (helm lingo for an installation), you can "upgrad
 # list helm releases to get the name of the one you want to upgrade
 helm list
 # change "geodata-release" to be the correct release name
-helm upgrade geodata-release ./helm_chart
+helm upgrade geodata-release ./helm_chart --values my-values.yaml
 ```
 If the output includes the phrase, "Happy Helming!" you're in the clear :smile:
 
