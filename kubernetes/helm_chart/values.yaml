@@ -1,9 +1,9 @@
-agentContainer: "prefecthq/prefect:2.8.6-python3.8"
+workerContainer: "prefecthq/prefect:2.14.2-python3.10"
 
 prefect:
   apiURL: "[YOUR_API_URL]"
   apiKey: "[YOUR_API_KEY]"
-  workQueue: "geodata-k8-local"
+  workPool: "geodata-pool"
 
 prod:
   nfs:
