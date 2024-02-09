@@ -90,6 +90,7 @@ flow.from_source(
 ).deploy(
     name=config["deploy"]["deployment_name"],
     work_pool_name=config["deploy"]["work_pool"],
+    job_variables={"env": {"DATA_MANAGER_VERSION": "0.1.0"} },
     parameters=get_config_dict(config_file),
     version=config["deploy"]["version"],
     build=False,
