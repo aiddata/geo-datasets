@@ -115,6 +115,9 @@ class Dataset(ABC):
             try:
                 return TaskResult(0, "Success", args, func(*args))
             except Exception as e:
+                if self.bypass_error_wrapper:
+                    logger.info("Task failed with exception, and error wrapper bypass enabled. Raising...")
+                    raise
                 if try_no < self.retries:
                     logger.error(f"Task failed with exception (retrying): {repr(e)}")
                     time.sleep(self.retry_delay)
@@ -461,6 +464,7 @@ class Dataset(ABC):
         retries: int=3,
         retry_delay: int=5,
         conda_env: str = "geodata38",
+        bypass_error_wrapper: bool=False,
         **kwargs):
         """
         Run a dataset
@@ -479,6 +483,8 @@ class Dataset(ABC):
 
         self.chunksize = chunksize
         os.makedirs(self.log_dir, exist_ok=True)
+
+        self.bypass_error_wrapper = bypass_error_wrapper
 
         # Allow datasets to set their own default max_workers
         if max_workers is None and hasattr(self, "max_workers"):
