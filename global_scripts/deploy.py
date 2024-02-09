@@ -87,7 +87,7 @@ flow.from_source(
         url=git_repo,
         branch=git_branch,
     ),
-    entrypoint="{}/flow.py:{}".format(git_directory, git_directory),
+    entrypoint="{}/{}.py:{}".format(git_directory, module_name, git_directory),
 ).deploy(
     name=config["deploy"]["deployment_name"],
     work_pool_name=config["deploy"]["work_pool"],
