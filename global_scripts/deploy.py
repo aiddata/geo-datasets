@@ -62,7 +62,7 @@ config.read(config_file)
 # load flow
 module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
-flow_image = "docker.io/jacobwhall/geodata-container:d7a4543"
+flow_image = "docker.io/jacobwhall/geodata-container:77fb4ec"
 
 
 # create and load storage block
