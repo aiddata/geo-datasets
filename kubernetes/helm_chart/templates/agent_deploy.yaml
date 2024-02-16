@@ -18,16 +18,16 @@ spec:
       containers:
       - command:
         - prefect
-        - agent
+        - worker
         - start
-        - -q
-        - {{.Values.prefect.workQueue}}
+        - -p
+        - {{.Values.prefect.workPool}}
         env:
         - name: PREFECT_API_URL
           value: {{.Values.prefect.apiURL}}
         - name: PREFECT_API_KEY
           value: {{.Values.prefect.apiKey}}
-        image: {{.Values.agentContainer}}
+        image: {{.Values.workerContainer}}
         imagePullPolicy: IfNotPresent
         name: agent
       serviceAccountName: geodata-launcher

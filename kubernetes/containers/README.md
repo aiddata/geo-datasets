@@ -21,6 +21,11 @@ It builds upon a Prefect docker image, adding the dependencies required to run m
 
 ### building
 
+> **Warning**
+Nota Bene: This image now builds with an unusually high UID, to match that of jwhall's on the HPC systems.
+To build this container, you will likely need to increase the range value of the available subuids on your system.
+The easiest way to do this is to append a "0" to the end of your user's line in `/etc/subuid`
+
 ```shell
 cd container
 podman build --tag geodata-container .

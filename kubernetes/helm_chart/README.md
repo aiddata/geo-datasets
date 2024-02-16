@@ -36,6 +36,10 @@ This section is for installing the helm chart for production needs, with an imag
 
 ## Upgrading
 
+> **Note**
+An important note regarding upgrades: PersistentVolumes and PersistentVolumeClaims will not be updated automatically.
+If you'd like to update them, you'll have to delete them manually first.
+
 If you have a previous release (helm lingo for an installation), you can "upgrade" it in-place with an updated chart.
 ```shell
 # list helm releases to get the name of the one you want to upgrade

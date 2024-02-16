@@ -1,4 +1,4 @@
-FROM prefecthq/prefect:2.8.6-python3.8
+FROM prefecthq/prefect:2.14.21-python3.10
 
 # install gdal, git, wget
 RUN apt-get update
@@ -10,12 +10,29 @@ RUN apt-get install -y --no-install-recommends \
     wget \
 && rm -rf /var/lib/apt/lists/*
 
+RUN sed -i -e 's/^UID_MAX.*$/&0/g' /etc/login.defs
+
+RUN useradd jwhall -ms /bin/bash -u 220294
+RUN groupadd ad-reu -g 9915
+
+# RUN chown -R jwhall /home/jwhall
+
+# jwhall and ad-reu
+USER jwhall:ad-reu
+
+WORKDIR /home/jwhall
+
+ENV PATH /home/jwhall/.local/bin:$PATH
+
 # install python packages
-COPY job-runner/requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
+
+# install numpy beforehand, otherwise netcdf4 build step will complain for some reason
+RUN pip install numpy
 RUN pip install -r requirements.txt --no-cache-dir --no-binary rasterio
 
-COPY job-runner/prepare.sh /usr/bin/prepare.sh
+COPY prepare.sh /usr/bin/prepare.sh
 ENTRYPOINT ["/usr/bin/prepare.sh"]
 
 # run prefect agent
-CMD ["prefect", "agent", "start", "-q", "geodata`"]
+CMD ["prefect", "worker", "start", "-p", "geodata-pool"]
