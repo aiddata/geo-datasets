@@ -8,7 +8,7 @@ prefect:
 prod:
   nfs:
     address: 128.239.59.130
-    mountPath: /sciclone/nova/test
+    mountPath: /sciclone/nova/test/geo
 
 dev:
   enabled: false
