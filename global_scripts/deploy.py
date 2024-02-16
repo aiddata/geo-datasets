@@ -63,6 +63,7 @@ config.read(config_file)
 module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
 flow_image = "docker.io/jacobwhall/geodata-container:77fb4ec"
+data_manager_version = config["deploy"]["data_manager_version"]
 
 
 # create and load storage block
@@ -92,7 +93,7 @@ flow.from_source(
     name=config["deploy"]["deployment_name"],
     work_pool_name=config["deploy"]["work_pool"],
     image=flow_image,
-    job_variables={"env": {"DATA_MANAGER_VERSION": "0.1.0"} },
+    job_variables={"env": {"DATA_MANAGER_VERSION": data_manager_version} },
     parameters=get_config_dict(config_file),
     version=config["deploy"]["version"],
     build=False,
