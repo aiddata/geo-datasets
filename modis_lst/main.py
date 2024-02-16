@@ -4,7 +4,7 @@ import requests
 import shutil
 from pathlib import Path
 from datetime import datetime
-from typing import List, Literal
+from typing import List, Literal, Union
 from urllib.parse import urlparse
 from configparser import ConfigParser
 
@@ -303,10 +303,15 @@ class MODISLandSurfaceTemp(Dataset):
         return flist
 
 
-    def process_hdf(self, input_path, layer, tmp_path, output_path):
+    def process_hdf(self, input_path: Union[str, Path], layer, tmp_path, output_path):
 
         logger = self.get_logger()
         self.process_dir.mkdir(parents=True, exist_ok=True)
+
+        # convert input_path to a str if it isn't one already
+        # (pyhdf doesn't like taking pathlib.Path objects)
+        if isinstance(input_path, Path):
+            input_path = input_path.as_posix()
 
         if self.overwrite_monthly or not os.path.isfile(output_path):
             # read HDF data files
