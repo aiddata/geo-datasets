@@ -464,7 +464,8 @@ else:
                 task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
                 run_parallel: bool,
                 max_workers: int,
-                log_dir: str):
+                log_dir: str,
+                bypass_error_wrapper: bool):
 
             timestamp = datetime.today()
             time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -497,6 +498,6 @@ else:
 
             if task_runner != 'hpc':
                 os.chdir(tmp_dir)
-                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, bypass_error_wrapper=bypass_error_wrapper)
             else:
-                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs, bypass_error_wrapper=bypass_error_wrapper)
