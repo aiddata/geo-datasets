@@ -113,6 +113,7 @@
       "finished_job_ttl": {
         "title": "Finished Job TTL",
         "description": "The number of seconds to retain jobs after completion. If set, finished jobs will be cleaned up by Kubernetes after the given delay. If not set, jobs will be retained indefinitely.",
+        "default": 86400,
         "type": "integer"
       },
       "job_watch_timeout_seconds": {
