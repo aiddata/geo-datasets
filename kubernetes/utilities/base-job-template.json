@@ -22,14 +22,26 @@
             "completions": 1,
             "restartPolicy": "Never",
             "serviceAccountName": "{{ service_account_name }}",
+            "securityContext": {
+              "runAsUser": 220294,
+              "runAsGroup": 9915
+            },
             "containers": [
               {
                 "name": "prefect-job",
                 "env": "{{ env }}",
                 "image": "{{ image }}",
                 "imagePullPolicy": "{{ image_pull_policy }}",
-                "args": "{{ command }}"
+                "args": "{{ command }}",
+                "volumeMounts": [
+                  {
+                    "mountPath": "/sciclone/aiddata10/REU/geo",
+                    "name": "sciclone"
+                  }
+		]
               }
+            ],
+            "volumes": [
             ]
           }
         }

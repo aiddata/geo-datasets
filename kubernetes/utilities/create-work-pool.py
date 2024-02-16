@@ -1,11 +1,11 @@
-import json
 import asyncio
+import json
 
 import click
-
 from prefect import get_client
-from prefect.exceptions import ObjectAlreadyExists
 from prefect.client.schemas.actions import WorkPoolCreate, WorkPoolUpdate
+from prefect.exceptions import ObjectAlreadyExists
+
 
 async def create_work_pool(wp_kwargs):
     async with get_client() as client:
@@ -18,24 +18,47 @@ async def create_work_pool(wp_kwargs):
             # TODO: assert that existing work pool has matching type (kubernetes)
             del wp_kwargs["type"]
             await client.update_work_pool(
-                work_pool_name=name,
-                work_pool=WorkPoolUpdate(**wp_kwargs)
+                work_pool_name=name, work_pool=WorkPoolUpdate(**wp_kwargs)
             )
-            print(
-                f"Work pool {name} updated"
-            )
+            print(f"Work pool {name} updated")
+
 
 @click.command()
 @click.option("--pool-name", default="geodata-pool", help="Name of work pool", type=str)
-@click.option("--concurrency-limit", default=None, help="Concurrency maximum for work pool", type=int)
+@click.option(
+    "--concurrency-limit",
+    default=None,
+    help="Concurrency maximum for work pool",
+    type=int,
+)
 @click.option("--namespace", required=True, help="Name of k8s namespace", type=str)
-@click.option("--image", default="jacobwhall/geodata-container", help="Name of image to run jobs in", type=str)
+@click.option(
+    "--image",
+    default="jacobwhall/geodata-container",
+    help="Name of image to run jobs in",
+    type=str,
+)
 @click.option("--cpu-request", default=None, help="CPU request", type=int)
 @click.option("--cpu-limit", default=None, help="CPU limit", type=int)
 @click.option("--memory-request", default=None, help="Memory request", type=int)
 @click.option("--memory-limit", default=None, help="Memory limit", type=int)
-def main(pool_name, concurrency_limit, namespace, image, cpu_request, cpu_limit, memory_request, memory_limit):
-
+@click.option(
+    "--persistent-volume-claim",
+    default="nova-geodata-prod",
+    help="Name of PersistentVolumeClaim in Kubernetes to mount to /sciclone/aiddata10/REU/geo in the image.",
+    type=str,
+)
+def main(
+    pool_name,
+    concurrency_limit,
+    namespace,
+    image,
+    cpu_request,
+    cpu_limit,
+    memory_request,
+    memory_limit,
+    persistent_volume_claim,
+):
     # should we have requests and limits?
     requests_and_limits: bool = False
 
@@ -47,6 +70,17 @@ def main(pool_name, concurrency_limit, namespace, image, cpu_request, cpu_limit,
 
     # set default image
     base_job_template["variables"]["properties"]["image"]["default"] = image
+
+    # set PersistentVolumeClaim to mount to /sciclone in the image
+    pvc_template = {
+        "name": "sciclone",
+        "persistentVolumeClaim": {
+            "claimName": persistent_volume_claim,
+        },
+    }
+    base_job_template["job_configuration"]["job_manifest"]["spec"]["template"]["spec"][
+        "volumes"
+    ].append(pvc_template)
 
     # TODO: set cpu request
 
