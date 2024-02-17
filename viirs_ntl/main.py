@@ -39,7 +39,7 @@ class VIIRS_NTL(Dataset):
         self.overwrite_extract = overwrite_extract
         self.overwrite_processing = overwrite_processing
 
-        self.base_url = "https://eogdata.mines.edu/nighttime_light/"
+        self.base_url = "https://eogdata.mines.edu/nighttime_light"
 
         # annual (non-tiled)
         self.annual_url_path = "annual/v21"
