@@ -1,13 +1,13 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts_4.05/yearly/pre/mean",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts_4.07/yearly/pre/mean",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "cru.pre.YYYY.tif",
-	"name": "cru_ts_405_pre_yearly_mean",
-	"title": "Yearly Mean Precipitation - CRU TS (v4.05)",
-	"description": "Yearly mean precipitation from Climate Research Unit (CRU) in millimeters. Version 4.05",
+	"name": "cru_ts_407_pre_yearly_mean",
+	"title": "Yearly Mean Precipitation - CRU TS (v4.07)",
+	"description": "Yearly mean precipitation from Climate Research Unit (CRU) in millimeters. Version 4.07",
     "details": "Created by aggregating (mean) monthly precipitation data from CRU TS",
-	"version": "4.05",
+	"version": "4.07",
 	"options": {
 	    "resolution": 0.5,
         "extract_types": ["max", "mean", "min"],
