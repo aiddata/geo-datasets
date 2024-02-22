@@ -3,20 +3,19 @@ import sys
 import requests
 import shutil
 from pathlib import Path
+from datetime import datetime
+from typing import List, Literal, Union
 from urllib.parse import urlparse
 from configparser import ConfigParser
 
-import numpy as np
-from affine import Affine
-
 import warnings
 import rasterio
+import numpy as np
+from affine import Affine
 from bs4 import BeautifulSoup
 from pyhdf.SD import SD, SDC
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-
-from dataset import Dataset
+from data_manager import Dataset
 
 
 def listFD(url, ext=''):
@@ -304,10 +303,15 @@ class MODISLandSurfaceTemp(Dataset):
         return flist
 
 
-    def process_hdf(self, input_path, layer, tmp_path, output_path):
+    def process_hdf(self, input_path: Union[str, Path], layer, tmp_path, output_path):
 
         logger = self.get_logger()
         self.process_dir.mkdir(parents=True, exist_ok=True)
+
+        # convert input_path to a str if it isn't one already
+        # (pyhdf doesn't like taking pathlib.Path objects)
+        if isinstance(input_path, Path):
+            input_path = input_path.as_posix()
 
         if self.overwrite_monthly or not os.path.isfile(output_path):
             # read HDF data files
@@ -430,3 +434,75 @@ if __name__ == "__main__":
     class_instance = MODISLandSurfaceTemp(config_dict["process_dir"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["username"], config_dict["password"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_monthly"], config_dict["overwrite_yearly"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
+
+else:
+    try:
+        from prefect import flow
+        from prefect.filesystems import GitHub
+    except:
+        pass
+    else:
+        config_file = "modis_lst/config.ini"
+        config = ConfigParser()
+        config.read(config_file)
+
+        block_name = config["deploy"]["storage_block"]
+        GitHub.load(block_name).get_directory('global_scripts')
+
+        from main import MODISLandSurfaceTemp
+
+        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+
+
+        @flow
+        def modis_lst(
+                process_dir: str,
+                raw_dir: str,
+                output_dir: str,
+                username: str,
+                password: str,
+                years: List[int],
+                overwrite_download: bool,
+                overwrite_monthly: bool,
+                overwrite_yearly: bool,
+                backend: Literal["local", "mpi", "prefect"],
+                task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
+                run_parallel: bool,
+                max_workers: int,
+                log_dir: str,
+                bypass_error_wrapper: bool):
+
+            timestamp = datetime.today()
+            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
+            timestamp_log_dir = Path(log_dir) / time_str
+            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+            cluster = "vortex"
+
+            cluster_kwargs = {
+                "shebang": "#!/bin/tcsh",
+                "resource_spec": "nodes=1:c18a:ppn=12",
+                "cores": 4,
+                "processes": 4,
+                "memory": "32GB",
+                "interface": "ib0",
+                "job_extra_directives": [
+                    "-j oe",
+                ],
+                "job_script_prologue": [
+                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+                    "module load anaconda3/2021.05",
+                    "conda activate geodata38",
+                    f"cd {tmp_dir}",
+                ],
+                "log_directory": str(timestamp_log_dir),
+            }
+
+
+            class_instance = MODISLandSurfaceTemp(process_dir=process_dir, raw_dir=raw_dir, output_dir=output_dir, username=username, password=password, years=years, overwrite_download=overwrite_download, overwrite_monthly=overwrite_monthly, overwrite_yearly=overwrite_yearly)
+
+            if task_runner != 'hpc':
+                os.chdir(tmp_dir)
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, bypass_error_wrapper=bypass_error_wrapper)
+            else:
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs, bypass_error_wrapper=bypass_error_wrapper)

@@ -19,7 +19,10 @@ from tempfile import mkdtemp, mkstemp
 A namedtuple that represents the results of one task
 You can access a status code, for example, using TaskResult.status_code or TaskResult[0]
 """
-TaskResult = namedtuple("TaskResult", ["status_code", "status_message", "args", "result"])
+TaskResult = namedtuple(
+    "TaskResult", ["status_code", "status_message", "args", "result"]
+)
+
 
 class ResultTuple(Sequence):
     """
@@ -27,13 +30,16 @@ class ResultTuple(Sequence):
     It also keeps track of the name of a run and the time it started
     ResultTuple.results() returns a list of results from each task
     """
+
     def __init__(self, iterable, name, timestamp=datetime.today()):
         self.elements = []
         for value in iterable:
             if isinstance(value, TaskResult):
                 self.elements.append(value)
             else:
-                raise ValueError("ResultTuples must only consist of TaskResult namedtuples!")
+                raise ValueError(
+                    "ResultTuples must only consist of TaskResult namedtuples!"
+                )
         self.name = name
         self.timestamp = timestamp
 
@@ -46,18 +52,22 @@ class ResultTuple(Sequence):
     def __repr__(self):
         success_count = sum(1 for t in self.elements if t.status_code == 0)
         error_count = len(self.elements) - success_count
-        return f"<ResultTuple named \"{self.name}\" with {success_count} successes, {error_count} errors>"
+        return f'<ResultTuple named "{self.name}" with {success_count} successes, {error_count} errors>'
 
     def args(self):
         args = [t.args for t in self.elements if t.status_code == 0]
         if len(args) < len(self.elements):
-            logging.getLogger("dataset").warning(f"args() function for ResultTuple {self.name} skipping errored tasks")
+            logging.getLogger("dataset").warning(
+                f"args() function for ResultTuple {self.name} skipping errored tasks"
+            )
         return args
 
     def results(self):
         results = [t.result for t in self.elements if t.status_code == 0]
         if len(results) < len(self.elements):
-            logging.getLogger("dataset").warning(f"results() function for ResultTuple {self.name} skipping errored tasks")
+            logging.getLogger("dataset").warning(
+                f"results() function for ResultTuple {self.name} skipping errored tasks"
+            )
         return results
 
 
@@ -74,7 +84,6 @@ class Dataset(ABC):
         """
         raise NotImplementedError("Dataset classes must implement a main function")
 
-
     def get_logger(self):
         """
         This function will return a logger that implements the Python logging API:
@@ -84,25 +93,30 @@ class Dataset(ABC):
         """
         if self.backend == "prefect":
             from prefect import get_run_logger
+
             return get_run_logger()
         else:
             return logging.getLogger("dataset")
-
 
     @contextmanager
     def tmp_to_dst_file(self, final_dst, tmp_dir=None):
         logger = self.get_logger()
         tmp_sub_dir = mkdtemp(dir=tmp_dir)
         _, tmp_path = mkstemp(dir=tmp_sub_dir)
-        logger.debug(f"Created temporary file {tmp_path} with final destination {str(final_dst)}")
+        logger.debug(
+            f"Created temporary file {tmp_path} with final destination {str(final_dst)}"
+        )
         yield tmp_path
         try:
             shutil.move(tmp_path, final_dst)
         except:
-            logger.exception(f"Failed to transfer temporary file {tmp_path} to final destination {str(final_dst)}")
+            logger.exception(
+                f"Failed to transfer temporary file {tmp_path} to final destination {str(final_dst)}"
+            )
         else:
-            logger.debug(f"Successfully transferred {tmp_path} to final destination {str(final_dst)}")
-
+            logger.debug(
+                f"Successfully transferred {tmp_path} to final destination {str(final_dst)}"
+            )
 
     def error_wrapper(self, func, args):
         """
@@ -115,6 +129,11 @@ class Dataset(ABC):
             try:
                 return TaskResult(0, "Success", args, func(*args))
             except Exception as e:
+                if self.bypass_error_wrapper:
+                    logger.info(
+                        "Task failed with exception, and error wrapper bypass enabled. Raising..."
+                    )
+                    raise
                 if try_no < self.retries:
                     logger.error(f"Task failed with exception (retrying): {repr(e)}")
                     time.sleep(self.retry_delay)
@@ -122,7 +141,6 @@ class Dataset(ABC):
                 else:
                     logger.error(f"Task failed with exception (giving up): {repr(e)}")
                     return TaskResult(1, repr(e), args, None)
-
 
     def run_serial_tasks(self, name, func, input_list):
         """
@@ -133,7 +151,6 @@ class Dataset(ABC):
         logger.debug(f"run_serial_tasks - input_list: {input_list}")
         return [self.error_wrapper(func, i) for i in input_list]
 
-
     def run_concurrent_tasks(self, name, func, input_list, force_sequential):
         """
         Run tasks concurrently (locally), given a function a list of inputs
@@ -141,9 +158,12 @@ class Dataset(ABC):
         """
         pool_size = 1 if force_sequential else 10
         with multiprocessing.Pool(pool_size) as pool:
-            results = pool.starmap(self.error_wrapper, [(func, i) for i in input_list], chunksize=self.chunksize)
+            results = pool.starmap(
+                self.error_wrapper,
+                [(func, i) for i in input_list],
+                chunksize=self.chunksize,
+            )
         return results
-
 
     def run_prefect_tasks(self, name, func, input_list, force_sequential):
         """
@@ -152,9 +172,16 @@ class Dataset(ABC):
         """
 
         from prefect import task
+
         logger = self.get_logger()
 
-        task_wrapper = task(func, name=name, retries=self.retries, retry_delay_seconds=self.retry_delay, persist_result=True)
+        task_wrapper = task(
+            func,
+            name=name,
+            retries=self.retries,
+            retry_delay_seconds=self.retry_delay,
+            persist_result=True,
+        )
 
         futures = []
         for i in input_list:
@@ -163,19 +190,18 @@ class Dataset(ABC):
 
         results = []
 
-
         states = [(i[0], i[1].wait()) for i in futures]
 
         while states:
             for ix, (inputs, state) in enumerate(states):
                 if state.is_completed():
                     # print('complete', ix, inputs)
-                    logger.info(f'complete - {ix} - {inputs}')
+                    logger.info(f"complete - {ix} - {inputs}")
 
                     results.append(TaskResult(0, "Success", inputs, state.result()))
                 elif state.is_failed() or state.is_crashed() or state.is_cancelled():
                     # print('fail', ix, inputs)
-                    logger.info(f'fail - {ix} - {inputs}')
+                    logger.info(f"fail - {ix} - {inputs}")
 
                     try:
                         msg = repr(state.result(raise_on_failure=True))
@@ -187,7 +213,6 @@ class Dataset(ABC):
                     continue
                 _ = states.pop(ix)
             time.sleep(5)
-
 
         # for inputs, future in futures:
         #     state = future.wait(60*60*2)
@@ -226,7 +251,6 @@ class Dataset(ABC):
 
         return results
 
-
     def run_mpi_tasks(self, name, func, input_list, force_sequential):
         """
         Run tasks using MPI, requiring the use of `mpirun`
@@ -234,7 +258,10 @@ class Dataset(ABC):
         This will always return a list of TaskResults!
         """
         from mpi4py.futures import MPIPoolExecutor
-        with MPIPoolExecutor(max_workers=self.mpi_max_workers, chunksize=self.chunksize) as pool:
+
+        with MPIPoolExecutor(
+            max_workers=self.mpi_max_workers, chunksize=self.chunksize
+        ) as pool:
             futures = []
             for i in input_list:
                 f = pool.submit(self.error_wrapper, func, i)
@@ -243,16 +270,17 @@ class Dataset(ABC):
                 futures.append(f)
         return [f.result() for f in futures]
 
-
-    def run_tasks(self,
-                  func,
-                  input_list,
-                  allow_futures: bool=True,
-                  name: Optional[str]=None,
-                  retries: Optional[int]=3,
-                  retry_delay: Optional[int]=60,
-                  force_sequential: bool=False,
-                  force_serial: bool=False):
+    def run_tasks(
+        self,
+        func,
+        input_list,
+        allow_futures: bool = True,
+        name: Optional[str] = None,
+        retries: Optional[int] = 3,
+        retry_delay: Optional[int] = 60,
+        force_sequential: bool = False,
+        force_serial: bool = False,
+    ):
         """
         Run a bunch of tasks, calling one of the above run_tasks functions
         This is the function that should be called most often from self.main()
@@ -274,7 +302,9 @@ class Dataset(ABC):
             try:
                 name = func.__name__
             except AttributeError:
-                logger.warning("No name given for task run, and function does not have a name (multiple unnamed functions may result in log files being overwritten)")
+                logger.warning(
+                    "No name given for task run, and function does not have a name (multiple unnamed functions may result in log files being overwritten)"
+                )
                 name = "unnamed"
         elif not isinstance(name, str):
             raise TypeError("Name of task run must be a string")
@@ -282,35 +312,46 @@ class Dataset(ABC):
         if self.backend == "serial" or force_serial:
             results = self.run_serial_tasks(name, func, input_list)
         elif self.backend == "concurrent":
-            results = self.run_concurrent_tasks(name, func, input_list, force_sequential)
+            results = self.run_concurrent_tasks(
+                name, func, input_list, force_sequential
+            )
         elif self.backend == "prefect":
             results = self.run_prefect_tasks(name, func, input_list, force_sequential)
         elif self.backend == "mpi":
             results = self.run_mpi_tasks(name, func, input_list, force_sequential)
         else:
-            raise ValueError("Requested backend not recognized. Have you called this Dataset's run function?")
+            raise ValueError(
+                "Requested backend not recognized. Have you called this Dataset's run function?"
+            )
 
         if len(results) == 0:
-            raise ValueError(f"Task run {name} yielded no results. Did it receive any inputs?")
+            raise ValueError(
+                f"Task run {name} yielded no results. Did it receive any inputs?"
+            )
 
         success_count = sum(1 for r in results if r.status_code == 0)
         error_count = len(results) - success_count
         if error_count == 0:
-            logger.info(f"Task run {name} completed with {success_count} successes and no errors")
+            logger.info(
+                f"Task run {name} completed with {success_count} successes and no errors"
+            )
         else:
-            logger.warning(f"Task run {name} completed with {error_count} errors and {success_count} successes")
+            logger.warning(
+                f"Task run {name} completed with {error_count} errors and {success_count} successes"
+            )
 
         # Restore global retry settings
         self.retries, self.retry_delay = old_retries, old_retry_delay
 
         return ResultTuple(results, name, timestamp)
 
-
-    def log_run(self,
-                results,
-                expand_args: list=[],
-                expand_results: list=[],
-                time_format_str: str="%Y_%m_%d_%H_%M"):
+    def log_run(
+        self,
+        results,
+        expand_args: list = [],
+        expand_results: list = [],
+        time_format_str: str = "%Y_%m_%d_%H_%M",
+    ):
         """
         Log a task run
         Given a ResultTuple (usually from run_tasks), and save its logs to a CSV file
@@ -355,12 +396,22 @@ class Dataset(ABC):
         for r in results:
             row = [r[0], r[1]]
             if should_expand_args:
-                row.extend([r[2][i] if r[2] is not None else None for _, i in args_expansion_spec])
+                row.extend(
+                    [
+                        r[2][i] if r[2] is not None else None
+                        for _, i in args_expansion_spec
+                    ]
+                )
             else:
                 row.append(r[2])
 
             if should_expand_results:
-                row.extend([r[3][i] if r[3] is not None else None  for _, i in results_expansion_spec])
+                row.extend(
+                    [
+                        r[3][i] if r[3] is not None else None
+                        for _, i in results_expansion_spec
+                    ]
+                )
             else:
                 row.append(r[3])
 
@@ -371,8 +422,7 @@ class Dataset(ABC):
             writer.writerow(fieldnames)
             writer.writerows(rows_to_write)
 
-
-    def init_retries(self, retries: int, retry_delay: int, save_settings: bool=False):
+    def init_retries(self, retries: int, retry_delay: int, save_settings: bool = False):
         """
         Given a number of task retries and a retry_delay,
         checks to make sure those values are valid
@@ -382,7 +432,9 @@ class Dataset(ABC):
         """
         if isinstance(retries, int):
             if retries < 0:
-                raise ValueError("Number of task retries must be greater than or equal to zero")
+                raise ValueError(
+                    "Number of task retries must be greater than or equal to zero"
+                )
             elif save_settings:
                 self.retries = retries
         elif retries is None:
@@ -398,10 +450,11 @@ class Dataset(ABC):
         elif retry_delay is None:
             retry_delay = self.retry_delay
         else:
-            raise TypeError("retry_delay must be an int greater than or equal to zero, representing the number of seconds to wait before retrying a task")
+            raise TypeError(
+                "retry_delay must be an int greater than or equal to zero, representing the number of seconds to wait before retrying a task"
+            )
 
         return retries, retry_delay
-
 
     def _check_env_and_run(self, correct_env: str):
         """
@@ -416,14 +469,18 @@ class Dataset(ABC):
             current_env = os.environ["CONDA_DEFAULT_ENV"]
         except KeyError:
             # KeyError if there is no such environment variable
-            logger.warning("No conda environment detected! Have you loaded the anaconda module and activated an environment?")
+            logger.warning(
+                "No conda environment detected! Have you loaded the anaconda module and activated an environment?"
+            )
         except:
             # don't kill the program if something else goes wrong
             logger.warning("Unable to detect current conda environment")
         else:
             # test if the current env is the one we wanted
             if current_env != correct_env:
-                logger.warning(f"Your conda environment is {current_env} instead of the expected {correct_env}")
+                logger.warning(
+                    f"Your conda environment is {current_env} instead of the expected {correct_env}"
+                )
 
         try:
             # $TMPDIR is the default temporary directory that deployments use to store and execute code
@@ -441,27 +498,30 @@ class Dataset(ABC):
             # is /local a parent dir of tmp_dir?
             for p in tmp_dir.parents:
                 if p.resolve() == slash_local:
-                    logger.warning("$TMPDIR in /local, deployments won't be accessible to compute nodes.")
+                    logger.warning(
+                        "$TMPDIR in /local, deployments won't be accessible to compute nodes."
+                    )
 
         # run the dataset (self.main() should be defined in child class instance)
         self.main()
 
-
     def run(
         self,
-        backend: Optional[str]=None,
-        task_runner: Optional[str]=None,
-        run_parallel: bool=False,
-        max_workers: Optional[int]=None,
-        threads_per_worker: Optional[int]=1,
+        backend: Optional[str] = None,
+        task_runner: Optional[str] = None,
+        run_parallel: bool = False,
+        max_workers: Optional[int] = None,
+        threads_per_worker: Optional[int] = 1,
         # cores_per_process: Optional[int]=None,
-        chunksize: int=1,
-        log_dir: str="logs",
+        chunksize: int = 1,
+        log_dir: str = "logs",
         logger_level=logging.INFO,
-        retries: int=3,
-        retry_delay: int=5,
+        retries: int = 3,
+        retry_delay: int = 5,
         conda_env: str = "geodata38",
-        **kwargs):
+        bypass_error_wrapper: bool = False,
+        **kwargs,
+    ):
         """
         Run a dataset
         Initializes class variables and chosen backend
@@ -472,13 +532,15 @@ class Dataset(ABC):
         # no matter what happens, this is our ticket to run the actual dataset
         # every backend calls this after initializing
         launch = lambda: self._check_env_and_run(conda_env)
-        
+
         self.init_retries(retries, retry_delay, save_settings=True)
 
         self.log_dir = Path(log_dir)
 
         self.chunksize = chunksize
         os.makedirs(self.log_dir, exist_ok=True)
+
+        self.bypass_error_wrapper = bypass_error_wrapper
 
         # Allow datasets to set their own default max_workers
         if max_workers is None and hasattr(self, "max_workers"):
@@ -500,44 +562,52 @@ class Dataset(ABC):
                 tr = ConcurrentTaskRunner
             elif task_runner == "dask":
                 from prefect_dask import DaskTaskRunner
+
                 # if "cluster" in kwargs:
-                    # del kwargs["cluster"]
+                # del kwargs["cluster"]
                 # if "cluster_kwargs" in kwargs:
-                    # del kwargs["cluster_kwargs"]
+                # del kwargs["cluster_kwargs"]
 
                 dask_cluster_kwargs = {
                     "n_workers": max_workers,
-                    "threads_per_worker": threads_per_worker
+                    "threads_per_worker": threads_per_worker,
                 }
                 tr = DaskTaskRunner(cluster_kwargs=dask_cluster_kwargs)
             elif task_runner == "hpc":
                 from hpc import HPCDaskTaskRunner
+
                 job_name = "".join(self.name.split())
-                tr = HPCDaskTaskRunner(num_procs=max_workers, job_name=job_name, log_dir=self.log_dir, **kwargs)
+                tr = HPCDaskTaskRunner(
+                    num_procs=max_workers,
+                    job_name=job_name,
+                    log_dir=self.log_dir,
+                    **kwargs,
+                )
             elif task_runner == "kubernetes":
                 from prefect_dask import DaskTaskRunner
                 from dask_kubernetes.operator import KubeCluster, make_cluster_spec
 
                 spec = make_cluster_spec(name="selector-example", n_workers=2)
-                spec["spec"]["worker"]["spec"]["containers"][0]["image"] = "docker.io/jacobwhall/geodata-dask"
-                spec["spec"]["worker"]["spec"]["containers"][0]["imagePullPolicy"] = "Always"
-                spec["spec"]["worker"]["spec"]["containers"][0]["env"] = [{
-                    "name": "DATA_MANAGER_VERSION",
-                    "value": os.environ["DATA_MANAGER_VERSION"],
-                }]
-                spec["spec"]["worker"]["spec"]["containers"][0]["volumeMounts"] = [
+                spec["spec"]["worker"]["spec"]["containers"][0][
+                    "image"
+                ] = "docker.io/jacobwhall/geodata-dask"
+                spec["spec"]["worker"]["spec"]["containers"][0][
+                    "imagePullPolicy"
+                ] = "Always"
+                spec["spec"]["worker"]["spec"]["containers"][0]["env"] = [
                     {
-                        "name": "sciclone",
-                        "mountPath": "/sciclone"
+                        "name": "DATA_MANAGER_VERSION",
+                        "value": os.environ["DATA_MANAGER_VERSION"],
                     }
+                ]
+                spec["spec"]["worker"]["spec"]["containers"][0]["volumeMounts"] = [
+                    {"name": "sciclone", "mountPath": "/sciclone"}
                 ]
 
                 spec["spec"]["worker"]["spec"]["volumes"] = [
                     {
                         "name": "sciclone",
-                        "persistentVolumeClaim": {
-                            "claimName": "nova-geodata-prod"
-                        }
+                        "persistentVolumeClaim": {"claimName": "nova-geodata-prod"},
                     }
                 ]
 
@@ -568,6 +638,7 @@ class Dataset(ABC):
 
             if backend == "mpi":
                 from mpi4py import MPI
+
                 comm = MPI.COMM_WORLD
                 rank = comm.Get_rank()
                 if rank != 0:
