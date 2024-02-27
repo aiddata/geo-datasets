@@ -1,7 +1,6 @@
 """
 Download and prepare data
 """
-import sys
 import os
 import zipfile
 import shutil
@@ -13,25 +12,31 @@ import cdsapi
 import rasterio
 import numpy as np
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-
-from dataset import Dataset
+import geo_datasets
+from geo_datasets import Dataset
 
 
 class ESALandcover(Dataset):
     name = "ESA Landcover"
 
-    def __init__(self, raw_dir, process_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
+    def __init__(self, raw_dir, process_dir, output_dir, years, api_key, api_uid, overwrite_download=False, overwrite_processing=False):
 
         self.raw_dir = Path(raw_dir)
         self.process_dir = Path(process_dir)
         self.output_dir = Path(output_dir)
+        self.api_key = api_key
+        self.api_uid = api_uid
         self.overwrite_download = overwrite_download
         self.overwrite_processing = overwrite_processing
         self.years = [int(y) for y in years]
 
         self.v207_years = range(1992, 2016)
         self.v211_years = range(2016, 2021)
+
+        cdsapi_path = Path.home() / ".cdsapirc"
+        with open(cdsapi_path, "w") as f:
+            f.write(f"url: https://cds.climate.copernicus.eu/api/v2 \nkey: {api_uid}:{api_key}")
+
 
         self.cdsapi_client = cdsapi.Client()
 
@@ -173,6 +178,8 @@ def get_config_dict(config_file="config.ini"):
         "process_dir": Path(config["main"]["process_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
+        "api_uid": config["main"].getboolean("api_uid"),
+        "api_key": config["main"].getboolean("api_key"),
         "overwrite_download": config["main"].getboolean("overwrite_download"),
         "overwrite_processing": config["main"].getboolean("overwrite_processing"),
         "backend": config["run"]["backend"],
@@ -195,6 +202,83 @@ if __name__ == "__main__":
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
 
-    class_instance = ESALandcover(config_dict["raw_dir"], config_dict["process_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
+    class_instance = ESALandcover(config_dict["raw_dir"], config_dict["process_dir"], config_dict["output_dir"], config_dict["years"], config_dict["api_uid"], config_dict["api_key"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
+
+
+try:
+    from prefect import flow
+    from prefect.filesystems import GitHub
+except:
+    pass
+else:
+    config_file = "esa_landcover/config.ini"
+    config = ConfigParser()
+    config.read(config_file)
+
+    block_name = config["deploy"]["storage_block"]
+    tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+
+    @flow
+    def esa_landcover(raw_dir, process_dir, output_dir, years, api_uid, api_key, overwrite_download, overwrite_processing, backend, task_runner, run_parallel,  max_workers, log_dir):
+
+        timestamp = datetime.today()
+        time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
+        timestamp_log_dir = Path(log_dir) / time_str
+        timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+        cluster = "vortex"
+
+        cluster_kwargs = {
+            "shebang": "#!/bin/tcsh",
+            "resource_spec": "nodes=1:c18a:ppn=12",
+            "walltime": "02:00:00",
+            "cores": 2,
+            "processes": 2,
+            "memory": "30GB",
+            "interface": "ib0",
+            "job_extra_directives": [
+                "#PBS -j oe",
+                # "#PBS -o ",
+                # "#PBS -e ",
+            ],
+            "job_script_prologue": [
+                "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+                "module load anaconda3/2021.05",
+                "conda activate geodata38",
+                f"cd {tmp_dir}",
+            ],
+            "log_directory": str(timestamp_log_dir)
+        }
+
+        # cluster = "hima"
+
+        # cluster_kwargs = {
+        #     "shebang": "#!/bin/tcsh",
+        #     "resource_spec": "nodes=1:hima:ppn=32",
+        #     "cores": 2,
+        #     "processes": 2,
+        #     "memory": "30GB",
+        #     "interface": "ib0",
+        #     "job_extra_directives": [
+        #         "#PBS -j oe",
+        #         # "#PBS -o ",
+        #         # "#PBS -e ",
+        #     ],
+        #     "job_script_prologue": [
+        #         "source /usr/local/anaconda3-2020.02/etc/profile.d/conda.csh",
+        #         "module load anaconda3/2021.05",
+        #         "conda activate geodata_38h1",
+        #         f"cd {tmp_dir}",
+        #     ],
+        #     "log_directory": str(timestamp_log_dir)
+        # }
+
+        class_instance = ESALandcover(raw_dir, process_dir, output_dir, years, api_uid, api_key, overwrite_download, overwrite_processing)
+
+        if task_runner != 'hpc':
+            os.chdir(tmp_dir)
+            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+        else:
+            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)

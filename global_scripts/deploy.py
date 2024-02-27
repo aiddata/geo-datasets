@@ -28,20 +28,28 @@ import os
 from configparser import ConfigParser
 
 from prefect.deployments import Deployment
-from prefect.filesystems import GitHub
-
+from prefect.runner.storage import GitRepository
 
 
 if len(sys.argv) != 2:
-    raise Exception("deploy.py requires input defining which dataset directory to obtain the config.ini from")
+    raise Exception(
+        "deploy.py requires input defining which dataset directory to obtain the config.ini from"
+    )
 
 dataset_dir = sys.argv[1].strip("/")
 
-if dataset_dir not in os.listdir(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))):
+if dataset_dir not in os.listdir(
+    os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+):
     raise Exception("dataset directory provided not found in current directory")
 
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), dataset_dir))
+sys.path.insert(
+    1,
+    os.path.join(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), dataset_dir
+    ),
+)
 
 from main import get_config_dict
 
@@ -54,49 +62,39 @@ config.read(config_file)
 # load flow
 module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
+flow_image = "docker.io/jacobwhall/geodata-container:77fb4ec"
+data_manager_version = config["deploy"]["data_manager_version"]
 
 
 # create and load storage block
-
-block_name = config["deploy"]["storage_block"]
-block_repo = config["github"]["repo"]
-block_reference = config["github"]["branch"] # branch or tag
-block_repo_dir = config["github"]["directory"]
-
-block = GitHub(
-    repository=block_repo,
-    reference=block_reference,
-    #access_token=<my_access_token> # only required for private repos
-)
-# block.get_directory(block_repo_dir)
-block.save(block_name, overwrite=True)
+git_repo = config["github"]["repo"]
+git_branch = config["github"]["branch"]  # branch or tag
+git_directory = config["github"]["directory"]
 
 # -------------------------------------
+
 
 def flow_import(module_name, flow_name):
     module = __import__(module_name)
     import_flow = getattr(module, flow_name)
     return import_flow
 
+
 # Driver Code
 flow = flow_import(module_name, flow_name)
 
-# # load a pre-defined block and specify a subfolder of repo
-storage = GitHub.load(block_name)#.get_directory(block_repo_dir)
-
-# build deployment
-deployment = Deployment.build_from_flow(
-    flow=flow,
+flow.from_source(
+    source=GitRepository(
+        url=git_repo,
+        branch=git_branch,
+    ),
+    entrypoint="{}/{}.py:{}".format(git_directory, module_name, git_directory),
+).deploy(
     name=config["deploy"]["deployment_name"],
-    version=config["deploy"]["version"],
-    # work_queue_name="geo-datasets",
-    work_queue_name=config["deploy"]["work_queue"],
-    storage=storage,
-    path=block_repo_dir,
-    # skip_upload=True,
+    work_pool_name=config["deploy"]["work_pool"],
+    image=flow_image,
+    job_variables={"env": {"DATA_MANAGER_VERSION": data_manager_version} },
     parameters=get_config_dict(config_file),
-    apply=True
+    version=config["deploy"]["version"],
+    build=False,
 )
-
-# alternative to apply deployment after creating build
-# deployment.apply()
