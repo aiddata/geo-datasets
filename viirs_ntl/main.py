@@ -8,7 +8,7 @@ import shutil
 import sys
 from configparser import ConfigParser
 from pathlib import Path
-from typing import Literal
+from typing import List, Literal
 
 import numpy as np
 import rasterio
@@ -524,15 +524,15 @@ else:
         def viirs_ntl(
             raw_dir: str,
             output_dir: str,
-            annual_files,
-            monthly_files,
-            months,
-            years,
-            username,
-            password,
-            client_secret,
-            max_retries,
-            cf_minimum,
+            annual_files: List[str],
+            monthly_files: List[str],
+            months: List[int],
+            years: List[int],
+            username: str,
+            password: str,
+            client_secret: str,
+            max_retries: int,
+            cf_minimum: int,
             annual: bool,
             overwrite_download: bool,
             overwrite_extract: bool,
