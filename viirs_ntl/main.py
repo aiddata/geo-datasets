@@ -7,6 +7,7 @@ import os
 import shutil
 import sys
 from configparser import ConfigParser
+from datetime import datetime
 from pathlib import Path
 from typing import List, Literal
 
@@ -542,6 +543,7 @@ else:
             run_parallel: bool,
             max_workers: int,
             log_dir: str,
+            bypass_error_wrapper: bool,
         ):
             timestamp = datetime.today()
             time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
