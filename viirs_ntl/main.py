@@ -8,11 +8,13 @@ import shutil
 import sys
 from configparser import ConfigParser
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 import rasterio
 import requests
 from bs4 import BeautifulSoup
+from data_manager import Dataset
 
 sys.path.insert(
     1,
@@ -20,8 +22,6 @@ sys.path.insert(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "global_scripts"
     ),
 )
-
-from dataset import Dataset
 
 
 class VIIRS_NTL(Dataset):
@@ -522,26 +522,26 @@ else:
 
         @flow
         def viirs_ntl(
-        raw_dir: str,
-        output_dir: str,
-        annual_files,
-        monthly_files,
-        months,
-        years,
-        username,
-        password,
-        client_secret,
-        max_retries,
-        cf_minimum,
-        annual: bool,
-        overwrite_download: bool,
-        overwrite_extract: bool,
-        overwrite_processing: bool,
-        backend: Literal["local", "mpi", "prefect"],
-        task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
-        run_parallel: bool,
-        max_workers: int,
-        log_dir: str,
+            raw_dir: str,
+            output_dir: str,
+            annual_files,
+            monthly_files,
+            months,
+            years,
+            username,
+            password,
+            client_secret,
+            max_retries,
+            cf_minimum,
+            annual: bool,
+            overwrite_download: bool,
+            overwrite_extract: bool,
+            overwrite_processing: bool,
+            backend: Literal["local", "mpi", "prefect"],
+            task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
+            run_parallel: bool,
+            max_workers: int,
+            log_dir: str,
         ):
             timestamp = datetime.today()
             time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
