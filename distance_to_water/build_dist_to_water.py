@@ -9,7 +9,7 @@ from affine import Affine
 import numpy as np
 
 
-shorelines_path = "/sciclone/aiddata10/REU/geo/raw/gshhg/gshhg-shp-2.3.6/GSHHS_shp/f/GSHHS_f_L1.shp"
+shorelines_path = "/sciclone/aiddata10/REU/geo/raw/gshhg/gshhg-shp-2.3.7/GSHHS_shp/f/GSHHS_f_L1.shp"
 lakes_path = "/sciclone/aiddata10/REU/geo/raw/natural-earth-vector/d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_lakes.shp"
 rivers_path = "/sciclone/aiddata10/REU/geo/raw/natural-earth-vector/d4533efe3715c55b51f49bc2bde9694bff2bf7b1/10m_physical/ne_10m_rivers_lake_centerlines.shp"
 
