@@ -32,7 +32,9 @@ class VIIRS_NTL(Dataset):
         self,
         raw_dir,
         output_dir,
+        run_annual,
         annual_files,
+        run_monthly,
         monthly_files,
         months,
         years,
@@ -41,14 +43,15 @@ class VIIRS_NTL(Dataset):
         client_secret,
         max_retries,
         cf_minimum,
-        annual=True,
         overwrite_download=False,
         overwrite_extract=False,
         overwrite_processing=False,
     ):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
+        self.run_annual = run_annual
         self.annual_files = annual_files
+        self.run_monthly = run_monthly
         self.monthly_files = monthly_files
         self.months = months
         self.years = years
@@ -57,7 +60,6 @@ class VIIRS_NTL(Dataset):
         self.client_secret = client_secret
         self.max_retries = max_retries
         self.cf_minimum = cf_minimum
-        self.annual = annual
         self.overwrite_download = overwrite_download
         self.overwrite_extract = overwrite_extract
         self.overwrite_processing = overwrite_processing
@@ -94,40 +96,16 @@ class VIIRS_NTL(Dataset):
         task_list = []
         logger = self.get_logger()
 
-        if self.annual:
+        if self.run_annual:
             # TODO: pull from beautiful soup for file url, filter out non-available urls here
             for year in self.years:
                 for file in self.annual_files:
-                    if year == 2012:
-                        if (
-                            (file == "average_masked")
-                            | (file == "lit_mask")
-                            | (file == "median_masked")
-                        ):
-                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}04-201303_global_vcmcfg_c202102150000.{TYPE}.tif.gz"
-                        else:
-                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}04-201303_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
-                    elif year == 2013:
-                        if (
-                            (file == "average_masked")
-                            | (file == "lit_mask")
-                            | (file == "median_masked")
-                        ):
-                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c202102150000.{TYPE}.tif.gz"
-                        else:
-                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmcfg_c202101211500.{TYPE}.tif.gz"
-                    elif year == 2021:
-                        download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/2021/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202203152300.{TYPE}.tif.gz"
+                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_{YEAR}_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
+                    if int(year) < 2014:
+                        file_config = "vcmcfg"
                     else:
-                        if (
-                            (file == "average_masked")
-                            | (file == "lit_mask")
-                            | (file == "median_masked")
-                        ):
-                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202102150000.{TYPE}.tif.gz"
-                        else:
-                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v20/{YEAR}/VNL_v2_npp_{YEAR}_global_vcmslcfg_c202101211500.{TYPE}.tif.gz"
-                    download_dest = download_url.format(YEAR=year, TYPE=file)
+                        file_config = "vcmslcfg"
+                    download_dest = download_url.format(YEAR=year, TYPE=file, CONFIG=file_config)
                     local_filename = (
                         self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
                     )
@@ -234,7 +212,7 @@ class VIIRS_NTL(Dataset):
         task_list = []
         logger = self.get_logger()
 
-        if self.annual:
+        if self.run_annual:
             for year in self.years:
                 for file in self.annual_files:
                     raw_local_filename = (
@@ -247,7 +225,7 @@ class VIIRS_NTL(Dataset):
                         task_list.append((raw_local_filename, output_filename))
                     else:
                         logger.info(f"Raw file not located:  {str(raw_local_filename)}")
-        else:
+        if self.run_monthly:
             for year in self.years:
                 for month in self.months:
                     for file in self.monthly_files:
@@ -297,7 +275,7 @@ class VIIRS_NTL(Dataset):
         task_list = []
         logger = self.get_logger()
 
-        if self.annual:
+        if self.run_annual:
             for year in self.years:
                 annual_avg_glob_str = (
                     self.output_dir
@@ -326,7 +304,7 @@ class VIIRS_NTL(Dataset):
                         f"Failed to find extracted raw file: {str(annual_cloud_glob_str)}"
                     )
 
-        else:
+        if self.run_monthly:
             for year in self.years:
                 for month in self.months:
                     if int(month) < 10:
@@ -454,7 +432,8 @@ def get_config_dict(config_file="config.ini"):
     config.read(config_file)
 
     return {
-        "annual": config["main"].getboolean("annual"),
+        "run_annual": config["main"].getboolean("run_annual"),
+        "run_monthly": config["main"].getboolean("run_monthly"),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "months": [int(y) for y in config["main"]["months"].split(", ")],
         "annual_files": [str(y) for y in config["main"]["annual_files"].split(", ")],
@@ -481,21 +460,22 @@ if __name__ == "__main__":
     config_dict = get_config_dict()
 
     class_instance = VIIRS_NTL(
-        config_dict["raw_dir"],
-        config_dict["output_dir"],
-        config_dict["annual_files"],
-        config_dict["monthly_files"],
-        config_dict["months"],
-        config_dict["years"],
-        config_dict["username"],
-        config_dict["password"],
-        config_dict["client_secret"],
-        config_dict["max_retries"],
-        config_dict["cf_minimum"],
-        config_dict["annual"],
-        config_dict["overwrite_download"],
-        config_dict["overwrite_extract"],
-        config_dict["overwrite_processing"],
+        raw_dir=config_dict["raw_dir"],
+        output_dir=config_dict["output_dir"],
+        run_annual=config_dict["run_annual"],
+        annual_files=config_dict["annual_files"],
+        run_monthly=config_dict["run_monthly"],
+        monthly_files=config_dict["monthly_files"],
+        months=config_dict["months"],
+        years=config_dict["years"],
+        username=config_dict["username"],
+        password=config_dict["password"],
+        client_secret=config_dict["client_secret"],
+        max_retries=config_dict["max_retries"],
+        cf_minimum=config_dict["cf_minimum"],
+        overwrite_download=config_dict["overwrite_download"],
+        overwrite_extract=config_dict["overwrite_extract"],
+        overwrite_processing=config_dict["overwrite_processing"],
     )
 
     class_instance.run(
@@ -525,7 +505,9 @@ else:
         def viirs_ntl(
             raw_dir: str,
             output_dir: str,
+            run_annual: bool,
             annual_files: List[str],
+            run_monthly: bool,
             monthly_files: List[str],
             months: List[int],
             years: List[int],
@@ -534,7 +516,6 @@ else:
             client_secret: str,
             max_retries: int,
             cf_minimum: int,
-            annual: bool,
             overwrite_download: bool,
             overwrite_extract: bool,
             overwrite_processing: bool,
@@ -574,21 +555,22 @@ else:
             }
 
             class_instance = VIIRS_NTL(
-                raw_dir,
-                output_dir,
-                annual_files,
-                monthly_files,
-                months,
-                years,
-                username,
-                password,
-                client_secret,
-                max_retries,
-                cf_minimum,
-                annual,
-                overwrite_download,
-                overwrite_extract,
-                overwrite_processing,
+                raw_dir=raw_dir,
+                output_dir=output_dir,
+                run_annual=run_annual,
+                annual_files=annual_files,
+                run_monthly=run_monthly,
+                monthly_files=monthly_files,
+                months=months,
+                years=months,
+                username=username,
+                password=password,
+                client_secret=client_secret,
+                max_retries=max_retries,
+                cf_minimum=cf_minimum,
+                overwrite_download=overwrite_download,
+                overwrite_extract=overwrite_extract,
+                overwrite_processing=overwrite_processing,
             )
 
             if task_runner != "hpc":
