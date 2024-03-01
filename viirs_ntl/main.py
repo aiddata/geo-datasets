@@ -488,7 +488,7 @@ if __name__ == "__main__":
 else:
     try:
         from prefect import flow
-    except:
+    except ModuleNotFoundError:
         pass
     else:
         config_file = "viirs_ntl/config.ini"
@@ -558,7 +558,7 @@ else:
                 run_monthly=run_monthly,
                 monthly_files=monthly_files,
                 months=months,
-                years=months,
+                years=years,
                 username=username,
                 password=password,
                 client_secret=client_secret,
