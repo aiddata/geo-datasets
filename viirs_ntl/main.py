@@ -98,7 +98,10 @@ class VIIRS_NTL(Dataset):
 
         if self.run_annual:
             # TODO: pull from beautiful soup for file url, filter out non-available urls here
+            print("self.years:")
+            print(self.years)
             for year in self.years:
+                print(f"running year {year}")
                 for file in self.annual_files:
                     download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_{YEAR}_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
                     if int(year) < 2014:
