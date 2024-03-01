@@ -100,12 +100,15 @@ class VIIRS_NTL(Dataset):
             # TODO: pull from beautiful soup for file url, filter out non-available urls here
             for year in self.years:
                 for file in self.annual_files:
-                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_{YEAR}_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
+                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_{SECONDYEAR}_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
+                    second_year = year
+                    if int(year) == 2012:
+                        second_year = "201204-201212"
                     if int(year) < 2014:
                         file_config = "vcmcfg"
                     else:
                         file_config = "vcmslcfg"
-                    download_dest = download_url.format(YEAR=year, TYPE=file, CONFIG=file_config)
+                    download_dest = download_url.format(YEAR=year, SECONDYEAR=second_year, TYPE=file, CONFIG=file_config)
                     local_filename = (
                         self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
                     )
