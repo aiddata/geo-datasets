@@ -6,6 +6,7 @@ fiona
 pandas
 geopandas
 distancerasters
+h5py
 
 dask-jobqueue == 0.8.1
 dask-kubernetes
