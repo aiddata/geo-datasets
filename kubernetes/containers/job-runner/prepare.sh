@@ -3,7 +3,10 @@
 # print all executed commands
 set -x
 
-if [ $DATA_MANAGER_VERSION = "latest" ] ; then
+if [[ -z "${DATA_MANAGER_VERSION}" ]]; then
+	echo "DATA_MANAGER_VERSION environment variable is not set! Exiting..."
+	exit 1
+elif [ $DATA_MANAGER_VERSION = "latest" ] ; then
 	branch=master
 else
 	branch=data_manager_$DATA_MANAGER_VERSION
