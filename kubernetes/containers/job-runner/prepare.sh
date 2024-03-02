@@ -4,7 +4,7 @@
 set -x
 
 if [ $DATA_MANAGER_VERSION = "latest" ] ; then
-	branch=develop-k8s
+	branch=master
 else
 	branch=data_manager_$DATA_MANAGER_VERSION
 fi
