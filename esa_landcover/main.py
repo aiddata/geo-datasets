@@ -12,8 +12,7 @@ import cdsapi
 import rasterio
 import numpy as np
 
-import geo_datasets
-from geo_datasets import Dataset
+from data_manager import Dataset
 
 
 class ESALandcover(Dataset):
