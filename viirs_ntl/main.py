@@ -26,7 +26,7 @@ sys.path.insert(
 
 
 class VIIRS_NTL(Dataset):
-    name = "VIIRS_NTL"
+    name = "VIIRS Nighttime Lights"
 
     def __init__(
         self,
