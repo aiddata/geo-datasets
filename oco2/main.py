@@ -598,18 +598,19 @@ else:
     except:
         pass
     else:
+        config_file = "oco2/config.ini"
+        config = ConfigParser()
+        config.read(config_file)
+        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+
+        config_dict = get_config_dict(config_file=config_file)
+
         log_dir = config_dict["log_dir"]
         timestamp = datetime.today()
         time_format_str: str = "%Y_%m_%d_%H_%M"
         time_str = timestamp.strftime(time_format_str)
         timestamp_log_dir = Path(log_dir) / time_str
         timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-        config_file = "oco2/config.ini"
-        config = ConfigParser()
-        config.read(config_file)
-
-        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
         @flow
         def oco2(
