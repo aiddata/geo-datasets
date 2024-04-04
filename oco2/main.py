@@ -665,22 +665,22 @@ else:
             }
 
             class_instance = OCO2(
-                data_url=config_dict["data_url"],
-                username=config_dict["username"],
-                password=config_dict["password"],
-                raw_dir=config_dict["raw_dir"],
-                output_dir=config_dict["output_dir"],
-                overwrite_download=config_dict["overwrite_download"],
-                overwrite_processing=config_dict["overwrite_processing"],
-                year_list=config_dict["year_list"],
-                interp_method=config_dict["interp_method"],
-                run_a=config_dict["run_a"],
-                run_b=config_dict["run_b"],
-                run_c=config_dict["run_c"],
-                run_d=config_dict["run_d"],
-                run_e=config_dict["run_e"],
-                run_f=config_dict["run_f"],
-                run_g=config_dict["run_g"],
+                data_url,
+                username,
+                password,
+                raw_dir,
+                output_dir,
+                year_list,
+                interp_method,
+                run_a,
+                run_b,
+                run_c,
+                run_d,
+                run_e,
+                run_f,
+                run_g,
+                overwrite_download,
+                overwrite_processing,
             )
 
             if task_runner != "hpc":
