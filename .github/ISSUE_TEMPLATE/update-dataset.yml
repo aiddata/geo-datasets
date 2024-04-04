@@ -1,6 +1,5 @@
 name: Update Dataset
 description: Request that a dataset be updated
-title: ""
 labels: ["update-dataset"]
 body:
   - type: input
