@@ -13,6 +13,7 @@ from concurrent.futures import wait
 from collections.abc import Sequence
 from contextlib import contextmanager
 from tempfile import mkdtemp, mkstemp
+from rio_cogeo import cog_validate
 
 
 """
@@ -99,7 +100,7 @@ class Dataset(ABC):
             return logging.getLogger("dataset")
 
     @contextmanager
-    def tmp_to_dst_file(self, final_dst, tmp_dir=None):
+    def tmp_to_dst_file(self, final_dst, tmp_dir=None, validate_cog=False):
         logger = self.get_logger()
         tmp_sub_dir = mkdtemp(dir=tmp_dir)
         _, tmp_path = mkstemp(dir=tmp_sub_dir)
@@ -107,9 +108,25 @@ class Dataset(ABC):
             f"Created temporary file {tmp_path} with final destination {str(final_dst)}"
         )
         yield tmp_path
+
+        # validate Cloud Optimized GeoTIFF
+        # doing this before move because disk r/w is almost certainly faster
+        if validate_cog:
+            is_valid, errors, warnings = cog_validate(tmp_path)
+            if is_valid:
+                logger.info(f"Successfully validated output COG {tmp_path} (destined for {final_dst})")
+            else:
+                logger.exception(f"Failed to validate COG {tmp_path} (destined for {final_dst})")
+            for error in errors:
+                logger.error(f"Error encountered when validating COG: {error}")
+            for warning in warnings:
+                logger.warning(f"Warning encountered when validating COG: {warning}")
+
+        # move file from tmp_path to final_dst
         try:
+            logger.debug(f"Attempting to move {tmp_path} to {final_dst}")
             shutil.move(tmp_path, final_dst)
-        except:
+        except Exception:
             logger.exception(
                 f"Failed to transfer temporary file {tmp_path} to final destination {str(final_dst)}"
             )
