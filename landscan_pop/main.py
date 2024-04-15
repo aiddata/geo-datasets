@@ -140,7 +140,8 @@ def get_config_dict(config_file="config.ini"):
         "task_runner": config["run"]["task_runner"],
         "run_parallel": config["run"].getboolean("run_parallel"),
         "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs"
+        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
+        "bypass_error_wrapper": config["run"].getboolean("bypass_error_wrapper"),
     }
 
 
@@ -158,4 +159,4 @@ if __name__ == "__main__":
 
     class_instance = LandScanPop(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["run_extract"], config_dict["run_conversion"], config_dict["overwrite_extract"], config_dict["overwrite_conversion"])
 
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
+    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir, bypass_error_wrapper=bypass_error_wrapper)
