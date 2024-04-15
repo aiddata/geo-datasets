@@ -374,12 +374,15 @@ class VIIRS_NTL(Dataset):
                     }
                 )
                 meta.update(**kwargs)
-                with rasterio.open(output_path, "w", **meta) as dst:
-                    for ji, window in src.block_windows(1):
-                        in_data = src.read(window=window)
-                        out_data = function(in_data)
-                        out_data = out_data.astype(meta["dtype"])
-                        dst.write(out_data, window=window)
+                with self.tmp_to_dst_file(
+                    output_path, validate_cog=True
+                ) as tmp_dst_path:
+                    with rasterio.open(tmp_dst_path, "w", **meta) as dst:
+                        for ji, window in src.block_windows(1):
+                            in_data = src.read(window=window)
+                            out_data = function(in_data)
+                            out_data = out_data.astype(meta["dtype"])
+                            dst.write(out_data, window=window)
 
     def remove_negative(self, x):
         """
