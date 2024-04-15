@@ -104,7 +104,7 @@ class VIIRS_NTL(Dataset):
                     if int(year) == 2012:
                         # IMPORTANT: this can either be 201204-201212 or 201204-201303
                         # depending on what we prefer!
-                        download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_201204-201212_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
+                        download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_201204-201303_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
                     else:
                         download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_{YEAR}_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
                     if int(year) < 2014:
