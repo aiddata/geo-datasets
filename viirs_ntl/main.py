@@ -6,10 +6,11 @@ import json
 import os
 import shutil
 import sys
+import urllib.parse
 from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
-from typing import List, Literal
+from typing import List, Literal, Union
 
 import numpy as np
 import rasterio
@@ -26,43 +27,43 @@ sys.path.insert(
 
 
 class VIIRS_NTL(Dataset):
-    name = "VIIRS_NTL"
+    name = "VIIRS Nighttime Lights"
 
     def __init__(
         self,
-        raw_dir,
-        output_dir,
-        run_annual,
-        annual_files,
-        run_monthly,
-        monthly_files,
-        months,
-        years,
-        username,
-        password,
-        client_secret,
-        max_retries,
+        raw_dir: Union[str, Path],
+        output_dir: Union[str, Path],
+        run_annual: bool,
+        annual_files: List[str],
+        run_monthly: bool,
+        monthly_files: List[str],
+        months: List[int],
+        years: List[int],
+        username: str,
+        password: str,
+        client_secret: str,
+        max_retries: int,
         cf_minimum,
-        overwrite_download=False,
-        overwrite_extract=False,
-        overwrite_processing=False,
+        overwrite_download: bool = False,
+        overwrite_extract: bool = False,
+        overwrite_processing: bool = False,
     ):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
-        self.run_annual = run_annual
-        self.annual_files = annual_files
-        self.run_monthly = run_monthly
-        self.monthly_files = monthly_files
-        self.months = months
-        self.years = years
-        self.username = username
-        self.password = password
-        self.client_secret = client_secret
-        self.max_retries = max_retries
+        self.run_annual: bool = run_annual
+        self.annual_files: List[str] = annual_files
+        self.run_monthly: bool = run_monthly
+        self.monthly_files: List[str] = monthly_files
+        self.months: List[int] = months
+        self.years: List[int] = years
+        self.username: str = username
+        self.password: str = password
+        self.client_secret: str = client_secret
+        self.max_retries: int = max_retries
         self.cf_minimum = cf_minimum
-        self.overwrite_download = overwrite_download
-        self.overwrite_extract = overwrite_extract
-        self.overwrite_processing = overwrite_processing
+        self.overwrite_download: bool = overwrite_download
+        self.overwrite_extract: bool = overwrite_extract
+        self.overwrite_processing: bool = overwrite_processing
 
     def test_connection(self):
         # test connection
@@ -98,86 +99,87 @@ class VIIRS_NTL(Dataset):
 
         if self.run_annual:
             # TODO: pull from beautiful soup for file url, filter out non-available urls here
-            print("self.years:")
-            print(self.years)
             for year in self.years:
-                print(f"running year {year}")
                 for file in self.annual_files:
-                    download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_{YEAR}_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
+                    if int(year) == 2012:
+                        # IMPORTANT: this can either be 201204-201212 or 201204-201303
+                        # depending on what we prefer!
+                        download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_201204-201212_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
+                    else:
+                        download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_{YEAR}_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
                     if int(year) < 2014:
                         file_config = "vcmcfg"
                     else:
                         file_config = "vcmslcfg"
-                    download_dest = download_url.format(YEAR=year, TYPE=file, CONFIG=file_config)
+                    download_dest = download_url.format(
+                        YEAR=year, TYPE=file, CONFIG=file_config
+                    )
                     local_filename = (
                         self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
                     )
                     task_list.append((download_dest, local_filename))
-        else:
+        if self.run_monthly:
             for year in self.years:
                 for month in self.months:
-                    for file in self.monthly_files:
-                        if (year == 2022) & (month == 8):
-                            download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/NOAA-20/vcmcfg/"
-                        else:
-                            download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmcfg/"
+                    format_month = str(month).zfill(2)
 
-                        if int(month) < 10:
-                            format_month = "0" + str(month)
-                        else:
-                            format_month = str(month)
+                    if year == 2012 and month in [1, 2, 3]:
+                        # dataset starts in April 2012!
+                        continue
 
-                        download_url = download_url.format(
-                            YEAR=year, MONTH=format_month
-                        )
+                    if (year == 2022) & (month == 8):
+                        download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/NOAA-20/vcmcfg/"
+                    else:
+                        download_url = "https://eogdata.mines.edu/nighttime_light/monthly_notile/v10/{YEAR}/{YEAR}{MONTH}/vcmcfg/"
 
-                        attempts = 1
-                        while attempts <= self.max_retries:
-                            try:
-                                session = requests.Session()
-                                r = session.get(
-                                    download_url, headers={"User-Agent": "Mozilla/5.0"}
+                    download_url = download_url.format(
+                        YEAR=str(year), MONTH=format_month
+                    )
+
+                    attempts = 1
+                    while attempts <= self.max_retries:
+                        try:
+                            session = requests.Session()
+                            r = session.get(
+                                download_url, headers={"User-Agent": "Mozilla/5.0"}
+                            )
+                            soup = BeautifulSoup(r.content, "html.parser")
+
+                            items = soup.find_all("tr")
+                            link_list: List[str] = []
+
+                            for i in items:
+                                link = str(i.findChild("a")["href"])
+                                absolute_link = urllib.parse.urljoin(download_url, link)
+                                link_list.append(absolute_link)
+
+                            break
+
+                        except Exception as e:
+                            attempts += 1
+                            if attempts > self.max_retries:
+                                logger.info(
+                                    f"Failed to download: {str(download_dest)}: {str(e)}"
                                 )
-                                soup = BeautifulSoup(r.content, "html.parser")
+                            else:
+                                logger.info("Retrieved: " + str(download_dest))
 
-                                items = soup.find_all("tr", {"class": "odd"})
-                                link_list = []
-
-                                for i in items:
-                                    link = str(i.findChild("a")["href"])
-                                    link_list.append(link)
-
-                                file_type = file + ".tif.gz"
-                                file_code = ""
-                                for link in link_list:
-                                    if file_type in link:
-                                        file_code = link
-                            except Exception as e:
-                                attempts += 1
-                                if attempts > self.max_retries:
-                                    logger.info(
-                                        str(e)
-                                        + f": Failed to download: {str(download_dest)}"
-                                    )
-                                else:
-                                    logger.info("Retrieved: " + str(download_dest))
-
-                        if len(file_code) == 0:
+                    for file in self.monthly_files:
+                        file_link: Optional[str] = None
+                        for link in link_list:
+                            if link.endswith(f"{file}.tif.gz"):
+                                file_link = link
+                                break
+                        if file_link is None:
                             logger.info(
-                                "Download option does not exist yet: "
-                                + str(year)
-                                + "/"
-                                + str(month)
-                                + "/"
-                                + file
+                                f"Download option does not exist yet: {str(year)}/{format_month}/{file}"
                             )
                         else:
-                            download_dest = download_url + str(file_code)
                             local_filename = (
                                 self.raw_dir
-                                / f"raw_viirs_ntl_{year}_{month}_{file}.tif.gz"
+                                / f"raw_viirs_ntl_{year}_{format_month}_{file}.tif.gz"
                             )
-                            task_list.append((download_dest, local_filename))
+                            task_list.append((file_link, local_filename))
 
         return task_list
 
@@ -186,6 +188,7 @@ class VIIRS_NTL(Dataset):
         """
         Download individual file
         """
+
         logger = self.get_logger()
 
         logger.info("Retrieving token")
@@ -197,6 +200,7 @@ class VIIRS_NTL(Dataset):
         if local_filename.exists() and not self.overwrite_download:
             logger.info(f"Download Exists: {local_filename}")
         else:
+            logger.info(f"Attempting to download from {download_dest}...")
             try:
                 with requests.get(download_dest, headers=headers, stream=True) as src:
                     # raise an exception (fail this task) if HTTP response indicates that an error occured
@@ -204,8 +208,9 @@ class VIIRS_NTL(Dataset):
                     with open(local_filename, "wb") as dst:
                         dst.write(src.content)
             except Exception as e:
-                logger.info(f"Failed to download: {str(download_dest)}")
-                raise Exception(str(e) + f": Failed to download: {str(download_dest)}")
+                raise RuntimeError(
+                    str(e) + f": Failed to download: {str(download_dest)}"
+                )
             else:
                 logger.info(f"Downloaded {str(local_filename)}")
 
@@ -222,33 +227,35 @@ class VIIRS_NTL(Dataset):
                         self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
                     )
                     output_filename = (
-                        self.output_dir / f"raw_extracted_viirs_ntl_{year}_{file}.tif"
+                        self.raw_dir / f"raw_extracted_viirs_ntl_{year}_{file}.tif"
                     )
                     if raw_local_filename.exists():
                         task_list.append((raw_local_filename, output_filename))
                     else:
-                        logger.info(f"Raw file not located:  {str(raw_local_filename)}")
+                        raise RuntimeError(
+                            f"Raw file not located:  {str(raw_local_filename)}"
+                        )
         if self.run_monthly:
             for year in self.years:
                 for month in self.months:
+                    if year == 2012 and month in [1, 2, 3]:
+                        # dataset starts in April 2012!
+                        continue
                     for file in self.monthly_files:
-                        if int(month) < 10:
-                            format_month = "0" + str(month)
-                        else:
-                            format_month = month
+                        format_month = str(month).zfill(2)
 
                         raw_local_filename = (
                             self.raw_dir
                             / f"raw_viirs_ntl_{year}_{format_month}_{file}.tif.gz"
                         )
                         output_filename = (
-                            self.output_dir
+                            self.raw_dir
                             / f"raw_extracted_viirs_ntl_{year}_{format_month}_{file}.tif"
                         )
                         if raw_local_filename.exists():
                             task_list.append((raw_local_filename, output_filename))
                         else:
-                            logger.info(
+                            raise RuntimeError(
                                 f"Raw file not located:  {str(raw_local_filename)}"
                             )
 
@@ -259,6 +266,7 @@ class VIIRS_NTL(Dataset):
         Extract individual file
         """
         logger = self.get_logger()
+
         if output_filename.exists() and not self.overwrite_extract:
             logger.info(f"Extracted File Exists: {output_filename}")
             return (raw_local_filename, output_filename)
@@ -267,6 +275,7 @@ class VIIRS_NTL(Dataset):
                 with gzip.open(raw_local_filename, "rb") as f_in:
                     with open(output_filename, "wb") as f_out:
                         shutil.copyfileobj(f_in, f_out)
+                logger.info(f"Extracted file to: {output_filename}")
                 return (raw_local_filename, output_filename)
             except Exception as e:
                 logger.info(f"Failed to extract: {str(raw_local_filename)}")
@@ -281,8 +290,7 @@ class VIIRS_NTL(Dataset):
         if self.run_annual:
             for year in self.years:
                 annual_avg_glob_str = (
-                    self.output_dir
-                    / f"raw_extracted_viirs_ntl_{year}_average_masked.tif"
+                    self.raw_dir / f"raw_extracted_viirs_ntl_{year}_average_masked.tif"
                 )
                 output_avg_glob = (
                     self.output_dir / f"viirs_ntl_annual_{year}_avg_masked.tif"
@@ -295,7 +303,7 @@ class VIIRS_NTL(Dataset):
                     )
 
                 annual_cloud_glob_str = (
-                    self.output_dir / f"raw_extracted_viirs_ntl_{year}_cf_cvg.tif"
+                    self.raw_dir / f"raw_extracted_viirs_ntl_{year}_cf_cvg.tif"
                 )
                 output_cloud_glob = (
                     self.output_dir / f"viirs_ntl_annual_{year}_cf_cvg.tif"
@@ -310,20 +318,17 @@ class VIIRS_NTL(Dataset):
         if self.run_monthly:
             for year in self.years:
                 for month in self.months:
-                    if int(month) < 10:
-                        format_month = "0" + str(month)
-                    else:
-                        format_month = month
+                    format_month = str(month).zfill(2)
 
                     monthly_avg_glob_str = (
-                        self.output_dir
+                        self.raw_dir
                         / f"raw_extracted_viirs_ntl_{year}_{format_month}_avg_rade9h.masked.tif"
                     )
                     output_avg_glob = (
                         self.output_dir
                         / f"viirs_ntl_monthly_{year}_{format_month}_avg_masked.tif"
                     )
-                    if annual_avg_glob_str.exists():
+                    if monthly_avg_glob_str.exists():
                         task_list.append((monthly_avg_glob_str, output_avg_glob))
                     else:
                         logger.info(
@@ -331,20 +336,20 @@ class VIIRS_NTL(Dataset):
                         )
 
                     monthly_cloud_glob_str = (
-                        self.output_dir
+                        self.raw_dir
                         / f"raw_extracted_viirs_ntl_{year}_{format_month}_cf_cvg.tif"
                     )
                     output_cloud_glob = (
-                        self.output_dir / f"viirs_ntl_monthly_{year}_{month}_cf_cvg.tif"
+                        self.output_dir
+                        / f"viirs_ntl_monthly_{year}_{format_month}_cf_cvg.tif"
                     )
-                    if annual_cloud_glob_str.exists():
+                    if monthly_cloud_glob_str.exists():
                         task_list.append((monthly_cloud_glob_str, output_cloud_glob))
                     else:
                         logger.info(
                             f"Failed to find extracted raw file: {str(monthly_cloud_glob_str)}"
                         )
 
-        logger.info(f"{str(task_list)}")
         return task_list
 
     def raster_calc(self, input_path, output_path, function, **kwargs):
@@ -363,6 +368,11 @@ class VIIRS_NTL(Dataset):
             with rasterio.open(input_path) as src:
                 assert len(set(src.block_shapes)) == 1
                 meta = src.meta.copy()
+                meta.update(
+                    {
+                        "driver": "COG",
+                    }
+                )
                 meta.update(**kwargs)
                 with rasterio.open(output_path, "w", **meta) as dst:
                     for ji, window in src.block_windows(1):
@@ -456,6 +466,7 @@ def get_config_dict(config_file="config.ini"):
         "task_runner": config["run"]["task_runner"],
         "run_parallel": config["run"].getboolean("run_parallel"),
         "max_workers": int(config["run"]["max_workers"]),
+        "bypass_error_wrapper": config["run"].getboolean("bypass_error_wrapper"),
     }
 
 
@@ -487,11 +498,12 @@ if __name__ == "__main__":
         max_workers=config_dict["max_workers"],
         task_runner=config_dict["task_runner"],
         log_dir=config_dict["log_dir"],
+        bypass_error_wrapper=config_dict["bypass_error_wrapper"],
     )
 else:
     try:
         from prefect import flow
-    except:
+    except Exception:
         pass
     else:
         config_file = "viirs_ntl/config.ini"
