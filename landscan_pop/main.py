@@ -8,9 +8,7 @@
 
 """
 
-import glob
 import os
-import sys
 import zipfile
 from configparser import ConfigParser
 from datetime import datetime
@@ -61,14 +59,14 @@ class LandScanPop(Dataset):
             with zipfile.ZipFile(zip_file, "r") as zip_ref:
                 zip_ref.extractall(out_dir)
 
-    def convert_to_cog(self, src, dst):
+    def convert_to_cog(self, src, final_dst):
         """Convert a raster from ESRI grid format to COG format"""
         logger = self.get_logger()
 
-        if os.path.isfile(dst) and not self.overwrite_conversion:
-            logger.info(f"COG exists - skipping ({dst})")
+        if os.path.isfile(final_dst) and not self.overwrite_conversion:
+            logger.info(f"COG exists - skipping ({final_dst})")
         else:
-            logger.info(f"Converting to COG ({dst})")
+            logger.info(f"Converting to COG ({final_dst})")
             with rasterio.open(src) as src:
                 assert len(set(src.block_shapes)) == 1
                 meta = src.meta.copy()
@@ -79,10 +77,11 @@ class LandScanPop(Dataset):
                     }
                 )
 
-                with rasterio.open(dst, "w", **meta) as dst:
-                    for ji, window in src.block_windows(1):
-                        in_data = src.read(window=window)
-                        dst.write(in_data, window=window)
+                with self.tmp_to_dst_file(final_dst, validate_cog=True) as tmp_dst:
+                    with rasterio.open(tmp_dst, "w", **meta) as dst:
+                        for ji, window in src.block_windows(1):
+                            in_data = src.read(window=window)
+                            dst.write(in_data, window=window)
 
     def build_extract_list(self):
         """Build a list of files to extract"""
@@ -172,5 +171,5 @@ if __name__ == "__main__":
         run_parallel=config_dict["run_parallel"],
         max_workers=config_dict["max_workers"],
         log_dir=timestamp_log_dir,
-        bypass_error_wrapper=bypass_error_wrapper,
+        bypass_error_wrapper=config_dict["bypass_error_wrapper"],
     )
