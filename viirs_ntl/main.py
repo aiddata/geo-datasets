@@ -371,6 +371,7 @@ class VIIRS_NTL(Dataset):
                 meta.update(
                     {
                         "driver": "COG",
+                        "compress": "LZW",
                     }
                 )
                 meta.update(**kwargs)
