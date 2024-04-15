@@ -23,13 +23,14 @@ prefect agent start -q 'work_queue_name'
 
 """
 
-import sys
+import inspect
 import os
+import sys
 from configparser import ConfigParser
 
+from data_manager import Dataset
 from prefect.deployments import Deployment
 from prefect.runner.storage import GitRepository
-
 
 if len(sys.argv) != 2:
     raise Exception(
@@ -53,7 +54,6 @@ sys.path.insert(
 
 from main import get_config_dict
 
-
 config_file = dataset_dir + "/config.ini"
 config = ConfigParser()
 config.read(config_file)
@@ -62,7 +62,7 @@ config.read(config_file)
 # load flow
 module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
-flow_image = "docker.io/jacobwhall/geodata-container:77fb4ec"
+flow_image = "docker.io/jacobwhall/geodata-container:{}".format(config["deploy"]["image_tag"])
 data_manager_version = config["deploy"]["data_manager_version"]
 
 
@@ -77,11 +77,24 @@ git_directory = config["github"]["directory"]
 def flow_import(module_name, flow_name):
     module = __import__(module_name)
     import_flow = getattr(module, flow_name)
-    return import_flow
+
+    # find the Dataset class
+    dataset_name = ""
+    for name, obj in inspect.getmembers(module):
+        if inspect.isclass(obj):
+            if Dataset in obj.__bases__:
+                if dataset_name != "":
+                    raise RuntimeError("Multiple Dataset classes found in module!")
+                else:
+                    dataset_name = obj.name
+    if dataset_name == "":
+        raise RuntimeError(f"No Dataset class found in module {module_name}")
+
+    return import_flow, dataset_name
 
 
 # Driver Code
-flow = flow_import(module_name, flow_name)
+flow, dataset_name = flow_import(module_name, flow_name)
 
 flow.from_source(
     source=GitRepository(
@@ -90,10 +103,10 @@ flow.from_source(
     ),
     entrypoint="{}/{}.py:{}".format(git_directory, module_name, git_directory),
 ).deploy(
-    name=config["deploy"]["deployment_name"],
+    name=dataset_name,
     work_pool_name=config["deploy"]["work_pool"],
     image=flow_image,
-    job_variables={"env": {"DATA_MANAGER_VERSION": data_manager_version} },
+    job_variables={"env": {"DATA_MANAGER_VERSION": data_manager_version}},
     parameters=get_config_dict(config_file),
     version=config["deploy"]["version"],
     build=False,
