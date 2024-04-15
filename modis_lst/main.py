@@ -1,24 +1,23 @@
 import os
-import sys
-import requests
 import shutil
-from pathlib import Path
+import sys
+import warnings
+from configparser import ConfigParser
 from datetime import datetime
+from pathlib import Path
 from typing import List, Literal, Union
 from urllib.parse import urlparse
-from configparser import ConfigParser
 
-import warnings
-import rasterio
 import numpy as np
+import rasterio
+import requests
 from affine import Affine
 from bs4 import BeautifulSoup
+from data_manager import Dataset
 from pyhdf.SD import SD, SDC
 
-from data_manager import Dataset
 
-
-def listFD(url, ext=''):
+def listFD(url, ext=""):
     """Find all links in a webpage
 
     Option matching on string at end of links founds
@@ -26,8 +25,12 @@ def listFD(url, ext=''):
     Returns list of complete (absolute) links
     """
     page = requests.get(url).text
-    soup = BeautifulSoup(page, 'html.parser')
-    urllist = [url + "/" + node.get('href').strip("/") for node in soup.find_all('a') if node.get('href').endswith(ext)]
+    soup = BeautifulSoup(page, "html.parser")
+    urllist = [
+        url + "/" + node.get("href").strip("/")
+        for node in soup.find_all("a")
+        if node.get("href").endswith(ext)
+    ]
     return urllist
 
 
@@ -37,10 +40,12 @@ class SessionWithHeaderRedirection(requests.Session):
     from: https://wiki.earthdata.nasa.gov/display/EL/How+To+Access+Data+With+Python
     """
 
-    AUTH_HOST = 'urs.earthdata.nasa.gov'
+    AUTH_HOST = "urs.earthdata.nasa.gov"
+
     def __init__(self, username, password):
         super().__init__()
         self.auth = (username, password)
+
     def rebuild_auth(self, prepared_request, response):
         """
         Overrides from the library to keep headers when redirected to or from
@@ -49,13 +54,15 @@ class SessionWithHeaderRedirection(requests.Session):
 
         headers = prepared_request.headers
         url = prepared_request.url
-        if 'Authorization' in headers:
+        if "Authorization" in headers:
             original_parsed = requests.utils.urlparse(response.request.url)
             redirect_parsed = requests.utils.urlparse(url)
-            if (original_parsed.hostname != redirect_parsed.hostname) and \
-                    redirect_parsed.hostname != self.AUTH_HOST and \
-                    original_parsed.hostname != self.AUTH_HOST:
-                del headers['Authorization']
+            if (
+                (original_parsed.hostname != redirect_parsed.hostname)
+                and redirect_parsed.hostname != self.AUTH_HOST
+                and original_parsed.hostname != self.AUTH_HOST
+            ):
+                del headers["Authorization"]
         return
 
 
@@ -66,25 +73,29 @@ def export_raster(data, path, meta, **kwargs):
     if not isinstance(meta, dict):
         raise ValueError("meta must be a dictionary")
 
-    if 'dtype' in meta:
+    if "dtype" in meta:
         if meta["dtype"] != data.dtype:
-            warnings.warn(f"Dtype specified by meta({meta['dtype']}) does not match data dtype ({data.dtype}). Adjusting data dtype to match meta.")
+            warnings.warn(
+                f"Dtype specified by meta({meta['dtype']}) does not match data dtype ({data.dtype}). Adjusting data dtype to match meta."
+            )
         data = data.astype(meta["dtype"])
     else:
-        meta['dtype'] = data.dtype
+        meta["dtype"] = data.dtype
 
     default_meta = {
-        'count': 1,
-        'crs': {'init': 'epsg:4326'},
-        'driver': 'COG',
-        'compress': 'lzw',
-        'nodata': -9999,
+        "count": 1,
+        "crs": {"init": "epsg:4326"},
+        "driver": "COG",
+        "compress": "lzw",
+        "nodata": -9999,
     }
 
     for k, v in default_meta.items():
         if k not in meta:
-            if 'quiet' not in kwargs or kwargs["quiet"] == False:
-                print(f"Value for `{k}` not in meta provided. Using default value ({v})")
+            if "quiet" not in kwargs or kwargs["quiet"] == False:
+                print(
+                    f"Value for `{k}` not in meta provided. Using default value ({v})"
+                )
             meta[k] = v
 
     # write geotif file
@@ -112,7 +123,6 @@ def aggregate_rasters(file_list, method="mean"):
 
     store = None
     for ix, file_path in enumerate(file_list):
-
         try:
             raster = rasterio.open(file_path)
         except:
@@ -140,7 +150,11 @@ def aggregate_rasters(file_list, method="mean"):
                 if ix == 1:
                     weights = (~store.mask).astype(int)
 
-                store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
+                store = np.ma.average(
+                    np.ma.array((store, active)),
+                    axis=0,
+                    weights=[weights, (~active.mask).astype(int)],
+                )
                 weights += (~active.mask).astype(int)
 
             elif method == "min":
@@ -159,7 +173,18 @@ def aggregate_rasters(file_list, method="mean"):
 class MODISLandSurfaceTemp(Dataset):
     name = "MODIS Land Surface Temperatures"
 
-    def __init__(self, process_dir, raw_dir, output_dir, username, password, years, overwrite_download, overwrite_monthly, overwrite_yearly):
+    def __init__(
+        self,
+        process_dir,
+        raw_dir,
+        output_dir,
+        username,
+        password,
+        years,
+        overwrite_download,
+        overwrite_monthly,
+        overwrite_yearly,
+    ):
         self.username = username
         self.password = password
 
@@ -181,8 +206,6 @@ class MODISLandSurfaceTemp(Dataset):
 
         self.method = "mean"
 
-
-
     def test_connection(self):
         logger = self.get_logger()
         logger.info("Testing connection...")
@@ -190,9 +213,7 @@ class MODISLandSurfaceTemp(Dataset):
         test_request = requests.get(self.data_url)
         test_request.raise_for_status()
 
-
     def build_download_list(self):
-
         logger = self.get_logger()
 
         logger.info("Preparing data download")
@@ -220,9 +241,8 @@ class MODISLandSurfaceTemp(Dataset):
                 p = Path(u.path)
                 if len(p.name.split(".")) == 3:
                     if p.name.split(".")[0] in self.years:
-
                         # get full url for each hdf file
-                        hdf_url_list = listFD(url, 'hdf')
+                        hdf_url_list = listFD(url, "hdf")
                         if len(hdf_url_list) == 0:
                             hdf_url = "Error"
                             missing_files_count += 1
@@ -249,7 +269,6 @@ class MODISLandSurfaceTemp(Dataset):
 
         return flist
 
-
     def download_file(self, url, tmp_file, dst_file):
         """
         download individual file using session created
@@ -275,17 +294,15 @@ class MODISLandSurfaceTemp(Dataset):
 
             with session.get(url, stream=True) as r:
                 r.raise_for_status()
-                with open(tmp_file, 'wb') as f:
-                    for chunk in r.iter_content(chunk_size=1024*1024):
+                with open(tmp_file, "wb") as f:
+                    for chunk in r.iter_content(chunk_size=1024 * 1024):
                         f.write(chunk)
 
             logger.info(f"Downloaded to tmp: {url} > {tmp_file}")
             shutil.copyfile(tmp_file, dst_file)
             logger.info(f"Copied to dst: {tmp_file} > {dst_file}")
 
-
     def build_process_list(self):
-
         flist = []
 
         for l_time, c_time in [("day", "Day"), ("night", "Night")]:
@@ -295,16 +312,21 @@ class MODISLandSurfaceTemp(Dataset):
             for p in self.raw_dir.iterdir():
                 if p.suffix == ".hdf":
                     temporal = p.name.split("_")[0]
-                    output_path = self.output_dir / "monthly" / l_time / f"modis_lst_{l_time}_cmg_{temporal}.tif"
-                    tmp_path = self.process_dir / f"modis_lst_{l_time}_cmg_{temporal}.tif"
+                    output_path = (
+                        self.output_dir
+                        / "monthly"
+                        / l_time
+                        / f"modis_lst_{l_time}_cmg_{temporal}.tif"
+                    )
+                    tmp_path = (
+                        self.process_dir / f"modis_lst_{l_time}_cmg_{temporal}.tif"
+                    )
 
                     flist.append([p, layer, tmp_path, output_path])
 
         return flist
 
-
     def process_hdf(self, input_path: Union[str, Path], layer, tmp_path, output_path):
-
         logger = self.get_logger()
         self.process_dir.mkdir(parents=True, exist_ok=True)
 
@@ -322,9 +344,13 @@ class MODISLandSurfaceTemp(Dataset):
             # define the affine transformation
             #   5600m or 0.05 degree resolution
             #   global coverage
-            transform = Affine(0.05,     0, -180,
-                                  0, -0.05,   90)
-            meta = {"transform": transform, "nodata": 0, "height": data.shape[0], "width": data.shape[1]}
+            transform = Affine(0.05, 0, -180, 0, -0.05, 90)
+            meta = {
+                "transform": transform,
+                "nodata": 0,
+                "height": data.shape[0],
+                "width": data.shape[1],
+            }
             # need to wrap data in array so it is 3-dimensions to account for raster band
             export_raster(np.array([data]), tmp_path, meta, quiet=True)
 
@@ -335,9 +361,7 @@ class MODISLandSurfaceTemp(Dataset):
         else:
             logger.info(f"{output_path} already exists, skipping...")
 
-
     def build_aggregation_list(self):
-
         src_dir = self.output_dir / "monthly"
 
         dst_dir = self.output_dir / "yearly"
@@ -347,7 +371,9 @@ class MODISLandSurfaceTemp(Dataset):
         data_class_list = ["day", "night"]
 
         for data_class in data_class_list:
-            month_files = [c for c in (src_dir / data_class).iterdir() if c.suffix == ".tif"]
+            month_files = [
+                c for c in (src_dir / data_class).iterdir() if c.suffix == ".tif"
+            ]
             year_months = {}
 
             for mfile in month_files:
@@ -359,14 +385,22 @@ class MODISLandSurfaceTemp(Dataset):
 
             for year_group, month_paths in year_months.items():
                 (dst_dir / data_class / self.method).mkdir(parents=True, exist_ok=True)
-                output_path = dst_dir / data_class / self.method / f"modis_lst_{data_class}_cmg_{year_group}.tif"
-                tmp_path = self.process_dir / f"{self.method}_modis_lst_{data_class}_cmg_{year_group}.tif"
+                output_path = (
+                    dst_dir
+                    / data_class
+                    / self.method
+                    / f"modis_lst_{data_class}_cmg_{year_group}.tif"
+                )
+                tmp_path = (
+                    self.process_dir
+                    / f"{self.method}_modis_lst_{data_class}_cmg_{year_group}.tif"
+                )
 
-                flist.append((year_group, self.method, month_paths, tmp_path, output_path))
-
+                flist.append(
+                    (year_group, self.method, month_paths, tmp_path, output_path)
+                )
 
         return flist
-
 
     def run_yearly_data(self, year, method, year_files, tmp_path, out_path):
         logger = self.get_logger()
@@ -383,9 +417,7 @@ class MODISLandSurfaceTemp(Dataset):
         else:
             logger.info(f"{out_path} already exists, skipping...")
 
-
     def main(self):
-
         # Test Connection
         self.test_connection()
 
@@ -428,12 +460,27 @@ def get_config_dict(config_file="config.ini"):
 
 
 if __name__ == "__main__":
-
     config_dict = get_config_dict()
 
-    class_instance = MODISLandSurfaceTemp(config_dict["process_dir"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["username"], config_dict["password"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_monthly"], config_dict["overwrite_yearly"])
+    class_instance = MODISLandSurfaceTemp(
+        config_dict["process_dir"],
+        config_dict["raw_dir"],
+        config_dict["output_dir"],
+        config_dict["username"],
+        config_dict["password"],
+        config_dict["years"],
+        config_dict["overwrite_download"],
+        config_dict["overwrite_monthly"],
+        config_dict["overwrite_yearly"],
+    )
 
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=config_dict["log_dir"])
+    class_instance.run(
+        backend=config_dict["backend"],
+        task_runner=config_dict["task_runner"],
+        run_parallel=config_dict["run_parallel"],
+        max_workers=config_dict["max_workers"],
+        log_dir=config_dict["log_dir"],
+    )
 
 else:
     try:
@@ -447,31 +494,32 @@ else:
         config.read(config_file)
 
         block_name = config["deploy"]["storage_block"]
-        GitHub.load(block_name).get_directory('global_scripts')
+        GitHub.load(block_name).get_directory("global_scripts")
 
         from main import MODISLandSurfaceTemp
 
         tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
-
         @flow
         def modis_lst(
-                process_dir: str,
-                raw_dir: str,
-                output_dir: str,
-                username: str,
-                password: str,
-                years: List[int],
-                overwrite_download: bool,
-                overwrite_monthly: bool,
-                overwrite_yearly: bool,
-                backend: Literal["local", "mpi", "prefect"],
-                task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
-                run_parallel: bool,
-                max_workers: int,
-                log_dir: str,
-                bypass_error_wrapper: bool):
-
+            process_dir: str,
+            raw_dir: str,
+            output_dir: str,
+            username: str,
+            password: str,
+            years: List[int],
+            overwrite_download: bool,
+            overwrite_monthly: bool,
+            overwrite_yearly: bool,
+            backend: Literal["local", "mpi", "prefect"],
+            task_runner: Literal[
+                "sequential", "concurrent", "dask", "hpc", "kubernetes"
+            ],
+            run_parallel: bool,
+            max_workers: int,
+            log_dir: str,
+            bypass_error_wrapper: bool,
+        ):
             timestamp = datetime.today()
             time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
             timestamp_log_dir = Path(log_dir) / time_str
@@ -498,11 +546,36 @@ else:
                 "log_directory": str(timestamp_log_dir),
             }
 
+            class_instance = MODISLandSurfaceTemp(
+                process_dir=process_dir,
+                raw_dir=raw_dir,
+                output_dir=output_dir,
+                username=username,
+                password=password,
+                years=years,
+                overwrite_download=overwrite_download,
+                overwrite_monthly=overwrite_monthly,
+                overwrite_yearly=overwrite_yearly,
+            )
 
-            class_instance = MODISLandSurfaceTemp(process_dir=process_dir, raw_dir=raw_dir, output_dir=output_dir, username=username, password=password, years=years, overwrite_download=overwrite_download, overwrite_monthly=overwrite_monthly, overwrite_yearly=overwrite_yearly)
-
-            if task_runner != 'hpc':
+            if task_runner != "hpc":
                 os.chdir(tmp_dir)
-                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, bypass_error_wrapper=bypass_error_wrapper)
+                class_instance.run(
+                    backend=backend,
+                    task_runner=task_runner,
+                    run_parallel=run_parallel,
+                    max_workers=max_workers,
+                    log_dir=timestamp_log_dir,
+                    bypass_error_wrapper=bypass_error_wrapper,
+                )
             else:
-                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs, bypass_error_wrapper=bypass_error_wrapper)
+                class_instance.run(
+                    backend=backend,
+                    task_runner=task_runner,
+                    run_parallel=run_parallel,
+                    max_workers=max_workers,
+                    log_dir=timestamp_log_dir,
+                    cluster=cluster,
+                    cluster_kwargs=cluster_kwargs,
+                    bypass_error_wrapper=bypass_error_wrapper,
+                )
