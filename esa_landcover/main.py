@@ -177,8 +177,8 @@ def get_config_dict(config_file="config.ini"):
         "process_dir": Path(config["main"]["process_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "api_uid": config["main"].getboolean("api_uid"),
-        "api_key": config["main"].getboolean("api_key"),
+        "api_uid": str(config["main"]["api_uid"]),
+        "api_key": config["main"]["api_key"],
         "overwrite_download": config["main"].getboolean("overwrite_download"),
         "overwrite_processing": config["main"].getboolean("overwrite_processing"),
         "backend": config["run"]["backend"],
@@ -186,7 +186,7 @@ def get_config_dict(config_file="config.ini"):
         "run_parallel": config["run"].getboolean("run_parallel"),
         "max_workers": int(config["run"]["max_workers"]),
         "log_dir": Path(config["main"]["raw_dir"]) / "logs",
-        "bypass_error_wrapper": config["run"].getboolean["bypass_error_wrapper"],
+        "bypass_error_wrapper": config["run"].getboolean("bypass_error_wrapper"),
     }
 
 
