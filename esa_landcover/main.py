@@ -7,6 +7,7 @@ import zipfile
 from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
+from typing import List, Literal, Union
 
 import cdsapi
 import numpy as np
@@ -19,14 +20,14 @@ class ESALandcover(Dataset):
 
     def __init__(
         self,
-        raw_dir,
-        process_dir,
-        output_dir,
-        years,
-        api_key,
-        api_uid,
-        overwrite_download=False,
-        overwrite_processing=False,
+        raw_dir: Union[Path, str],
+        process_dir: Union[Path, str],
+        output_dir: Union[Path, str],
+        years: List[int],
+        api_key: str,
+        api_uid: str,
+        overwrite_download: bool = False,
+        overwrite_processing: bool = False,
     ):
         self.raw_dir = Path(raw_dir)
         self.process_dir = Path(process_dir)
@@ -233,29 +234,31 @@ if __name__ == "__main__":
 
 try:
     from prefect import flow
-except:
+except Exception:
     pass
 else:
     config_file = "esa_landcover/config.ini"
     config = ConfigParser()
     config.read(config_file)
 
+    tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+
     @flow
     def esa_landcover(
-        raw_dir,
-        process_dir,
-        output_dir,
-        years,
-        api_uid,
-        api_key,
-        overwrite_download,
-        overwrite_processing,
-        backend,
-        task_runner,
-        run_parallel,
-        max_workers,
-        log_dir,
-        bypass_error_wrapper,
+        raw_dir: str,
+        process_dir: str,
+        output_dir: str,
+        years: List[int],
+        api_uid: str,
+        api_key: str,
+        overwrite_download: bool,
+        overwrite_processing: bool,
+        backend: Literal["local", "mpi", "prefect"],
+        task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
+        run_parallel: bool,
+        max_workers: int,
+        log_dir: str,
+        bypass_error_wrapper: bool,
     ):
         timestamp = datetime.today()
         time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
