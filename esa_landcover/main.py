@@ -185,7 +185,8 @@ def get_config_dict(config_file="config.ini"):
         "task_runner": config["run"]["task_runner"],
         "run_parallel": config["run"].getboolean("run_parallel"),
         "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs"
+        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
+        "bypass_error_wrapper": config["run"].getboolean["bypass_error_wrapper"],
     }
 
 
@@ -203,12 +204,11 @@ if __name__ == "__main__":
 
     class_instance = ESALandcover(config_dict["raw_dir"], config_dict["process_dir"], config_dict["output_dir"], config_dict["years"], config_dict["api_uid"], config_dict["api_key"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
 
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
+    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir, bypass_error_wrapper=config_dict["bypass_error_wrapper"])
 
 
 try:
     from prefect import flow
-    from prefect.filesystems import GitHub
 except:
     pass
 else:
@@ -216,11 +216,8 @@ else:
     config = ConfigParser()
     config.read(config_file)
 
-    block_name = config["deploy"]["storage_block"]
-    tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
-
     @flow
-    def esa_landcover(raw_dir, process_dir, output_dir, years, api_uid, api_key, overwrite_download, overwrite_processing, backend, task_runner, run_parallel,  max_workers, log_dir):
+    def esa_landcover(raw_dir, process_dir, output_dir, years, api_uid, api_key, overwrite_download, overwrite_processing, backend, task_runner, run_parallel,  max_workers, log_dir, bypass_error_wrapper):
 
         timestamp = datetime.today()
         time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
@@ -278,6 +275,6 @@ else:
 
         if task_runner != 'hpc':
             os.chdir(tmp_dir)
-            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, bypass_error_wrapper=bypass_error_wrapper)
         else:
-            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
+            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs, bypass_error_wrapper=bypass_error_wrapper)
