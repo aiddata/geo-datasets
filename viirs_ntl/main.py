@@ -34,6 +34,7 @@ class VIIRS_NTL(Dataset):
         raw_dir: Union[str, Path],
         output_dir: Union[str, Path],
         run_annual: bool,
+        annual_version: str,
         annual_files: List[str],
         run_monthly: bool,
         monthly_files: List[str],
@@ -51,6 +52,7 @@ class VIIRS_NTL(Dataset):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
         self.run_annual: bool = run_annual
+        self.annual_version: str = annual_version
         self.annual_files: List[str] = annual_files
         self.run_monthly: bool = run_monthly
         self.monthly_files: List[str] = monthly_files
@@ -101,16 +103,25 @@ class VIIRS_NTL(Dataset):
             # TODO: pull from beautiful soup for file url, filter out non-available urls here
             for year in self.years:
                 for file in self.annual_files:
-                    if int(year) == 2012:
-                        # IMPORTANT: this can either be 201204-201212 or 201204-201303
-                        # depending on what we prefer!
-                        download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_201204-201303_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
-                    else:
-                        download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_{YEAR}_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
-                    if int(year) < 2014:
-                        file_config = "vcmcfg"
-                    else:
+                    if self.annual_version == "v21":
+                        if int(year) == 2012:
+                            # IMPORTANT: this can either be 201204-201212 or 201204-201303
+                            # depending on what we prefer!
+                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_201204-201303_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
+                        else:
+                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_{YEAR}_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
+                        if int(year) < 2014:
+                            file_config = "vcmcfg"
+                        else:
+                            file_config = "vcmslcfg"
+                    elif self.annual_version == "v22":
                         file_config = "vcmslcfg"
+                        if int(year) == 2022:
+                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v22/{YEAR}/VNL_v22_npp-j01_{YEAR}_global_{CONFIG}_c202303062300.{TYPE}.dat.tif.gz"
+                        else:
+                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v22/{YEAR}/VNL_npp_{YEAR}_global_{CONFIG}_v2_c202402081600.{TYPE}.dat.tif.gz"
+                    else:
+                        raise NotImplementedError(f"Annual version {self.annual_version} is not yet supported.")
                     download_dest = download_url.format(
                         YEAR=year, TYPE=file, CONFIG=file_config
                     )
@@ -450,6 +461,7 @@ def get_config_dict(config_file="config.ini"):
 
     return {
         "run_annual": config["main"].getboolean("run_annual"),
+        "annual_version": config["main"]["annual_version"],
         "run_monthly": config["main"].getboolean("run_monthly"),
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "months": [int(y) for y in config["main"]["months"].split(", ")],
@@ -481,6 +493,7 @@ if __name__ == "__main__":
         raw_dir=config_dict["raw_dir"],
         output_dir=config_dict["output_dir"],
         run_annual=config_dict["run_annual"],
+        annual_version=config_dict["annual_version"],
         annual_files=config_dict["annual_files"],
         run_monthly=config_dict["run_monthly"],
         monthly_files=config_dict["monthly_files"],
@@ -522,6 +535,7 @@ else:
             output_dir: str,
             run_annual: bool,
             annual_files: List[str],
+            annual_version: str,
             run_monthly: bool,
             monthly_files: List[str],
             months: List[int],
@@ -573,6 +587,7 @@ else:
                 raw_dir=raw_dir,
                 output_dir=output_dir,
                 run_annual=run_annual,
+                annual_version=annual_version,
                 annual_files=annual_files,
                 run_monthly=run_monthly,
                 monthly_files=monthly_files,
