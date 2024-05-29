@@ -6,6 +6,7 @@
     "name": "china_osm_v301_500m",
     "title": "Locations of Chinese development projects - 500m Buffer (GeoGCDF v3.0.1)",
     "description": "Locations of Chinese development projects from AidData's Global Chinese Development Finance Dataset v3.0.1. These boundaries represent a subset of projects from the dataset for which locations were found using OpenStreetMaps. For all locations a 500m buffer was applied.",
+    "details": "Project IDs 40451, 90779, 64952 in Fiji were removed due to issues buffering the associated features.",
     "version": "v301",
     "options": {
         "group": "china_osm_v301",
