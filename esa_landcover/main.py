@@ -39,7 +39,7 @@ class ESALandcover(Dataset):
         self.years = [int(y) for y in years]
 
         self.v207_years = range(1992, 2016)
-        self.v211_years = range(2016, 2021)
+        self.v211_years = range(2016, 2022)
 
         cdsapi_path = Path.home() / ".cdsapirc"
         with open(cdsapi_path, "w") as f:
