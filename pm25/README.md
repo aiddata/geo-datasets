@@ -58,17 +58,17 @@ If you aren't comfortable setting up the Box application as described above, it 
    ```
    mkdir -p input_data
    ```
-2. Navigate to the [data hosted on Box](https://wustl.app.box.com/v/ACAG-V5GL02-GWRPM25), and click the download button in the upper left corner
+2. Navigate to the [data hosted on Box](https://wustl.app.box.com/v/ACAG-V5GL04-GWRPM25), and click the download button in the upper left corner
 3. Extract the zip file into input_data so that it looks like this:
    ```
    ├── input_data
    │   ├── Annual
-   │   │   ├── V5GL02.HybridPM25.Global.199801-199812.nc
-   │   │   ├── V5GL02.HybridPM25.Global.199901-199912.nc
+   │   │   ├── V5GL04.HybridPM25.Global.199801-199812.nc
+   │   │   ├── V5GL04.HybridPM25.Global.199901-199912.nc
    │   │   └── ...
    │   └── Monthly
-   │       ├── V5GL02.HybridPM25.Global.199801-199801.nc
-   │       ├── V5GL02.HybridPM25.Global.199802-199802.nc
+   │       ├── V5GL04.HybridPM25.Global.199801-199801.nc
+   │       ├── V5GL04.HybridPM25.Global.199802-199802.nc
    │       └── ...
    └── ...
    ```
