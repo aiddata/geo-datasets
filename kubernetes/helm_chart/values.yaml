@@ -1,4 +1,4 @@
-workerContainer: "prefecthq/prefect:2.14.21-python3.10-kubernetes"
+workerContainer: "prefecthq/prefect:2.19.6-python3.10-kubernetes"
 
 prefect:
   apiURL: "[YOUR_API_URL]"
