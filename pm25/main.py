@@ -105,6 +105,14 @@ class PM25(Dataset):
 
         logger = self.get_logger()
 
+        from boxsdk import JWTAuth, Client
+
+        logger.debug(boxsdk.__name__, boxsdk.__version__)
+        logger.debug(JWTAuth.__name__)
+
+        x = JWTAuth.__name__
+        logger.debug(x)
+
         # load JWT authentication JSON (see README.md for how to set this up)
         auth = JWTAuth.from_settings_dictionary(self.box_config)
 
@@ -187,7 +195,7 @@ class PM25(Dataset):
 
     def get_box_item(self, id: str):
         client = self.create_box_client()
-        box_folder_url = 'https://wustl.app.box.com/v/ACAG-V5GL03-GWRPM25'
+        box_folder_url = f'https://wustl.app.box.com/v/ACAG-{self.version}-GWRPM25'
 
         for i in client.get_shared_item(box_folder_url).get_items():
             if i.name == 'Global':
