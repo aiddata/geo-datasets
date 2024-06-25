@@ -577,16 +577,12 @@ if __name__ == "__main__":
 else:
     try:
         from prefect import flow
-        from prefect.filesystems import GitHub
     except:
         pass
     else:
         config_file = "ltdr_ndvi/config.ini"
         config = ConfigParser()
         config.read(config_file)
-
-        block_name = config["deploy"]["storage_block"]
-        GitHub.load(block_name).get_directory("global_scripts")
 
         tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
