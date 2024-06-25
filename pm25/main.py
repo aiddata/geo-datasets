@@ -102,7 +102,7 @@ class PM25(Dataset):
         """
         Creates a Box client using the provided JWT authentication JSON.
         """
-        
+
         logger = self.get_logger()
 
         # load JWT authentication JSON (see README.md for how to set this up)
@@ -380,7 +380,6 @@ if __name__ == "__main__":
 else:
     try:
         from prefect import flow
-        from prefect.filesystems import GitHub
     except:
         pass
     else:
@@ -388,27 +387,24 @@ else:
         config = ConfigParser()
         config.read(config_file)
 
-        block_name = config["deploy"]["storage_block"]
-        GitHub.load(block_name).get_directory("global_scripts")
-
         from main import PM25
 
         tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
         @flow
         def pm25(
-            raw_dir: str, 
-            output_dir: str, 
-            box_config: dict, 
-            version: str, 
-            years: List[int], 
-            overwrite_downloads: bool, 
-            verify_existing_downloads: bool, 
-            overwrite_processing: bool, 
+            raw_dir: str,
+            output_dir: str,
+            box_config: dict,
+            version: str,
+            years: List[int],
+            overwrite_downloads: bool,
+            verify_existing_downloads: bool,
+            overwrite_processing: bool,
             backend: Literal["local", "mpi", "prefect"],
             task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
-            run_parallel: bool, 
-            max_workers: int, 
+            run_parallel: bool,
+            max_workers: int,
             log_dir: str):
 
             timestamp = datetime.today()
