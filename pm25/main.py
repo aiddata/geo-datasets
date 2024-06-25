@@ -105,14 +105,6 @@ class PM25(Dataset):
 
         logger = self.get_logger()
 
-        from boxsdk import JWTAuth, Client
-
-        logger.debug(boxsdk.__name__, boxsdk.__version__)
-        logger.debug(JWTAuth.__name__)
-
-        x = JWTAuth.__name__
-        logger.debug(x)
-
         # load JWT authentication JSON (see README.md for how to set this up)
         auth = JWTAuth.from_settings_dictionary(self.box_config)
 
