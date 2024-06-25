@@ -6,7 +6,7 @@ metadata:
   name: prefect-agent
   namespace: {{.Release.namespace}}
 spec:
-  replicas: 1
+  replicas: {{ .Values.prefect.replicas }}
   selector:
     matchLabels:
       app: prefect-agent

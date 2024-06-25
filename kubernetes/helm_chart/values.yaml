@@ -4,6 +4,7 @@ prefect:
   apiURL: "[YOUR_API_URL]"
   apiKey: "[YOUR_API_KEY]"
   workPool: "geodata-pool"
+  replicas: 3
 
 prod:
   nfs:
