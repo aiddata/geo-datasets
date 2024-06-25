@@ -58,7 +58,8 @@ class LTDR_NDVI(Dataset):
     name = "Long-term Data Record NDVI"
 
     def __init__(self,
-                 token:str,
+                 token: str,
+                 data_num: int,
                  years: List[Union[int, str]],
                  raw_dir: Union[str, os.PathLike],
                  output_dir: Union[str, os.PathLike],
@@ -76,15 +77,15 @@ class LTDR_NDVI(Dataset):
 
         self.years = [int(y) for y in years]
 
-        # TODO: warn if raw_dir already points to a directory named "465", it's probably one too deep
-        self.raw_dir = Path(raw_dir) / "465"
+        # TODO: warn if raw_dir already points to a directory named [data_num], it's probably one too deep
+        self.raw_dir = Path(raw_dir) / str(data_num)
         self.output_dir = Path(output_dir)
 
         self.overwrite_download = overwrite_download
         self.validate_download = validate_download
         self.overwrite_processing = overwrite_processing
 
-        self.dataset_url = "https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/details/allData/465/"
+        self.dataset_url = f"https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/details/allData/{data_num}/"
 
         self.sensors = [
             "N07_AVH13C1",
@@ -511,6 +512,7 @@ def get_config_dict(config_file="config.ini"):
 
     return {
         "token": config["main"]["token"],
+        "data_num": config["main"]["data_num"],
         "years": [int(y) for y in config["main"]["years"].split(", ")],
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
@@ -536,7 +538,7 @@ if __name__ == "__main__":
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-    class_instance = LTDR_NDVI(config_dict["token"], config_dict["years"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["validate_download"], config_dict["overwrite_processing"])
+    class_instance = LTDR_NDVI(config_dict["token"], config_dict["data_num"], config_dict["years"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["validate_download"], config_dict["overwrite_processing"])
 
     class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
 
@@ -559,6 +561,7 @@ else:
         @flow
         def ltdr_ndvi(
                 token: str,
+                data_num: int,
                 years: List[int],
                 raw_dir: str,
                 output_dir: str,
@@ -600,7 +603,7 @@ else:
             }
 
 
-            class_instance = LTDR_NDVI(token, years, raw_dir, output_dir, overwrite_download, validate_download, overwrite_processing)
+            class_instance = LTDR_NDVI(token, data_num, years, raw_dir, output_dir, overwrite_download, validate_download, overwrite_processing)
 
             if task_runner != 'hpc':
                 os.chdir(tmp_dir)
