@@ -27,53 +27,48 @@ full file name - "AVH13C1.A1981181.N07.004.2013227210959.hdf"
 
 """
 
+import csv
+import hashlib
+import json
 import os
 import re
-import csv
 import ssl
 import sys
-import json
-import hashlib
-from io import StringIO
-from pathlib import Path
-from itertools import chain
-from datetime import datetime
-from urllib.parse import urljoin
 from collections import OrderedDict
 from configparser import ConfigParser
+from datetime import datetime
+from io import StringIO
+from itertools import chain
+from pathlib import Path
 from typing import Any, Generator, List, Literal, Tuple, Type, Union
+from urllib.parse import urljoin
 
-import rasterio
-from rasterio.crs import CRS
-import requests
 import numpy as np
 import pandas as pd
-from osgeo import gdal, osr
-
+import rasterio
+import requests
 from data_manager import Dataset
+from osgeo import gdal, osr
+from rasterio.crs import CRS
 
 
 class LTDR_NDVI(Dataset):
-
     name = "Long-term Data Record NDVI"
 
-    def __init__(self,
-                 token: str,
-                 data_num: int,
-                 years: List[Union[int, str]],
-                 raw_dir: Union[str, os.PathLike],
-                 output_dir: Union[str, os.PathLike],
-                 overwrite_download: bool,
-                 validate_download: bool,
-                 overwrite_processing: bool):
+    def __init__(
+        self,
+        token: str,
+        data_num: int,
+        years: List[Union[int, str]],
+        raw_dir: Union[str, os.PathLike],
+        output_dir: Union[str, os.PathLike],
+        overwrite_download: bool,
+        validate_download: bool,
+        overwrite_processing: bool,
+    ):
+        self.build_list = ["daily", "monthly", "yearly"]
 
-        self.build_list = [
-            "daily",
-            "monthly",
-            "yearly"
-        ]
-
-        self.auth_headers = { "Authorization": f"Bearer {token}" }
+        self.auth_headers = {"Authorization": f"Bearer {token}"}
 
         self.years = [int(y) for y in years]
 
@@ -96,7 +91,6 @@ class LTDR_NDVI(Dataset):
             "N18_AVH13C1",
             "N19_AVH13C1",
         ]
-
 
     def build_sensor_download_list(self, sensor: str):
         logger = self.get_logger()
@@ -131,16 +125,28 @@ class LTDR_NDVI(Dataset):
                     # for each file the sensor created for this day
                     for file_detail in dir_contents(day_dir):
                         day_download_url: str = file_detail["downloadsLink"]
-                        dst = self.raw_dir / sensor / year_details["name"] / day_details["name"] / file_detail["name"]
+                        dst = (
+                            self.raw_dir
+                            / sensor
+                            / year_details["name"]
+                            / day_details["name"]
+                            / file_detail["name"]
+                        )
                         # if file is already downloaded, and we aren't in overwrite mode
                         if dst.exists() and not self.overwrite_download:
                             if self.validate_download:
                                 if validate(dst, file_detail["md5sum"]):
                                     logger.info(f"File validated: {dst.as_posix()}")
-                                    download_list.append((False, (day_download_url, dst)))
+                                    download_list.append(
+                                        (False, (day_download_url, dst))
+                                    )
                                 else:
-                                    logger.info(f"File validation failed, queuing for download: {dst.as_posix()}")
-                                    download_list.append((True, (day_download_url, dst)))
+                                    logger.info(
+                                        f"File validation failed, queuing for download: {dst.as_posix()}"
+                                    )
+                                    download_list.append(
+                                        (True, (day_download_url, dst))
+                                    )
                             else:
                                 logger.info(f"File exists, skipping: {dst.as_posix()}")
                                 download_list.append((False, (day_download_url, dst)))
@@ -148,7 +154,6 @@ class LTDR_NDVI(Dataset):
                             logger.info(f"Queuing for download: {day_download_url}")
                             download_list.append((True, (day_download_url, dst)))
         return download_list
-
 
     def download(self, src_url: str, final_dst_path: Union[str, os.PathLike]) -> None:
         logger = self.get_logger()
@@ -160,9 +165,7 @@ class LTDR_NDVI(Dataset):
                     for chunk in src.iter_content(chunk_size=8192):
                         dst.write(chunk)
 
-
     def build_process_list(self, downloaded_files):
-
         # filter options to accept/deny based on sensor, year
         # all values must be strings
         # do not enable/use both accept/deny for a given field
@@ -175,7 +178,7 @@ class LTDR_NDVI(Dataset):
             "use_year_accept": True,
             "year_accept": ["2019", "2020"],
             "use_year_deny": False,
-            "year_deny": ["2019"]
+            "year_deny": ["2019"],
         }
 
         df_dict_list = []
@@ -186,17 +189,21 @@ class LTDR_NDVI(Dataset):
             day = items[1][5:8]
             sensor = items[2]
             month = "{0:02d}".format(datetime.strptime(f"{year}+{day}", "%Y+%j").month)
-            output_path = self.output_dir / "daily" / f"avhrr_ndvi_v5_{sensor}_{year}_{day}.tif"
-            df_dict_list.append({
-                "input_path": input_path,
-                "sensor": sensor,
-                "year": year,
-                "month": month,
-                "day": day,
-                "year_month": year+"_"+month,
-                "year_day": year+"_"+day,
-                "output_path": output_path
-            })
+            output_path = (
+                self.output_dir / "daily" / f"avhrr_ndvi_v5_{sensor}_{year}_{day}.tif"
+            )
+            df_dict_list.append(
+                {
+                    "input_path": input_path,
+                    "sensor": sensor,
+                    "year": year,
+                    "month": month,
+                    "day": day,
+                    "year_month": year + "_" + month,
+                    "year_day": year + "_" + day,
+                    "output_path": output_path,
+                }
+            )
 
         df = pd.DataFrame(df_dict_list).sort_values(by=["input_path"])
 
@@ -204,21 +211,20 @@ class LTDR_NDVI(Dataset):
         sensors = sorted(list(set(df["sensor"])))
         years = sorted(list(set(df["year"])))
         filter_sensors = None
-        if ops['use_sensor_accept']:
-            filter_sensors = [i for i in sensors if i in ops['sensor_accept']]
-        elif ops['use_sensor_deny']:
-            filter_sensors = [i for i in sensors if i not in ops['sensor_deny']]
+        if ops["use_sensor_accept"]:
+            filter_sensors = [i for i in sensors if i in ops["sensor_accept"]]
+        elif ops["use_sensor_deny"]:
+            filter_sensors = [i for i in sensors if i not in ops["sensor_deny"]]
         if filter_sensors:
             df = df.loc[df["sensor"].isin(filter_sensors)]
         filter_years = None
-        if ops['use_year_accept']:
-            filter_years = [i for i in years if i in ops['year_accept']]
-        elif ops['use_year_deny']:
-            filter_years = [i for i in years if i not in ops['year_deny']]
+        if ops["use_year_accept"]:
+            filter_years = [i for i in years if i in ops["year_accept"]]
+        elif ops["use_year_deny"]:
+            filter_years = [i for i in years if i not in ops["year_deny"]]
         if filter_years:
             df = df.loc[df["year"].isin(filter_years)]
         return df
-
 
     @staticmethod
     def create_mask(qa_array, mask_vals):
@@ -232,7 +238,6 @@ class LTDR_NDVI(Dataset):
 
         qa_mask = pd.DataFrame(qa_array).applymap(flag).to_numpy()
         return qa_mask
-
 
     def process_daily_data(self, src, output_path):
         """
@@ -287,14 +292,14 @@ class LTDR_NDVI(Dataset):
                 3: "Pixel is over water",
                 2: "Pixel contains cloud shadow",
                 1: "Pixel is cloudy",
-                0: "Unused"
+                0: "Unused",
             }
 
             # qa_mask_vals = [15, 9, 8, 6, 4, 3, 2, 1]
             qa_mask_vals = [15, 9, 8, 1]
 
-            ndvi_gdal_path = f"HDF4_EOS:EOS_GRID:\"{src.as_posix()}\":Grid:NDVI"
-            qa_gdal_path = f"HDF4_EOS:EOS_GRID:\"{src.as_posix()}\":Grid:QA"
+            ndvi_gdal_path = f'HDF4_EOS:EOS_GRID:"{src.as_posix()}":Grid:NDVI'
+            qa_gdal_path = f'HDF4_EOS:EOS_GRID:"{src.as_posix()}":Grid:QA'
 
             # open data subdataset
             with rasterio.open(ndvi_gdal_path) as ndvi_src:
@@ -330,7 +335,6 @@ class LTDR_NDVI(Dataset):
                         # for some reason rasterio raises an exception if we don't specify that there is one index
                         dst.write(ndvi_array, indexes=1)
 
-
     def process_monthly_data(self, year_month, month_files, month_path):
         logger = self.get_logger()
         if os.path.exists(month_path) and not self.overwrite_processing:
@@ -340,7 +344,6 @@ class LTDR_NDVI(Dataset):
             data, meta = self.aggregate_rasters(file_list=month_files, method="max")
             self.write_raster(month_path, data, meta)
 
-
     def process_yearly_data(self, year, year_files, year_path):
         logger = self.get_logger()
         if os.path.exists(year_path) and not self.overwrite_processing:
@@ -349,7 +352,6 @@ class LTDR_NDVI(Dataset):
             logger.info(f"Processing year: {year}")
             data, meta = self.aggregate_rasters(file_list=year_files, method="mean")
             self.write_raster(year_path, data, meta)
-
 
     def aggregate_rasters(self, file_list, method="mean"):
         """
@@ -371,11 +373,12 @@ class LTDR_NDVI(Dataset):
         logger = self.get_logger()
         store = None
         for ix, file_path in enumerate(file_list):
-
             try:
                 raster = rasterio.open(file_path)
             except:
-                logger.error(f"Could not include file in aggregation ({str(file_path)})")
+                logger.error(
+                    f"Could not include file in aggregation ({str(file_path)})"
+                )
                 continue
 
             active = raster.read(masked=True)
@@ -399,7 +402,11 @@ class LTDR_NDVI(Dataset):
                     if ix == 1:
                         weights = (~store.mask).astype(int)
 
-                    store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
+                    store = np.ma.average(
+                        np.ma.array((store, active)),
+                        axis=0,
+                        weights=[weights, (~active.mask).astype(int)],
+                    )
                     weights += (~active.mask).astype(int)
 
                 elif method == "min":
@@ -414,7 +421,6 @@ class LTDR_NDVI(Dataset):
         store = store.filled(raster.nodata)
         return store, raster.profile
 
-
     def write_raster(self, path, data, meta):
         logger = self.get_logger()
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -426,11 +432,11 @@ class LTDR_NDVI(Dataset):
                 except:
                     logger.exception("Error writing raster to {path}")
 
-
     def main(self):
-
         # Build download list
-        raw_file_list = self.run_tasks(self.build_sensor_download_list, [[s] for s in self.sensors])
+        raw_file_list = self.run_tasks(
+            self.build_sensor_download_list, [[s] for s in self.sensors]
+        )
 
         # We have a list of lists (from each sensor), merge them into one
         file_list = [i for i in chain(*raw_file_list.results())]
@@ -454,10 +460,16 @@ class LTDR_NDVI(Dataset):
         # See bottom of this page:
         # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.core.groupby.DataFrameGroupBy.aggregate.html
         # see also https://pandas.pydata.org/pandas-docs/stable/user_guide/groupby.html#groupby-aggregate-named
-        month_df = day_df[["output_path", "year", "year_month"]].groupby("year_month", as_index=False).aggregate(
-            day_path_list = pd.NamedAgg(column="output_path",   aggfunc=lambda x: tuple(x)),
-            count =         pd.NamedAgg(column="output_path",   aggfunc="count"),
-            year =          pd.NamedAgg(column="year",          aggfunc="last")
+        month_df = (
+            day_df[["output_path", "year", "year_month"]]
+            .groupby("year_month", as_index=False)
+            .aggregate(
+                day_path_list=pd.NamedAgg(
+                    column="output_path", aggfunc=lambda x: tuple(x)
+                ),
+                count=pd.NamedAgg(column="output_path", aggfunc="count"),
+                year=pd.NamedAgg(column="year", aggfunc="last"),
+            )
         )
 
         minimum_days_in_month = 20
@@ -465,15 +477,19 @@ class LTDR_NDVI(Dataset):
         month_df = month_df.loc[month_df["count"] >= minimum_days_in_month]
 
         month_df["output_path"] = month_df.apply(
-            lambda x: (self.output_dir / "monthly/avhrr_ndvi_v5_{}.tif".format(x["year_month"])).as_posix(), axis=1
+            lambda x: (
+                self.output_dir / "monthly/avhrr_ndvi_v5_{}.tif".format(x["year_month"])
+            ).as_posix(),
+            axis=1,
         )
 
         # build year dataframe
-        year_df = month_df[["output_path", "year"]].groupby("year", as_index=False).aggregate({
-            "output_path": [lambda x: tuple(x), "count"]
-        })
+        year_df = (
+            month_df[["output_path", "year"]]
+            .groupby("year", as_index=False)
+            .aggregate({"output_path": [lambda x: tuple(x), "count"]})
+        )
         year_df.columns = ["year", "month_path_list", "count"]
-
 
         year_df["output_path"] = year_df["year"].apply(
             lambda x: (self.output_dir / f"yearly/avhrr_ndvi_v5_{x}.tif").as_posix()
@@ -487,7 +503,9 @@ class LTDR_NDVI(Dataset):
 
         month_qlist = []
         for _, row in month_df.iterrows():
-            month_qlist.append([row["year_month"], row["day_path_list"], row["output_path"]])
+            month_qlist.append(
+                [row["year_month"], row["day_path_list"], row["output_path"]]
+            )
 
         year_qlist = []
         for _, row in year_df.iterrows():
@@ -523,24 +541,38 @@ def get_config_dict(config_file="config.ini"):
         "task_runner": config["run"]["task_runner"],
         "run_parallel": config["run"].getboolean("run_parallel"),
         "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs"
+        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
     }
 
 
 if __name__ == "__main__":
-
     config_dict = get_config_dict()
 
     log_dir = config_dict["log_dir"]
     timestamp = datetime.today()
-    time_format_str: str="%Y_%m_%d_%H_%M"
+    time_format_str: str = "%Y_%m_%d_%H_%M"
     time_str = timestamp.strftime(time_format_str)
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-    class_instance = LTDR_NDVI(config_dict["token"], config_dict["data_num"], config_dict["years"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["validate_download"], config_dict["overwrite_processing"])
+    class_instance = LTDR_NDVI(
+        config_dict["token"],
+        config_dict["data_num"],
+        config_dict["years"],
+        config_dict["raw_dir"],
+        config_dict["output_dir"],
+        config_dict["overwrite_download"],
+        config_dict["validate_download"],
+        config_dict["overwrite_processing"],
+    )
 
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
+    class_instance.run(
+        backend=config_dict["backend"],
+        task_runner=config_dict["task_runner"],
+        run_parallel=config_dict["run_parallel"],
+        max_workers=config_dict["max_workers"],
+        log_dir=timestamp_log_dir,
+    )
 
 else:
     try:
@@ -554,26 +586,28 @@ else:
         config.read(config_file)
 
         block_name = config["deploy"]["storage_block"]
-        GitHub.load(block_name).get_directory('global_scripts')
+        GitHub.load(block_name).get_directory("global_scripts")
 
         tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
         @flow
         def ltdr_ndvi(
-                token: str,
-                data_num: int,
-                years: List[int],
-                raw_dir: str,
-                output_dir: str,
-                overwrite_download: bool,
-                validate_download: bool,
-                overwrite_processing: bool,
-                backend: Literal["local", "mpi", "prefect"],
-                task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
-                run_parallel: bool,
-                max_workers: int,
-                log_dir: str):
-
+            token: str,
+            data_num: int,
+            years: List[int],
+            raw_dir: str,
+            output_dir: str,
+            overwrite_download: bool,
+            validate_download: bool,
+            overwrite_processing: bool,
+            backend: Literal["local", "mpi", "prefect"],
+            task_runner: Literal[
+                "sequential", "concurrent", "dask", "hpc", "kubernetes"
+            ],
+            run_parallel: bool,
+            max_workers: int,
+            log_dir: str,
+        ):
             timestamp = datetime.today()
             time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
             timestamp_log_dir = Path(log_dir) / time_str
@@ -599,14 +633,36 @@ else:
                     "conda activate geodata38",
                     f"cd {tmp_dir}",
                 ],
-                "log_directory": str(timestamp_log_dir)
+                "log_directory": str(timestamp_log_dir),
             }
 
+            class_instance = LTDR_NDVI(
+                token,
+                data_num,
+                years,
+                raw_dir,
+                output_dir,
+                overwrite_download,
+                validate_download,
+                overwrite_processing,
+            )
 
-            class_instance = LTDR_NDVI(token, data_num, years, raw_dir, output_dir, overwrite_download, validate_download, overwrite_processing)
-
-            if task_runner != 'hpc':
+            if task_runner != "hpc":
                 os.chdir(tmp_dir)
-                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+                class_instance.run(
+                    backend=backend,
+                    task_runner=task_runner,
+                    run_parallel=run_parallel,
+                    max_workers=max_workers,
+                    log_dir=timestamp_log_dir,
+                )
             else:
-                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
+                class_instance.run(
+                    backend=backend,
+                    task_runner=task_runner,
+                    run_parallel=run_parallel,
+                    max_workers=max_workers,
+                    log_dir=timestamp_log_dir,
+                    cluster=cluster,
+                    cluster_kwargs=cluster_kwargs,
+                )
