@@ -105,6 +105,8 @@ class PM25(Dataset):
 
         logger = self.get_logger()
 
+        logger.debug(JWTAuth.__name__)
+
         # load JWT authentication JSON (see README.md for how to set this up)
         auth = JWTAuth.from_settings_dictionary(self.box_config)
 
@@ -112,6 +114,7 @@ class PM25(Dataset):
         client = Client(auth)
 
         return client
+
 
     def build_file_download_list(self):
         """
