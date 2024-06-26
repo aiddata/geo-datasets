@@ -12,7 +12,6 @@ dask-jobqueue == 0.8.1
 dask-kubernetes
 netcdf4 == 1.7.1
 numpy == 1.23.3
-prefect-dask == 0.2.9
 requests == 2.28.1
 arrow == 1.2.3
 bokeh == 2.4.3
@@ -20,6 +19,8 @@ cdsapi == 0.5.1
 cligj == 0.7.2
 pandas == 1.5.1
 pillow == 9.2.0
+prefect == 2.14.21
+prefect-dask == 0.2.9
 proj == 0.2.0
 rasterio == 1.3.3
 boxsdk[jwt] == 3.6.1
