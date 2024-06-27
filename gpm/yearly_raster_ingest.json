@@ -1,13 +1,13 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/gpm/yearly/mean",
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/gpm/v07b/yearly/mean",
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "gpm_precipitation_YYYY.tif",
-	"name": "gpm_precipitation_yearly_mean",
-	"title": "Yearly GPM precipitation",
-	"description": "Yearly IMERG GPM precipitation - Created by aggregating (mean) the monthly GPM precipitation",
-    "details": "",
-	"version": "v05B",
+	"name": "gpm_precipitation_v07b_yearly_mean",
+	"title": "Yearly GPM precipitation (v07B)",
+	"description": "Yearly IMERG GPM (v07B) precipitation - Created by aggregating (mean) the monthly GPM precipitation",
+    "details": "Created by aggregatubg monthly IMERG V07B GPM data",
+	"version": "v07B",
 	"options": {
 	    "resolution": 0.1,
         "extract_types": ["max", "mean", "min"],
@@ -27,5 +27,3 @@
 	},
 	"active": 1
 }
-
-

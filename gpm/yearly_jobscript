@@ -1,8 +1,0 @@
-#!/bin/tcsh
-#PBS -N asg:gpm
-#PBS -l nodes=2:c18c:ppn=16
-#PBS -l walltime=96:00:00
-#PBS -j oe
-
-
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 32 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/gpm/build_yearly.py
