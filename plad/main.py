@@ -1,42 +1,52 @@
 # data download script for PLAD political leaders' birthplace dataset
-# info link: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575 
+# info link: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575
 
 import os
-import sys
 import requests
 from pathlib import Path
 from configparser import ConfigParser
-import xlrd
+from datetime import datetime
+from typing import List, Literal
+
 import pandas as pd
+import rasterio
+from rasterio import features
+from shapely.geometry import Point
+import geopandas as gpd
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+from data_manager import Dataset
 
-from dataset import Dataset
 
 class PLAD(Dataset):
 
     name = "PLAD"
 
-    def __init__(self, raw_dir, output_dir, years, leader_options, max_retries, overwrite_download=False, overwrite_sorting=False):
+    def __init__(self,
+                 raw_dir: str,
+                 output_dir: str,
+                 years: list,
+                 max_retries: int,
+                 overwrite_download: bool,
+                 overwrite_output: bool):
+
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
         self.years = years
-        self.leader_options = leader_options
         self.max_retries = max_retries
         self.overwrite_download = overwrite_download
-        self.overwrite_sorting = overwrite_sorting
+        self.overwrite_output = overwrite_output
         self.download_url = "https://dataverse.harvard.edu/api/access/datafile/5211722"
+        self.src_path = self.raw_dir / "plad.xls"
 
     def test_connection(self):
         # test connection
         test_request = requests.get("https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575", verify=True)
         test_request.raise_for_status()
 
-    def manage_download(self):
+    def download_data(self):
         """
         Download original spreadsheet
         """
-
         logger = self.get_logger()
 
         download_dest = "https://dataverse.harvard.edu/api/access/datafile/5211722"
@@ -58,71 +68,85 @@ class PLAD(Dataset):
                 except Exception as e:
                     attempts += 1
                     if attempts > self.max_retries:
-                        logger.info(str(e) + f": Failed to download: {str(download_dest)}")
+                        logger.info(f"{str(e)}: Failed to download: {str(download_dest)}")
                         return (download_dest, local_filename)
                     else:
-                        logger.info(f"Attempt " + {str(attempts)} + ": "+ {str(download_dest)})
-    
-    def sort_data(self, year, option):
-        "create csv for each year + leader option in config"
+                        logger.info(f"Attempt {str(attempts)} : {str(download_dest)}")
+
+    def process_year(self, year):
+        """create file for each year
+        """
 
         logger = self.get_logger()
 
-        output_filename = "leader_birthplace_data_{YEAR}_{OPTION}.csv".format(YEAR = year, OPTION = option)
+        output_filename = f"leader_birthplace_data_{year}.tif"
         output_path = self.output_dir / output_filename
-        if os.path.isfile(output_path) and not self.overwrite_sorting:
+
+        if os.path.isfile(output_path) and not self.overwrite_output:
             logger.info(f"File exists: {str(output_path)}")
             return ("File exists", str(output_path))
 
-        master_data = self.raw_dir / "plad.xls"
-        if not os.path.isfile(master_data):
-            logger.info(f"Error: Master data download: {master_data} not found" )
-            raise Exception(f"Data file not found: {master_data}")
-        data_sheet = xlrd.open_workbook(str(master_data))
-        data = data_sheet.sheet_by_index(0)
-        
-        return_list = []
-        for row in range(1, data.nrows):
-            country_code = data.cell_value(row, 0) # code or name?
-            leader_name = data.cell_value(row, 1)
-            lat = data.cell_value(row, 13)
-            long = data.cell_value(row, 14)
 
-            start_year = int(data.cell_value(row, 6))
-            end_year = int(data.cell_value(row, 7))
-            if (year > start_year) & (year < end_year):
-                return_list.append((country_code, leader_name, lat, long))
-            elif ("outgoing" in option) & (year == end_year):
-                return_list.append((country_code, leader_name, lat, long))
-            elif ("incoming" in option) & (year == start_year):
-                return_list.append((country_code, leader_name, lat, long))
+        if not os.path.isfile(self.src_path):
+            logger.info(f"Error: Master data download: {self.src_path} not found" )
+            raise Exception(f"Data file not found: {self.src_path}")
 
-        try:
-            data_df = pd.DataFrame(return_list, columns=["country", "leader_name", "latitude", "longitude"])
-            data_df.to_csv(output_path, index=False)
-            logger.info(f"Data Compiled: {str(output_path)}")
-            return ("Success", output_path)
-        except Exception as e:
-            logger.info(f"Error compiling {output_path}:   {str(e)}")
-            raise Exception(str(e), output_path)
+        src_df = pd.read_excel(self.src_path, sheet_name=0)
+
+        # adm2 or finer precision
+        df = src_df.loc[src_df.geo_precision.isin([1,2,3])].copy()
+
+        df = df.loc[(df.startyear <= year) & (df.endyear >= year)].copy()
+
+
+        df["geometry"] = df.apply(lambda x: Point(x.longitude, x.latitude), axis=1)
+
+        gdf = gpd.GeoDataFrame(df, geometry="geometry")
+        gdf = gdf.set_crs(epsg=4326)
+
+        pixel_size = 0.05
+        transform = rasterio.transform.from_origin(-180, 90, pixel_size, pixel_size)
+        shape = (int(180/pixel_size), int(360/pixel_size))
+
+        rasterized = features.rasterize(gdf.geometry,
+                                        out_shape = shape,
+                                        fill = 0,
+                                        out = None,
+                                        transform = transform,
+                                        all_touched = True,
+                                        default_value = 1,
+                                        dtype = None)
+
+        with rasterio.open(
+                output_path, "w",
+                driver = "GTiff",
+                crs = "EPSG:4326",
+                transform = transform,
+                dtype = rasterio.uint8,
+                count = 1,
+                width = shape[1],
+                height = shape[0]) as dst:
+            dst.write(rasterized, indexes = 1)
+
+        logger.info(f"Data Compiled: {str(year)}")
+
 
     def main(self):
 
         logger = self.get_logger()
 
-        os.makedirs(self.raw_dir, exist_ok=True)
-
         logger.info("Testing Connection...")
         self.test_connection()
 
         logger.info("Running data download")
-        self.manage_download()
-
-        os.makedirs(self.output_dir, exist_ok=True)
+        self.raw_dir.mkdir(parents=True, exist_ok=True)
+        self.download_data()
 
         logger.info("Sorting Data")
-        sort = self.run_tasks(self.sort_data, [[y,o] for y in self.years for o in self.leader_options])
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        sort = self.run_tasks(self.process_year, [[y,] for y in self.years])
         self.log_run(sort)
+
 
 def get_config_dict(config_file="config.ini"):
     config = ConfigParser()
@@ -132,21 +156,95 @@ def get_config_dict(config_file="config.ini"):
             "raw_dir": Path(config["main"]["raw_dir"]),
             "output_dir": Path(config["main"]["output_dir"]),
             "years": [int(y) for y in config["main"]["years"].split(", ")],
-            "leader_options": [str(y) for y in config["main"]["leader_options"].split(", ")],
-            "log_dir": Path(config["main"]["output_dir"]) / "logs", 
+            "log_dir": Path(config["main"]["output_dir"]) / "logs",
             "backend": config["run"]["backend"],
             "task_runner": config["run"]["task_runner"],
             "run_parallel": config["run"].getboolean("run_parallel"),
             "max_workers": int(config["run"]["max_workers"]),
             "max_retries": config["main"].getint("max_retries"),
-            "cores_per_process": int(config["run"]["cores_per_process"]),
             "overwrite_download": config["main"].getboolean("overwrite_download"),
-            "overwrite_sorting": config["main"].getboolean("overwrite_sorting"),
+            "overwrite_output": config["main"].getboolean("overwrite_output"),
         }
 
+
 if __name__ == "__main__":
+
     config_dict = get_config_dict()
 
-    class_instance = PLAD(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["leader_options"], config_dict["max_retries"], config_dict["overwrite_download"], config_dict["overwrite_sorting"])
+    log_dir = config_dict["log_dir"]
+    timestamp = datetime.today()
+    time_format_str: str="%Y_%m_%d_%H_%M"
+    time_str = timestamp.strftime(time_format_str)
+    timestamp_log_dir = Path(log_dir) / time_str
+    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+    class_instance = PLAD(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["max_retries"], config_dict["overwrite_download"], config_dict["overwrite_output"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
+
+
+else:
+    try:
+        from prefect import flow
+    except:
+        pass
+    else:
+        config_file = "plad/config.ini"
+        config = ConfigParser()
+        config.read(config_file)
+
+        from main import PLAD
+
+        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+
+        @flow
+        def plad(
+            raw_dir: str,
+            output_dir: str,
+            years: List[int],
+            max_retries: int,
+            overwrite_download: bool,
+            overwrite_output: bool,
+            backend: Literal["local", "mpi", "prefect"],
+            task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
+            run_parallel: bool,
+            max_workers: int,
+            log_dir: str):
+
+            timestamp = datetime.today()
+            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
+            timestamp_log_dir = Path(log_dir) / time_str
+            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+            cluster = "vortex"
+
+
+            hpc_cluster_kwargs = {
+                "shebang": "#!/bin/tcsh",
+                "resource_spec": "nodes=1:c18a:ppn=12",
+                "walltime": "4:00:00",
+                "cores": 3,
+                "processes": 3,
+                "memory": "30GB",
+                "interface": "ib0",
+                "job_extra_directives": [
+                    "-j oe",
+                ],
+                "job_script_prologue": [
+                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+                    "module load anaconda3/2021.05",
+                    "conda activate geodata38",
+                    f"cd {tmp_dir}",
+                ],
+                "log_directory": str(timestamp_log_dir),
+            }
+
+
+            class_instance = PLAD(raw_dir=raw_dir, output_dir=output_dir, years=years, max_retries=max_retries, overwrite_download=overwrite_download, overwrite_output=overwrite_output)
+
+
+            if task_runner != 'hpc':
+                os.chdir(tmp_dir)
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+            else:
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=hpc_cluster_kwargs)
