@@ -129,7 +129,7 @@ class GPM(Dataset):
 
         self.version = version
         self.year_agg_method = year_agg_method
-        self.years = [int(y) for y in years]
+        self.years = years
         self.email = email
 
         self.raw_dir = Path(raw_dir) / self.version
@@ -202,7 +202,7 @@ class GPM(Dataset):
                 except:
                     logger.info("no data for: {0} {1}".format(year, month))
 
-            return download_list
+        return download_list
 
 
     def download_gpm(self, local_filename, filepath, file, year, month):
