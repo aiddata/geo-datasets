@@ -4,7 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "gpm_precipitation_YYYY_MM.tif",
 	"name": "gpm_precipitation_v07b_monthly",
-	"title": "Monthly GPM precipitation (v07B)",
+	"title": "Monthly IMERG (GPM) precipitation (v07B)",
 	"description": "Monthly IMERG GPM (v07B) precipitation - research version",
     "details": "Created by extracting monthly IMERG V07B GPM data",
 	"version": "v07B",
@@ -20,8 +20,8 @@
         "variable_description": "0.001 millimeters per hour"
 	},
 	"extras": {
-        "citation": "G. Huffman, D. Bolvin, D. Braithwaite, K. Hsu, R. Joyce, P. Xie, 2014: Integrated Multi-satellitE Retrievals for GPM (IMERG), version 4.4. NASA's Precipitation Processing Center, accessed 31 March, 2015, ftp://arthurhou.pps.eosdis.nasa.gov/gpmdata/",
-	    "sources_web": "https://pmm.nasa.gov/data-access/downloads/gpm",
+        "citation": "G. Huffman, D. Bolvin, D. Braithwaite, K. Hsu, R. Joyce, P. Xie, 2014: Integrated Multi-satellitE Retrievals for GPM (IMERG), V07B. NASA's Precipitation Processing Center, accessed 27 June, 2024, arthurhouftps.pps.eosdis.nasa.gov",
+	    "sources_web": "https://gpm.nasa.gov/data/directory",
 	    "sources_name": "NASA Goddard Space Flight Center",
 	    "tags": ["nasa","precipitation", "gpm","environment", "monthly"]
 	},

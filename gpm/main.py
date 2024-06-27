@@ -6,7 +6,7 @@ from typing import List, Literal
 from configparser import ConfigParser
 
 from pathlib import Path
-from ftplib import FTP, FTP_TLS
+from ftplib import FTP_TLS
 
 import rasterio
 import numpy as np
@@ -162,10 +162,9 @@ class GPM(Dataset):
     def build_download_list(self):
         """
         data folder format:
-            ftp://arthurhou.pps.eosdis.nasa.gov/gpmdata/2014/05/03/imerg/
+            arthurhouftps.pps.eosdis.nasa.gov/gpmdata/2014/05/03/01/gis/
         file name:
-            3B-MO.MS.MRG.3IMERG.20140501-S000000-E235959.05.V05B.HDF5
-            3B-HHR.MS.MRG.3IMERG.20140501-S233000-E235959.1410.V05B.HDF5
+            3B-MO.MS.MRG.3IMERG.20140501-S000000-E235959.05.V05B.tif
         """
         logger = self.get_logger()
 
