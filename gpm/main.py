@@ -316,7 +316,7 @@ def get_config_dict(config_file="config.ini"):
         "raw_dir": Path(config["main"]["raw_dir"]),
         "output_dir": Path(config["main"]["output_dir"]),
         "version": config["main"]["version"],
-        "years": config["main"]["years"],
+        "years": [int(y) for y in config["main"]["years"].split(", ")],
         "year_agg_method": config["main"]["year_agg_method"],
         "email": config["main"]["email"],
         "overwrite_downloads": config["main"].getboolean("overwrite_downloads"),
