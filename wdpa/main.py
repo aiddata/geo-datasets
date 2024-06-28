@@ -12,8 +12,6 @@ import fiona
 import numpy as np
 from affine import Affine
 import rasterio
-from distancerasters import rasterize
-from shapely.geometry import shape
 import geopandas as gpd
 
 from data_manager import Dataset
@@ -50,9 +48,8 @@ class WDPA(Dataset):
 
         self.field_name = "IUCN_CAT"
         self.field_values = [
-            # "Ia", "Ib", "II", "III", "IV",
-            "V", "VI",
-            # "Not Applicable", "Not Assigned", "Not Reported"
+            "Ia", "Ib", "II", "III", "IV", "V", "VI",
+            "Not Applicable", "Not Assigned", "Not Reported"
         ]
 
         try:
@@ -132,7 +129,6 @@ class WDPA(Dataset):
 
         logger.info("Loading features")
         # load features from gdb
-        # input_features = fiona.open(self.gdb_path, layer=self.poly_layer)
         input_features = gpd.read_file(self.gdb_path, layer=self.poly_layer)
 
         # init output raster
@@ -143,7 +139,7 @@ class WDPA(Dataset):
         # add rasterized layer to output raster and assign pixels
         # associated with multiple feature across categories to 11
         for index, cat in enumerate(self.field_values):
-            # features_filtered = [shape(f["geometry"]) for f in input_features if f["properties"][self.field_name] == cat]
+
             features_filtered = input_features.loc[input_features[self.field_name] == cat, "geometry"]
 
             logger.info("selected {0} features for field: {1}".format(len(features_filtered), cat))
@@ -152,7 +148,6 @@ class WDPA(Dataset):
                 logger.info("\tno feature selected for year {0}".format(cat))
                 pass
 
-            # cat_raster, _ = rasterize(features_filtered, affine=self.affine, shape=self.out_shape)
 
             cat_raster = rasterio.features.rasterize(
                 features_filtered,
@@ -184,7 +179,7 @@ class WDPA(Dataset):
 
         raster_out = np.array([output_raster])
 
-        self.output_path.mkdir(parents=True, exist_ok=True)
+        self.output_path.parent.mkdir(parents=True, exist_ok=True)
         with rasterio.open(self.output_path, "w", **meta) as dst:
             dst.write(raster_out)
 
