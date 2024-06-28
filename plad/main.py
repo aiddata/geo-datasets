@@ -35,12 +35,15 @@ class PLAD(Dataset):
         self.max_retries = max_retries
         self.overwrite_download = overwrite_download
         self.overwrite_output = overwrite_output
-        self.download_url = "https://dataverse.harvard.edu/api/access/datafile/5211722"
+        self.dataset_url = "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575"
+        self.download_url = "https://dataverse.harvard.edu/api/access/datafile/10119324"
+
+
         self.src_path = self.raw_dir / "plad.xls"
 
     def test_connection(self):
         # test connection
-        test_request = requests.get("https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575", verify=True)
+        test_request = requests.get(self.dataset_url, verify=True)
         test_request.raise_for_status()
 
     def download_data(self):
@@ -49,7 +52,6 @@ class PLAD(Dataset):
         """
         logger = self.get_logger()
 
-        download_dest = "https://dataverse.harvard.edu/api/access/datafile/5211722"
         local_filename = self.raw_dir / "plad.xls"
 
         if os.path.isfile(local_filename) and not self.overwrite_download:
@@ -58,20 +60,20 @@ class PLAD(Dataset):
             attempts = 1
             while attempts <= self.max_retries:
                 try:
-                    with requests.get(download_dest, stream=True, verify=True) as r:
+                    with requests.get(self.download_url, stream=True, verify=True) as r:
                         r.raise_for_status()
                         with open(local_filename, 'wb') as f:
                             for chunk in r.iter_content(chunk_size=1024*1024):
                                 f.write(chunk)
-                    logger.info(f"Downloaded: {download_dest}")
-                    return (download_dest, local_filename)
+                    logger.info(f"Downloaded: {self.download_url}")
+                    return (self.download_url, local_filename)
                 except Exception as e:
                     attempts += 1
                     if attempts > self.max_retries:
-                        logger.info(f"{str(e)}: Failed to download: {str(download_dest)}")
-                        return (download_dest, local_filename)
+                        logger.info(f"{str(e)}: Failed to download: {str(self.download_url)}")
+                        return (self.download_url, local_filename)
                     else:
-                        logger.info(f"Attempt {str(attempts)} : {str(download_dest)}")
+                        logger.info(f"Attempt {str(attempts)} : {str(self.download_url)}")
 
     def process_year(self, year):
         """create file for each year
