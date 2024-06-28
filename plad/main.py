@@ -36,9 +36,9 @@ class PLAD(Dataset):
         self.overwrite_download = overwrite_download
         self.overwrite_output = overwrite_output
         self.dataset_url = "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575"
-        self.download_url = "https://dataverse.harvard.edu/api/access/datafile/10119324"
+        self.download_url = "https://dataverse.harvard.edu/api/access/datafile/10119325?format=tab&gbrecs=true"
 
-        self.src_path = self.raw_dir / "plad.xls"
+        self.src_path = self.raw_dir / "plad.tab"
 
     def test_connection(self):
         # test connection
@@ -90,7 +90,7 @@ class PLAD(Dataset):
             logger.info(f"Error: Master data download: {self.src_path} not found" )
             raise Exception(f"Data file not found: {self.src_path}")
 
-        src_df = pd.read_excel(self.src_path, sheet_name=0)
+        src_df = pd.read_csv(self.src_path, sep="\t", low_memory=False)
 
         # adm2 or finer precision
         df = src_df.loc[src_df.geo_precision.isin([1,2,3])].copy()
