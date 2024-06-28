@@ -169,7 +169,7 @@ else:
         tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
         @flow
-        def crhab(
+        def critical_habitats(
             raw_dir: str,
             output_dir: str,
             download_url: str,
