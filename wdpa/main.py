@@ -12,6 +12,7 @@ import fiona
 import numpy as np
 from affine import Affine
 import rasterio
+from rasterio import features
 import geopandas as gpd
 
 from data_manager import Dataset
@@ -149,7 +150,7 @@ class WDPA(Dataset):
                 pass
 
 
-            cat_raster = rasterio.features.rasterize(
+            cat_raster = features.rasterize(
                 features_filtered,
                 out_shape=self.out_shape,
                 transform=self.affine,
