@@ -38,7 +38,6 @@ class PLAD(Dataset):
         self.dataset_url = "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575"
         self.download_url = "https://dataverse.harvard.edu/api/access/datafile/10119324"
 
-
         self.src_path = self.raw_dir / "plad.xls"
 
     def test_connection(self):
@@ -52,26 +51,24 @@ class PLAD(Dataset):
         """
         logger = self.get_logger()
 
-        local_filename = self.raw_dir / "plad.xls"
-
-        if os.path.isfile(local_filename) and not self.overwrite_download:
-            logger.info(f"Download Exists: {local_filename}")
+        if os.path.isfile(self.src_path) and not self.overwrite_download:
+            logger.info(f"Download Exists: {self.src_path}")
         else:
             attempts = 1
             while attempts <= self.max_retries:
                 try:
                     with requests.get(self.download_url, stream=True, verify=True) as r:
                         r.raise_for_status()
-                        with open(local_filename, 'wb') as f:
+                        with open(self.src_path, 'wb') as f:
                             for chunk in r.iter_content(chunk_size=1024*1024):
                                 f.write(chunk)
                     logger.info(f"Downloaded: {self.download_url}")
-                    return (self.download_url, local_filename)
+                    return (self.download_url, self.src_path)
                 except Exception as e:
                     attempts += 1
                     if attempts > self.max_retries:
                         logger.info(f"{str(e)}: Failed to download: {str(self.download_url)}")
-                        return (self.download_url, local_filename)
+                        return (self.download_url, self.src_path)
                     else:
                         logger.info(f"Attempt {str(attempts)} : {str(self.download_url)}")
 
