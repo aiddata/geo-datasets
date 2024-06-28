@@ -93,7 +93,13 @@ class PLAD(Dataset):
         src_df = pd.read_csv(self.src_path, sep="\t", low_memory=False)
 
         # adm2 or finer precision
-        df = src_df.loc[src_df.geo_precision.isin([1,2,3])].copy()
+        # valid lat/lon and not foreign leader
+        df = src_df.loc[
+            ( src_df.longitude != "." ) &
+            ( src_df.latitude != "." ) &
+            ( src_df.foreign_leader.isin([0, '0']) ) &
+            ( src_df.geo_precision.isin([1,2,3]) )
+        ].copy()
 
         df = df.loc[(df.startyear <= year) & (df.endyear >= year)].copy()
 
