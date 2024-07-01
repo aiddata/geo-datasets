@@ -272,7 +272,7 @@ else:
 
 
         @flow
-        def worldpop_pop_age_sex(process_dir, raw_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
+        def worldpop_age_sex(process_dir, raw_dir, output_dir, years, overwrite_download, overwrite_processing, backend, task_runner, run_parallel, max_workers, log_dir):
 
             timestamp = datetime.today()
             time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
