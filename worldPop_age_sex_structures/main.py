@@ -16,7 +16,7 @@ from datetime import datetime
 
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
-from dataset import Dataset
+from data_manager import Dataset
 
 
 class WorldPopAgeSex(Dataset):
