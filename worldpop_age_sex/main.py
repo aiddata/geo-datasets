@@ -262,7 +262,7 @@ else:
     except:
         pass
     else:
-        config_file = "worldPop_age_sex_structures/config.ini"
+        config_file = "worldpop_age_sex/config.ini"
         config = ConfigParser()
         config.read(config_file)
 
