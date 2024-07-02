@@ -107,7 +107,8 @@ class WorldPopAgeSex(Dataset):
         """Download a file from url to tmp_path
         Downloads in chunks
         """
-        with requests.get(url, stream=True, verify=True) as r:
+        user_agent_str = "Mozilla/5.0"
+        with requests.get(url, stream=True, verify=True, headers={"User-Agent": user_agent_str}) as r:
             r.raise_for_status()
             with open(tmp_path, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=1024*1024):
