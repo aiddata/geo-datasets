@@ -116,6 +116,7 @@ class WorldPopAgeSex(Dataset):
 
 
     def move_file(self, src, dst):
+        dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(src, dst)
 
 
