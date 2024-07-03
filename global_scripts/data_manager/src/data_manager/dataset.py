@@ -1,20 +1,22 @@
-import os
 import csv
-import time
-import shutil
 import logging
 import multiprocessing
-from pathlib import Path
-from typing import Optional
-from datetime import datetime
-from collections import namedtuple
+import os
+import shutil
+import time
 from abc import ABC, abstractmethod
-from concurrent.futures import wait
+from collections import namedtuple
 from collections.abc import Sequence
+from concurrent.futures import wait
 from contextlib import contextmanager
+from datetime import datetime
+from pathlib import Path
 from tempfile import mkdtemp, mkstemp
+from typing import Optional
+
 from rio_cogeo import cog_validate
 
+from .configuration import RunParameters
 
 """
 A namedtuple that represents the results of one task
@@ -114,9 +116,13 @@ class Dataset(ABC):
         if validate_cog:
             is_valid, errors, warnings = cog_validate(tmp_path)
             if is_valid:
-                logger.info(f"Successfully validated output COG {tmp_path} (destined for {final_dst})")
+                logger.info(
+                    f"Successfully validated output COG {tmp_path} (destined for {final_dst})"
+                )
             else:
-                logger.exception(f"Failed to validate COG {tmp_path} (destined for {final_dst})")
+                logger.exception(
+                    f"Failed to validate COG {tmp_path} (destined for {final_dst})"
+                )
             for error in errors:
                 logger.error(f"Error encountered when validating COG: {error}")
             for warning in warnings:
@@ -524,19 +530,7 @@ class Dataset(ABC):
 
     def run(
         self,
-        backend: Optional[str] = None,
-        task_runner: Optional[str] = None,
-        run_parallel: bool = False,
-        max_workers: Optional[int] = None,
-        threads_per_worker: Optional[int] = 1,
-        # cores_per_process: Optional[int]=None,
-        chunksize: int = 1,
-        log_dir: str = "logs",
-        logger_level=logging.INFO,
-        retries: int = 3,
-        retry_delay: int = 5,
-        conda_env: str = "geodata38",
-        bypass_error_wrapper: bool = False,
+        params: RunParameters,
         **kwargs,
     ):
         """
@@ -548,36 +542,37 @@ class Dataset(ABC):
 
         # no matter what happens, this is our ticket to run the actual dataset
         # every backend calls this after initializing
-        launch = lambda: self._check_env_and_run(conda_env)
+        launch = lambda: self._check_env_and_run(params.conda_env)
 
-        self.init_retries(retries, retry_delay, save_settings=True)
+        self.init_retries(params.retries, params.retry_delay, save_settings=True)
 
-        self.log_dir = Path(log_dir)
+        self.log_dir = Path(params.log_dir)
 
-        self.chunksize = chunksize
+        self.chunksize = params.chunksize
         os.makedirs(self.log_dir, exist_ok=True)
 
-        self.bypass_error_wrapper = bypass_error_wrapper
+        self.bypass_error_wrapper = params.bypass_error_wrapper
 
         # Allow datasets to set their own default max_workers
-        if max_workers is None and hasattr(self, "max_workers"):
+        if params.max_workers is None and hasattr(self, "max_workers"):
             max_workers = self.max_workers
 
         # If dataset doesn't come with a name use its class name
         if not self.name:
             self.name = self._type()
 
-        if backend == "prefect":
+        if params.backend == "prefect":
             self.backend = "prefect"
 
             from prefect import flow
-            from prefect.task_runners import SequentialTaskRunner, ConcurrentTaskRunner
+            from prefect.task_runners import (ConcurrentTaskRunner,
+                                              SequentialTaskRunner)
 
-            if task_runner == "sequential":
+            if params.task_runner == "sequential":
                 tr = SequentialTaskRunner
-            elif task_runner == "concurrent" or task_runner is None:
+            elif params.task_runner == "concurrent" or params.task_runner is None:
                 tr = ConcurrentTaskRunner
-            elif task_runner == "dask":
+            elif params.task_runner == "dask":
                 from prefect_dask import DaskTaskRunner
 
                 # if "cluster" in kwargs:
@@ -587,10 +582,10 @@ class Dataset(ABC):
 
                 dask_cluster_kwargs = {
                     "n_workers": max_workers,
-                    "threads_per_worker": threads_per_worker,
+                    "threads_per_worker": params.threads_per_worker,
                 }
                 tr = DaskTaskRunner(cluster_kwargs=dask_cluster_kwargs)
-            elif task_runner == "hpc":
+            elif params.task_runner == "hpc":
                 from hpc import HPCDaskTaskRunner
 
                 job_name = "".join(self.name.split())
@@ -600,9 +595,10 @@ class Dataset(ABC):
                     log_dir=self.log_dir,
                     **kwargs,
                 )
-            elif task_runner == "kubernetes":
+            elif params.task_runner == "kubernetes":
+                from dask_kubernetes.operator import (KubeCluster,
+                                                      make_cluster_spec)
                 from prefect_dask import DaskTaskRunner
-                from dask_kubernetes.operator import KubeCluster, make_cluster_spec
 
                 spec = make_cluster_spec(name="selector-example", n_workers=2)
                 spec["spec"]["worker"]["spec"]["containers"][0][
@@ -650,10 +646,10 @@ class Dataset(ABC):
 
         else:
             logger = logging.getLogger("dataset")
-            logger.setLevel(logger_level)
+            logger.setLevel(params.logger_level)
             logger.addHandler(logging.StreamHandler())
 
-            if backend == "mpi":
+            if params.backend == "mpi":
                 from mpi4py import MPI
 
                 comm = MPI.COMM_WORLD
@@ -666,12 +662,12 @@ class Dataset(ABC):
 
                 launch()
 
-            elif backend == "local" or backend is None:
-                if run_parallel:
+            elif params.backend == "local":
+                if params.run_parallel:
                     self.backend = "concurrent"
                 else:
                     self.backend = "serial"
                 launch()
 
             else:
-                raise ValueError(f"Backend {backend} not recognized.")
+                raise ValueError(f"Backend {params.backend} not recognized.")
