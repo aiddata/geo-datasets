@@ -14,9 +14,9 @@ import distancerasters as dr
 from data_manager import Dataset
 
 
-class DISTANCE_TO_COASTS(Dataset):
+class DISTANCE_TO_COAST(Dataset):
 
-    name = "DISTANCE_TO_COASTS"
+    name = "DISTANCE_TO_COAST"
 
     def __init__(self,
                  raw_dir,
@@ -218,7 +218,7 @@ if __name__ == "__main__":
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-    class_instance = DISTANCE_TO_COASTS(config_dict["raw_dir"], config_dict["output_dir"], config_dict["gshhg_version"], config_dict["pixel_size"], config_dict["download_dest"], config_dict["raster_type"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
+    class_instance = DISTANCE_TO_COAST(config_dict["raw_dir"], config_dict["output_dir"], config_dict["gshhg_version"], config_dict["pixel_size"], config_dict["download_dest"], config_dict["raster_type"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=timestamp_log_dir)
 
@@ -233,7 +233,7 @@ else:
         config = ConfigParser()
         config.read(config_file)
 
-        from main import DISTANCE_TO_COASTS
+        from main import DISTANCE_TO_COAST
 
         tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
@@ -284,7 +284,7 @@ else:
             }
 
 
-            class_instance = DISTANCE_TO_COASTS(raw_dir, output_dir, gshhg_version, pixel_size, download_dest, raster_type, overwrite_download, overwrite_extract, overwrite_binary_raster, overwrite_distance_raster)
+            class_instance = DISTANCE_TO_COAST(raw_dir, output_dir, gshhg_version, pixel_size, download_dest, raster_type, overwrite_download, overwrite_extract, overwrite_binary_raster, overwrite_distance_raster)
 
 
 
