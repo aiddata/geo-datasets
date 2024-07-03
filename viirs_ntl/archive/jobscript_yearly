@@ -1,7 +1,0 @@
-#!/bin/tcsh
-#PBS -N asg:viirs_yearly
-#PBS -l nodes=2:c18c:ppn=16
-#PBS -l walltime=48:00:00
-#PBS -j oe
-
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 4 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/viirs//viirs_yearly.py

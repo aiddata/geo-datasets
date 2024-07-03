@@ -1,0 +1,29 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/gpm/v07b/yearly/mean",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "gpm_precipitation_YYYY.tif",
+	"name": "gpm_precipitation_v07b_yearly_mean",
+	"title": "Yearly IMERG (GPM) precipitation (v07B)",
+	"description": "Yearly IMERG GPM (v07B) precipitation - Created by aggregating (mean) the monthly GPM precipitation",
+    "details": "Created by aggregatubg monthly IMERG V07B GPM data",
+	"version": "v07B",
+	"options": {
+	    "resolution": 0.1,
+        "extract_types": ["max", "mean", "min"],
+        "extract_types_info" : {
+            "max" : "maximum precipitation value per unit of analysis",
+            "mean" : "average precipitation value per unit of analysis",
+            "min" : "minimum precipitation value per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "0.001 millimeters per hour"
+	},
+	"extras": {
+        "citation": "G. Huffman, D. Bolvin, D. Braithwaite, K. Hsu, R. Joyce, P. Xie, 2014: Integrated Multi-satellitE Retrievals for GPM (IMERG), V07B. NASA's Precipitation Processing Center, accessed 27 June, 2024, arthurhouftps.pps.eosdis.nasa.gov",
+	    "sources_web": "https://gpm.nasa.gov/data/directory",
+	    "sources_name": "NASA Goddard Space Flight Center",
+	    "tags": ["nasa","precipitation", "gpm","environment", "yearly"]
+	},
+	"active": 1
+}

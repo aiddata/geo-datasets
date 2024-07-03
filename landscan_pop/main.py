@@ -9,26 +9,29 @@
 """
 
 import os
-import sys
 import zipfile
-import glob
+from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
-from configparser import ConfigParser
 
 import rasterio
 
-
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-
-from dataset import Dataset
+from data_manager import Dataset
 
 
 class LandScanPop(Dataset):
     name = "LandScan Population"
 
-    def __init__(self, raw_dir, output_dir, years, run_extract=True, run_conversion=True, overwrite_extract=False, overwrite_conversion=False):
-
+    def __init__(
+        self,
+        raw_dir,
+        output_dir,
+        years,
+        run_extract=True,
+        run_conversion=True,
+        overwrite_extract=False,
+        overwrite_conversion=False,
+    ):
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
 
@@ -41,12 +44,13 @@ class LandScanPop(Dataset):
         self.overwrite_conversion = overwrite_conversion
 
         self.download_dir = self.raw_dir / "compressed"
+        os.makedirs(self.download_dir, exist_ok=True)
+
         self.extract_dir = self.raw_dir / "uncompressed"
+        os.makedirs(self.extract_dir, exist_ok=True)
 
         self.extract_dir.mkdir(parents=True, exist_ok=True)
         self.output_dir.mkdir(parents=True, exist_ok=True)
-
-
 
     def unzip_file(self, zip_file, out_dir):
         """Extract a zipfile"""
@@ -58,28 +62,29 @@ class LandScanPop(Dataset):
             with zipfile.ZipFile(zip_file, "r") as zip_ref:
                 zip_ref.extractall(out_dir)
 
-
-    def convert_to_cog(self, src, dst):
+    def convert_to_cog(self, src, final_dst):
         """Convert a raster from ESRI grid format to COG format"""
         logger = self.get_logger()
 
-        if os.path.isfile(dst) and not self.overwrite_conversion:
-            logger.info(f"COG exists - skipping ({dst})")
+        if os.path.isfile(final_dst) and not self.overwrite_conversion:
+            logger.info(f"COG exists - skipping ({final_dst})")
         else:
-            logger.info(f"Converting to COG ({dst})")
+            logger.info(f"Converting to COG ({final_dst})")
             with rasterio.open(src) as src:
                 assert len(set(src.block_shapes)) == 1
                 meta = src.meta.copy()
-                meta.update({
-                    'driver': 'COG',
-                    'compress': 'LZW',
-                })
+                meta.update(
+                    {
+                        "driver": "COG",
+                        "compress": "LZW",
+                    }
+                )
 
-                with rasterio.open(dst, "w", **meta) as dst:
-                    for ji, window in src.block_windows(1):
-                        in_data = src.read(window=window)
-                        dst.write(in_data, window=window)
-
+                with self.tmp_to_dst_file(final_dst, validate_cog=True) as tmp_dst:
+                    with rasterio.open(tmp_dst, "w", **meta) as dst:
+                        for ji, window in src.block_windows(1):
+                            in_data = src.read(window=window)
+                            dst.write(in_data, window=window)
 
     def build_extract_list(self):
         """Build a list of files to extract"""
@@ -87,10 +92,9 @@ class LandScanPop(Dataset):
         for x in self.download_dir.iterdir():
             y = int(x.name.split("-")[2])
             if x.name.endswith(".zip") and y in self.years:
-                flist.append(( self.download_dir / x, self.extract_dir / x.name[:-4] ))
+                flist.append((self.download_dir / x, self.extract_dir / x.name[:-4]))
 
         return flist
-
 
     def build_conversion_list(self):
         """Build a list of files to convert"""
@@ -98,27 +102,26 @@ class LandScanPop(Dataset):
         for x in self.extract_dir.iterdir():
             y = int(x.name.split("-")[2])
             if os.path.isdir(x) and y in self.years:
-                fname = x.name.replace('-assets', '.tif')
-                flist.append(( x / fname , self.output_dir / fname ))
+                fname = x.name.replace("-assets", ".tif")
+                flist.append((x / fname, self.output_dir / fname))
 
         return flist
 
     def main(self):
         logger = self.get_logger()
 
-        logger.info('Starting pipeline...')
+        logger.info("Starting pipeline...")
 
         # unzip
         if self.run_extract:
-            logger.info('Running extract tasks...')
+            logger.info("Running extract tasks...")
             ex_list = self.build_extract_list()
             extract = self.run_tasks(self.unzip_file, ex_list)
             self.log_run(extract)
 
-
         # convert from esri grid format to COG
         if self.run_conversion:
-            logger.info('Running conversion tasks...')
+            logger.info("Running conversion tasks...")
             conv_list = self.build_conversion_list()
             conv = self.run_tasks(self.convert_to_cog, conv_list)
             self.log_run(conv)
@@ -140,22 +143,36 @@ def get_config_dict(config_file="config.ini"):
         "task_runner": config["run"]["task_runner"],
         "run_parallel": config["run"].getboolean("run_parallel"),
         "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs"
+        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
+        "bypass_error_wrapper": config["run"].getboolean("bypass_error_wrapper"),
     }
 
 
 if __name__ == "__main__":
-
     config_dict = get_config_dict()
 
     log_dir = config_dict["log_dir"]
     timestamp = datetime.today()
-    time_format_str: str="%Y_%m_%d_%H_%M"
+    time_format_str: str = "%Y_%m_%d_%H_%M"
     time_str = timestamp.strftime(time_format_str)
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
+    class_instance = LandScanPop(
+        config_dict["raw_dir"],
+        config_dict["output_dir"],
+        config_dict["years"],
+        config_dict["run_extract"],
+        config_dict["run_conversion"],
+        config_dict["overwrite_extract"],
+        config_dict["overwrite_conversion"],
+    )
 
-    class_instance = LandScanPop(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["run_extract"], config_dict["run_conversion"], config_dict["overwrite_extract"], config_dict["overwrite_conversion"])
-
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
+    class_instance.run(
+        backend=config_dict["backend"],
+        task_runner=config_dict["task_runner"],
+        run_parallel=config_dict["run_parallel"],
+        max_workers=config_dict["max_workers"],
+        log_dir=timestamp_log_dir,
+        bypass_error_wrapper=config_dict["bypass_error_wrapper"],
+    )

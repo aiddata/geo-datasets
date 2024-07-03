@@ -1,11 +1,11 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/gadm28_borders",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/geoBoundaries_borders",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "dist_to_gadm28_borders",
-    "title": "Distance to Country Borders (GADM 2.8)",
-    "description": "Distance to country borders, measured in meters. Derived using GADM 2.8 ADM0 (Country) boundaries.",
+    "name": "dist_to_geoBoundaries_borders",
+    "title": "Distance to Country Borders (geoBoundaries)",
+    "description": "Distance to country borders, measured in meters. Derived using geoBoundaries ADM0 (Country) boundaries.",
     "details": "",
     "version": 1,
     "options": {
@@ -21,9 +21,9 @@
         "variable_description": "distance in meters"
     },
     "extras": {
-        "citation": "Global Administrative Areas (GADM) http://www.gadm.org.",
-        "sources_web": "http://www.gadm.org",
-        "sources_name": "Global Administrative Areas (GADM)",
+        "citation": "geoBoundaries https://www.geoboundaries.org/index.htmlg.",
+        "sources_web": "https://www.geoboundaries.org/index.html",
+        "sources_name": "geoBoundaries",
         "tags": ["accessibility", "other"]
     },
     "active": 1

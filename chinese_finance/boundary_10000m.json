@@ -1,0 +1,28 @@
+{
+    "base": "/sciclone/aiddata10/REU/geo/data/boundaries/china_osm/v301/10000m",
+    "type": "boundary",
+    "file_extension": ".geojson",
+    "file_mask": "None",
+    "name": "china_osm_v301_10000m",
+    "title": "Locations of Chinese development projects - 10km Buffer (GeoGCDF v3.0.1)",
+    "description": "Locations of Chinese development projects from AidData's Global Chinese Development Finance Dataset v3.0.1. These boundaries represent a subset of projects from the dataset for which locations were found using OpenStreetMaps. For all locations a 10km buffer was applied.",
+    "details": "Project IDs 40451, 90779, 64952 in Fiji were removed due to issues buffering the associated features.",
+    "version": "v301",
+    "options": {
+        "group": "china_osm_v301",
+        "group_title": "Global Chinese Development Finance - AidData v3.0.1",
+        "group_class": "sub"
+    },
+    "extras": {
+        "tags": [
+            "aiddata",
+            "china",
+            "geocoded",
+            "osm"
+        ],
+        "citation": "Goodman, S., Zhang, S., Malik, A.A., Parks, B.C., Hall, J. 2024. AidData's Geospatial Global Chinese Development Finance Dataset. Scientific Data. https://doi.org/10.1038/s41597-024-03341-w",
+        "sources_name": "AidData",
+        "sources_web": "https://github.com/aiddata/gcdf-geospatial-data"
+    },
+    "active": 1
+}

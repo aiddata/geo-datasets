@@ -1,0 +1,24 @@
+name: Update Dataset
+description: Request that a dataset be updated
+labels: ["dataset-update"]
+body:
+  - type: input
+    id: dataset
+    attributes:
+      label: Name of dataset
+      description: Which dataset needs updating?
+    validations:
+      required: true
+  - type: textarea
+    id: update-description
+    attributes:
+      label: What needs updating?
+      description: Are there more recent years of data available, or newly-released variables?
+    validations:
+      required: true
+  - type: textarea
+    id: other-notes
+    attributes:
+      label: Other notes
+    validations:
+      required: false

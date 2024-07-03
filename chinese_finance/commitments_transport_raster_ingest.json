@@ -1,0 +1,34 @@
+{
+	"base": "/sciclone/aiddata10/REU/geo/data/rasters/china_osm/v301/commitments_transport/transport.tif",
+	"type": "raster",
+	"file_extension": ".tif",
+	"file_mask": "None",
+    "name": "china_osm_v301_commitments_transport",
+    "title": "Monetary value of Chinese ODA and OOF-financed transport projects (GeoGCDF v3.0.1)",
+    "description": "Monetary commitment value of Chinese ODA- and OOF-financed projects from AidData's Geospatial Global Chinese Development Finance Dataset v3.0.1. These constant 2021 USD values are associated with transport sector projects from the dataset for which locations were found using OpenStreetMap (OSM).",
+    "details": "",
+	"version": "v301",
+	"options": {
+	    "resolution": 0.00833,
+	    "extract_types": ["sum", "count"],
+        "extract_types_info": {
+            "sum": "total commitment value (2021 USD) per unit of analysis",
+            "count" : "total count of pixels per unit of analysis"
+        },
+	    "factor": 1,
+        "variable_description": "commitment value in 2021 USD",
+        "pixel_check": "any"
+	},
+    "extras": {
+        "tags": [
+            "aiddata",
+            "china",
+            "geocoded",
+            "osm"
+        ],
+        "citation": "Goodman, S., Zhang, S., Malik, A.A., Parks, B.C., Hall, J. 2024. AidData's Geospatial Global Chinese Development Finance Dataset. Scientific Data. https://doi.org/10.1038/s41597-024-03341-w",
+        "sources_name": "AidData",
+        "sources_web": "https://github.com/aiddata/gcdf-geospatial-data"
+    },
+    "active": 1
+}

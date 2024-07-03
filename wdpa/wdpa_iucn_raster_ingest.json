@@ -1,13 +1,13 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/wdpa/iucn_cat_201704",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/wdpa/Jun2024/iucn_cat",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "wdpa_iucn_cat_201704",
-    "title": "Protected Areas (IUCN Categories)",
-    "description": "The World Database on Protected Areas (WDPA) is the most comprehensive global database of marine and terrestrial protected areas. Dataset downloaded April 2017. This is a categorical raster indicating the IUCN category (or relevant information when no category exists) of the protected area covering each pixel. ",
+    "name": "wdpa_iucn_cat_202406",
+    "title": "Protected Areas (IUCN Categories) - June 2024",
+    "description": "The World Database on Protected Areas (WDPA) is the most comprehensive global database of marine and terrestrial protected areas. Dataset downloaded June 2024. This is a categorical raster indicating the IUCN category (or relevant information when no category exists) of the protected area covering each pixel. ",
     "details": "Features which had different IUCN categories and overlapped with each other were assigned a new category (represented by 'mix') during the rasterization process.",
-    "version": 201704,
+    "version": 202406,
     "options": {
         "resolution": 0.01,
         "extract_types": ["categorical", "count"],
@@ -19,7 +19,7 @@
         "variable_description": "IUCN category information"
     },
     "extras": {
-        "citation": "IUCN and UNEP-WCMC (2016), The World Database on Protected Areas (WDPA) [On-line], [April 2017], Cambridge, UK: UNEP-WCMC. Available at: www.protectedplanet.net.",
+        "citation": "IUCN and UNEP-WCMC (2016), The World Database on Protected Areas (WDPA) [On-line], [June 2024], Cambridge, UK: UNEP-WCMC. Available at: www.protectedplanet.net.",
         "sources_web": "www.protectedplanet.net",
         "sources_name": "IUCN and UNEP-WCMC",
         "tags": ["protected", "conservation", "environment", "iucn"],
@@ -40,4 +40,3 @@
     },
     "active": 1
 }
-

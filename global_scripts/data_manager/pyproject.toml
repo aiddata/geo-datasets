@@ -1,0 +1,10 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "data_manager"
+version = "0.2.0"
+dependencies = [
+  "rio-cogeo ~= 5.3.0",
+]

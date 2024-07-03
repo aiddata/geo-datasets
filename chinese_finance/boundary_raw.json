@@ -1,15 +1,16 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/boundaries/china_osm/v20/raw",
+    "base": "/sciclone/aiddata10/REU/geo/data/boundaries/china_osm/v301/raw",
     "type": "boundary",
     "file_extension": ".geojson",
     "file_mask": "None",
-    "name": "china_osm_v20_raw",
-    "title": "Locations of Chinese development projects",
-    "description": "Locations of Chinese development projects from AidData's Global Chinese Development Finance Dataset v2.0. These boundaries represent a subset of projects from the dataset for which precise locations were found using OpenStreetMaps.",
-    "version": "v20",
+    "name": "china_osm_v301_raw",
+    "title": "Locations of Chinese development projects - No Buffer (GeoGCDF v3.0.1)",
+    "description": "Locations of Chinese development projects from AidData's Global Chinese Development Finance Dataset v3.0.1. These boundaries represent a subset of projects from the dataset for which locations were found using OpenStreetMaps.",
+    "version": "v301",
+    "details": "Project IDs 40451, 90779, 64952 in Fiji were removed due to issues buffering the associated features.",
     "options": {
-        "group": "china_osm_v20",
-        "group_title": "Global Chinese Development Finance - AidData v2.0",
+        "group": "china_osm_v301",
+        "group_title": "Global Chinese Development Finance - AidData v3.0.1",
         "group_class": "sub"
     },
     "extras": {
@@ -19,10 +20,9 @@
             "geocoded",
             "osm"
         ],
-        "citation": "Malik, A., Parks, B., Russell, B., Lin, J., Walsh, K., Solomon, K., Zhang, S., Elston, T., and S. Goodman. (2021). Banking on the Belt and Road: Insights from a new global dataset of 13,427 Chinese development projects. Williamsburg, VA: AidData at William & Mary.",
+        "citation": "Goodman, S., Zhang, S., Malik, A.A., Parks, B.C., Hall, J. 2024. AidData's Geospatial Global Chinese Development Finance Dataset. Scientific Data. https://doi.org/10.1038/s41597-024-03341-w",
         "sources_name": "AidData",
-        "sources_web": "https://github.com/aiddata/china-osm-geodata"
+        "sources_web": "https://github.com/aiddata/gcdf-geospatial-data"
     },
     "active": 1
 }
-
