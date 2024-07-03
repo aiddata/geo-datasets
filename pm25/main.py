@@ -2,7 +2,6 @@
 # version: multiple file download - HPC version, based off Dr. Goodman's script for converting nc file to tiff image, MONTHLY data
 
 import os
-import sys
 import json
 import hashlib
 import warnings
@@ -372,7 +371,6 @@ if __name__ == "__main__":
     time_str = timestamp.strftime(time_format_str)
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
 
     class_instance = PM25(config_dict["raw_dir"], config_dict["output_dir"], config_dict["box_config"], config_dict["version"], config_dict["years"], config_dict["overwrite_downloads"], config_dict["verify_existing_downloads"], config_dict["overwrite_processing"])
 
