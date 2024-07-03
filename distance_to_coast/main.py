@@ -21,6 +21,7 @@ class DISTANCE_TO_COASTS(Dataset):
     def __init__(self,
                  raw_dir,
                  output_dir,
+                 gsshg_version,
                  pixel_size,
                  download_dest,
                  raster_type,
@@ -29,8 +30,12 @@ class DISTANCE_TO_COASTS(Dataset):
                  overwrite_binary_raster=False,
                  overwrite_distance_raster=False):
 
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
+
+        self.gsshg_version = gsshg_version
+        self.version = gsshg_version
+
+        self.raw_dir = Path(raw_dir) / self.version
+        self.output_dir = Path(output_dir) / self.version
 
         self.pixel_size = pixel_size
         self.download_dest = download_dest
@@ -54,7 +59,7 @@ class DISTANCE_TO_COASTS(Dataset):
         Download individual file
         """
         logger = self.get_logger()
-        local_filename = self.raw_dir / "gshhg-shp-2.3.7.zip"
+        local_filename = self.raw_dir / f"gshhg-shp-{self.gsshg_version}.zip"
 
         if os.path.isfile(local_filename) and not self.overwrite_download:
             logger.info(f"Download Exists: {local_filename}")
@@ -74,35 +79,16 @@ class DISTANCE_TO_COASTS(Dataset):
         """
         logger = self.get_logger()
 
-        zip_name = self.raw_dir / "gshhg-shp-2.3.7.zip"
+        zip_name = self.raw_dir / f"gshhg-shp-{self.gsshg_version}.zip"
         task_list = []
-        zip_shp_file = "GSHHS_shp/f/GSHHS_f_L1.shp"
-        output_shp_file = self.raw_dir / "GSHHS_f_L1.shp"
-        if os.path.isfile(output_shp_file) and not self.overwrite_extract:
-            logger.info(f"File previously extracted: {output_shp_file}")
-        else:
-            task_list.append((zip_name, zip_shp_file, output_shp_file))
 
-        zip_shx_file = "GSHHS_shp/f/GSHHS_f_L1.shx"
-        output_shx_file = self.raw_dir / "GSHHS_f_L1.shx"
-        if os.path.isfile(output_shx_file) and not self.overwrite_extract:
-            logger.info(f"File previously extracted: {output_shx_file}")
-        else:
-            task_list.append((zip_name, zip_shx_file, output_shx_file))
-
-        zip_prj_file = "GSHHS_shp/f/GSHHS_f_L1.prj"
-        output_prj_file = self.raw_dir / "GSHHS_f_L1.prj"
-        if os.path.isfile(output_prj_file) and not self.overwrite_extract:
-            logger.info(f"File previously extracted: {output_prj_file}")
-        else:
-            task_list.append((zip_name, zip_prj_file, output_prj_file))
-
-        zip_dbf_file = "GSHHS_shp/f/GSHHS_f_L1.dbf"
-        output_dbf_file = self.raw_dir / "GSHHS_f_L1.dbf"
-        if os.path.isfile(output_dbf_file) and not self.overwrite_extract:
-            logger.info(f"File previously extracted: {output_dbf_file}")
-        else:
-            task_list.append((zip_name, zip_dbf_file, output_dbf_file))
+        for ext in ["shp", "shx", "prj", "dbf"]:
+            zip_shp_file = f"GSHHS_shp/f/GSHHS_f_L1.{ext}"
+            output_shp_file = self.raw_dir / f"GSHHS_f_L1.{ext}"
+            if os.path.isfile(output_shp_file) and not self.overwrite_extract:
+                logger.info(f"File previously extracted: {output_shp_file}")
+            else:
+                task_list.append((zip_name, zip_shp_file, output_shp_file))
 
         return task_list
 
@@ -206,6 +192,7 @@ def get_config_dict(config_file="config.ini"):
             "raw_dir": Path(config["main"]["raw_dir"]),
             "output_dir": Path(config["main"]["output_dir"]),
             "log_dir": Path(config["main"]["output_dir"]) / "logs",
+            "gsshg_version": config["main"]["gsshg_version"],
             "pixel_size": config["main"].getfloat("pixel_size"),
             "download_dest": [str(y) for y in config["main"]["download_dest"].split(", ")],
             "raster_type": [str(y) for y in config["main"]["raster_type"].split(", ")],
@@ -231,7 +218,7 @@ if __name__ == "__main__":
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-    class_instance = DISTANCE_TO_COASTS(config_dict["raw_dir"], config_dict["output_dir"], config_dict["pixel_size"], config_dict["download_dest"], config_dict["raster_type"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
+    class_instance = DISTANCE_TO_COASTS(config_dict["raw_dir"], config_dict["output_dir"], config_dict["gsshg_version"], config_dict["pixel_size"], config_dict["download_dest"], config_dict["raster_type"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=timestamp_log_dir)
 
@@ -254,6 +241,7 @@ else:
         def distance_to_coast(
             raw_dir: str,
             output_dir: str,
+            gsshg_version: str,
             pixel_size: float,
             download_dest: List[str],
             raster_type: List[str],
@@ -296,7 +284,7 @@ else:
             }
 
 
-            class_instance = DISTANCE_TO_COASTS(raw_dir, output_dir, pixel_size, download_dest, raster_type, overwrite_download, overwrite_extract, overwrite_binary_raster, overwrite_distance_raster)
+            class_instance = DISTANCE_TO_COASTS(raw_dir, output_dir, gsshg_version, pixel_size, download_dest, raster_type, overwrite_download, overwrite_extract, overwrite_binary_raster, overwrite_distance_raster)
 
 
 
