@@ -1,4 +1,4 @@
-FROM prefecthq/prefect:2.14.21-python3.10
+FROM prefecthq/prefect:2.14.21-python3.11
 
 # install gdal, git, wget
 RUN apt-get update
