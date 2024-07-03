@@ -1,5 +1,8 @@
 import logging
-from typing import Literal, Optional
+import tomllib
+from configparser import ConfigParser
+from pathlib import Path
+from typing import Literal, Optional, Union
 
 from pydantic import BaseModel
 
@@ -28,3 +31,14 @@ class RunParameters(BaseModel):
 
 class BaseDatasetConfiguration(BaseModel):
     run: RunParameters
+
+
+def get_config(
+    model: BaseDatasetConfiguration, config_path: Union[Path, str] = "config.toml"
+):
+    config_path = Path(config_path)
+    if config_path.exists():
+        with open(config_path, "rb") as src:
+            return model.model_validate(tomllib.load(src))
+    else:
+        return FileNotFoundError("No TOML config file found for dataset.")

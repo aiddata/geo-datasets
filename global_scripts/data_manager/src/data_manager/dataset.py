@@ -565,8 +565,7 @@ class Dataset(ABC):
             self.backend = "prefect"
 
             from prefect import flow
-            from prefect.task_runners import (ConcurrentTaskRunner,
-                                              SequentialTaskRunner)
+            from prefect.task_runners import ConcurrentTaskRunner, SequentialTaskRunner
 
             if params.task_runner == "sequential":
                 tr = SequentialTaskRunner
@@ -596,8 +595,7 @@ class Dataset(ABC):
                     **kwargs,
                 )
             elif params.task_runner == "kubernetes":
-                from dask_kubernetes.operator import (KubeCluster,
-                                                      make_cluster_spec)
+                from dask_kubernetes.operator import KubeCluster, make_cluster_spec
                 from prefect_dask import DaskTaskRunner
 
                 spec = make_cluster_spec(name="selector-example", n_workers=2)

@@ -1,4 +1,4 @@
-from .configuration import BaseDatasetConfiguration
+from .configuration import BaseDatasetConfiguration, get_config
 from .dataset import Dataset
 
 __version__ = "0.3.0"
