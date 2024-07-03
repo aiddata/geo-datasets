@@ -8,7 +8,7 @@
 
 # download (from ftp) and unzip specified version of GSHHG database
 
-version="2.3.7"
+version="2.3.6"
 src="ftp://ftp.soest.hawaii.edu/gshhg/gshhg-shp-"${version}".zip"
 
 dst="/sciclone/aiddata10/REU/geo/raw/gshhg"
