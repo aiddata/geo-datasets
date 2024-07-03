@@ -1,17 +1,17 @@
 import logging
-from typing import Literal, Optional, Union
+from typing import Literal, Optional
 
 from pydantic import BaseModel
 
 
 class RunParameters(BaseModel):
-    backend: Union[Literal["local"], Literal["mpi"], Literal["prefect"]] = "prefect"
-    task_runner: Union[
-        Literal["concurrent"],
-        Literal["dask"],
-        Literal["hpc"],
-        Literal["kubernetes"],
-        Literal["sequential"],
+    backend: Literal["local", "mpi", "prefect"] = "prefect"
+    task_runner: Literal[
+        "concurrent",
+        "dask",
+        "hpc",
+        "kubernetes",
+        "sequential",
     ] = "concurrent"
     run_parallel: bool = True
     max_workers: Optional[int] = 4
