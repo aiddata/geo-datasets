@@ -1,40 +1,54 @@
 
-import distancerasters as dr
 import os
-import sys
 import requests
 from affine import Affine
 from pathlib import Path
 import shutil
 from zipfile import ZipFile
 from configparser import ConfigParser
+from datetime import datetime
+from typing import List, Literal
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+import distancerasters as dr
 
-from dataset import Dataset
+from data_manager import Dataset
+
 
 class DISTANCE_TO_COASTS(Dataset):
+
     name = "DISTANCE_TO_COASTS"
 
-    def __init__(self, raw_dir, output_dir, pixel_size, download_dest, raster_type, overwrite_download=False, overwrite_extract=False, overwrite_binary_raster=False, overwrite_distance_raster=False):
+    def __init__(self,
+                 raw_dir,
+                 output_dir,
+                 pixel_size,
+                 download_dest,
+                 raster_type,
+                 overwrite_download=False,
+                 overwrite_extract=False,
+                 overwrite_binary_raster=False,
+                 overwrite_distance_raster=False):
+
         self.raw_dir = Path(raw_dir)
         self.output_dir = Path(output_dir)
+
         self.pixel_size = pixel_size
         self.download_dest = download_dest
         self.raster_type = raster_type
+
         self.overwrite_download = overwrite_download
         self.overwrite_extract = overwrite_extract
         self.overwrite_binary_raster = overwrite_binary_raster
         self.overwrite_distance_raster = overwrite_distance_raster
-    
+
     def raster_conditional(self, rarray):
         return (rarray == 1)
-    
+
     def test_connection(self):
         # test connection
         test_request = requests.get("https://www.soest.hawaii.edu/pwessel/gshhg/", verify=True)
         test_request.raise_for_status()
-    
+
     def manage_download(self, download_dest):
         """
         Download individual file
@@ -53,14 +67,14 @@ class DISTANCE_TO_COASTS(Dataset):
             logger.info(f"Downloaded: {download_dest}")
 
         return (self, download_dest, local_filename)
-    
+
     def build_extract_list(self):
         """
         Prepare file list to extract
         """
         logger = self.get_logger()
-        
-        zip_name = self.raw_dir / "gshhg-shp-2.3.7.zip" 
+
+        zip_name = self.raw_dir / "gshhg-shp-2.3.7.zip"
         task_list = []
         zip_shp_file = "GSHHS_shp/f/GSHHS_f_L1.shp"
         output_shp_file = self.raw_dir / "GSHHS_f_L1.shp"
@@ -75,21 +89,21 @@ class DISTANCE_TO_COASTS(Dataset):
             logger.info(f"File previously extracted: {output_shx_file}")
         else:
             task_list.append((zip_name, zip_shx_file, output_shx_file))
-        
+
         zip_prj_file = "GSHHS_shp/f/GSHHS_f_L1.prj"
         output_prj_file = self.raw_dir / "GSHHS_f_L1.prj"
         if os.path.isfile(output_prj_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_prj_file}")
         else:
             task_list.append((zip_name, zip_prj_file, output_prj_file))
-        
+
         zip_dbf_file = "GSHHS_shp/f/GSHHS_f_L1.dbf"
         output_dbf_file = self.raw_dir / "GSHHS_f_L1.dbf"
         if os.path.isfile(output_dbf_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_dbf_file}")
         else:
             task_list.append((zip_name, zip_dbf_file, output_dbf_file))
-        
+
         return task_list
 
     def extract_files(self, zip_path, zip_file, dst_path):
@@ -119,12 +133,12 @@ class DISTANCE_TO_COASTS(Dataset):
         """
         logger = self.get_logger()
         return_list = []
-        
+
         logger.info("Preparing rasterization")
         pixel_size = self.pixel_size
         xmin = -180
         xmax = 180
-        ymin = -90            
+        ymin = -90
         ymax = 90
         affine = Affine(pixel_size, 0, xmin, 0, -pixel_size, ymax)
         shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
@@ -159,8 +173,8 @@ class DISTANCE_TO_COASTS(Dataset):
                     logger.info(f"Error creating distance raster {distance_output_raster_path}: {e}")
                     return_list.append((str(e), str(distance_output_raster_path)))
         return return_list
-    
-    
+
+
     def main(self):
         logger = self.get_logger()
 
@@ -207,10 +221,87 @@ def get_config_dict(config_file="config.ini"):
         }
 
 if __name__ == "__main__":
+
     config_dict = get_config_dict()
+
+    log_dir = config_dict["log_dir"]
+    timestamp = datetime.today()
+    time_format_str: str="%Y_%m_%d_%H_%M"
+    time_str = timestamp.strftime(time_format_str)
+    timestamp_log_dir = Path(log_dir) / time_str
+    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
     class_instance = DISTANCE_TO_COASTS(config_dict["raw_dir"], config_dict["output_dir"], config_dict["pixel_size"], config_dict["download_dest"], config_dict["raster_type"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
 
-    class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
+    class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=timestamp_log_dir)
 
 
+else:
+    try:
+        from prefect import flow
+    except:
+        pass
+    else:
+        config_file = "distance_to_coast/config.ini"
+        config = ConfigParser()
+        config.read(config_file)
+
+        from main import DISTANCE_TO_COASTS
+
+        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
+
+        @flow
+        def distance_to_coast(
+            raw_dir: str,
+            output_dir: str,
+            pixel_size: float,
+            download_dest: List[str],
+            raster_type: List[str],
+            overwrite_download: bool,
+            overwrite_extract: bool,
+            overwrite_binary_raster: bool,
+            overwrite_distance_raster: bool,
+            backend: Literal["local", "mpi", "prefect"],
+            task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
+            run_parallel: bool,
+            max_workers: int,
+            log_dir: str):
+
+            timestamp = datetime.today()
+            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
+            timestamp_log_dir = Path(log_dir) / time_str
+            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
+
+            cluster = "vortex"
+
+
+            hpc_cluster_kwargs = {
+                "shebang": "#!/bin/tcsh",
+                "resource_spec": "nodes=1:c18a:ppn=12",
+                "walltime": "4:00:00",
+                "cores": 3,
+                "processes": 3,
+                "memory": "30GB",
+                "interface": "ib0",
+                "job_extra_directives": [
+                    "-j oe",
+                ],
+                "job_script_prologue": [
+                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
+                    "module load anaconda3/2021.05",
+                    "conda activate geodata38",
+                    f"cd {tmp_dir}",
+                ],
+                "log_directory": str(timestamp_log_dir),
+            }
+
+
+            class_instance = DISTANCE_TO_COASTS(raw_dir, output_dir, pixel_size, download_dest, raster_type, overwrite_download, overwrite_extract, overwrite_binary_raster, overwrite_distance_raster)
+
+
+
+            if task_runner != 'hpc':
+                os.chdir(tmp_dir)
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
+            else:
+                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=hpc_cluster_kwargs)

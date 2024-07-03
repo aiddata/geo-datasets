@@ -1,7 +1,0 @@
-#!/bin/tcsh
-#PBS -N build_coast
-#PBS -l nodes=1:c18c:ppn=8
-#PBS -l walltime=24:00:00
-#PBS -j oe
-
-python /sciclone/aiddata10/geo/master/source/geo-datasets/distance_to_coast/build_dist_to_coast.py
