@@ -21,7 +21,7 @@ class DISTANCE_TO_WATER(Dataset):
     def __init__(self,
                  raw_dir,
                  output_dir,
-                 gsshg_version,
+                 gshhg_version,
                  ne_hash,
                  pixel_size,
                  download_files,
@@ -32,10 +32,10 @@ class DISTANCE_TO_WATER(Dataset):
                  overwrite_distance_raster=False):
 
 
-        self.gsshg_version = gsshg_version
+        self.gshhg_version = gshhg_version
         self.ne_hash = ne_hash
 
-        self.version = f"{gsshg_version}_{ne_hash[:7]}"
+        self.version = f"{gshhg_version}_{ne_hash[:7]}"
 
         self.raw_dir = Path(raw_dir) / self.version
         self.output_dir = Path(output_dir) / self.version
@@ -62,10 +62,10 @@ class DISTANCE_TO_WATER(Dataset):
         Download individual file
         """
         logger = self.get_logger()
-        if download_dest == f"http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-shp-{self.gsshg_version}.zip":
+        if download_dest == f"http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-shp-{self.gshhg_version}.zip":
             dir_name = self.raw_dir / "gshhg"
             os.makedirs(dir_name, exist_ok=True)
-            local_filename = self.raw_dir / "gshhg" / f"gshhg-shp-{self.gsshg_version}.zip"
+            local_filename = self.raw_dir / "gshhg" / f"gshhg-shp-{self.gshhg_version}.zip"
         elif download_dest == f"https://github.com/nvkelso/natural-earth-vector/archive/{self.ne_hash}.zip":
             dir_name = self.raw_dir / "natural-earth-vector"
             os.makedirs(dir_name, exist_ok=True)
@@ -91,7 +91,7 @@ class DISTANCE_TO_WATER(Dataset):
         task_list = []
 
 
-        gshhg_zip_name = self.raw_dir / "gshhg" / f"gshhg-shp-{self.gsshg_version}.zip"
+        gshhg_zip_name = self.raw_dir / "gshhg" / f"gshhg-shp-{self.gshhg_version}.zip"
 
         for ext in ["shp", "shx", "prj", "dbf"]:
 
@@ -236,7 +236,7 @@ def get_config_dict(config_file="config.ini"):
             "raw_dir": Path(config["main"]["raw_dir"]),
             "output_dir": Path(config["main"]["output_dir"]),
             "log_dir": Path(config["main"]["output_dir"]) / "logs",
-            "gsshg_version": config["main"]["gsshg_version"],
+            "gshhg_version": config["main"]["gshhg_version"],
             "ne_hash": config["main"]["ne_hash"],
             "pixel_size": config["main"].getfloat("pixel_size"),
             "download_files": [str(y) for y in config["main"]["download_files"].split(", ")],
@@ -263,7 +263,7 @@ if __name__ == "__main__":
     timestamp_log_dir = Path(log_dir) / time_str
     timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-    class_instance = DISTANCE_TO_WATER(config_dict["raw_dir"], config_dict["output_dir"], config_dict["gsshg_version"], config_dict["ne_hash"], config_dict["pixel_size"], config_dict["download_files"], config_dict["raster_type"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
+    class_instance = DISTANCE_TO_WATER(config_dict["raw_dir"], config_dict["output_dir"], config_dict["gshhg_version"], config_dict["ne_hash"], config_dict["pixel_size"], config_dict["download_files"], config_dict["raster_type"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
 
     class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=timestamp_log_dir)
 
@@ -286,7 +286,7 @@ else:
         def distance_to_water(
             raw_dir: str,
             output_dir: str,
-            gsshg_version: str,
+            gshhg_version: str,
             ne_hash: str,
             pixel_size: float,
             download_files: List[str],
@@ -330,7 +330,7 @@ else:
             }
 
 
-            class_instance = DISTANCE_TO_WATER(raw_dir, output_dir, gsshg_version, ne_hash, pixel_size, download_files, raster_type, overwrite_download, overwrite_extract, overwrite_binary_raster, overwrite_distance_raster)
+            class_instance = DISTANCE_TO_WATER(raw_dir, output_dir, gshhg_version, ne_hash, pixel_size, download_files, raster_type, overwrite_download, overwrite_extract, overwrite_binary_raster, overwrite_distance_raster)
 
 
             if task_runner != 'hpc':
