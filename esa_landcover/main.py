@@ -4,17 +4,14 @@ Download and prepare data
 
 import os
 import shutil
-import tomllib
 import zipfile
-from configparser import ConfigParser
-from datetime import datetime
 from pathlib import Path
-from typing import List, Literal, Union
+from typing import List
 
 import cdsapi
 import numpy as np
 import rasterio
-from data_manager import BaseDatasetConfiguration, Dataset
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
 
 class ESALandcoverConfiguration(BaseDatasetConfiguration):
@@ -182,25 +179,17 @@ class ESALandcover(Dataset):
         self.log_run(process)
 
 
-def get_config(config_file="config.toml"):
-    with open(config_file, "rb") as src:
-        config_dict = tomllib.load(src)
-    return ESALandcoverConfiguration.model_validate(config_dict)
-
-
-if __name__ == "__main__":
-    config = get_config()
-    class_instance = ESALandcover(config)
-    class_instance.run(config.run)
-
-
 try:
     from prefect import flow
-except Exception:
+except:
     pass
 else:
 
     @flow
     def esa_landcover(config: ESALandcoverConfiguration):
-        class_instance = ESALandcover(config)
-        class_instance.run(config.run)
+        ESALandcover(config).run(config.run)
+
+
+if __name__ == "__main__":
+    config = get_config(ESALandcoverConfiguration)
+    ESALandcover(config).run(config.run)
