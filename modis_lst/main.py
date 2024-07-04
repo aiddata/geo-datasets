@@ -189,7 +189,7 @@ class MODISLandSurfaceTemp(Dataset):
         self.username = config.username
         self.password = config.password
 
-        self.years = config.years
+        self.years = [str(y) for y in config.years]
 
         self.overwrite_download = config.overwrite_download
         self.overwrite_monthly = config.overwrite_monthly
