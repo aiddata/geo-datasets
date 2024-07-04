@@ -35,4 +35,4 @@ version = 3
 flow_file_name = "main"
 flow_name = "esa_landcover"
 work_pool = "geodata-pool"
-data_manager_version = "HEAD"
+data_manager_version = "0.3.0"
