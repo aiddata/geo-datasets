@@ -13,35 +13,36 @@ import zipfile
 from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
+from typing import List
 
 import rasterio
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
-from data_manager import Dataset
+
+class LandScanPopConfiguration(BaseDatasetConfiguration):
+    raw_dir: str
+    output_dir: str
+    years: List[int]
+    run_extract: bool
+    run_conversion: bool
+    overwrite_extract: bool
+    overwrite_conversion: bool
 
 
 class LandScanPop(Dataset):
     name = "LandScan Population"
 
-    def __init__(
-        self,
-        raw_dir,
-        output_dir,
-        years,
-        run_extract=True,
-        run_conversion=True,
-        overwrite_extract=False,
-        overwrite_conversion=False,
-    ):
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
+    def __init__(self, config: LandScanPopConfiguration):
+        self.raw_dir = Path(config.raw_dir)
+        self.output_dir = Path(config.output_dir)
 
-        self.years = years
+        self.years = config.years
 
-        self.run_extract = run_extract
-        self.run_conversion = run_conversion
+        self.run_extract = config.run_extract
+        self.run_conversion = config.run_conversion
 
-        self.overwrite_extract = overwrite_extract
-        self.overwrite_conversion = overwrite_conversion
+        self.overwrite_extract = config.overwrite_extract
+        self.overwrite_conversion = config.overwrite_conversion
 
         self.download_dir = self.raw_dir / "compressed"
         os.makedirs(self.download_dir, exist_ok=True)
@@ -127,52 +128,17 @@ class LandScanPop(Dataset):
             self.log_run(conv)
 
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
+try:
+    from prefect import flow
+except:
+    pass
+else:
 
-    return {
-        "raw_dir": Path(config["main"]["raw_dir"]),
-        "output_dir": Path(config["main"]["output_dir"]),
-        "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "run_extract": config["main"].getboolean("run_extract"),
-        "run_conversion": config["main"].getboolean("run_conversion"),
-        "overwrite_extract": config["main"].getboolean("overwrite_extract"),
-        "overwrite_conversion": config["main"].getboolean("overwrite_conversion"),
-        "backend": config["run"]["backend"],
-        "task_runner": config["run"]["task_runner"],
-        "run_parallel": config["run"].getboolean("run_parallel"),
-        "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
-        "bypass_error_wrapper": config["run"].getboolean("bypass_error_wrapper"),
-    }
+    @flow
+    def landscan_pop(config: LandScanPopConfiguration):
+        LandScanPop(config).run(config.run)
 
 
 if __name__ == "__main__":
-    config_dict = get_config_dict()
-
-    log_dir = config_dict["log_dir"]
-    timestamp = datetime.today()
-    time_format_str: str = "%Y_%m_%d_%H_%M"
-    time_str = timestamp.strftime(time_format_str)
-    timestamp_log_dir = Path(log_dir) / time_str
-    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-    class_instance = LandScanPop(
-        config_dict["raw_dir"],
-        config_dict["output_dir"],
-        config_dict["years"],
-        config_dict["run_extract"],
-        config_dict["run_conversion"],
-        config_dict["overwrite_extract"],
-        config_dict["overwrite_conversion"],
-    )
-
-    class_instance.run(
-        backend=config_dict["backend"],
-        task_runner=config_dict["task_runner"],
-        run_parallel=config_dict["run_parallel"],
-        max_workers=config_dict["max_workers"],
-        log_dir=timestamp_log_dir,
-        bypass_error_wrapper=config_dict["bypass_error_wrapper"],
-    )
+    config = get_config(LandScanPopConfiguration)
+    LandScanPop(config).run(config.run)

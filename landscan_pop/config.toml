@@ -1,0 +1,31 @@
+raw_dir = "/sciclone/aiddata10/REU/pre_geo/raw/landscan/population"
+output_dir = "/sciclone/aiddata10/REU/pre_geo/data/rasters/landscan/population"
+
+years = [ 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022 ]
+
+run_extract = true
+run_conversion = true
+
+overwrite_extract = false
+overwrite_conversion = false
+
+
+[run]
+max_workers = 8
+log_dir = "/sciclone/aiddata10/REU/geo/raw/landscan/population/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "landscan_pop"
+
+
+[deploy]
+deployment_name = "landscan_pop"
+image_tag = "05dea6e"
+version = 3
+flow_file_name = "main"
+flow_name = "landscan_pop"
+work_pool = "geodata-pool"
+data_manager_version = "0.3.0"
