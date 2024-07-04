@@ -1,4 +1,4 @@
-process_dir = "/local/scr/smgoodman/TMPDIR/MODIS/terra/MOLT/MOD11C3.061"
+process_dir = "/tmp"
 raw_dir = "/sciclone/aiddata10/REU/geo/raw/MODIS/terra/MOLT/MOD11C3.061"
 output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/MODIS/terra/MOLT/MOD11C3.061"
 username = "<username>"
