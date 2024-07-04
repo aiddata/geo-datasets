@@ -242,7 +242,7 @@ except:
 else:
 
     @flow
-    def esa_landcover(config: WorldPopAgeSexConfiguration):
+    def worldpop_age_sex(config: WorldPopAgeSexConfiguration):
         WorldPopAgeSex(config).run(config.run)
 
 
