@@ -27,6 +27,7 @@ import inspect
 import os
 import sys
 from configparser import ConfigParser
+import tomllib
 
 from data_manager import Dataset
 from prefect.deployments import Deployment
@@ -52,12 +53,11 @@ sys.path.insert(
     ),
 )
 
-from main import get_config_dict
+from main import get_config
 
-config_file = dataset_dir + "/config.ini"
-config = ConfigParser()
-config.read(config_file)
-
+config_file = dataset_dir + "/config.toml"
+with open(config_file, "rb") as src:
+    config = tomllib.load(src)
 
 # load flow
 module_name = config["deploy"]["flow_file_name"]
@@ -67,9 +67,9 @@ data_manager_version = config["deploy"]["data_manager_version"]
 
 
 # create and load storage block
-git_repo = config["github"]["repo"]
-git_branch = config["github"]["branch"]  # branch or tag
-git_directory = config["github"]["directory"]
+git_repo_url = config["repo"]["url"]
+git_branch = config["repo"]["branch"]  # branch or tag
+git_directory = config["repo"]["directory"]
 
 # -------------------------------------
 
@@ -96,9 +96,10 @@ def flow_import(module_name, flow_name):
 # Driver Code
 flow, dataset_name = flow_import(module_name, flow_name)
 
+
 flow.from_source(
     source=GitRepository(
-        url=git_repo,
+        url=git_repo_url,
         branch=git_branch,
     ),
     entrypoint="{}/{}.py:{}".format(git_directory, module_name, git_directory),
@@ -107,7 +108,7 @@ flow.from_source(
     work_pool_name=config["deploy"]["work_pool"],
     image=flow_image,
     job_variables={"env": {"DATA_MANAGER_VERSION": data_manager_version}},
-    parameters=get_config_dict(config_file),
+    parameters={"config": config},
     version=config["deploy"]["version"],
     build=False,
 )
