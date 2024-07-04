@@ -11,7 +11,7 @@ import pandas as pd
 import rasterio
 import requests
 from affine import Affine
-from data_manager import Dataset
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 from scipy.interpolate import griddata
 
 from utility import file_exists, find_files, get_current_timestamp
@@ -49,39 +49,43 @@ class SessionWithHeaderRedirection(requests.Session):
         return
 
 
+class OCO2Configuration(BaseDatasetConfiguration):
+    data_url: str
+    username: str
+    password: str
+    raw_dir: str
+    output_dir: str
+    overwrite_download: bool
+    overwrite_processing: bool
+    year_list: List[int]
+    interp_method: str
+    run_a: bool
+    run_b: bool
+    run_c: bool
+    run_d: bool
+    run_e: bool
+    run_f: bool
+    run_g: bool
+
+
 class OCO2(Dataset):
     name = "OCO-2 Carbon Dioxide"
 
     def __init__(
         self,
-        data_url: str,
-        username: str,
-        password: str,
-        raw_dir: Union[Path, str],
-        output_dir: Union[Path, str],
-        year_list: List[int],
-        interp_method: str,
-        run_a: bool,
-        run_b: bool,
-        run_c: bool,
-        run_d: bool,
-        run_e: bool,
-        run_f: bool,
-        run_g: bool,
-        overwrite_download: bool,
-        overwrite_processing: bool,
+        config: OCO2Configuration,
     ):
         self.timestamp = get_current_timestamp("%Y_%m_%d_%H_%M")
 
-        self.interp_method = interp_method
-        self.data_url = data_url
-        self.username = username
-        self.password = password
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
-        self.year_list = year_list
-        self.overwrite_download = overwrite_download
-        self.overwrite_processing = overwrite_processing
+        self.interp_method = config.interp_method
+        self.data_url = config.data_url
+        self.username = config.username
+        self.password = config.password
+        self.raw_dir = Path(config.raw_dir)
+        self.output_dir = Path(config.output_dir)
+        self.year_list = config.year_list
+        self.overwrite_download = config.overwrite_download
+        self.overwrite_processing = config.overwrite_processing
 
         self.day_dir = os.path.join(self.output_dir, "day")
         self.month_dir = os.path.join(self.output_dir, "month")
@@ -91,13 +95,13 @@ class OCO2(Dataset):
         self.year_grid_dir = os.path.join(self.output_dir, "year_grid")
         self.year_interp_dir = os.path.join(self.output_dir, "year_interp")
 
-        self.run_a = run_a
-        self.run_b = run_b
-        self.run_c = run_c
-        self.run_d = run_d
-        self.run_e = run_e
-        self.run_f = run_f
-        self.run_g = run_g
+        self.run_a = config.run_a
+        self.run_b = config.run_b
+        self.run_c = config.run_c
+        self.run_d = config.run_d
+        self.run_e = config.run_e
+        self.run_f = config.run_f
+        self.run_g = config.run_g
 
         os.makedirs(self.day_dir, exist_ok=True)
         os.makedirs(self.month_dir, exist_ok=True)
@@ -525,182 +529,17 @@ class OCO2(Dataset):
             # self.output_results(qlist_g, results_g, "interp-year")
 
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
+try:
+    from prefect import flow
+except:
+    pass
+else:
 
-    return {
-        "data_url": config["main"]["data_url"],
-        "username": config["main"]["username"],
-        "password": config["main"]["password"],
-        "raw_dir": Path(config["main"]["raw_dir"]),
-        "output_dir": Path(config["main"]["output_dir"]),
-        "overwrite_download": config["main"].getboolean("overwrite_download"),
-        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
-        "year_list": [int(a) for a in config["main"]["year_list"].split(", ")],
-        "interp_method": config["main"]["interp_method"],
-        "run_a": config["main"].getboolean("run_a"),
-        "run_b": config["main"].getboolean("run_b"),
-        "run_c": config["main"].getboolean("run_c"),
-        "run_d": config["main"].getboolean("run_d"),
-        "run_e": config["main"].getboolean("run_e"),
-        "run_f": config["main"].getboolean("run_f"),
-        "run_g": config["main"].getboolean("run_g"),
-        "backend": config["run"]["backend"],
-        "task_runner": config["run"]["task_runner"],
-        "run_parallel": config["run"].getboolean("run_parallel"),
-        "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
-        "bypass_error_wrapper": config["run"].getboolean("bypass_error_wrapper"),
-    }
+    @flow
+    def oco2(config: OCO2Configuration):
+        OCO2(config).run(config.run)
 
 
 if __name__ == "__main__":
-    config_dict = get_config_dict()
-
-    log_dir = config_dict["log_dir"]
-    timestamp = datetime.today()
-    time_format_str: str = "%Y_%m_%d_%H_%M"
-    time_str = timestamp.strftime(time_format_str)
-    timestamp_log_dir = Path(log_dir) / time_str
-    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-    class_instance = OCO2(
-        data_url=config_dict["data_url"],
-        username=config_dict["username"],
-        password=config_dict["password"],
-        raw_dir=config_dict["raw_dir"],
-        output_dir=config_dict["output_dir"],
-        overwrite_download=config_dict["overwrite_download"],
-        overwrite_processing=config_dict["overwrite_processing"],
-        year_list=config_dict["year_list"],
-        interp_method=config_dict["interp_method"],
-        run_a=config_dict["run_a"],
-        run_b=config_dict["run_b"],
-        run_c=config_dict["run_c"],
-        run_d=config_dict["run_d"],
-        run_e=config_dict["run_e"],
-        run_f=config_dict["run_f"],
-        run_g=config_dict["run_g"],
-    )
-
-    class_instance.run(
-        backend=config_dict["backend"],
-        task_runner=config_dict["task_runner"],
-        run_parallel=config_dict["run_parallel"],
-        max_workers=config_dict["max_workers"],
-        log_dir=timestamp_log_dir,
-        bypass_error_wrapper=config_dict["bypass_error_wrapper"],
-    )
-else:
-    try:
-        from prefect import flow
-    except:
-        pass
-    else:
-        config_file = "oco2/config.ini"
-        config = ConfigParser()
-        config.read(config_file)
-        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
-
-        config_dict = get_config_dict(config_file=config_file)
-
-        log_dir = config_dict["log_dir"]
-        timestamp = datetime.today()
-        time_format_str: str = "%Y_%m_%d_%H_%M"
-        time_str = timestamp.strftime(time_format_str)
-        timestamp_log_dir = Path(log_dir) / time_str
-
-        @flow
-        def oco2(
-            data_url: str = config_dict["data_url"],
-            username: str = config_dict["username"],
-            password: str = config_dict["password"],
-            raw_dir: str = config_dict["raw_dir"],
-            output_dir: str = config_dict["output_dir"],
-            overwrite_download: bool = config_dict["overwrite_download"],
-            overwrite_processing: bool = config_dict["overwrite_processing"],
-            year_list: List[int] = config_dict["year_list"],
-            interp_method: str = config_dict["interp_method"],
-            run_a: bool = config_dict["run_a"],
-            run_b: bool = config_dict["run_b"],
-            run_c: bool = config_dict["run_c"],
-            run_d: bool = config_dict["run_d"],
-            run_e: bool = config_dict["run_e"],
-            run_f: bool = config_dict["run_f"],
-            run_g: bool = config_dict["run_g"],
-            backend: Literal["local", "mpi", "prefect"] = config_dict["backend"],
-            task_runner: Literal[
-                "sequential", "concurrent", "dask", "hpc", "kubernetes"
-            ] = config_dict["task_runner"],
-            run_parallel: bool = config_dict["run_parallel"],
-            max_workers: int = config_dict["max_workers"],
-            log_dir: str = timestamp_log_dir.as_posix(),
-            bypass_error_wrapper: bool = config_dict["bypass_error_wrapper"],
-        ):
-            timestamp = datetime.today()
-            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
-            timestamp_log_dir = Path(log_dir) / time_str
-            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-            cluster = "vortex"
-
-            cluster_kwargs = {
-                "shebang": "#!/bin/tcsh",
-                "resource_spec": "nodes=1:c18a:ppn=12",
-                "cores": 4,
-                "processes": 4,
-                "memory": "32GB",
-                "interface": "ib0",
-                "job_extra_directives": [
-                    "-j oe",
-                ],
-                "job_script_prologue": [
-                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-                    "module load anaconda3/2021.05",
-                    "conda activate geodata38",
-                    f"cd {tmp_dir}",
-                ],
-                "log_directory": str(timestamp_log_dir),
-            }
-
-            class_instance = OCO2(
-                data_url,
-                username,
-                password,
-                raw_dir,
-                output_dir,
-                year_list,
-                interp_method,
-                run_a,
-                run_b,
-                run_c,
-                run_d,
-                run_e,
-                run_f,
-                run_g,
-                overwrite_download,
-                overwrite_processing,
-            )
-
-            if task_runner != "hpc":
-                os.chdir(tmp_dir)
-                class_instance.run(
-                    backend=backend,
-                    task_runner=task_runner,
-                    run_parallel=run_parallel,
-                    max_workers=max_workers,
-                    log_dir=timestamp_log_dir,
-                    bypass_error_wrapper=bypass_error_wrapper,
-                )
-            else:
-                class_instance.run(
-                    backend=backend,
-                    task_runner=task_runner,
-                    run_parallel=run_parallel,
-                    max_workers=max_workers,
-                    log_dir=timestamp_log_dir,
-                    cluster=cluster,
-                    cluster_kwargs=cluster_kwargs,
-                    bypass_error_wrapper=bypass_error_wrapper,
-                )
+    config = get_config(OCO2Configuration)
+    OCO2(config).run(config.run)

@@ -13,7 +13,7 @@ import rasterio
 import requests
 from affine import Affine
 from bs4 import BeautifulSoup
-from data_manager import Dataset
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 from pyhdf.SD import SD, SDC
 
 
@@ -170,36 +170,37 @@ def aggregate_rasters(file_list, method="mean"):
     return store, raster.meta
 
 
+class MODISLandSurfaceTempConfiguration(BaseDatasetConfiguration):
+    process_dir: str
+    raw_dir: str
+    output_dir: str
+    username: str
+    password: str
+    years: List[int]
+    overwrite_download: bool
+    overwrite_monthly: bool
+    overwrite_yearly: bool
+
+
 class MODISLandSurfaceTemp(Dataset):
     name = "MODIS Land Surface Temperatures"
 
-    def __init__(
-        self,
-        process_dir,
-        raw_dir,
-        output_dir,
-        username,
-        password,
-        years,
-        overwrite_download,
-        overwrite_monthly,
-        overwrite_yearly,
-    ):
-        self.username = username
-        self.password = password
+    def __init__(self, config: MODISLandSurfaceTempConfiguration):
+        self.username = config.username
+        self.password = config.password
 
-        self.years = [str(y) for y in years]
+        self.years = config.years
 
-        self.overwrite_download = overwrite_download
-        self.overwrite_monthly = overwrite_monthly
-        self.overwrite_yearly = overwrite_yearly
+        self.overwrite_download = config.overwrite_download
+        self.overwrite_monthly = config.overwrite_monthly
+        self.overwrite_yearly = config.overwrite_yearly
 
         self.root_url = "https://e4ftl01.cr.usgs.gov"
         self.data_url = os.path.join(self.root_url, "MOLT/MOD11C3.061")
 
-        self.process_dir = Path(process_dir)
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
+        self.process_dir = Path(config.process_dir)
+        self.raw_dir = Path(config.raw_dir)
+        self.output_dir = Path(config.output_dir)
 
         self.raw_dir.mkdir(parents=True, exist_ok=True)
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -437,145 +438,16 @@ class MODISLandSurfaceTemp(Dataset):
         self.log_run(agg)
 
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
-
-    return {
-        "process_dir": Path(config["main"]["process_dir"]),
-        "raw_dir": Path(config["main"]["raw_dir"]),
-        "output_dir": Path(config["main"]["output_dir"]),
-        "username": config["main"]["username"],
-        "password": config["main"]["password"],
-        "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "overwrite_download": config["main"].getboolean("overwrite_download"),
-        "overwrite_monthly": config["main"].getboolean("overwrite_monthly"),
-        "overwrite_yearly": config["main"].getboolean("overwrite_yearly"),
-        "backend": config["run"]["backend"],
-        "task_runner": config["run"]["task_runner"],
-        "run_parallel": config["run"].getboolean("run_parallel"),
-        "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
-    }
+try:
+    from prefect import flow
+except:
+    pass
+else:
+    @flow
+    def modis_lst(config: MODISLandSurfaceTempConfiguration):
+        MODISLandSurfaceTemp(config).run(config.run)
 
 
 if __name__ == "__main__":
-    config_dict = get_config_dict()
-
-    class_instance = MODISLandSurfaceTemp(
-        config_dict["process_dir"],
-        config_dict["raw_dir"],
-        config_dict["output_dir"],
-        config_dict["username"],
-        config_dict["password"],
-        config_dict["years"],
-        config_dict["overwrite_download"],
-        config_dict["overwrite_monthly"],
-        config_dict["overwrite_yearly"],
-    )
-
-    class_instance.run(
-        backend=config_dict["backend"],
-        task_runner=config_dict["task_runner"],
-        run_parallel=config_dict["run_parallel"],
-        max_workers=config_dict["max_workers"],
-        log_dir=config_dict["log_dir"],
-    )
-
-else:
-    try:
-        from prefect import flow
-        from prefect.filesystems import GitHub
-    except:
-        pass
-    else:
-        config_file = "modis_lst/config.ini"
-        config = ConfigParser()
-        config.read(config_file)
-
-        block_name = config["deploy"]["storage_block"]
-        GitHub.load(block_name).get_directory("global_scripts")
-
-        from main import MODISLandSurfaceTemp
-
-        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
-
-        @flow
-        def modis_lst(
-            process_dir: str,
-            raw_dir: str,
-            output_dir: str,
-            username: str,
-            password: str,
-            years: List[int],
-            overwrite_download: bool,
-            overwrite_monthly: bool,
-            overwrite_yearly: bool,
-            backend: Literal["local", "mpi", "prefect"],
-            task_runner: Literal[
-                "sequential", "concurrent", "dask", "hpc", "kubernetes"
-            ],
-            run_parallel: bool,
-            max_workers: int,
-            log_dir: str,
-            bypass_error_wrapper: bool,
-        ):
-            timestamp = datetime.today()
-            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
-            timestamp_log_dir = Path(log_dir) / time_str
-            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-            cluster = "vortex"
-
-            cluster_kwargs = {
-                "shebang": "#!/bin/tcsh",
-                "resource_spec": "nodes=1:c18a:ppn=12",
-                "cores": 4,
-                "processes": 4,
-                "memory": "32GB",
-                "interface": "ib0",
-                "job_extra_directives": [
-                    "-j oe",
-                ],
-                "job_script_prologue": [
-                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-                    "module load anaconda3/2021.05",
-                    "conda activate geodata38",
-                    f"cd {tmp_dir}",
-                ],
-                "log_directory": str(timestamp_log_dir),
-            }
-
-            class_instance = MODISLandSurfaceTemp(
-                process_dir=process_dir,
-                raw_dir=raw_dir,
-                output_dir=output_dir,
-                username=username,
-                password=password,
-                years=years,
-                overwrite_download=overwrite_download,
-                overwrite_monthly=overwrite_monthly,
-                overwrite_yearly=overwrite_yearly,
-            )
-
-            if task_runner != "hpc":
-                os.chdir(tmp_dir)
-                class_instance.run(
-                    backend=backend,
-                    task_runner=task_runner,
-                    run_parallel=run_parallel,
-                    max_workers=max_workers,
-                    log_dir=timestamp_log_dir,
-                    bypass_error_wrapper=bypass_error_wrapper,
-                )
-            else:
-                class_instance.run(
-                    backend=backend,
-                    task_runner=task_runner,
-                    run_parallel=run_parallel,
-                    max_workers=max_workers,
-                    log_dir=timestamp_log_dir,
-                    cluster=cluster,
-                    cluster_kwargs=cluster_kwargs,
-                    bypass_error_wrapper=bypass_error_wrapper,
-                )
+    config = get_config(MODISLandSurfaceTempConfiguration)
+    MODISLandSurfaceTemp(config).run(config.run)
