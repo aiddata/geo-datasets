@@ -16,56 +16,50 @@ import numpy as np
 import rasterio
 import requests
 from bs4 import BeautifulSoup
-from data_manager import Dataset
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
-sys.path.insert(
-    1,
-    os.path.join(
-        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "global_scripts"
-    ),
-)
+
+class VIIRS_NTL_Configuration(BaseDatasetConfiguration):
+    raw_dir: str
+    output_dir: str
+    run_annual: bool
+    annual_files: List[str]
+    annual_version: str
+    run_monthly: bool
+    monthly_files: List[str]
+    months: List[int]
+    years: List[int]
+    username: str
+    password: str
+    client_secret: str
+    max_retries: int
+    cf_minimum: int
+    overwrite_download: bool
+    overwrite_extract: bool
+    overwrite_processing: bool
 
 
 class VIIRS_NTL(Dataset):
     name = "VIIRS Nighttime Lights"
 
-    def __init__(
-        self,
-        raw_dir: Union[str, Path],
-        output_dir: Union[str, Path],
-        run_annual: bool,
-        annual_version: str,
-        annual_files: List[str],
-        run_monthly: bool,
-        monthly_files: List[str],
-        months: List[int],
-        years: List[int],
-        username: str,
-        password: str,
-        client_secret: str,
-        max_retries: int,
-        cf_minimum,
-        overwrite_download: bool = False,
-        overwrite_extract: bool = False,
-        overwrite_processing: bool = False,
-    ):
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
-        self.run_annual: bool = run_annual
-        self.annual_version: str = annual_version
-        self.annual_files: List[str] = annual_files
-        self.run_monthly: bool = run_monthly
-        self.monthly_files: List[str] = monthly_files
-        self.months: List[int] = months
-        self.years: List[int] = years
-        self.username: str = username
-        self.password: str = password
-        self.client_secret: str = client_secret
-        self.max_retries: int = max_retries
-        self.cf_minimum = cf_minimum
-        self.overwrite_download: bool = overwrite_download
-        self.overwrite_extract: bool = overwrite_extract
-        self.overwrite_processing: bool = overwrite_processing
+    def __init__(self, config: VIIRS_NTL_Configuration):
+        self.raw_dir = Path(config.raw_dir)
+        self.output_dir = Path(config.output_dir)
+        self.run_annual: bool = config.run_annual
+        self.annual_version: str = config.annual_version
+        self.annual_files: List[str] = config.annual_files
+        self.run_monthly: bool = config.run_monthly
+        self.monthly_files: List[str] = config.monthly_files
+        self.months: List[int] = config.months
+        self.years: List[int] = config.years
+        self.username: str = config.username
+        self.password: str = config.password
+        self.client_secret: str = config.client_secret
+        self.max_retries: int = config.max_retries
+        self.cf_minimum = config.cf_minimum
+        self.overwrite_download: bool = config.overwrite_download
+        self.overwrite_extract: bool = config.overwrite_extract
+        self.overwrite_processing: bool = config.overwrite_processing
 
     def test_connection(self):
         # test connection
@@ -121,7 +115,9 @@ class VIIRS_NTL(Dataset):
                         else:
                             download_url = "https://eogdata.mines.edu/nighttime_light/annual/v22/{YEAR}/VNL_npp_{YEAR}_global_{CONFIG}_v2_c202402081600.{TYPE}.dat.tif.gz"
                     else:
-                        raise NotImplementedError(f"Annual version {self.annual_version} is not yet supported.")
+                        raise NotImplementedError(
+                            f"Annual version {self.annual_version} is not yet supported."
+                        )
                     download_dest = download_url.format(
                         YEAR=year, TYPE=file, CONFIG=file_config
                     )
@@ -455,172 +451,17 @@ class VIIRS_NTL(Dataset):
         self.log_run(process)
 
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
+try:
+    from prefect import flow
+except:
+    pass
+else:
 
-    return {
-        "run_annual": config["main"].getboolean("run_annual"),
-        "annual_version": config["main"]["annual_version"],
-        "run_monthly": config["main"].getboolean("run_monthly"),
-        "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "months": [int(y) for y in config["main"]["months"].split(", ")],
-        "annual_files": [str(y) for y in config["main"]["annual_files"].split(", ")],
-        "monthly_files": [str(y) for y in config["main"]["monthly_files"].split(", ")],
-        "raw_dir": Path(config["main"]["raw_dir"]),
-        "output_dir": Path(config["main"]["output_dir"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
-        "overwrite_download": config["main"].getboolean("overwrite_download"),
-        "overwrite_extract": config["main"].getboolean("overwrite_extract"),
-        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
-        "max_retries": config["main"].getint("max_retries"),
-        "cf_minimum": config["main"].getint("cf_minimum"),
-        "username": config["download"]["username"],
-        "password": config["download"]["password"],
-        "client_secret": config["download"]["client_secret"],
-        "backend": config["run"]["backend"],
-        "task_runner": config["run"]["task_runner"],
-        "run_parallel": config["run"].getboolean("run_parallel"),
-        "max_workers": int(config["run"]["max_workers"]),
-        "bypass_error_wrapper": config["run"].getboolean("bypass_error_wrapper"),
-    }
+    @flow
+    def viirs_ntl(config: VIIRS_NTL_Configuration):
+        VIIRS_NTL(config).run(config.run)
 
 
 if __name__ == "__main__":
-    config_dict = get_config_dict()
-
-    class_instance = VIIRS_NTL(
-        raw_dir=config_dict["raw_dir"],
-        output_dir=config_dict["output_dir"],
-        run_annual=config_dict["run_annual"],
-        annual_version=config_dict["annual_version"],
-        annual_files=config_dict["annual_files"],
-        run_monthly=config_dict["run_monthly"],
-        monthly_files=config_dict["monthly_files"],
-        months=config_dict["months"],
-        years=config_dict["years"],
-        username=config_dict["username"],
-        password=config_dict["password"],
-        client_secret=config_dict["client_secret"],
-        max_retries=config_dict["max_retries"],
-        cf_minimum=config_dict["cf_minimum"],
-        overwrite_download=config_dict["overwrite_download"],
-        overwrite_extract=config_dict["overwrite_extract"],
-        overwrite_processing=config_dict["overwrite_processing"],
-    )
-
-    class_instance.run(
-        backend=config_dict["backend"],
-        run_parallel=config_dict["run_parallel"],
-        max_workers=config_dict["max_workers"],
-        task_runner=config_dict["task_runner"],
-        log_dir=config_dict["log_dir"],
-        bypass_error_wrapper=config_dict["bypass_error_wrapper"],
-    )
-else:
-    try:
-        from prefect import flow
-    except Exception:
-        pass
-    else:
-        config_file = "viirs_ntl/config.ini"
-        config = ConfigParser()
-        config.read(config_file)
-
-        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
-
-        @flow
-        def viirs_ntl(
-            raw_dir: str,
-            output_dir: str,
-            run_annual: bool,
-            annual_files: List[str],
-            annual_version: str,
-            run_monthly: bool,
-            monthly_files: List[str],
-            months: List[int],
-            years: List[int],
-            username: str,
-            password: str,
-            client_secret: str,
-            max_retries: int,
-            cf_minimum: int,
-            overwrite_download: bool,
-            overwrite_extract: bool,
-            overwrite_processing: bool,
-            backend: Literal["local", "mpi", "prefect"],
-            task_runner: Literal["sequential", "concurrent", "dask", "hpc"],
-            run_parallel: bool,
-            max_workers: int,
-            log_dir: str,
-            bypass_error_wrapper: bool,
-        ):
-            timestamp = datetime.today()
-            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
-            timestamp_log_dir = Path(log_dir) / time_str
-            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-            cluster = "vortex"
-
-            cluster_kwargs = {
-                "shebang": "#!/bin/tcsh",
-                "resource_spec": "nodes=1:c18a:ppn=12",
-                "cores": 6,
-                "processes": 6,
-                "memory": "32GB",
-                "interface": "ib0",
-                "job_extra_directives": [
-                    "#PBS -j oe",
-                    # "#PBS -o ",
-                    # "#PBS -e ",
-                ],
-                "job_script_prologue": [
-                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-                    "module load anaconda3/2021.05",
-                    "conda activate geodata38",
-                    f"cd {tmp_dir}",
-                ],
-                "log_directory": str(timestamp_log_dir),
-            }
-
-            class_instance = VIIRS_NTL(
-                raw_dir=raw_dir,
-                output_dir=output_dir,
-                run_annual=run_annual,
-                annual_version=annual_version,
-                annual_files=annual_files,
-                run_monthly=run_monthly,
-                monthly_files=monthly_files,
-                months=months,
-                years=years,
-                username=username,
-                password=password,
-                client_secret=client_secret,
-                max_retries=max_retries,
-                cf_minimum=cf_minimum,
-                overwrite_download=overwrite_download,
-                overwrite_extract=overwrite_extract,
-                overwrite_processing=overwrite_processing,
-            )
-
-            if task_runner != "hpc":
-                os.chdir(tmp_dir)
-                class_instance.run(
-                    backend=backend,
-                    task_runner=task_runner,
-                    run_parallel=run_parallel,
-                    max_workers=max_workers,
-                    log_dir=timestamp_log_dir,
-                    bypass_error_wrapper=bypass_error_wrapper,
-                )
-            else:
-                class_instance.run(
-                    backend=backend,
-                    task_runner=task_runner,
-                    run_parallel=run_parallel,
-                    max_workers=max_workers,
-                    log_dir=timestamp_log_dir,
-                    cluster=cluster,
-                    cluster_kwargs=cluster_kwargs,
-                    bypass_error_wrapper=bypass_error_wrapper,
-                )
+    config = get_config(VIIRS_NTL_Configuration)
+    VIIRS_NTL(config).run(config.run)
