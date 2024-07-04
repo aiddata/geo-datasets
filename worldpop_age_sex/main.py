@@ -6,7 +6,6 @@ worldpop: https://www.worldpop.org/geodata/listing?id=65
 
 import os
 import shutil
-import sys
 from configparser import ConfigParser
 from copy import copy
 from datetime import datetime
@@ -14,15 +13,16 @@ from pathlib import Path
 from typing import List
 
 import requests
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
-sys.path.insert(
-    1,
-    os.path.join(
-        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "global_scripts"
-    ),
-)
 
-from data_manager import Dataset
+class WorldPopAgeSexConfiguration(BaseDatasetConfiguration):
+    process_dir: str
+    raw_dir: str
+    output_dir: str
+    years: List[int]
+    overwrite_download: bool
+    overwrite_processing: bool
 
 
 class WorldPopAgeSex(Dataset):
@@ -30,19 +30,14 @@ class WorldPopAgeSex(Dataset):
 
     def __init__(
         self,
-        process_dir,
-        raw_dir,
-        output_dir,
-        years,
-        overwrite_download=False,
-        overwrite_processing=False,
+        config: WorldPopAgeSexConfiguration,
     ):
-        self.process_dir = Path(process_dir)
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
-        self.years = years
-        self.overwrite_download = overwrite_download
-        self.overwrite_processing = overwrite_processing
+        self.process_dir = Path(config.process_dir)
+        self.raw_dir = Path(config.raw_dir)
+        self.output_dir = Path(config.output_dir)
+        self.years = config.years
+        self.overwrite_download = config.overwrite_download
+        self.overwrite_processing = config.overwrite_processing
 
         self.template_url = "https://data.worldpop.org/GIS/AgeSex_structures/Global_2000_2020/{YEAR}/0_Mosaicked/global_mosaic_1km/global_{SEX}_{AGE}_{YEAR}_1km.tif"
 
@@ -240,135 +235,17 @@ class WorldPopAgeSex(Dataset):
         self.log_run(conversions, expand_args=["src_path", "dst_path"])
 
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
+try:
+    from prefect import flow
+except:
+    pass
+else:
 
-    return {
-        "process_dir": Path(config["main"]["process_dir"]),
-        "raw_dir": Path(config["main"]["raw_dir"]),
-        "output_dir": Path(config["main"]["output_dir"]),
-        "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "overwrite_download": config["main"].getboolean("overwrite_download"),
-        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
-        "backend": config["run"]["backend"],
-        "task_runner": config["run"]["task_runner"],
-        "run_parallel": config["run"].getboolean("run_parallel"),
-        "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
-    }
+    @flow
+    def esa_landcover(config: WorldPopAgeSexConfiguration):
+        WorldPopAgeSex(config).run(config.run)
 
 
 if __name__ == "__main__":
-    config_dict = get_config_dict()
-
-    log_dir = config_dict["log_dir"]
-    timestamp = datetime.today()
-    time_format_str: str = "%Y_%m_%d_%H_%M"
-    time_str = timestamp.strftime(time_format_str)
-    timestamp_log_dir = Path(log_dir) / time_str
-    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-    class_instance = WorldPopAgeSex(
-        config_dict["process_dir"],
-        config_dict["raw_dir"],
-        config_dict["output_dir"],
-        config_dict["years"],
-        config_dict["overwrite_download"],
-        config_dict["overwrite_processing"],
-    )
-
-    class_instance.run(
-        backend=config_dict["backend"],
-        task_runner=config_dict["task_runner"],
-        run_parallel=config_dict["run_parallel"],
-        max_workers=config_dict["max_workers"],
-        log_dir=timestamp_log_dir,
-    )
-
-
-else:
-    try:
-        from prefect import flow
-    except:
-        pass
-    else:
-        config_file = "worldpop_age_sex/config.ini"
-        config = ConfigParser()
-        config.read(config_file)
-
-        from main import WorldPopAgeSex
-
-        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
-
-        @flow
-        def worldpop_age_sex(
-            process_dir: str,
-            raw_dir: str,
-            output_dir: str,
-            years: List[int],
-            overwrite_download: bool,
-            overwrite_processing: bool,
-            backend: str,
-            task_runner: str,
-            run_parallel: bool,
-            max_workers: int,
-            log_dir: str,
-        ):
-            timestamp = datetime.today()
-            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
-            timestamp_log_dir = Path(log_dir) / time_str
-            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-            cluster = "vortex"
-
-            cluster_kwargs = {
-                "shebang": "#!/bin/tcsh",
-                "resource_spec": "nodes=1:c18a:ppn=12",
-                "walltime": "02:00:00",
-                "cores": 5,
-                "processes": 5,
-                "memory": "30GB",
-                "interface": "ib0",
-                "job_extra_directives": [
-                    "#PBS -j oe",
-                    # "#PBS -o ",
-                    # "#PBS -e ",
-                ],
-                "job_script_prologue": [
-                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-                    "module load anaconda3/2021.05",
-                    "conda activate geodata38",
-                    f"cd {tmp_dir}",
-                ],
-                "log_directory": str(timestamp_log_dir),
-            }
-
-            class_instance = WorldPopAgeSex(
-                process_dir,
-                raw_dir,
-                output_dir,
-                years,
-                overwrite_download,
-                overwrite_processing,
-            )
-
-            if task_runner != "hpc":
-                os.chdir(tmp_dir)
-                class_instance.run(
-                    backend=backend,
-                    task_runner=task_runner,
-                    run_parallel=run_parallel,
-                    max_workers=max_workers,
-                    log_dir=timestamp_log_dir,
-                )
-            else:
-                class_instance.run(
-                    backend=backend,
-                    task_runner=task_runner,
-                    run_parallel=run_parallel,
-                    max_workers=max_workers,
-                    log_dir=timestamp_log_dir,
-                    cluster=cluster,
-                    cluster_kwargs=cluster_kwargs,
-                )
+    config = get_config(WorldPopAgeSexConfiguration)
+    WorldPopAgeSex(config).run(config.run)
