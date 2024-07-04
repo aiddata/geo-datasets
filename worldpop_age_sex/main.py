@@ -6,9 +6,7 @@ worldpop: https://www.worldpop.org/geodata/listing?id=65
 
 import os
 import shutil
-from configparser import ConfigParser
 from copy import copy
-from datetime import datetime
 from pathlib import Path
 from typing import List
 
