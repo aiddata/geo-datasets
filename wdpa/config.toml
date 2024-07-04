@@ -1,0 +1,29 @@
+download_url = "https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_Jun2024_Public.zip"
+
+raw_dir = "/sciclone/aiddata10/REU/geo/raw/wdpa/"
+output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/wdpa"
+
+max_retries = 5
+overwrite_download = false
+overwrite_output = true
+
+
+[run]
+max_workers = 1
+log_dir = "/sciclone/aiddata10/REU/geo/data/rasters/wdpa/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "wdpa"
+
+
+[deploy]
+deployment_name = "WDPA"
+image_tag = "05dea6e"
+version = 1
+flow_file_name = "main"
+flow_name = "wdpa"
+work_pool = "geodata-pool"
+data_manager_version = "0.3.0"
