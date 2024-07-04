@@ -27,29 +27,32 @@ full file name - "AVH13C1.A1981181.N07.004.2013227210959.hdf"
 
 """
 
-import csv
 import hashlib
 import json
 import os
-import re
-import ssl
-import sys
-from collections import OrderedDict
-from configparser import ConfigParser
 from datetime import datetime
-from io import StringIO
 from itertools import chain
 from pathlib import Path
-from typing import Any, Generator, List, Literal, Tuple, Type, Union
+from typing import List, Tuple, Type, Union
 from urllib.parse import urljoin
 
 import numpy as np
 import pandas as pd
 import rasterio
 import requests
-from data_manager import Dataset
-from osgeo import gdal, osr
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 from rasterio.crs import CRS
+
+
+class LTDR_NDVI_Configuration(BaseDatasetConfiguration):
+    token: str
+    data_num: int
+    years: List[int]
+    raw_dir: str
+    output_dir: str
+    overwrite_download: bool
+    validate_download: bool
+    overwrite_processing: bool
 
 
 class LTDR_NDVI(Dataset):
@@ -57,30 +60,23 @@ class LTDR_NDVI(Dataset):
 
     def __init__(
         self,
-        token: str,
-        data_num: int,
-        years: List[Union[int, str]],
-        raw_dir: Union[str, os.PathLike],
-        output_dir: Union[str, os.PathLike],
-        overwrite_download: bool,
-        validate_download: bool,
-        overwrite_processing: bool,
+        config: LTDR_NDVI_Configuration,
     ):
         self.build_list = ["daily", "monthly", "yearly"]
 
-        self.auth_headers = {"Authorization": f"Bearer {token}"}
+        self.auth_headers = {"Authorization": f"Bearer {config.token}"}
 
-        self.years = [int(y) for y in years]
+        self.years = config.years
 
         # TODO: warn if raw_dir already points to a directory named [data_num], it's probably one too deep
-        self.raw_dir = Path(raw_dir) / str(data_num)
-        self.output_dir = Path(output_dir)
+        self.raw_dir = Path(config.raw_dir) / str(config.data_num)
+        self.output_dir = Path(config.output_dir)
 
-        self.overwrite_download = overwrite_download
-        self.validate_download = validate_download
-        self.overwrite_processing = overwrite_processing
+        self.overwrite_download = config.overwrite_download
+        self.validate_download = config.validate_download
+        self.overwrite_processing = config.overwrite_processing
 
-        self.dataset_url = f"https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/details/allData/{data_num}/"
+        self.dataset_url = f"https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/details/allData/{config.data_num}/"
 
         self.sensors = [
             "N07_AVH13C1",
@@ -524,141 +520,17 @@ class LTDR_NDVI(Dataset):
             self.run_tasks(self.process_yearly_data, year_qlist)
 
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
+try:
+    from prefect import flow
+except:
+    pass
+else:
 
-    return {
-        "token": config["main"]["token"],
-        "data_num": config["main"]["data_num"],
-        "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "raw_dir": Path(config["main"]["raw_dir"]),
-        "output_dir": Path(config["main"]["output_dir"]),
-        "overwrite_download": config["main"].getboolean("overwrite_download"),
-        "validate_download": config["main"].getboolean("validate_download"),
-        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
-        "backend": config["run"]["backend"],
-        "task_runner": config["run"]["task_runner"],
-        "run_parallel": config["run"].getboolean("run_parallel"),
-        "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
-    }
+    @flow
+    def ltdr_ndvi(config: LTDR_NDVI_Configuration):
+        LTDR_NDVI(config).run(config.run)
 
 
 if __name__ == "__main__":
-    config_dict = get_config_dict()
-
-    log_dir = config_dict["log_dir"]
-    timestamp = datetime.today()
-    time_format_str: str = "%Y_%m_%d_%H_%M"
-    time_str = timestamp.strftime(time_format_str)
-    timestamp_log_dir = Path(log_dir) / time_str
-    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-    class_instance = LTDR_NDVI(
-        config_dict["token"],
-        config_dict["data_num"],
-        config_dict["years"],
-        config_dict["raw_dir"],
-        config_dict["output_dir"],
-        config_dict["overwrite_download"],
-        config_dict["validate_download"],
-        config_dict["overwrite_processing"],
-    )
-
-    class_instance.run(
-        backend=config_dict["backend"],
-        task_runner=config_dict["task_runner"],
-        run_parallel=config_dict["run_parallel"],
-        max_workers=config_dict["max_workers"],
-        log_dir=timestamp_log_dir,
-    )
-
-else:
-    try:
-        from prefect import flow
-    except:
-        pass
-    else:
-        config_file = "ltdr_ndvi/config.ini"
-        config = ConfigParser()
-        config.read(config_file)
-
-        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
-
-        @flow
-        def ltdr_ndvi(
-            token: str,
-            data_num: int,
-            years: List[int],
-            raw_dir: str,
-            output_dir: str,
-            overwrite_download: bool,
-            validate_download: bool,
-            overwrite_processing: bool,
-            backend: Literal["local", "mpi", "prefect"],
-            task_runner: Literal[
-                "sequential", "concurrent", "dask", "hpc", "kubernetes"
-            ],
-            run_parallel: bool,
-            max_workers: int,
-            log_dir: str,
-        ):
-            timestamp = datetime.today()
-            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
-            timestamp_log_dir = Path(log_dir) / time_str
-            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-            cluster = "vortex"
-
-            cluster_kwargs = {
-                "shebang": "#!/bin/tcsh",
-                "resource_spec": "nodes=1:c18a:ppn=12",
-                "cores": 6,
-                "processes": 6,
-                "memory": "32GB",
-                "interface": "ib0",
-                "job_extra_directives": [
-                    "#PBS -j oe",
-                    # "#PBS -o ",
-                    # "#PBS -e ",
-                ],
-                "job_script_prologue": [
-                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-                    "module load anaconda3/2021.05",
-                    "conda activate geodata38",
-                    f"cd {tmp_dir}",
-                ],
-                "log_directory": str(timestamp_log_dir),
-            }
-
-            class_instance = LTDR_NDVI(
-                token,
-                data_num,
-                years,
-                raw_dir,
-                output_dir,
-                overwrite_download,
-                validate_download,
-                overwrite_processing,
-            )
-
-            if task_runner != "hpc":
-                os.chdir(tmp_dir)
-                class_instance.run(
-                    backend=backend,
-                    task_runner=task_runner,
-                    run_parallel=run_parallel,
-                    max_workers=max_workers,
-                    log_dir=timestamp_log_dir,
-                )
-            else:
-                class_instance.run(
-                    backend=backend,
-                    task_runner=task_runner,
-                    run_parallel=run_parallel,
-                    max_workers=max_workers,
-                    log_dir=timestamp_log_dir,
-                    cluster=cluster,
-                    cluster_kwargs=cluster_kwargs,
-                )
+    config = get_config(LTDR_NDVI_Configuration)
+    LTDR_NDVI(config).run(config.run)
