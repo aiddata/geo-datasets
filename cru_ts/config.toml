@@ -1,0 +1,36 @@
+# define range of years to download, process
+start_year = 1901
+end_year = 2022
+
+# this should match the dir names used for raw data and to be used for processed data
+cru_version = "4.07"
+cru_url_dir = "cruts.2304141047.v4.07"
+
+# output directories
+raw_dir = "/sciclone/aiddata10/REU/geo/raw/cru_ts"
+output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts"
+
+overwrite_download = false
+overwrite_unzip = false
+overwrite_processing = true
+
+
+[run]
+max_workers = 6
+log_dir = "/sciclone/aiddata10/REU/geo/raw/cru_ts/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "cru_ts"
+
+
+[deploy]
+deployment_name = "cru_ts"
+image_tag = "05dea6e"
+version = 4
+flow_file_name = "main"
+flow_name = "cru_ts"
+work_pool = "geodata-pool"
+data_manager_version = "0.3.0"

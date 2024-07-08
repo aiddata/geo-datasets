@@ -26,59 +26,57 @@ to multiple cores. This can be run on SciClone's Hima nodes using the following 
 
 """
 
-import os
-import sys
 import gzip
 from pathlib import Path
-from datetime import datetime
-from urllib import request, parse
-from configparser import ConfigParser
+from urllib import parse, request
 
-import rasterio
 import numpy as np
+import rasterio
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
 
-from data_manager import Dataset
+class CRU_TS_Configuration(BaseDatasetConfiguration):
+    start_year: int
+    end_year: int
+    cru_version: str
+    cru_url_dir: str
+    raw_dir: str
+    output_dir: str
+    overwrite_download: bool
+    overwrite_unzip: bool
+    overwrite_processing: bool
 
 
 class CRU_TS(Dataset):
 
     name = "Climatic Research Unit gridded Time Series"
 
-    def __init__(self,
-                 start_year: int,
-                 end_year: int,
-                 cru_version: str,
-                 cru_url_dir: str,
-                 raw_dir: str,
-                 output_dir: str,
-                 overwrite_download: bool,
-                 overwrite_unzip: bool,
-                 overwrite_processing: bool):
+    def __init__(self, config: CRU_TS_Configuration):
 
-        self.cru_version = cru_version
-        self.cru_url_dir = cru_url_dir
+        self.cru_version = config.cru_version
+        self.cru_url_dir = config.cru_url_dir
         self.dl_file_years_str = "1901.2022"
 
         # note that later in the download URL, there is no second underscore
         # there is more code in self.download() to correct for this difference
         self.cru_label = f"cru_ts_{self.cru_version}"
 
-        self.raw_dir = Path(raw_dir) / self.cru_label
-        self.output_dir = Path(output_dir) / self.cru_label
+        self.raw_dir = Path(config.raw_dir) / self.cru_label
+        self.output_dir = Path(config.output_dir) / self.cru_label
 
         self.raw_dir.mkdir(parents=True, exist_ok=True)
 
-        self.overwrite_download = overwrite_download
-        self.overwrite_unzip = overwrite_unzip
-        self.overwrite_process = overwrite_processing
+        self.overwrite_download = config.overwrite_download
+        self.overwrite_unzip = config.overwrite_unzip
+        self.overwrite_process = config.overwrite_processing
 
-        self.years = range(int(start_year), int(end_year)+1)
+        self.years = range(int(config.start_year), int(config.end_year) + 1)
         self.months = range(1, 13)
 
-        temporal_list = ["{}{}".format(y, str(m).zfill(2)) for y in self.years for m in self.months]
-        band_list = range(1, len(temporal_list)+1)
+        temporal_list = [
+            "{}{}".format(y, str(m).zfill(2)) for y in self.years for m in self.months
+        ]
+        band_list = range(1, len(temporal_list) + 1)
         self.band_temporal_list = list(zip(band_list, temporal_list))
 
         self.var_list = [
@@ -96,7 +94,6 @@ class CRU_TS(Dataset):
 
         self.method_list = ["mean", "min", "max", "sum"]
 
-    
     def download(self, var):
         logger = self.get_logger()
 
@@ -127,15 +124,20 @@ class CRU_TS(Dataset):
             logger.info(f"Skipping {str(final_gzip_path)}, already unzipped")
         else:
             with self.tmp_to_dst_file(final_gzip_path) as gzip_dst:
-                logger.debug(f"Attempting to unzip {str(final_dl_path)} to {str(final_gzip_path)}")
+                logger.debug(
+                    f"Attempting to unzip {str(final_dl_path)} to {str(final_gzip_path)}"
+                )
                 try:
-                    with gzip.open(final_dl_path.as_posix(), "rb") as src, open(gzip_dst, 'wb') as dst:
+                    with gzip.open(final_dl_path.as_posix(), "rb") as src, open(
+                        gzip_dst, "wb"
+                    ) as dst:
                         dst.write(src.read())
                 except:
-                    logger.exception(f"Failed to unzip {str(final_dl_path)} to {str(final_gzip_path)}")
+                    logger.exception(
+                        f"Failed to unzip {str(final_dl_path)} to {str(final_gzip_path)}"
+                    )
                 else:
                     logger.info(f"Successfully unzipped {str(final_gzip_path)}")
-
 
     def extract_layer(self, input, out_path, band):
         """convert specified netcdf band to geotiff and output"""
@@ -155,12 +157,11 @@ class CRU_TS(Dataset):
             "height": src.meta["height"],
             "width": src.meta["width"],
             "nodata": src.meta["nodata"],
-            "compress": "lzw"
+            "compress": "lzw",
         }
         with self.tmp_to_dst_file(out_path) as dst_path:
             with rasterio.open(dst_path, "w", **meta) as dst:
                 dst.write(np.array([data]))
-
 
     def aggregate_rasters(self, file_list, method="mean"):
         """Aggregate multiple rasters
@@ -201,7 +202,11 @@ class CRU_TS(Dataset):
                 elif method == "mean":
                     if ix == 1:
                         weights = (~store.mask).astype(int)
-                    store = np.ma.average(np.ma.array((store, active)), axis=0, weights=[weights, (~active.mask).astype(int)])
+                    store = np.ma.average(
+                        np.ma.array((store, active)),
+                        axis=0,
+                        weights=[weights, (~active.mask).astype(int)],
+                    )
                     weights += (~active.mask).astype(int)
                 elif method == "min":
                     store = np.ma.array((store, active)).min(axis=0)
@@ -212,13 +217,14 @@ class CRU_TS(Dataset):
         store = store.filled(raster.nodata)
         return store, raster.profile
 
-
     def run_yearly_data(self, year, method, var):
         logger = self.get_logger()
         logger.info(f"Running: {var}, {method}, {str(year)}")
         src_base = self.output_dir / "monthly" / var
         dst_base = self.output_dir / "yearly" / var / method
-        year_files = sorted([i for i in src_base.iterdir() if f"cru.{var}.{year}" in i.name])
+        year_files = sorted(
+            [i for i in src_base.iterdir() if f"cru.{var}.{year}" in i.name]
+        )
         year_mask = f"cru.{var}.YYYY.tif"
         year_path = dst_base / year_mask.replace("YYYY", str(year))
         # aggregate
@@ -229,7 +235,6 @@ class CRU_TS(Dataset):
         meta["compress"] = "lzw"
         with rasterio.open(year_path, "w", **meta) as result:
             result.write(data)
-
 
     def run_monthly_data(self, var):
         logger = self.get_logger()
@@ -249,21 +254,18 @@ class CRU_TS(Dataset):
 
         src.close()
 
-
     def main(self):
         logger = self.get_logger()
 
         var_tasks = [[i] for i in self.var_list]
-        
+
         logger.info("Downloading and Extracting")
         dl_results = self.run_tasks(self.download, var_tasks)
         self.log_run(dl_results)
 
-
         logger.info("Processing Monthly Data")
         monthly_results = self.run_tasks(self.run_monthly_data, var_tasks)
         self.log_run(monthly_results)
-
 
         logger.info("Processing Yearly Data")
 
@@ -279,39 +281,17 @@ class CRU_TS(Dataset):
         self.log_run(yearly_results)
 
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
+try:
+    from prefect import flow
+except:
+    pass
+else:
 
-    return {
-        "start_year": int(config["main"]["start_year"]),
-        "end_year": int(config["main"]["end_year"]),
-        "cru_version": config["main"]["cru_version"],
-        "cru_url_dir": config["main"]["cru_url_dir"],
-        "raw_dir": Path(config["main"]["raw_dir"]),
-        "output_dir": Path(config["main"]["output_dir"]),
-        "overwrite_download": config["main"].getboolean("overwrite_download"),
-        "overwrite_unzip": config["main"].getboolean("overwrite_unzip"),
-        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
-        "backend": config["run"]["backend"],
-        "task_runner": config["run"]["task_runner"],
-        "run_parallel": config["run"].getboolean("run_parallel"),
-        "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs"
-    }
+    @flow
+    def cru_ts(config: CRU_TS_Configuration):
+        CRU_TS(config).run(config.run)
 
 
 if __name__ == "__main__":
-
-    config_dict = get_config_dict()
-
-    log_dir = config_dict["log_dir"]
-    timestamp = datetime.today()
-    time_format_str: str="%Y_%m_%d_%H_%M"
-    time_str = timestamp.strftime(time_format_str)
-    timestamp_log_dir = Path(log_dir) / time_str
-    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-    class_instance = CRU_TS(config_dict["start_year"], config_dict["end_year"], config_dict["cru_version"], config_dict["cru_url_dir"], config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["overwrite_unzip"], config_dict["overwrite_processing"])
-
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
+    config = get_config(CRU_TS_Configuration)
+    CRU_TS(config).run(config.run)
