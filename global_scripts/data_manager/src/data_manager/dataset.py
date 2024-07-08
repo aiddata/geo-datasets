@@ -102,8 +102,26 @@ class Dataset(ABC):
             return logging.getLogger("dataset")
 
     @contextmanager
-    def tmp_to_dst_file(self, final_dst, tmp_dir=None, validate_cog=False):
+    def tmp_to_dst_file(
+        self,
+        final_dst: str | os.PathLike,
+        make_dst_dir: bool = False,
+        tmp_dir: Optional[str | os.PathLike] = None,
+        validate_cog: bool = False,
+    ):
         logger = self.get_logger()
+
+        final_dst = Path(final_dst)
+
+        # make sure that final_dst parent directory exists
+        if not final_dst.parent.exists():
+            if make_dst_dir:
+                os.makedirs(final_dst.parent, exist_ok=True)
+            else:
+                raise FileNotFoundError(
+                    f"Parent directory of requested filepath {str(final_dst)} does not exist."
+                )
+
         tmp_sub_dir = mkdtemp(dir=tmp_dir)
         _, tmp_path = mkstemp(dir=tmp_sub_dir)
         logger.debug(
@@ -117,11 +135,11 @@ class Dataset(ABC):
             is_valid, errors, warnings = cog_validate(tmp_path)
             if is_valid:
                 logger.info(
-                    f"Successfully validated output COG {tmp_path} (destined for {final_dst})"
+                    f"Successfully validated output COG {tmp_path} (destined for {str(final_dst)}))"
                 )
             else:
                 logger.exception(
-                    f"Failed to validate COG {tmp_path} (destined for {final_dst})"
+                    f"Failed to validate COG {tmp_path} (destined for {str(final_dst)})"
                 )
             for error in errors:
                 logger.error(f"Error encountered when validating COG: {error}")
@@ -130,7 +148,7 @@ class Dataset(ABC):
 
         # move file from tmp_path to final_dst
         try:
-            logger.debug(f"Attempting to move {tmp_path} to {final_dst}")
+            logger.debug(f"Attempting to move {tmp_path} to {str(final_dst)}")
             shutil.move(tmp_path, final_dst)
         except Exception:
             logger.exception(
