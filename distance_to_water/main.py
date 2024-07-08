@@ -27,7 +27,7 @@ class DISTANCE_TO_WATER_Configuration(BaseDatasetConfiguration):
 
 class DISTANCE_TO_WATER(Dataset):
 
-    name = "DISTANCE_TO_WATER"
+    name = "Distance to Water"
 
     def __init__(self, config: DISTANCE_TO_WATER_Configuration):
 
