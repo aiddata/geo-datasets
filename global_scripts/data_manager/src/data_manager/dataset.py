@@ -558,16 +558,20 @@ class Dataset(ABC):
         Eventually calls _check_env_and_run(), starting dataset (see below)
         """
 
+        # get current timestamp and initialize log directory
+        timestamp = datetime.today()
+        time_format_str: str = "%Y_%m_%d_%H_%M"
+        time_str = timestamp.strftime(time_format_str)
+        self.log_dir = Path(params.log_dir) / time_str
+        os.makedirs(self.log_dir, exist_ok=True)
+
         # no matter what happens, this is our ticket to run the actual dataset
         # every backend calls this after initializing
         launch = lambda: self._check_env_and_run(params.conda_env)
 
         self.init_retries(params.retries, params.retry_delay, save_settings=True)
 
-        self.log_dir = Path(params.log_dir)
-
         self.chunksize = params.chunksize
-        os.makedirs(self.log_dir, exist_ok=True)
 
         self.bypass_error_wrapper = params.bypass_error_wrapper
 
