@@ -497,31 +497,12 @@ class Dataset(ABC):
 
         return retries, retry_delay
 
-    def _check_env_and_run(self, correct_env: str):
+    def _check_env_and_run(self):
         """
-        Check conda environment is set to correct_env, log warning if it isn't
         Check if $TMPDIR is in /local, log warning if it is
         Then, run self.main()
         """
         logger = self.get_logger()
-
-        try:
-            # CONDA_DEFAULT_ENV should just be the name of the current env
-            current_env = os.environ["CONDA_DEFAULT_ENV"]
-        except KeyError:
-            # KeyError if there is no such environment variable
-            logger.warning(
-                "No conda environment detected! Have you loaded the anaconda module and activated an environment?"
-            )
-        except:
-            # don't kill the program if something else goes wrong
-            logger.warning("Unable to detect current conda environment")
-        else:
-            # test if the current env is the one we wanted
-            if current_env != correct_env:
-                logger.warning(
-                    f"Your conda environment is {current_env} instead of the expected {correct_env}"
-                )
 
         try:
             # $TMPDIR is the default temporary directory that deployments use to store and execute code
@@ -564,10 +545,6 @@ class Dataset(ABC):
         time_str = timestamp.strftime(time_format_str)
         self.log_dir = Path(params.log_dir) / time_str
         os.makedirs(self.log_dir, exist_ok=True)
-
-        # no matter what happens, this is our ticket to run the actual dataset
-        # every backend calls this after initializing
-        launch = lambda: self._check_env_and_run(params.conda_env)
 
         self.init_retries(params.retries, params.retry_delay, save_settings=True)
 
@@ -660,7 +637,7 @@ class Dataset(ABC):
 
             @flow(task_runner=tr, name=self.name)
             def prefect_main_wrapper():
-                launch()
+                self._check_env_and_run()
 
             prefect_main_wrapper()
 
@@ -680,14 +657,14 @@ class Dataset(ABC):
                 self.backend = "mpi"
                 self.mpi_max_workers = max_workers
 
-                launch()
+                self._check_env_and_run()
 
             elif params.backend == "local":
                 if params.run_parallel:
                     self.backend = "concurrent"
                 else:
                     self.backend = "serial"
-                launch()
+                self._check_env_and_run()
 
             else:
                 raise ValueError(f"Backend {params.backend} not recognized.")
