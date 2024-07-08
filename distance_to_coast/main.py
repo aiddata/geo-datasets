@@ -25,7 +25,7 @@ class DISTANCE_TO_COAST_Configuration(BaseDatasetConfiguration):
 
 class DISTANCE_TO_COAST(Dataset):
 
-    name = "DISTANCE_TO_COAST"
+    name = "Distance to Coast"
 
     def __init__(self, config: DISTANCE_TO_COAST_Configuration):
 
