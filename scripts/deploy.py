@@ -26,23 +26,22 @@ prefect agent start -q 'work_queue_name'
 import inspect
 import os
 import sys
-from configparser import ConfigParser
 import tomllib
+from pathlib import Path
+
+from prefect.runner.storage import GitRepository
 
 from data_manager import Dataset
-from prefect.deployments import Deployment
-from prefect.runner.storage import GitRepository
 
 if len(sys.argv) != 2:
     raise Exception(
         "deploy.py requires input defining which dataset directory to obtain the config.ini from"
     )
 
-dataset_dir = sys.argv[1].strip("/")
+dataset_name = sys.argv[1].strip("/")
+dataset_dir = Path(os.path.realpath(__file__)).parent.parent / "datasets" / dataset_name
 
-if dataset_dir not in os.listdir(
-    os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-):
+if not dataset_dir.exists():
     raise Exception("dataset directory provided not found in current directory")
 
 
@@ -55,14 +54,16 @@ sys.path.insert(
 
 from main import get_config
 
-config_file = dataset_dir + "/config.toml"
+config_file = dataset_dir / "config.toml"
 with open(config_file, "rb") as src:
     config = tomllib.load(src)
 
 # load flow
 module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
-flow_image = "docker.io/jacobwhall/geodata-container:{}".format(config["deploy"]["image_tag"])
+flow_image = "docker.io/jacobwhall/geodata-container:{}".format(
+    config["deploy"]["image_tag"]
+)
 data_manager_version = config["deploy"]["data_manager_version"]
 
 
@@ -102,7 +103,7 @@ flow.from_source(
         url=git_repo_url,
         branch=git_branch,
     ),
-    entrypoint="{}/{}.py:{}".format(git_directory, module_name, git_directory),
+    entrypoint="{}/{}.py:{}".format(git_directory, module_name, flow_name),
 ).deploy(
     name=dataset_name,
     work_pool_name=config["deploy"]["work_pool"],

@@ -17,7 +17,7 @@ log_dir = "/sciclone/aiddata10/REU/geo/data/rasters/plad/v70/logs"
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "plad"
+directory = "datasets/plad"
 
 
 [deploy]

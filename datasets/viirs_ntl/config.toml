@@ -45,7 +45,7 @@ log_dir = "/sciclone/aiddata10/REU/geo/raw/viirs_ntl/logs"
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "viirs_ntl"
+directory = "datasets/viirs_ntl"
 
 
 [deploy]

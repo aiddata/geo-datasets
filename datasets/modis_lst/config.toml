@@ -17,7 +17,7 @@ log_dir = "/sciclone/aiddata10/REU/geo/raw/MODIS/terra/MOLT/MOD11C3.061/logs"
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "modis_lst"
+directory = "datasets/modis_lst"
 
 
 [deploy]

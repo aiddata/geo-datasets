@@ -23,7 +23,7 @@ log_dir = "/sciclone/aiddata10/REU/geo/raw/cru_ts/logs"
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "cru_ts"
+directory = "datasets/cru_ts"
 
 
 [deploy]
