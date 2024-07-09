@@ -28,4 +28,4 @@ version = 3
 flow_file_name = "main"
 flow_name = "landscan_pop"
 work_pool = "geodata-pool"
-data_manager_version = "0.3.0"
+data_manager_version = "0.4.0"
