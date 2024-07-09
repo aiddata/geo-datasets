@@ -26,13 +26,14 @@ prefect agent start -q 'work_queue_name'
 import inspect
 import os
 import sys
-from configparser import ConfigParser
 import tomllib
+from configparser import ConfigParser
 from pathlib import Path
 
-from data_manager import Dataset
 from prefect.deployments import Deployment
 from prefect.runner.storage import GitRepository
+
+from data_manager import Dataset
 
 if len(sys.argv) != 2:
     raise Exception(
@@ -62,7 +63,9 @@ with open(config_file, "rb") as src:
 # load flow
 module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
-flow_image = "docker.io/jacobwhall/geodata-container:{}".format(config["deploy"]["image_tag"])
+flow_image = "docker.io/jacobwhall/geodata-container:{}".format(
+    config["deploy"]["image_tag"]
+)
 data_manager_version = config["deploy"]["data_manager_version"]
 
 
