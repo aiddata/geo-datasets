@@ -1,0 +1,31 @@
+version = "v6"
+gb_data_hash = "9469f09"
+gb_web_hash = "57dcd43"
+
+raw_dir = "/sciclone/aiddata10/REU/geo/raw/geoboundaries"
+output_dir = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries"
+
+max_retries = 5
+overwrite_download = true
+overwrite_output = true
+
+
+[run]
+max_workers = 1
+log_dir = "/sciclone/aiddata10/REU/geo/data/rasters/geoboundaries/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "geoboundaries"
+
+
+[deploy]
+deployment_name = "geoBoundaries"
+image_tag = "05dea6e"
+version = 2
+flow_file_name = "main"
+flow_name = "geoBoundariesFlow"
+work_pool = "geodata-pool"
+data_manager_version = "0.3.0"
