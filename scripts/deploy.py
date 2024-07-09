@@ -27,10 +27,8 @@ import inspect
 import os
 import sys
 import tomllib
-from configparser import ConfigParser
 from pathlib import Path
 
-from prefect.deployments import Deployment
 from prefect.runner.storage import GitRepository
 
 from data_manager import Dataset
