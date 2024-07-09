@@ -28,6 +28,7 @@ import os
 import sys
 from configparser import ConfigParser
 import tomllib
+from pathlib import Path
 
 from data_manager import Dataset
 from prefect.deployments import Deployment
@@ -38,11 +39,10 @@ if len(sys.argv) != 2:
         "deploy.py requires input defining which dataset directory to obtain the config.ini from"
     )
 
-dataset_dir = sys.argv[1].strip("/")
+dataset_name = sys.argv[1].strip("/")
+dataset_dir = Path(os.path.realpath(__file__)).parent.parent / "datasets" / dataset_name
 
-if dataset_dir not in os.listdir(
-    os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-):
+if not dataset_dir.exists():
     raise Exception("dataset directory provided not found in current directory")
 
 
@@ -55,7 +55,7 @@ sys.path.insert(
 
 from main import get_config
 
-config_file = dataset_dir + "/config.toml"
+config_file = dataset_dir / "config.toml"
 with open(config_file, "rb") as src:
     config = tomllib.load(src)
 
