@@ -6,13 +6,13 @@ import shutil
 import time
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from collections.abc import Sequence
+from collections.abc import Callable, Iterable, Sequence
 from concurrent.futures import wait
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from tempfile import mkdtemp, mkstemp
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from rio_cogeo import cog_validate
 
@@ -34,7 +34,12 @@ class ResultTuple(Sequence):
     ResultTuple.results() returns a list of results from each task
     """
 
-    def __init__(self, iterable, name, timestamp=datetime.today()):
+    def __init__(
+        self,
+        iterable: Iterable[TaskResult],
+        name: str,
+        timestamp: datetime = datetime.today(),
+    ):
         self.elements = []
         for value in iterable:
             if isinstance(value, TaskResult):
@@ -46,8 +51,8 @@ class ResultTuple(Sequence):
         self.name = name
         self.timestamp = timestamp
 
-    def __getitem__(self, index):
-        return self.elements[index]
+    def __getitem__(self, key: int):
+        return self.elements[key]
 
     def __len__(self):
         return len(self.elements)
@@ -78,6 +83,11 @@ class Dataset(ABC):
     """
     This is the base class for Datasets, providing functions that manage task runs and logs
     """
+
+    backend: str
+    name: str
+    retries: int
+    retry_delay: int
 
     @abstractmethod
     def main(self):
@@ -159,7 +169,7 @@ class Dataset(ABC):
                 f"Successfully transferred {tmp_path} to final destination {str(final_dst)}"
             )
 
-    def error_wrapper(self, func, args):
+    def error_wrapper(self, func: Callable, args: Dict[str, Any]):
         """
         This is the wrapper that is used when running individual tasks
         It will always return a TaskResult!
@@ -183,7 +193,7 @@ class Dataset(ABC):
                     logger.error(f"Task failed with exception (giving up): {repr(e)}")
                     return TaskResult(1, repr(e), args, None)
 
-    def run_serial_tasks(self, name, func, input_list):
+    def run_serial_tasks(self, name, func: Callable, input_list: Iterable[Any]):
         """
         Run tasks in serial (locally), given a function and list of inputs
         This will always return a list of TaskResults!
@@ -192,7 +202,13 @@ class Dataset(ABC):
         logger.debug(f"run_serial_tasks - input_list: {input_list}")
         return [self.error_wrapper(func, i) for i in input_list]
 
-    def run_concurrent_tasks(self, name, func, input_list, force_sequential):
+    def run_concurrent_tasks(
+        self,
+        name: str,
+        func: Callable,
+        input_list: Iterable[Any],
+        force_sequential: bool,
+    ):
         """
         Run tasks concurrently (locally), given a function a list of inputs
         This will always return a list of TaskResults!
@@ -206,7 +222,13 @@ class Dataset(ABC):
             )
         return results
 
-    def run_prefect_tasks(self, name, func, input_list, force_sequential):
+    def run_prefect_tasks(
+        self,
+        name: str,
+        func: Callable,
+        input_list: Iterable[Any],
+        force_sequential: bool,
+    ):
         """
         Run tasks using Prefect, using whichever task runner decided in self.run()
         This will always return a list of TaskResults!
@@ -292,7 +314,13 @@ class Dataset(ABC):
 
         return results
 
-    def run_mpi_tasks(self, name, func, input_list, force_sequential):
+    def run_mpi_tasks(
+        self,
+        name: str,
+        func: Callable,
+        input_list: Iterable[Any],
+        force_sequential: bool,
+    ):
         """
         Run tasks using MPI, requiring the use of `mpirun`
         self.pool is an MPIPoolExecutor initialized by self.run()
@@ -313,12 +341,12 @@ class Dataset(ABC):
 
     def run_tasks(
         self,
-        func,
-        input_list,
+        func: Callable,
+        input_list: Iterable[Any],
         allow_futures: bool = True,
         name: Optional[str] = None,
-        retries: Optional[int] = 3,
-        retry_delay: Optional[int] = 60,
+        retries: int = 3,
+        retry_delay: int = 60,
         force_sequential: bool = False,
         force_serial: bool = False,
     ):
@@ -478,8 +506,6 @@ class Dataset(ABC):
                 )
             elif save_settings:
                 self.retries = retries
-        elif retries is None:
-            retries = self.retries
         else:
             raise TypeError("retries must be an int greater than or equal to zero")
 
@@ -488,8 +514,6 @@ class Dataset(ABC):
                 raise ValueError("Retry delay must be greater than or equal to zero")
             elif save_settings:
                 self.retry_delay = retry_delay
-        elif retry_delay is None:
-            retry_delay = self.retry_delay
         else:
             raise TypeError(
                 "retry_delay must be an int greater than or equal to zero, representing the number of seconds to wait before retrying a task"
