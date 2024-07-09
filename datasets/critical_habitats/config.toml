@@ -16,7 +16,7 @@ log_dir = "/sciclone/aiddata10/REU/geo/data/rasters/critical_habitats/logs"
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "critical_habitats"
+directory = "datasets/critical_habitats"
 
 
 [deploy]

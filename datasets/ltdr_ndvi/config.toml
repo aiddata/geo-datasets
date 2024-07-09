@@ -1,0 +1,45 @@
+# number corresponding to data folder
+# ...nasa.gov/api/v2/content/archives/allData/XXX
+data_num = 466
+
+# years = [ 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022 ]
+
+years = [2000, 2022]
+
+# output directories
+# raw_dir = "/sciclone/aiddata10/REU/geo/raw/ltdr_ndvi"
+raw_dir = "/home/jacob/Documents/aiddata/geo-datasets/ltdr_ndvi/raw"
+# output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/ltdr_ndvi"
+output_dir = "/home/jacob/Documents/aiddata/geo-datasets/ltdr_ndvi/out"
+
+# create a token at the LAADS DAAC site
+# https://ladsweb.modaps.eosdis.nasa.gov/
+# once logged in, click on "Login" and click "Generate Token"
+token = "eyJ0eXAiOiJKV1QiLCJvcmlnaW4iOiJFYXJ0aGRhdGEgTG9naW4iLCJzaWciOiJlZGxqd3RwdWJrZXlfb3BzIiwiYWxnIjoiUlMyNTYifQ.eyJ0eXBlIjoiVXNlciIsInVpZCI6ImphY29iaGFsbCIsImV4cCI6MTcyNDUxNTkzNywiaWF0IjoxNzE5MzMxOTM3LCJpc3MiOiJFYXJ0aGRhdGEgTG9naW4ifQ.0u2kfqtKVjNmBexnsTeaYp44EJm3NSFLwtCRkp7NX9zuhdmrv1HUXMjYNxyIhxGjWk2pdIPDYNNAJ8siHWlsmxuiVsX0WsFuETz1y4McPTeIzEi0-1vefhKhHU6Otls_H5EmuAafTBFfokdmYR5ZiZ2Z4c3TnzwNcPmpyQEeYft2EE1B1dpCmsSy3JDILuUpJSictlRdfvM0NYy3vwOBPMC-cVBPmPeoFparb17KaI6SkbOpO811P-OVdC1YSO3j8Bbl4ShZRfyiFkbyNx_c0FryzUkslaGHV-XM0yb1UMaaGKtMieWC4TZw3jaa33PdV4tLLm20FXm15BxBk4mzkQ"
+
+overwrite_download = false
+validate_download = true
+overwrite_processing = true
+
+
+[run]
+backend = "local"
+max_workers = 4
+# log_dir = "/sciclone/aiddata10/REU/geo/raw/ltdr_ndvi/logs"
+log_dir = "/home/jacob/Documents/aiddata/geo-datasets/ltdr_ndvi/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/ltdr_ndvi"
+
+
+[deploy]
+deployment_name = "ltdr_ndvi"
+version = 2
+image_tag = "05dea6e"
+flow_file_name = "main"
+flow_name = "ltdr_ndvi"
+work_pool = "geodata-pool"
+data_manager_version = "0.4.0"

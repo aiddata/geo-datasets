@@ -16,7 +16,7 @@ log_dir = "/sciclone/aiddata10/REU/geo/data/rasters/wdpa/logs"
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "wdpa"
+directory = "datasets/wdpa"
 
 
 [deploy]

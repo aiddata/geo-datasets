@@ -19,7 +19,7 @@ log_dir = "/sciclone/aiddata10/REU/geo/raw/worldpop/population_age_sex/logs"
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "worldpop_age_sex"
+directory = "datasets/worldpop_age_sex"
 
 
 [deploy]

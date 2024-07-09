@@ -31,7 +31,7 @@ log_dir = "/sciclone/aiddata10/REU/geo/raw/gesdisc/OCO2_L2_Lite_FP.11.1r/logs"
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "oco2"
+directory = "datasets/oco2"
 
 
 [deploy]
