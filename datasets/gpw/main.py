@@ -1,31 +1,26 @@
-import os
-import sys
 import zipfile
-import requests
 from copy import copy
 from pathlib import Path
-from datetime import datetime
-from pathlib import Path
-from configparser import ConfigParser
+from typing import List
+
+import requests
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
-
-from dataset import Dataset
-
+class GPWConfiguration(BaseDatasetConfiguration):
+    raw_dir: str
+    output_dir: str
+    years: List[int]
+    sedac_cookie: str
+    overwrite_download: bool
+    overwrite_extract: bool
+    overwrite_processing: bool
 
 
 class GPWv4(Dataset):
     name = "GPWv4"
 
-    def __init__(self,
-                 raw_dir: str,
-                 output_dir: str,
-                 years: list,
-                 sedac_cookie: str,
-                 overwrite_download: bool = False,
-                 overwrite_extract: bool = False,
-                 overwrite_processing: bool = False):
+    def __init__(self, config: GPWConfiguration):
         """
         :param raw_dir: directory to download files to
         :param output_dir: directory to unzip files to
@@ -37,26 +32,29 @@ class GPWv4(Dataset):
         :param overwrite_processing: if you want to overwrite files that have already been processed, set this to true
         """
 
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
+        self.raw_dir = Path(config.raw_dir)
+        self.output_dir = Path(config.output_dir)
 
-        self.years = [int(year) for year in years]
+        self.years = config.years
 
-        self.sedac_cookie = sedac_cookie
+        self.sedac_cookie = config.sedac_cookie
 
-        self.overwrite_download = overwrite_download
-        self.overwrite_extract = overwrite_extract
-        self.overwrite_processing = overwrite_processing
-
-
+        self.overwrite_download = config.overwrite_download
+        self.overwrite_extract = config.overwrite_extract
+        self.overwrite_processing = config.overwrite_processing
 
     def download_docs(self):
         documentation_url = "https://sedac.ciesin.columbia.edu/downloads/docs/gpw-v4/gpw-v4-documentation-rev11.zip"
 
         # download documentation
-        response = requests.get(documentation_url, headers={'Cookie': f'sedac={self.sedac_cookie}'}, allow_redirects=True)
-        open(f"{self.raw_dir}/gpw-v4-documentation-rev11.zip", 'wb').write(response.content)
-
+        response = requests.get(
+            documentation_url,
+            headers={"Cookie": f"sedac={self.sedac_cookie}"},
+            allow_redirects=True,
+        )
+        open(f"{self.raw_dir}/gpw-v4-documentation-rev11.zip", "wb").write(
+            response.content
+        )
 
     def build_download_list(self):
 
@@ -65,8 +63,8 @@ class GPWv4(Dataset):
         for var in ["density", "count"]:
 
             # path to download/extract files to
-            var_dl_dir = self.raw_dir / 'download' / var
-            var_extract_dir = self.raw_dir / 'extract' / var
+            var_dl_dir = self.raw_dir / "download" / var
+            var_extract_dir = self.raw_dir / "extract" / var
 
             var_dl_dir.mkdir(parents=True, exist_ok=True)
             var_extract_dir.mkdir(parents=True, exist_ok=True)
@@ -83,28 +81,31 @@ class GPWv4(Dataset):
 
         return task_list
 
-
     def download(self, src, dst, extract_dir):
 
         logger = self.get_logger()
 
         if not dst.exists() or self.overwrite_download:
             logger.info(f"Downloading {src}")
-            response = requests.get(src, headers={'Cookie': f'sedac={self.sedac_cookie}'}, allow_redirects=True)
-            with open(dst, 'wb') as dst_file:
+            response = requests.get(
+                src,
+                headers={"Cookie": f"sedac={self.sedac_cookie}"},
+                allow_redirects=True,
+            )
+            with open(dst, "wb") as dst_file:
                 dst_file.write(response.content)
         else:
             logger.info(f"Download Exists {src}")
 
-
-        with zipfile.ZipFile(dst, 'r') as zip_ref:
-            zip_member = [member for member in zip_ref.namelist() if member.endswith('.tif')][0]
+        with zipfile.ZipFile(dst, "r") as zip_ref:
+            zip_member = [
+                member for member in zip_ref.namelist() if member.endswith(".tif")
+            ][0]
             if not (extract_dir / zip_member).exists() or self.overwrite_extract:
                 logger.info(f"Extracting {dst}")
                 zip_ref.extract(zip_member, path=extract_dir)
             else:
                 logger.info(f"Extract Exists {dst}")
-
 
     def create_process_list(self):
         logger = self.get_logger()
@@ -116,18 +117,19 @@ class GPWv4(Dataset):
             var_final_dir = self.output_dir / var
             var_final_dir.mkdir(parents=True, exist_ok=True)
 
-            var_extract_dir = self.raw_dir / 'extract' / var
+            var_extract_dir = self.raw_dir / "extract" / var
 
-            extracted_files = [i for i in var_extract_dir.iterdir() if str(i).endswith('.tif')]
+            extracted_files = [
+                i for i in var_extract_dir.iterdir() if str(i).endswith(".tif")
+            ]
             for i in extracted_files:
-                year = int(i.name.split('_')[-3])
+                year = int(i.name.split("_")[-3])
                 if year in self.years:
                     flist.append((i, var_final_dir / i.name))
 
         logger.info(f"COG conversion list: {flist}")
 
         return flist
-
 
     def convert_to_cog(self, src_path, dst_path):
         """
@@ -146,14 +148,16 @@ class GPWv4(Dataset):
 
             logger.info(f"Generating COG: {dst_path}")
 
-            with rasterio.open(src_path, 'r') as src:
+            with rasterio.open(src_path, "r") as src:
 
                 profile = copy(src.profile)
 
-                profile.update({
-                    'driver': 'COG',
-                    'compress': 'LZW',
-                })
+                profile.update(
+                    {
+                        "driver": "COG",
+                        "compress": "LZW",
+                    }
+                )
 
                 # These creation options are not supported by the COG driver
                 for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
@@ -163,20 +167,28 @@ class GPWv4(Dataset):
                 # print(profile)
                 # logger.info(profile)
 
-                with rasterio.open(dst_path, 'w+', **profile) as dst:
+                with rasterio.open(dst_path, "w+", **profile) as dst:
 
                     for ji, src_window in src.block_windows(1):
                         # convert relative input window location to relative output window location
                         # using real world coordinates (bounds)
-                        src_bounds = windows.bounds(src_window, transform=src.profile["transform"])
-                        dst_window = windows.from_bounds(*src_bounds, transform=dst.profile["transform"])
+                        src_bounds = windows.bounds(
+                            src_window, transform=src.profile["transform"]
+                        )
+                        dst_window = windows.from_bounds(
+                            *src_bounds, transform=dst.profile["transform"]
+                        )
                         # round the values of dest_window as they can be float
-                        dst_window = windows.Window(round(dst_window.col_off), round(dst_window.row_off), round(dst_window.width), round(dst_window.height))
+                        dst_window = windows.Window(
+                            round(dst_window.col_off),
+                            round(dst_window.row_off),
+                            round(dst_window.width),
+                            round(dst_window.height),
+                        )
                         # read data from source window
                         r = src.read(1, window=src_window)
                         # write data to output window
                         dst.write(r, 1, window=dst_window)
-
 
     def main(self):
 
@@ -199,38 +211,17 @@ class GPWv4(Dataset):
         self.log_run(cog)
 
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
+try:
+    from prefect import flow
+except:
+    pass
+else:
 
-    return {
-        "raw_dir": Path(config["main"]["raw_dir"]),
-        "output_dir": Path(config["main"]["output_dir"]),
-        "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "sedac_cookie": config["main"]["sedac_cookie"],
-        "overwrite_download": config["main"].getboolean("overwrite_download"),
-        "overwrite_extract": config["main"].getboolean("overwrite_extract"),
-        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
-        "backend": config["run"]["backend"],
-        "task_runner": config["run"]["task_runner"],
-        "run_parallel": config["run"].getboolean("run_parallel"),
-        "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
-    }
+    @flow
+    def esa_landcover(config: GPWConfiguration):
+        GPWv4(config).run(config.run)
 
 
 if __name__ == "__main__":
-
-    config_dict = get_config_dict()
-
-    log_dir = config_dict["log_dir"]
-    timestamp = datetime.today()
-    time_format_str: str="%Y_%m_%d_%H_%M"
-    time_str = timestamp.strftime(time_format_str)
-    timestamp_log_dir = Path(log_dir) / time_str
-    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-
-    class_instance = GPWv4(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["sedac_cookie"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_processing"])
-
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
+    config = get_config(GPWConfiguration)
+    GPWv4(config).run(config.run)
