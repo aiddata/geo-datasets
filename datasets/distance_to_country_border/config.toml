@@ -1,0 +1,27 @@
+raw_dir = "/sciclone/aiddata10/REU/geo/raw/distance_to_country_borders"
+output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to_country_borders"
+overwrite_download = false
+overwrite_extract = false
+overwrite_binary_raster = false
+overwrite_distance_raster = false
+
+
+[run]
+max_workers = 3
+log_dir = "/sciclone/aiddata10/REU/geo/raw/distance_to_country_borders/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/distance_to_country_border"
+
+
+[deploy]
+deployment_name = "distance_to_country_border"
+image_tag = "05dea6e"
+version = 2
+flow_file_name = "main"
+flow_name = "distance_to_country_border"
+work_pool = "geodata-pool"
+data_manager_version = "0.4.0"

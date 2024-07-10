@@ -1,37 +1,44 @@
 import os
-import sys
 import shutil
-import requests
 from pathlib import Path
-from typing import Literal
 from zipfile import ZipFile
-from configparser import ConfigParser
-
-from affine import Affine
 
 import distancerasters as dr
+import requests
+from affine import Affine
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
-from data_manager import Dataset
 
-class DISTANCE_TO_BORDERS(Dataset):
-    name = "DISTANCE_TO_BORDERS"
+class DistanceToBordersConfiguration(BaseDatasetConfiguration):
+    raw_dir: str
+    output_dir: str
+    overwrite_download: bool
+    overwrite_extract: bool
+    overwrite_binary_raster: bool
+    overwrite_distance_raster: bool
 
-    def __init__(self, raw_dir, output_dir, overwrite_download=False, overwrite_extract=False, overwrite_binary_raster=False, overwrite_distance_raster=False):
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
-        self.overwrite_download = overwrite_download
-        self.overwrite_extract = overwrite_extract
-        self.overwrite_binary_raster = overwrite_binary_raster
-        self.overwrite_distance_raster = overwrite_distance_raster
-    
+
+class DistanceToBorders(Dataset):
+    name = "Distance to Borders"
+
+    def __init__(self, config: DistanceToBordersConfiguration):
+        self.raw_dir = Path(config.raw_dir)
+        self.output_dir = Path(config.output_dir)
+        self.overwrite_download = config.overwrite_download
+        self.overwrite_extract = config.overwrite_extract
+        self.overwrite_binary_raster = config.overwrite_binary_raster
+        self.overwrite_distance_raster = config.overwrite_distance_raster
+
     def raster_conditional(self, rarray):
-        return (rarray == 1)
-    
+        return rarray == 1
+
     def test_connection(self):
         # test connection
-        test_request = requests.get("https://www.geoboundaries.org/index.html", verify=True)
+        test_request = requests.get(
+            "https://www.geoboundaries.org/index.html", verify=True
+        )
         test_request.raise_for_status()
-    
+
     def manage_download(self):
         """
         Download individual file
@@ -47,19 +54,19 @@ class DISTANCE_TO_BORDERS(Dataset):
         else:
             with requests.get(download_dest, stream=True, verify=True) as r:
                 r.raise_for_status()
-                with open(local_filename, 'wb') as f:
-                    for chunk in r.iter_content(chunk_size=1024*1024):
+                with open(local_filename, "wb") as f:
+                    for chunk in r.iter_content(chunk_size=1024 * 1024):
                         f.write(chunk)
             logger.info(f"Downloaded: {download_dest}")
 
         return (self, download_dest, local_filename)
-    
+
     def build_extract_list(self):
         """
         Prepare file list to extract
         """
         logger = self.get_logger()
-        
+
         zip_name = self.raw_dir / "geoBoundariesCGAZ_ADM0.zip"
         task_list = []
         zip_shp_file = "geoBoundariesCGAZ_ADM0.shp"
@@ -75,14 +82,14 @@ class DISTANCE_TO_BORDERS(Dataset):
             logger.info(f"File previously extracted: {output_shx_file}")
         else:
             task_list.append((zip_name, zip_shx_file, output_shx_file))
-        
+
         zip_prj_file = "geoBoundariesCGAZ_ADM0.prj"
         output_prj_file = self.raw_dir / "geoBoundariesCGAZ_ADM0.prj"
         if os.path.isfile(output_prj_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_prj_file}")
         else:
             task_list.append((zip_name, zip_prj_file, output_prj_file))
-        
+
         return task_list
 
     def extract_files(self, zip_path, zip_file, dst_path):
@@ -112,21 +119,26 @@ class DISTANCE_TO_BORDERS(Dataset):
         """
         logger = self.get_logger()
         return_list = []
-        
+
         logger.info("Preparing rasterization")
         pixel_size = 0.01
         xmin = -180
         xmax = 180
-        ymin = -90            
+        ymin = -90
         ymax = 90
         affine = Affine(pixel_size, 0, xmin, 0, -pixel_size, ymax)
-        shape = (int((ymax-ymin)/pixel_size), int((xmax-xmin)/pixel_size))
+        shape = (int((ymax - ymin) / pixel_size), int((xmax - xmin) / pixel_size))
         borders_path = str(self.raw_dir) + "/geoBoundariesCGAZ_ADM0.shp"
         borders, _ = dr.rasterize(borders_path, affine=affine, shape=shape)
 
         logger.info("Creating binary borders raster")
-        borders_output_raster_path = self.output_dir / "binary" / "geoboundaries_borders_binary.tif"
-        if os.path.isfile(borders_output_raster_path) and not self.overwrite_binary_raster:
+        borders_output_raster_path = (
+            self.output_dir / "binary" / "geoboundaries_borders_binary.tif"
+        )
+        if (
+            os.path.isfile(borders_output_raster_path)
+            and not self.overwrite_binary_raster
+        ):
             logger.info(f"Raster previously created: {borders_output_raster_path}")
         else:
             try:
@@ -134,24 +146,37 @@ class DISTANCE_TO_BORDERS(Dataset):
                 logger.info(f"Binary raster created: {borders_output_raster_path}")
                 return_list.append(("Success", str(borders_output_raster_path)))
             except Exception as e:
-                logger.info(f"Error creating binary raster {borders_output_raster_path}: {e}")
+                logger.info(
+                    f"Error creating binary raster {borders_output_raster_path}: {e}"
+                )
                 return_list.append((str(e), str(borders_output_raster_path)))
 
         logger.info("Creating distance raster")
-        distance_output_raster_path = self.output_dir / "geoboundaries_borders_distance.tif"
-        if os.path.isfile(distance_output_raster_path) and not self.overwrite_distance_raster:
+        distance_output_raster_path = (
+            self.output_dir / "geoboundaries_borders_distance.tif"
+        )
+        if (
+            os.path.isfile(distance_output_raster_path)
+            and not self.overwrite_distance_raster
+        ):
             logger.info(f"Raster previously created: {distance_output_raster_path}")
         else:
             try:
-                dr.DistanceRaster(borders, affine=affine, output_path=distance_output_raster_path, conditional=self.raster_conditional)
+                dr.DistanceRaster(
+                    borders,
+                    affine=affine,
+                    output_path=distance_output_raster_path,
+                    conditional=self.raster_conditional,
+                )
                 logger.info(f"Distance raster created: {distance_output_raster_path}")
                 return_list.append(("Success", str(distance_output_raster_path)))
             except Exception as e:
-                logger.info(f"Error creating distance raster {distance_output_raster_path}: {e}")
+                logger.info(
+                    f"Error creating distance raster {distance_output_raster_path}: {e}"
+                )
                 return_list.append((str(e), str(distance_output_raster_path)))
         return return_list
-    
-    
+
     def main(self):
         logger = self.get_logger()
 
@@ -175,93 +200,18 @@ class DISTANCE_TO_BORDERS(Dataset):
         logger.info("Creating rasters")
         create_raster = self.create_raster()
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
 
-    return {
-            "raw_dir": Path(config["main"]["raw_dir"]),
-            "output_dir": Path(config["main"]["output_dir"]),
-            "log_dir": Path(config["main"]["output_dir"]) / "logs",
-            "backend": config["run"]["backend"],
-            "task_runner": config["run"]["task_runner"],
-            "run_parallel": config["run"].getboolean("run_parallel"),
-            "max_workers": int(config["run"]["max_workers"]),
-            "cores_per_process": int(config["run"]["cores_per_process"]),
-            "overwrite_download": config["main"].getboolean("overwrite_download"),
-            "overwrite_extract": config["main"].getboolean("overwrite_extract"),
-            "overwrite_binary_raster": config["main"].getboolean("overwrite_binary_raster"),
-            "overwrite_distance_raster": config["main"].getboolean("overwrite_distance_raster")
-        }
+try:
+    from prefect import flow
+except:
+    pass
+else:
+
+    @flow
+    def distance_to_country_border(config: DistanceToBordersConfiguration):
+        DistanceToBorders(config).run(config.run)
 
 
 if __name__ == "__main__":
-    config_dict = get_config_dict()
-
-    class_instance = DISTANCE_TO_BORDERS(config_dict["raw_dir"], config_dict["output_dir"], config_dict["overwrite_download"], config_dict["overwrite_extract"], config_dict["overwrite_binary_raster"], config_dict["overwrite_distance_raster"])
-
-    class_instance.run(backend=config_dict["backend"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], task_runner=config_dict["task_runner"], log_dir=config_dict["log_dir"])
-
-else:
-    try:
-        from prefect import flow
-        from prefect.filesystems import GitHub
-    except:
-        pass
-    else:
-        config_file = "distance_to_country_border/config.ini"
-        config = ConfigParser()
-        config.read(config_file)
-
-        block_name = config["deploy"]["storage_block"]
-        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
-
-        @flow
-        def distance_to_country_border(
-                raw_dir: str,
-                output_dir: str,
-                overwrite_download: bool,
-                overwrite_extract: bool,
-                overwrite_binary_raster: bool,
-                overwrite_distance_raster: bool,
-                backend: Literal["local", "mpi", "prefect"],
-                task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
-                run_parallel: bool,
-                max_workers: int,
-                log_dir: str):
-
-            timestamp = datetime.today()
-            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
-            timestamp_log_dir = Path(log_dir) / time_str
-            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-            cluster = "vortex"
-
-            cluster_kwargs = {
-                "shebang": "#!/bin/tcsh",
-                "resource_spec": "nodes=1:c18a:ppn=12",
-                "cores": 6,
-                "processes": 6,
-                "memory": "32GB",
-                "interface": "ib0",
-                "job_extra_directives": [
-                    "#PBS -j oe",
-                    # "#PBS -o ",
-                    # "#PBS -e ",
-                ],
-                "job_script_prologue": [
-                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-                    "module load anaconda3/2021.05",
-                    "conda activate geodata38",
-                    f"cd {tmp_dir}",
-                ],
-                "log_directory": str(timestamp_log_dir)
-            }
-
-            class_instance = DISTANCE_TO_BORDERS(raw_dir, output_dir, overwrite_download, overwrite_extract, overwrite_binary_raster, overwrite_distance_raster)
-
-            if task_runner != 'hpc':
-                os.chdir(tmp_dir)
-                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
-            else:
-                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
+    config = get_config(DistanceToBordersConfiguration)
+    DistanceToBorders(config).run(config.run)
