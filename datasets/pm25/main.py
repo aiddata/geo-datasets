@@ -1,22 +1,19 @@
 # for converting MONTHLY pm data downloaded from https://wustl.app.box.com/v/ACAG-V5GL02-GWRPM25/folder/148055008434
 # version: multiple file download - HPC version, based off Dr. Goodman's script for converting nc file to tiff image, MONTHLY data
 
-import os
-import json
 import hashlib
+import os
 import warnings
 from pathlib import Path
-from datetime import datetime
-from typing import List, Literal
-from configparser import ConfigParser
+from typing import List
 
-import rasterio
 import numpy as np
+import rasterio
 from affine import Affine
+from boxsdk import Client, JWTAuth
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 from netCDF4 import Dataset as NCDFDataset
-from boxsdk import JWTAuth, Client
-
-from data_manager import Dataset
+from pydantic import BaseModel
 
 
 def export_raster(data, path, meta, **kwargs):
@@ -29,23 +26,27 @@ def export_raster(data, path, meta, **kwargs):
 
     if "dtype" in meta:
         if meta["dtype"] != data.dtype:
-            warnings.warn(f"Dtype specified by meta({meta['dtype']}) does not match data dtype ({data.dtype}). Adjusting data dtype to match meta.")
+            warnings.warn(
+                f"Dtype specified by meta({meta['dtype']}) does not match data dtype ({data.dtype}). Adjusting data dtype to match meta."
+            )
         data = data.astype(meta["dtype"])
     else:
         meta["dtype"] = data.dtype
 
     default_meta = {
-        'count': 1,
-        'crs': {'init': 'epsg:4326'},
-        'driver': 'GTiff',
-        'compress': 'lzw',
-        'nodata': -9999,
+        "count": 1,
+        "crs": {"init": "epsg:4326"},
+        "driver": "GTiff",
+        "compress": "lzw",
+        "nodata": -9999,
     }
 
     for k, v in default_meta.items():
         if k not in meta:
             if "quiet" not in kwargs or kwargs["quiet"] == False:
-                print(f"Value for `{k}` not in meta provided. Using default value ({v})")
+                print(
+                    f"Value for `{k}` not in meta provided. Using default value ({v})"
+                )
             meta[k] = v
 
     # write geotif file
@@ -55,47 +56,68 @@ def export_raster(data, path, meta, **kwargs):
 
 # adapted from https://stackoverflow.com/a/44873382
 def sha1(filename):
-    h  = hashlib.sha1()
-    b  = bytearray(128*1024)
+    h = hashlib.sha1()
+    b = bytearray(128 * 1024)
     mv = memoryview(b)
-    with open(filename, 'rb', buffering=0) as f:
+    with open(filename, "rb", buffering=0) as f:
         while n := f.readinto(mv):
             h.update(mv[:n])
     return h.hexdigest()
 
 
+class BoxAppAuth(BaseModel):
+    publicKeyID: str
+    privateKey: str
+    passphrase: str
+
+
+class BoxAppSettings(BaseModel):
+    clientID: str
+    clientSecret: str
+    appAuth: BoxAppAuth
+    enterpriseID: str
+
+
+class BoxConfig(BaseModel):
+    boxAppSettings: BoxAppSettings
+
+
+class PM25Configuration(BaseDatasetConfiguration):
+    raw_dir: str
+    output_dir: str
+    box_config: BoxConfig
+    version: str
+    years: List[int]
+    overwrite_downloads: bool
+    verify_existing_downloads: bool
+    overwrite_processing: bool
+
+
 class PM25(Dataset):
     name = "Surface PM2.5"
 
-    def __init__(self,
-                 raw_dir: str,
-                 output_dir: str,
-                 box_config: dict,
-                 version: str,
-                 years: list,
-                 overwrite_downloads: bool,
-                 verify_existing_downloads: bool,
-                 overwrite_processing: bool,):
+    def __init__(self, config: PM25Configuration):
 
-        self.version = version
+        self.version = config.version
 
-        self.raw_dir = Path(raw_dir) / self.version
-        self.output_dir = Path(output_dir) / self.version
+        self.raw_dir = Path(config.raw_dir) / self.version
+        self.output_dir = Path(config.output_dir) / self.version
 
-        self.years = [int(y) for y in years]
+        self.years = config.years
 
-        self.box_config = box_config
+        self.box_config = config.box_config
 
         # skip existing files while downloading?
-        self.overwrite_downloads = overwrite_downloads
+        self.overwrite_downloads = config.overwrite_downloads
 
         # verify existing files' hashes while downloading?
-        self.verify_existing_downloads = verify_existing_downloads
+        self.verify_existing_downloads = config.verify_existing_downloads
 
-        self.overwrite_processing = overwrite_processing
+        self.overwrite_processing = config.overwrite_processing
 
-        self.filename_template =  self.version + ".HybridPM25.Global.{YEAR}{FIRST_MONTH}-{YEAR}{LAST_MONTH}"
-
+        self.filename_template = (
+            self.version + ".HybridPM25.Global.{YEAR}{FIRST_MONTH}-{YEAR}{LAST_MONTH}"
+        )
 
     def create_box_client(self):
         """
@@ -112,7 +134,6 @@ class PM25(Dataset):
 
         return client
 
-
     def build_file_download_list(self):
         """
         Generates a task list of downloads from the Box shared folder for this dataset.
@@ -123,7 +144,9 @@ class PM25(Dataset):
         self.client = self.create_box_client()
 
         # find shared folder
-        shared_folder = self.client.get_shared_item(f"https://wustl.app.box.com/v/ACAG-{self.version}-GWRPM25")
+        shared_folder = self.client.get_shared_item(
+            f"https://wustl.app.box.com/v/ACAG-{self.version}-GWRPM25"
+        )
 
         # find Global folder
         for i in shared_folder.get_items():
@@ -132,7 +155,7 @@ class PM25(Dataset):
 
         # raise a KeyError if Global directory cannot be found
         if not global_item:
-            raise KeyError("Could not find directory \"Global\" in shared Box folder")
+            raise KeyError('Could not find directory "Global" in shared Box folder')
 
         # find Annual and Monthly child folders
         for i in global_item.get_items():
@@ -143,13 +166,22 @@ class PM25(Dataset):
 
         # raise a KeyError if Annual or Monthly directories cannot be found
         if not annual_item:
-            raise KeyError("Could not find directory \"Global/Annual\" in shared Box folder")
+            raise KeyError(
+                'Could not find directory "Global/Annual" in shared Box folder'
+            )
         elif not monthly_item:
-            raise KeyError("Could not find directory \"Global/Monthly\" in shared Box folder")
+            raise KeyError(
+                'Could not find directory "Global/Monthly" in shared Box folder'
+            )
 
-
-        annual_item_list = [(i, self.raw_dir / "Global" / "Annual" / i.name) for i in annual_item.get_items()]
-        monthly_item_list = [(i, self.raw_dir / "Global" / "Monthly" / i.name) for i in monthly_item.get_items()]
+        annual_item_list = [
+            (i, self.raw_dir / "Global" / "Annual" / i.name)
+            for i in annual_item.get_items()
+        ]
+        monthly_item_list = [
+            (i, self.raw_dir / "Global" / "Monthly" / i.name)
+            for i in monthly_item.get_items()
+        ]
 
         tmp_download_item_list = annual_item_list + monthly_item_list
 
@@ -170,13 +202,17 @@ class PM25(Dataset):
                         download_item_list.append((item.id, dst_file))
 
                     elif os.path.isfile(dst_file) and self.verify_existing_downloads:
-                        logger.info(f"File exists but adding to download list for verification: {dst_file}")
+                        logger.info(
+                            f"File exists but adding to download list for verification: {dst_file}"
+                        )
                         download_item_list.append((item.id, dst_file))
                     else:
                         logger.info(f"File already downloaded, skipping: {dst_file}")
 
                 else:
-                    logger.debug(f"Skipping {item.name}, year not in range for this run")
+                    logger.debug(
+                        f"Skipping {item.name}, year not in range for this run"
+                    )
             else:
                 raise Exception(f"Unable to parse file name: {item.name}")
 
@@ -184,21 +220,19 @@ class PM25(Dataset):
 
         return download_item_list
 
-
     def get_box_item(self, id: str):
         client = self.create_box_client()
-        box_folder_url = f'https://wustl.app.box.com/v/ACAG-{self.version}-GWRPM25'
+        box_folder_url = f"https://wustl.app.box.com/v/ACAG-{self.version}-GWRPM25"
 
         for i in client.get_shared_item(box_folder_url).get_items():
-            if i.name == 'Global':
+            if i.name == "Global":
                 for j in i.get_items():
-                    if j.name in ['Annual', 'Monthly']:
+                    if j.name in ["Annual", "Monthly"]:
                         for k in j.get_items():
                             if k.id == id:
                                 return k
 
         raise KeyError(f"Could not find file id: {id}")
-
 
     def download_file(self, item_id, dst_file):
 
@@ -215,7 +249,9 @@ class PM25(Dataset):
         run_download = True
         if os.path.isfile(dst_file) and self.verify_existing_downloads:
             if sha1(dst_file) == item.sha1:
-                logger.info(f"File already downloaded with correct hash, skipping: {dst_file}")
+                logger.info(
+                    f"File already downloaded with correct hash, skipping: {dst_file}"
+                )
                 run_download = False
             else:
                 logger.info(f"File already exists with incorrect hash {dst_file}")
@@ -229,17 +265,20 @@ class PM25(Dataset):
 
         # logger.info(f"DEBUG BB: {item} ---- {dst_file}")
 
-
     def build_process_list(self):
 
         task_list = []
 
         # run annual data
         for year in self.years:
-            filename = self.filename_template.format(YEAR = year, FIRST_MONTH = "01", LAST_MONTH = "12")
+            filename = self.filename_template.format(
+                YEAR=year, FIRST_MONTH="01", LAST_MONTH="12"
+            )
             input_path = self.raw_dir / "Global" / "Annual" / (filename + ".nc")
             if input_path.exists():
-                output_path = self.output_dir / "Global" / "Annual" / (filename + ".tif")
+                output_path = (
+                    self.output_dir / "Global" / "Annual" / (filename + ".tif")
+                )
                 task_list.append((input_path, output_path))
             else:
                 warnings.warn(f"No annual data found for year {year}. Skipping...")
@@ -249,16 +288,21 @@ class PM25(Dataset):
         for year in self.years:
             for i in range(1, 13):
                 month = str(i).zfill(2)
-                filename = self.filename_template.format(YEAR = year, FIRST_MONTH = month, LAST_MONTH = month)
+                filename = self.filename_template.format(
+                    YEAR=year, FIRST_MONTH=month, LAST_MONTH=month
+                )
                 input_path = self.raw_dir / "Global" / "Monthly" / (filename + ".nc")
                 if input_path.exists():
-                    output_path = self.output_dir / "Global" / "Monthly" / (filename + ".tif")
+                    output_path = (
+                        self.output_dir / "Global" / "Monthly" / (filename + ".tif")
+                    )
                     task_list.append((input_path, output_path))
                 else:
-                    warnings.warn(f"No monthly data found for year {year} month {month}. Skipping...")
+                    warnings.warn(
+                        f"No monthly data found for year {year} month {month}. Skipping..."
+                    )
 
         return task_list
-
 
     def convert_file(self, input_path, output_path):
         # Converts nc file to tiff file
@@ -294,9 +338,8 @@ class PM25(Dataset):
                 "count": 1,
                 "crs": {"init": "epsg:4326"},
                 "compress": "lzw",
-                "transform": Affine(lon_res, 0.0, lon_min,
-                                    0.0, -lat_res, lat_max)
-                }
+                "transform": Affine(lon_res, 0.0, lon_min, 0.0, -lat_res, lat_max),
+            }
 
             export_raster(np.array([data.data]), output_path, meta)
 
@@ -304,11 +347,9 @@ class PM25(Dataset):
 
         return str(output_path)
 
-
     def main(self):
 
         logger = self.get_logger()
-
 
         logger.info("Building initial download list")
         dl_file_list = self.build_file_download_list()
@@ -323,7 +364,6 @@ class PM25(Dataset):
         else:
             logger.info("Skipping download, no files queued for download")
 
-
         logger.info("Generating Task List")
         conv_flist = self.build_process_list()
 
@@ -336,110 +376,17 @@ class PM25(Dataset):
         self.log_run(conv)
 
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
+try:
+    from prefect import flow
+except:
+    pass
+else:
 
-    box_config_path = Path(config["main"]["box_config_path"])
-    with open(box_config_path) as box_config_src:
-        box_config = json.load(box_config_src)
-
-    return {
-        "raw_dir": Path(config["main"]["raw_dir"]),
-        "output_dir": Path(config["main"]["output_dir"]),
-        "version": config["main"]["version"],
-        "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "box_config": box_config,
-        "overwrite_downloads": config["main"].getboolean("overwrite_downloads"),
-        "verify_existing_downloads": config["main"].getboolean("verify_existing_downloads"),
-        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
-        "backend": config["run"]["backend"],
-        "task_runner": config["run"]["task_runner"],
-        "run_parallel": config["run"].getboolean("run_parallel"),
-        "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs",
-    }
+    @flow
+    def pm25(config: PM25Configuration):
+        PM25(config).run(config.run)
 
 
 if __name__ == "__main__":
-
-    config_dict = get_config_dict()
-
-    log_dir = config_dict["log_dir"]
-    timestamp = datetime.today()
-    time_format_str: str="%Y_%m_%d_%H_%M"
-    time_str = timestamp.strftime(time_format_str)
-    timestamp_log_dir = Path(log_dir) / time_str
-    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-    class_instance = PM25(config_dict["raw_dir"], config_dict["output_dir"], config_dict["box_config"], config_dict["version"], config_dict["years"], config_dict["overwrite_downloads"], config_dict["verify_existing_downloads"], config_dict["overwrite_processing"])
-
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
-
-else:
-    try:
-        from prefect import flow
-    except:
-        pass
-    else:
-        config_file = "pm25/config.ini"
-        config = ConfigParser()
-        config.read(config_file)
-
-        from main import PM25
-
-        tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
-
-        @flow
-        def pm25(
-            raw_dir: str,
-            output_dir: str,
-            box_config: dict,
-            version: str,
-            years: List[int],
-            overwrite_downloads: bool,
-            verify_existing_downloads: bool,
-            overwrite_processing: bool,
-            backend: Literal["local", "mpi", "prefect"],
-            task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
-            run_parallel: bool,
-            max_workers: int,
-            log_dir: str):
-
-            timestamp = datetime.today()
-            time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
-            timestamp_log_dir = Path(log_dir) / time_str
-            timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-            cluster = "vortex"
-
-
-            hpc_cluster_kwargs = {
-                "shebang": "#!/bin/tcsh",
-                "resource_spec": "nodes=1:c18a:ppn=12",
-                "walltime": "4:00:00",
-                "cores": 3,
-                "processes": 3,
-                "memory": "30GB",
-                "interface": "ib0",
-                "job_extra_directives": [
-                    "-j oe",
-                ],
-                "job_script_prologue": [
-                    "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-                    "module load anaconda3/2021.05",
-                    "conda activate geodata38",
-                    f"cd {tmp_dir}",
-                ],
-                "log_directory": str(timestamp_log_dir),
-            }
-
-
-            class_instance = PM25(raw_dir=raw_dir, output_dir=output_dir, box_config=box_config, version=version, years=years, overwrite_downloads=overwrite_downloads, verify_existing_downloads=verify_existing_downloads, overwrite_processing=overwrite_processing)
-
-
-            if task_runner != 'hpc':
-                os.chdir(tmp_dir)
-                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
-            else:
-                class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=hpc_cluster_kwargs)
+    config = get_config(PM25Configuration)
+    PM25(config).run(config.run)
