@@ -1,0 +1,31 @@
+raw_dir = "/sciclone/aiddata10/REU/pre_geo/raw/udel_climate"
+output_dir = "/sciclone/aiddata10/REU/pre_geo/data/rasters/udel_climate"
+
+methods = [ "mean", "min", "max", "sum", "var" ]
+
+build_monthly = true
+build_yearly = true
+
+overwrite_download = false
+overwrite_processing = false
+
+
+[run]
+max_workers = 18
+log_dir = "/sciclone/aiddata10/REU/geo/raw/esa_landcover/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/udel_climate"
+
+
+[deploy]
+deployment_name = "udel_climate"
+image_tag = "05dea6e"
+version = 2
+flow_file_name = "main"
+flow_name = "udel_climate"
+work_pool = "geodata-pool"
+data_manager_version = "0.4.0"

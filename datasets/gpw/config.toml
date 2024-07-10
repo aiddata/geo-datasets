@@ -1,0 +1,36 @@
+# Name of dataset
+name = "GPWv4"
+
+# Paths of input and output directories
+raw_dir = "/sciclone/aiddata10/REU/pre_geo/raw/gpw/gpw_v4_rev11"
+output_dir = "/sciclone/aiddata10/REU/pre_geo/data/rasters/gpw/gpw_v4_rev11"
+
+# Years to process
+years = [ 2000, 2005, 2010, 2015, 2020 ]
+
+sedac_cookie = "None"
+
+# Overwrite existing files?
+overwrite_download = false
+overwrite_extract = false
+overwrite_processing = false
+
+
+[run]
+max_workers = 10
+log_dir = "/sciclone/aiddata10/REU/geo/raw/gpw/logs"
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/gpw"
+
+
+[deploy]
+deployment_name = "GPWv4"
+image_tag = "05dea6e"
+version = 2
+flow_file_name = "main"
+flow_name = "gpwv4"
+work_pool = "geodata-pool"
+data_manager_version = "0.4.0"

@@ -20,44 +20,49 @@ Unless otherwise specified, all datasets are:
 
 import os
 import shutil
-import requests
 from copy import copy
 from pathlib import Path
+from typing import List
 from zipfile import ZipFile
-from configparser import ConfigParser
-from datetime import datetime
-from typing import List, Literal
 
-from data_manager import Dataset
+import requests
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
+
+
+class MalariaAtlasProjectConfiguration(BaseDatasetConfiguration):
+    raw_dir: str
+    output_dir: str
+    years: List[int]
+    dataset: str
+    overwrite_download: bool
+    overwrite_processing: bool
 
 
 class MalariaAtlasProject(Dataset):
     name = "Malaria Atlas Project"
 
-    def __init__(self, raw_dir, output_dir, years, dataset="pf_incidence_rate", overwrite_download=False, overwrite_processing=False):
+    def __init__(self, config: MalariaAtlasProjectConfiguration):
 
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
-        self.years = years
-        self.dataset = dataset
-        self.overwrite_download = overwrite_download
-        self.overwrite_processing = overwrite_processing
+        self.raw_dir = Path(config.raw_dir)
+        self.output_dir = Path(config.output_dir)
+        self.years = config.years
+        self.dataset = config.dataset
+        self.overwrite_download = config.overwrite_download
+        self.overwrite_processing = config.overwrite_processing
 
         dataset_lookup = {
             "pf_incidence_rate": {
-                "data_zipFile_url": 'https://data.malariaatlas.org/geoserver/Malaria/ows?service=CSW&version=2.0.1&request=DirectDownload&ResourceId=Malaria:202206_Global_Pf_Incidence_Rate',
-                "data_name": "202206_Global_Pf_Incidence_Rate"
+                "data_zipFile_url": "https://data.malariaatlas.org/geoserver/Malaria/ows?service=CSW&version=2.0.1&request=DirectDownload&ResourceId=Malaria:202206_Global_Pf_Incidence_Rate",
+                "data_name": "202206_Global_Pf_Incidence_Rate",
             },
         }
 
         self.data_info = dataset_lookup[self.dataset]
 
-
     def test_connection(self):
         # test connection
         test_request = requests.get("https://data.malariaatlas.org", verify=True)
         test_request.raise_for_status()
-
 
     def copy_files(self, zip_path, zip_file, dst_path, cog_path):
         if not os.path.isfile(dst_path) or self.overwrite_processing:
@@ -70,7 +75,6 @@ class MalariaAtlasProject(Dataset):
                 raise Exception("File extracted but not found at destination")
 
         return (dst_path, cog_path)
-
 
     def convert_to_cog(self, src_path, dst_path):
         """
@@ -88,14 +92,16 @@ class MalariaAtlasProject(Dataset):
 
         logger.info(f"Generating COG: {dst_path}")
 
-        with rasterio.open(src_path, 'r') as src:
+        with rasterio.open(src_path, "r") as src:
 
             profile = copy(src.profile)
 
-            profile.update({
-                'driver': 'COG',
-                'compress': 'LZW',
-            })
+            profile.update(
+                {
+                    "driver": "COG",
+                    "compress": "LZW",
+                }
+            )
 
             # These creation options are not supported by the COG driver
             for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
@@ -105,20 +111,28 @@ class MalariaAtlasProject(Dataset):
             print(profile)
             logger.info(profile)
 
-            with rasterio.open(dst_path, 'w+', **profile) as dst:
+            with rasterio.open(dst_path, "w+", **profile) as dst:
 
                 for ji, src_window in src.block_windows(1):
                     # convert relative input window location to relative output window location
                     # using real world coordinates (bounds)
-                    src_bounds = windows.bounds(src_window, transform=src.profile["transform"])
-                    dst_window = windows.from_bounds(*src_bounds, transform=dst.profile["transform"])
+                    src_bounds = windows.bounds(
+                        src_window, transform=src.profile["transform"]
+                    )
+                    dst_window = windows.from_bounds(
+                        *src_bounds, transform=dst.profile["transform"]
+                    )
                     # round the values of dest_window as they can be float
-                    dst_window = windows.Window(round(dst_window.col_off), round(dst_window.row_off), round(dst_window.width), round(dst_window.height))
+                    dst_window = windows.Window(
+                        round(dst_window.col_off),
+                        round(dst_window.row_off),
+                        round(dst_window.width),
+                        round(dst_window.height),
+                    )
                     # read data from source window
                     r = src.read(1, window=src_window)
                     # write data to output window
                     dst.write(r, 1, window=dst_window)
-
 
     def copy_data_files(self, zip_file_local_name):
 
@@ -135,7 +149,9 @@ class MalariaAtlasProject(Dataset):
         raw_geotiff_dir.mkdir(parents=True, exist_ok=True)
 
         # validate years for processing
-        zip_years = sorted([int(i[-8:-4]) for i in dataZip.namelist() if i.endswith('.tif')])
+        zip_years = sorted(
+            [int(i[-8:-4]) for i in dataZip.namelist() if i.endswith(".tif")]
+        )
         year_list = self.years
         years = [i for i in year_list if i in zip_years]
         if len(year_list) != len(years):
@@ -153,17 +169,15 @@ class MalariaAtlasProject(Dataset):
 
         return flist
 
-
     def download_file(self, url, local_filename):
         """Download a file from url to local_filename
         Downloads in chunks
         """
         with requests.get(url, stream=True, verify=True) as r:
             r.raise_for_status()
-            with open(local_filename, 'wb') as f:
-                for chunk in r.iter_content(chunk_size=1024*1024):
+            with open(local_filename, "wb") as f:
+                for chunk in r.iter_content(chunk_size=1024 * 1024):
                     f.write(chunk)
-
 
     def manage_download(self, url, local_filename):
         """download individual file using session created
@@ -202,7 +216,10 @@ class MalariaAtlasProject(Dataset):
         logger.info("Running data download")
         zip_file_local_name = raw_zip_dir / (self.data_info["data_name"] + ".zip")
         # download data zipFile from url to the local output directory
-        downloads = self.run_tasks(self.manage_download, [(self.data_info["data_zipFile_url"], zip_file_local_name)])
+        downloads = self.run_tasks(
+            self.manage_download,
+            [(self.data_info["data_zipFile_url"], zip_file_local_name)],
+        )
         self.log_run(downloads)
 
         dataset_output_dir = self.output_dir / self.dataset
@@ -218,102 +235,17 @@ class MalariaAtlasProject(Dataset):
         self.log_run(conversions)
 
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
-
-    return {
-        "dataset": config["main"]["dataset"],
-        "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "raw_dir": Path(config["main"]["raw_dir"]),
-        "output_dir": Path(config["main"]["output_dir"]),
-        "overwrite_download": config["main"].getboolean("overwrite_download"),
-        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
-        "backend": config["run"]["backend"],
-        "task_runner": config["run"]["task_runner"],
-        "run_parallel": config["run"].getboolean("run_parallel"),
-        "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs"
-    }
-
-
-if __name__ == "__main__":
-
-    config_dict = get_config_dict()
-
-    log_dir = config_dict["log_dir"]
-    timestamp = datetime.today()
-    time_format_str: str="%Y_%m_%d_%H_%M"
-    time_str = timestamp.strftime(time_format_str)
-    timestamp_log_dir = Path(log_dir) / time_str
-    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-
-    class_instance = MalariaAtlasProject(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["dataset"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
-
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
-
-
-
 try:
     from prefect import flow
-    from prefect.filesystems import GitHub
 except:
     pass
 else:
-    config_file = "malaria_atlas_project/config.ini"
-    config = ConfigParser()
-    config.read(config_file)
-
-    block_name = config["deploy"]["storage_block"]
-    tmp_dir = Path(os.getcwd()) / config["github"]["directory"]
 
     @flow
-    def malaria_atlas_project(
-            raw_dir: str,
-            output_dir: str,
-            years: List[int],
-            dataset: str,
-            overwrite_download: bool,
-            overwrite_processing: bool,
-            backend: Literal["local", "mpi", "prefect"],
-            task_runner: Literal["sequential", "concurrent", "dask", "hpc", "kubernetes"],
-            run_parallel: bool,
-            max_workers: int,
-            log_dir: str):
+    def malaria_atlas_project(config: MalariaAtlasProjectConfiguration):
+        MalariaAtlasProject(config).run(config.run)
 
-        timestamp = datetime.today()
-        time_str = timestamp.strftime("%Y_%m_%d_%H_%M")
-        timestamp_log_dir = Path(log_dir) / time_str
-        timestamp_log_dir.mkdir(parents=True, exist_ok=True)
 
-        cluster = "vortex"
-
-        cluster_kwargs = {
-            "shebang": "#!/bin/tcsh",
-            "resource_spec": "nodes=1:c18a:ppn=12",
-            "cores": 6,
-            "processes": 6,
-            "memory": "32GB",
-            "interface": "ib0",
-            "job_extra_directives": [
-                "#PBS -j oe",
-                # "#PBS -o ",
-                # "#PBS -e ",
-            ],
-            "job_script_prologue": [
-                "source /usr/local/anaconda3-2021.05/etc/profile.d/conda.csh",
-                "module load anaconda3/2021.05",
-                "conda activate geodata38",
-                f"cd {tmp_dir}",
-            ],
-            "log_directory": str(timestamp_log_dir)
-        }
-
-        class_instance = MalariaAtlasProject(raw_dir, output_dir, years, dataset, overwrite_download, overwrite_processing)
-
-        if task_runner != 'hpc':
-            os.chdir(tmp_dir)
-            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir)
-        else:
-            class_instance.run(backend=backend, task_runner=task_runner, run_parallel=run_parallel, max_workers=max_workers, log_dir=timestamp_log_dir, cluster=cluster, cluster_kwargs=cluster_kwargs)
+if __name__ == "__main__":
+    config = get_config(MalariaAtlasProjectConfiguration)
+    MalariaAtlasProject(config).run(config.run)
