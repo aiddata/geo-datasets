@@ -218,7 +218,7 @@ except:
 else:
 
     @flow
-    def esa_landcover(config: GPWConfiguration):
+    def gpwv4(config: GPWConfiguration):
         GPWv4(config).run(config.run)
 
 
