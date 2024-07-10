@@ -71,7 +71,7 @@ class DISTANCE_TO_COAST(Dataset):
                         f.write(chunk)
             logger.info(f"Downloaded: {download_dest}")
 
-        return (self, download_dest, local_filename)
+        return (self, str(download_dest), str(local_filename))
 
     def build_extract_list(self):
         """
