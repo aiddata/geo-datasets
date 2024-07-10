@@ -183,9 +183,9 @@ class geoBoundariesDataset(Dataset):
 
         ingest_items = self.prepare()
 
-        # logger.info("Running data download")
-        # dl_run = self.run_tasks(self.dl_gb_item, ingest_items)
-        # self.log_run(dl_run)
+        logger.info("Running data download")
+        dl_run = self.run_tasks(self.dl_gb_item, ingest_items)
+        self.log_run(dl_run)
 
 
 try:
