@@ -4,7 +4,6 @@ gb_web_hash = "57dcd43"
 
 dl_iso3_list = []
 
-raw_dir = "/sciclone/aiddata10/REU/geo/raw/geoboundaries"
 output_dir = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries"
 
 overwrite_existing = false
@@ -12,7 +11,7 @@ overwrite_existing = false
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/aiddata10/REU/geo/raw/geoboundaries/logs"
+log_dir = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries/logs"
 
 
 [repo]

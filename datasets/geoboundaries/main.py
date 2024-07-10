@@ -20,12 +20,11 @@ class geoBoundariesConfiguration(BaseDatasetConfiguration):
     version: str
     gb_data_hash: str
     gb_web_hash: str
-    raw_dir: str
     output_dir: str
     overwrite_existing: bool
     dl_iso3_list: Optional[List[str]] = None
 
-    @field_validator("raw_dir", "output_dir")
+    @field_validator("output_dir")
     @classmethod
     def validate_path(cls, f: str) -> Path:
         return Path(f)
@@ -39,17 +38,12 @@ class geoBoundariesDataset(Dataset):
 
         self.config = config
 
-        self.raw_dir = config.raw_dir / config.version
         self.output_dir = config.output_dir / f"{config.version}_{config.gb_data_hash}_{config.gb_web_hash}"
 
         self.overwrite_existing = config.overwrite_existing
 
         # leave blank / set to None to download all ISO3 boundaries
         self.dl_iso3_list = config.dl_iso3_list
-
-
-        self.raw_dir.mkdir(exist_ok=True, parents=True)
-        self.output_dir.mkdir(exist_ok=True, parents=True)
 
         self.api_url = f"https://raw.githubusercontent.com/wmgeolab/gbWeb/{config.gb_web_hash}/api/current/gbOpen/ALL/ALL/index.json"
 
@@ -130,7 +124,11 @@ class geoBoundariesDataset(Dataset):
 
         # commit_dl_url = raw_dl_url.replace(raw_dl_url.split("/")[6], target_gb_commit)
 
-        gpkg_path = self.output_dir / f"{Path(commit_dl_url).stem}.gpkg"
+        fname = Path(commit_dl_url).stem
+        dir_path = self.output_dir / fname
+        dir_path.mkdir(exist_ok=True, parents=True)
+
+        gpkg_path = dir_path / f"{fname}.gpkg"
         adm_meta["path"] = str(gpkg_path)
 
         geojson_path = gpkg_path.with_suffix(".geojson")
