@@ -1,0 +1,33 @@
+# change var = if want to download a different variant's data
+dataset = "pf_incidence_rate"
+
+# change var = set to year range wanted
+years = [ 2000, 2001, 2002, 2021 ]
+
+# output directories
+raw_dir = "/sciclone/aiddata10/REU/geo/raw/malaria_atlas_project"
+output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/malaria_atlas_project"
+
+overwrite_download = false
+overwrite_processing = false
+
+
+[run]
+max_workers = 12
+log_dir = "/sciclone/aiddata10/REU/geo/raw/malaria_atlas_project/logs"
+
+
+[repo]
+repo = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "malaria_atlas_project"
+
+
+[deploy]
+deployment_name = "malaria_atlas_project_pf_prevalence_rate"
+image_tag = "05dea6e"
+version = 2
+flow_file_name = "main"
+flow_name = "malaria_atlas_project"
+work_pool = "geodata-pool"
+data_manager_version = "0.4.0"
