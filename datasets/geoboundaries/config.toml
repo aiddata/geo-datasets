@@ -12,7 +12,7 @@ overwrite_output = true
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/aiddata10/REU/geo/data/rasters/geoboundaries/logs"
+log_dir = "/sciclone/aiddata10/REU/geo/raw/geoboundaries/logs"
 
 
 [repo]

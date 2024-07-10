@@ -14,6 +14,7 @@ from pydantic import ValidationInfo, field_validator
 
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
+
 def get_api_url(url):
     response = requests.get(url)
     content = response.json()
@@ -34,7 +35,6 @@ class geoBoundariesConfiguration(BaseDatasetConfiguration):
     @classmethod
     def validate_path(cls, f: str) -> Path:
         return Path(f)
-
 
 
 class geoBoundariesDataset(Dataset):
@@ -168,7 +168,7 @@ class geoBoundariesDataset(Dataset):
                 gdf["shapeName"] = None
 
         gdf.to_file(gpkg_path, driver="GPKG")
-
+        gdf.to_file(gpkg_path.with_suffix(".geojson"), driver="GeoJSON")
 
         logger.debug(f"Getting bounding box for {commit_dl_url}")
         spatial_extent = shapely.box(*gdf.total_bounds).wkt
@@ -182,70 +182,6 @@ class geoBoundariesDataset(Dataset):
             json.dump(export_adm_meta, file, indent=4)
 
 
-
-    # def download_data(self):
-    #     """
-    #     Download data zip from source
-    #     """
-    #     logger = self.get_logger()
-
-    #     if self.zip_path.exists() and not self.overwrite_download:
-    #         logger.info(f"Download Exists: {self.zip_path}")
-    #         return
-
-    #     attempts = 1
-    #     while attempts <= self.max_retries:
-    #         try:
-    #             with requests.get(self.download_url, stream=True, verify=True) as r:
-    #                 r.raise_for_status()
-    #                 with open(self.zip_path, "wb") as f:
-    #                     for chunk in r.iter_content(chunk_size=1024 * 1024):
-    #                         f.write(chunk)
-    #             logger.info(f"Downloaded: {self.download_url}")
-    #             return (self.download_url, self.zip_path)
-    #         except Exception as e:
-    #             attempts += 1
-    #             if attempts > self.max_retries:
-    #                 logger.info(
-    #                     f"{str(e)}: Failed to download: {str(self.download_url)}"
-    #                 )
-    #                 logger.exception(e)
-    #                 raise
-    #             else:
-    #                 logger.info(f"Attempt {str(attempts)} : {str(self.download_url)}")
-
-
-    # def extract_data(self):
-    #     """Extract data from downloaded zip file"""
-
-    #     logger = self.get_logger()
-
-    #     if self.data_path.exists() and not self.overwrite_download:
-    #         logger.info(f"Extract Exists: {self.zip_path}")
-    #     elif not self.zip_path.exists():
-    #         logger.info(f"Error: Data download not found: {self.zip_path}")
-    #         raise Exception(f"Data file not found: {self.zip_path}")
-    #     else:
-    #         logger.info(f"Extracting: {self.zip_path}")
-    #         # extract zipfile to raw_dir
-    #         with zipfile.ZipFile(self.zip_path, "r") as zip_ref:
-    #             zip_ref.extractall(self.raw_dir)
-
-    # def process_data(self):
-    #     """Copy extract file to output"""
-    #     logger = self.get_logger()
-
-    #     self.output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    #     if self.output_path.exists() and not self.overwrite_output:
-    #         logger.info(f"Output Exists: {self.output_path}")
-    #         return
-    #     else:
-    #         logger.info(f"Processing: {self.data_path}")
-    #         shutil.copy(self.data_path, self.output_path)
-
-
-
     def main(self):
 
         logger = self.get_logger()
@@ -255,7 +191,6 @@ class geoBoundariesDataset(Dataset):
         logger.info("Running data download")
         dl_run = self.run_tasks(self.dl_gb_item, ingest_items)
         self.log_run(dl_run)
-
 
 
 try:
