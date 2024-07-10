@@ -156,7 +156,7 @@ class LTDR_NDVI(Dataset):
         logger.info(f"Downloading {str(final_dst_path)}...")
         with requests.get(src_url, headers=self.auth_headers, stream=True) as src:
             src.raise_for_status()
-            with self.tmp_to_dst_file(final_dst_path) as dst_path:
+            with self.tmp_to_dst_file(final_dst_path, make_dst_dir=True) as dst_path:
                 with open(dst_path, "wb") as dst:
                     for chunk in src.iter_content(chunk_size=8192):
                         dst.write(chunk)
