@@ -1,0 +1,29 @@
+# change var = set to year range wanted - range available 2013 - 2019
+years = [ 2013, 2014, 2015, 2016, 2017, 2018, 2019 ]
+
+# change var - set to intended output directories
+raw_dir = "/sciclone/aiddata10/REU/geo/raw/dvnl"
+output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/dvnl"
+overwrite_download = false
+overwrite_processing = false
+
+
+[run]
+max_workers = 9
+log_dir = "/sciclone/aiddata10/REU/geo/raw/esa_landcover/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/dvnl"
+
+
+[deploy]
+deployment_name = "dvnl"
+image_tag = "05dea6e"
+version = 2
+flow_file_name = "main"
+flow_name = "dvnl"
+work_pool = "geodata-pool"
+data_manager_version = "0.4.0"
