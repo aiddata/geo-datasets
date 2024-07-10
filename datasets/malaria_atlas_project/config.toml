@@ -18,9 +18,9 @@ log_dir = "/sciclone/aiddata10/REU/geo/raw/malaria_atlas_project/logs"
 
 
 [repo]
-repo = "https://github.com/aiddata/geo-datasets.git"
+url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "malaria_atlas_project"
+directory = "datasets/malaria_atlas_project"
 
 
 [deploy]
