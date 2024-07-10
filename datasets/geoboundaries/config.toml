@@ -18,7 +18,7 @@ log_dir = "/sciclone/aiddata10/REU/geo/raw/geoboundaries/logs"
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "geoboundaries"
+directory = "datasets/geoboundaries"
 
 
 [deploy]
