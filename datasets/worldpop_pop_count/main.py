@@ -5,37 +5,42 @@ worldpop: https://www.worldpop.org/geodata/listing?id=64
 """
 
 import os
-import sys
-import requests
 from copy import copy
 from pathlib import Path
-from configparser import ConfigParser
-from datetime import datetime
+from typing import List
 
-sys.path.insert(1, os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'global_scripts'))
+import requests
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
-from dataset import Dataset
+
+class WorldPopCountConfiguration(BaseDatasetConfiguration):
+    raw_dir: str
+    output_dir: str
+    years: List[int]
+    overwrite_download: bool
+    overwrite_processing: bool
 
 
 class WorldPopCount(Dataset):
     name = "WorldPop Count"
 
-    def __init__(self, raw_dir, output_dir, years, overwrite_download=False, overwrite_processing=False):
+    def __init__(
+        self,
+        config: WorldPopCountConfiguration,
+    ):
 
-        self.raw_dir = Path(raw_dir)
-        self.output_dir = Path(output_dir)
-        self.years = years
-        self.overwrite_download = overwrite_download
-        self.overwrite_processing = overwrite_processing
+        self.raw_dir = Path(config.raw_dir)
+        self.output_dir = Path(config.output_dir)
+        self.years = config.years
+        self.overwrite_download = config.overwrite_download
+        self.overwrite_processing = config.overwrite_processing
 
         self.template_url = "https://data.worldpop.org/GIS/Population/Global_2000_2020/{YEAR}/0_Mosaicked/ppp_{YEAR}_1km_Aggregated.tif"
-
 
     def test_connection(self):
         # test connection
         test_request = requests.get("https://data.worldpop.org/GIS/", verify=True)
         test_request.raise_for_status()
-
 
     def create_download_list(self):
 
@@ -46,7 +51,6 @@ class WorldPopCount(Dataset):
             flist.append((src_url, dst_path))
 
         return flist
-
 
     def manage_download(self, url, local_filename):
         """download individual file using session created
@@ -73,32 +77,31 @@ class WorldPopCount(Dataset):
                     logger.info(f"Downloaded: {url}")
                     return
 
-
     def download_file(self, url, local_filename):
         """Download a file from url to local_filename
         Downloads in chunks
         """
         with requests.get(url, stream=True, verify=True) as r:
             r.raise_for_status()
-            with open(local_filename, 'wb') as f:
-                for chunk in r.iter_content(chunk_size=1024*1024):
+            with open(local_filename, "wb") as f:
+                for chunk in r.iter_content(chunk_size=1024 * 1024):
                     f.write(chunk)
-
 
     def create_process_list(self):
         logger = self.get_logger()
 
         flist = []
-        downloaded_files = [i for i in self.raw_dir.iterdir() if str(i).endswith('.tif')]
+        downloaded_files = [
+            i for i in self.raw_dir.iterdir() if str(i).endswith(".tif")
+        ]
         for i in downloaded_files:
-            year = int(i.name.split('_')[1])
+            year = int(i.name.split("_")[1])
             if year in self.years:
                 flist.append((i, self.output_dir / i.name))
 
         logger.info(f"COG conversion list: {flist}")
 
         return flist
-
 
     def convert_to_cog(self, src_path, dst_path):
         """
@@ -117,14 +120,16 @@ class WorldPopCount(Dataset):
 
             logger.info(f"Generating COG: {dst_path}")
 
-            with rasterio.open(src_path, 'r') as src:
+            with rasterio.open(src_path, "r") as src:
 
                 profile = copy(src.profile)
 
-                profile.update({
-                    'driver': 'COG',
-                    'compress': 'LZW',
-                })
+                profile.update(
+                    {
+                        "driver": "COG",
+                        "compress": "LZW",
+                    }
+                )
 
                 # These creation options are not supported by the COG driver
                 for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
@@ -134,20 +139,28 @@ class WorldPopCount(Dataset):
                 print(profile)
                 logger.info(profile)
 
-                with rasterio.open(dst_path, 'w+', **profile) as dst:
+                with rasterio.open(dst_path, "w+", **profile) as dst:
 
                     for ji, src_window in src.block_windows(1):
                         # convert relative input window location to relative output window location
                         # using real world coordinates (bounds)
-                        src_bounds = windows.bounds(src_window, transform=src.profile["transform"])
-                        dst_window = windows.from_bounds(*src_bounds, transform=dst.profile["transform"])
+                        src_bounds = windows.bounds(
+                            src_window, transform=src.profile["transform"]
+                        )
+                        dst_window = windows.from_bounds(
+                            *src_bounds, transform=dst.profile["transform"]
+                        )
                         # round the values of dest_window as they can be float
-                        dst_window = windows.Window(round(dst_window.col_off), round(dst_window.row_off), round(dst_window.width), round(dst_window.height))
+                        dst_window = windows.Window(
+                            round(dst_window.col_off),
+                            round(dst_window.row_off),
+                            round(dst_window.width),
+                            round(dst_window.height),
+                        )
                         # read data from source window
                         r = src.read(1, window=src_window)
                         # write data to output window
                         dst.write(r, 1, window=dst_window)
-
 
     def main(self):
 
@@ -173,35 +186,17 @@ class WorldPopCount(Dataset):
         self.log_run(conversions, expand_args=["src_path", "dst_path"])
 
 
-def get_config_dict(config_file="config.ini"):
-    config = ConfigParser()
-    config.read(config_file)
+try:
+    from prefect import flow
+except:
+    pass
+else:
 
-    return {
-        "raw_dir": Path(config["main"]["raw_dir"]),
-        "output_dir": Path(config["main"]["output_dir"]),
-        "years": [int(y) for y in config["main"]["years"].split(", ")],
-        "overwrite_download": config["main"].getboolean("overwrite_download"),
-        "overwrite_processing": config["main"].getboolean("overwrite_processing"),
-        "backend": config["run"]["backend"],
-        "task_runner": config["run"]["task_runner"],
-        "run_parallel": config["run"].getboolean("run_parallel"),
-        "max_workers": int(config["run"]["max_workers"]),
-        "log_dir": Path(config["main"]["raw_dir"]) / "logs"
-    }
+    @flow
+    def worldpop_pop_count(config: WorldPopCountConfiguration):
+        WorldPopCount(config).run(config.run)
+
 
 if __name__ == "__main__":
-
-    config_dict = get_config_dict()
-
-    log_dir = config_dict["log_dir"]
-    timestamp = datetime.today()
-    time_format_str: str="%Y_%m_%d_%H_%M"
-    time_str = timestamp.strftime(time_format_str)
-    timestamp_log_dir = Path(log_dir) / time_str
-    timestamp_log_dir.mkdir(parents=True, exist_ok=True)
-
-
-    class_instance = WorldPopCount(config_dict["raw_dir"], config_dict["output_dir"], config_dict["years"], config_dict["overwrite_download"], config_dict["overwrite_processing"])
-
-    class_instance.run(backend=config_dict["backend"], task_runner=config_dict["task_runner"], run_parallel=config_dict["run_parallel"], max_workers=config_dict["max_workers"], log_dir=timestamp_log_dir)
+    config = get_config(WorldPopCountConfiguration)
+    WorldPopCount(config).run(config.run)
