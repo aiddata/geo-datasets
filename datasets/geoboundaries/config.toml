@@ -2,12 +2,12 @@ version = "v6"
 gb_data_hash = "9469f09"
 gb_web_hash = "57dcd43"
 
+dl_iso3_list = []
+
 raw_dir = "/sciclone/aiddata10/REU/geo/raw/geoboundaries"
 output_dir = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries"
 
-max_retries = 5
-overwrite_download = true
-overwrite_output = true
+overwrite_existing = false
 
 
 [run]

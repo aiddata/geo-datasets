@@ -1,5 +1,5 @@
 """
-add geoboundaries dataset to geo:
+utility func to add geoboundaries dataset to geo:
     - build dataset specific options
     - generate metadata for dataset resources
     - create document

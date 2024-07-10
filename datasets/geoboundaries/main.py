@@ -1,16 +1,11 @@
-import os
-import shutil
-import zipfile
-from configparser import ConfigParser
-from datetime import datetime
+
 from pathlib import Path
-from typing import List, Literal, Optional
+from typing import List, Optional
 import json
 import shapely
 import requests
-import pandas as pd
 import geopandas as gpd
-from pydantic import ValidationInfo, field_validator
+from pydantic import field_validator
 
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
@@ -27,9 +22,8 @@ class geoBoundariesConfiguration(BaseDatasetConfiguration):
     gb_web_hash: str
     raw_dir: str
     output_dir: str
-    max_retries: int
-    overwrite_download: bool
-    overwrite_output: bool
+    overwrite_existing: bool
+    dl_iso3_list: Optional[List[str]] = None
 
     @field_validator("raw_dir", "output_dir")
     @classmethod
@@ -48,14 +42,10 @@ class geoBoundariesDataset(Dataset):
         self.raw_dir = config.raw_dir / config.version
         self.output_dir = config.output_dir / f"{config.version}_{config.gb_data_hash}_{config.gb_web_hash}"
 
-        self.max_retries = config.max_retries
-        self.overwrite_download = config.overwrite_download
-        self.overwrite_output = config.overwrite_output
+        self.overwrite_existing = config.overwrite_existing
 
-
-        # set this to None to download all ISO3 boundaries
-        self.dl_iso3_list: Optional[List[str]] = ["GHA", "AFG"]
-        # self.dl_iso3_list: Optional[List[str]] = None
+        # leave blank / set to None to download all ISO3 boundaries
+        self.dl_iso3_list = config.dl_iso3_list
 
 
         self.raw_dir.mkdir(exist_ok=True, parents=True)
@@ -95,13 +85,12 @@ class geoBoundariesDataset(Dataset):
 
         api_data = get_api_url(self.api_url)
 
-        if self.dl_iso3_list is None:
-            ingest_items = [(i,) for i in api_data]
-        else:
+        if self.dl_iso3_list:
             ingest_items = [(i,) for i in api_data if i["boundaryISO"] in self.dl_iso3_list]
+        else:
+            ingest_items = [(i,) for i in api_data]
 
         ingest_items = sorted(ingest_items, key=lambda d: d[0]['boundaryISO'])
-
         return ingest_items
 
 
@@ -144,6 +133,13 @@ class geoBoundariesDataset(Dataset):
         gpkg_path = self.output_dir / f"{Path(commit_dl_url).stem}.gpkg"
         adm_meta["path"] = str(gpkg_path)
 
+        geojson_path = gpkg_path.with_suffix(".geojson")
+        json_path = gpkg_path.with_suffix(".test.json")
+
+        if gpkg_path.exists() and geojson_path.exists() and json_path.exists() and not self.overwrite_existing:
+            logger.info(f"Skipping existing file: {gpkg_path}")
+            return
+
         logger.debug(f"Downloading {commit_dl_url}")
         try:
             gdf = gpd.read_file(commit_dl_url)
@@ -168,7 +164,7 @@ class geoBoundariesDataset(Dataset):
                 gdf["shapeName"] = None
 
         gdf.to_file(gpkg_path, driver="GPKG")
-        gdf.to_file(gpkg_path.with_suffix(".geojson"), driver="GeoJSON")
+        gdf.to_file(geojson_path, driver="GeoJSON")
 
         logger.debug(f"Getting bounding box for {commit_dl_url}")
         spatial_extent = shapely.box(*gdf.total_bounds).wkt
@@ -177,7 +173,6 @@ class geoBoundariesDataset(Dataset):
 
         # export to json
         export_adm_meta = adm_meta.copy()
-        json_path = gpkg_path.with_suffix(".json")
         with open(json_path, "w") as file:
             json.dump(export_adm_meta, file, indent=4)
 
@@ -187,10 +182,10 @@ class geoBoundariesDataset(Dataset):
         logger = self.get_logger()
 
         ingest_items = self.prepare()
-        # breakpoint()
-        logger.info("Running data download")
-        dl_run = self.run_tasks(self.dl_gb_item, ingest_items)
-        self.log_run(dl_run)
+
+        # logger.info("Running data download")
+        # dl_run = self.run_tasks(self.dl_gb_item, ingest_items)
+        # self.log_run(dl_run)
 
 
 try:

@@ -1,16 +1,18 @@
 """
 Example usage:
 
-python geo-datasets/boundaries/geoboundaries_ingest.py master 1_3_3 serial missing True
+python geo-datasets/boundaries/geoboundaries_ingest.py master v6_9469f09_57dcd43 serial missing True
 
 Where args are: branch, version, method, update mode, dry run
 
-Note: when using parallel mode, be sure to spin up job first (manually or use job script)
+Note: when using parallel mode, be sure to spin up job first (manually)
       and use appropriate mpi command to run script
 
 qsub -I -l nodes=5:c18c:ppn=16 -l walltime=48:00:00
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/boundaries/geoboundaries_ingest.py master 1_3_3 parallel missing True
-mpirun --mca mpi_warn_on_fork 0 --map-by node -np 16 python geoboundaries_ingest.py master v4 parallel missing False
+
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 80 python-mpi /sciclone/aiddata10/geo/master/source/geo-datasets/boundaries/geoboundaries_ingest.py master  parallel False True
+
+mpirun --mca mpi_warn_on_fork 0 --map-by node -np 16 python geoboundaries_ingest.py master v6_9469f09_57dcd43 parallel False True
 
 """
 
@@ -48,9 +50,8 @@ if config.connection_status != 0:
 
 # -------------------------------------------------------------------------
 
-branch = "master"
-version = "v4"
-
+# branch = "master"
+# version = "v6_9469f09_57dcd43"
 
 version = sys.argv[2]
 
