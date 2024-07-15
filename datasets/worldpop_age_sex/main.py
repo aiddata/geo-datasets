@@ -107,7 +107,7 @@ class WorldPopAgeSex(Dataset):
         """Download a file from url to tmp_path
         Downloads in chunks
         """
-        user_agent_str = "Mozilla/5.0"
+        user_agent_str = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
         with requests.get(
             url, stream=True, verify=True, headers={"User-Agent": user_agent_str}
         ) as r:
