@@ -1,6 +1,6 @@
 # change var - set to intended output directories
-raw_dir = "/sciclone/aiddata10/REU/geo/raw/distance_to/water"
-output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/water"
+raw_dir = "/sciclone/aiddata10/REU/geo/raw/distance_to_water"
+output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to_water"
 gshhg_version = "2.3.7"
 ne_hash = "d4533efe3715c55b51f49bc2bde9694bff2bf7b1"
 overwrite_download = false
@@ -16,7 +16,7 @@ raster_type = [ "binary", "distance" ]
 max_workers = 12
 # cores_per_process only used for dask-jobqueue runs (backend=prefect, task_runner=hpc)
 cores_per_process = 2
-log_dir = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to_water/logs"
+log_dir = "/sciclone/aiddata10/REU/geo/raw/distance_to_water/logs"
 
 
 [repo]

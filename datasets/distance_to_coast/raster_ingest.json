@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/coast_237",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to_coast/2.3.7/distance",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

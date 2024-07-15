@@ -1,5 +1,5 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/water",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to_water/2.3.7_d4533ef/distance",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
@@ -7,7 +7,7 @@
     "title": "Distance to Water",
     "description": "Distance to water, measured in meters. Derived using World Vector Shorelines combined with rivers and lakes from World Data Bank 2 (via Natural Earth).",
     "details": "",
-    "version": 1,
+    "version": "2.3.7_d4533ef",
     "options": {
         "resolution": 0.01,
         "extract_types": ["mean", "max", "min", "count"],
