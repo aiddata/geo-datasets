@@ -601,12 +601,12 @@ class Dataset(ABC):
             self.backend = "prefect"
 
             from prefect import flow
-            from prefect.task_runners import ConcurrentTaskRunner, SequentialTaskRunner
+            from prefect.task_runners import SequentialTaskRunner, ThreadPoolTaskRunner
 
             if params.task_runner == "sequential":
                 tr = SequentialTaskRunner
             elif params.task_runner == "concurrent" or params.task_runner is None:
-                tr = ConcurrentTaskRunner
+                tr = ThreadPoolTaskRunner(max_workers=max_workers)
             elif params.task_runner == "dask":
                 from prefect_dask import DaskTaskRunner
 
