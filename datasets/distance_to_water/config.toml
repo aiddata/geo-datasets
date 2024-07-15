@@ -1,6 +1,6 @@
 # change var - set to intended output directories
-raw_dir = "/sciclone/aiddata10/REU/geo/raw/distance_to_water"
-output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to_water"
+raw_dir = "/sciclone/aiddata10/REU/geo/raw/distance_to/water"
+output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/water"
 gshhg_version = "2.3.7"
 ne_hash = "d4533efe3715c55b51f49bc2bde9694bff2bf7b1"
 overwrite_download = false

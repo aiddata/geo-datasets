@@ -208,7 +208,8 @@ class DISTANCE_TO_WATER(Dataset):
 
         if type == "binary":
             logger.info("Creating binary raster")
-            water_output_raster_path = str(self.output_dir) + "/water_binary.tif"
+            water_output_raster_path = str(self.output_dir) + "/binary/water_binary.tif"
+            Path(water_output_raster_path).parent.mkdir(parents=True, exist_ok=True)
             if (
                 os.path.isfile(water_output_raster_path)
                 and not self.overwrite_distance_raster
@@ -227,7 +228,8 @@ class DISTANCE_TO_WATER(Dataset):
 
         elif type == "distance":
             logger.info("Creating distance raster")
-            distance_output_raster_path = str(self.output_dir) + "/water_distance.tif"
+            distance_output_raster_path = str(self.output_dir) + "/distance/water_distance.tif"
+            Path(distance_output_raster_path).parent.mkdir(parents=True, exist_ok=True)
             if (
                 os.path.isfile(distance_output_raster_path)
                 and not self.overwrite_distance_raster

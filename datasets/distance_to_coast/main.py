@@ -136,6 +136,7 @@ class DISTANCE_TO_COAST(Dataset):
             borders_output_raster_path = (
                 self.output_dir / "binary" / "GSHHS_coasts_binary.tif"
             )
+            borders_output_raster_path.parent.mkdir(parents=True, exist_ok=True)
             if (
                 os.path.isfile(borders_output_raster_path)
                 and not self.overwrite_binary_raster
@@ -154,7 +155,8 @@ class DISTANCE_TO_COAST(Dataset):
 
         elif type == "distance":
             logger.info("Creating distance raster")
-            distance_output_raster_path = self.output_dir / "GSHHS_coasts_distance.tif"
+            distance_output_raster_path = self.output_dir / "distance" / "GSHHS_coasts_distance.tif"
+            distance_output_raster_path.parent.mkdir(parents=True, exist_ok=True)
             if (
                 os.path.isfile(distance_output_raster_path)
                 and not self.overwrite_distance_raster
