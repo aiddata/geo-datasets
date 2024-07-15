@@ -3,7 +3,7 @@
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "dist_to_water",
+    "name": "dist_to_water_237_d4533ef",
     "title": "Distance to Water",
     "description": "Distance to water, measured in meters. Derived using World Vector Shorelines combined with rivers and lakes from World Data Bank 2 (via Natural Earth).",
     "details": "",

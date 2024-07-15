@@ -3,7 +3,7 @@
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "distance_to_coast_237",
+    "name": "dist_to_coast_237",
     "title": "Distance to Coast",
     "description": "Distance to coast (on land only), measured in meters. Derived using World Vector Shorelines.",
     "details": "Distance is only measured for land. Pixels in the ocean will always have a distance of zero.",
