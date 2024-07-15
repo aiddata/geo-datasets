@@ -208,12 +208,15 @@ class Dataset(ABC):
         func: Callable,
         input_list: Iterable[Any],
         force_sequential: bool,
+        max_workers: int = None,
     ):
         """
         Run tasks concurrently (locally), given a function a list of inputs
         This will always return a list of TaskResults!
         """
-        pool_size = 1 if force_sequential else 10
+        if max_workers is None:
+            max_workers = self.max_workers
+        pool_size = 1 if force_sequential else max_workers
         with multiprocessing.Pool(pool_size) as pool:
             results = pool.starmap(
                 self.error_wrapper,
@@ -320,6 +323,7 @@ class Dataset(ABC):
         func: Callable,
         input_list: Iterable[Any],
         force_sequential: bool,
+        max_workers: int = None,
     ):
         """
         Run tasks using MPI, requiring the use of `mpirun`
@@ -328,8 +332,11 @@ class Dataset(ABC):
         """
         from mpi4py.futures import MPIPoolExecutor
 
+        if not max_workers:
+            max_workers = self.mpi_max_workers
+
         with MPIPoolExecutor(
-            max_workers=self.mpi_max_workers, chunksize=self.chunksize
+            max_workers=max_workers, chunksize=self.chunksize
         ) as pool:
             futures = []
             for i in input_list:
@@ -349,6 +356,7 @@ class Dataset(ABC):
         retry_delay: int = 60,
         force_sequential: bool = False,
         force_serial: bool = False,
+        max_workers: Optional[int] = None,
     ):
         """
         Run a bunch of tasks, calling one of the above run_tasks functions
@@ -378,16 +386,19 @@ class Dataset(ABC):
         elif not isinstance(name, str):
             raise TypeError("Name of task run must be a string")
 
+        if max_workers is None:
+            max_workers = self.max_workers
+
         if self.backend == "serial" or force_serial:
             results = self.run_serial_tasks(name, func, input_list)
         elif self.backend == "concurrent":
             results = self.run_concurrent_tasks(
-                name, func, input_list, force_sequential
+                name, func, input_list, force_sequential, max_workers=max_workers
             )
         elif self.backend == "prefect":
             results = self.run_prefect_tasks(name, func, input_list, force_sequential)
         elif self.backend == "mpi":
-            results = self.run_mpi_tasks(name, func, input_list, force_sequential)
+            results = self.run_mpi_tasks(name, func, input_list, force_sequential, max_workers=max_workers)
         else:
             raise ValueError(
                 "Requested backend not recognized. Have you called this Dataset's run function?"
@@ -579,6 +590,8 @@ class Dataset(ABC):
         # Allow datasets to set their own default max_workers
         if params.max_workers is None and hasattr(self, "max_workers"):
             max_workers = self.max_workers
+        else:
+            max_workers = params.max_workers
 
         # If dataset doesn't come with a name use its class name
         if not self.name:
