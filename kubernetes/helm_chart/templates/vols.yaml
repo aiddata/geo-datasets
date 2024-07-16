@@ -1,0 +1,49 @@
+{{- $pvname := printf "%s-%s" (ternary "local-geodata-dev-pv" "nova-geodata-prod-pv" .Values.dev.enabled) .Release.Name }}
+{{- $pvexists := lookup "v1" "persistentvolume" .Release.Namespace $pvname }}
+{{- if not $pvexists -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $pvname }}
+spec:
+  capacity:
+    storage: 100Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  {{- if .Values.dev.enabled }}
+  storageClassName: manual
+  hostPath:
+    path: {{ .Values.dev.localDir }}
+  {{- else }}
+  storageClassName: nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: {{ .Values.prod.nfs.mountPath }}
+    server: {{ .Values.prod.nfs.address }}
+  {{- end }}
+{{- end }}
+---
+{{- $pvcexists := lookup "v1" "PersistentVolumeClaim" .Release.Namespace "nova-geodata-prod" }}
+{{- if not $pvcexists }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nova-geodata-prod
+  annotations:
+    "helm.sh/resource-policy": keep
+spec:
+  {{- if .Values.dev.enabled }}
+  storageClassName: manual
+  {{- else }}
+  storageClassName: nfs
+  {{- end }}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+{{- end }}

@@ -1,0 +1,31 @@
+FROM ghcr.io/dask/dask:2023.3.1-py3.8
+
+# install gdal
+RUN apt-get update
+
+# to avoid interactive timezone selection on tzdata upgrade
+# https://serverfault.com/questions/949991/how-to-install-tzdata-on-a-ubuntu-docker-image
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/New_York
+
+RUN apt-get install -y --no-install-recommends \
+    software-properties-common \
+&& rm -rf /var/lib/apt/lists/*
+
+RUN add-apt-repository ppa:ubuntugis/ppa
+
+# install gdal, git, wget
+RUN apt-get install -y --no-install-recommends \
+    build-essential \
+    gdal-bin \
+    libgdal-dev \
+    openssh-client \
+    git \
+    wget \
+&& rm -rf /var/lib/apt/lists/*
+
+COPY dask-worker/prepare.sh /usr/bin/prepare.sh
+
+# install python packages
+COPY dask-worker/requirements.txt requirements.txt
+RUN /opt/conda/bin/pip install -r requirements.txt --no-cache-dir --no-binary rasterio
