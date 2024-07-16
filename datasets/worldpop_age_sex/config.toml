@@ -24,7 +24,7 @@ directory = "datasets/worldpop_age_sex"
 
 [deploy]
 deployment_name = "worldpop_age_sex"
-image_tag = "05dea6e"
+image_tag = "3617c59"
 version = 3
 flow_file_name = "main"
 flow_name = "worldpop_age_sex"
