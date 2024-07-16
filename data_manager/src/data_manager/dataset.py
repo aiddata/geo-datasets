@@ -601,6 +601,8 @@ class Dataset(ABC):
         if params.backend == "prefect":
             self.backend = "prefect"
 
+            logger.info(f"Running with {params.task_runner} task runner with {max_workers} workers")
+
             from prefect import flow
             from prefect.task_runners import SequentialTaskRunner, ThreadPoolTaskRunner
 
@@ -608,7 +610,6 @@ class Dataset(ABC):
                 tr = SequentialTaskRunner
             elif params.task_runner == "concurrent" or params.task_runner is None:
                 tr = ThreadPoolTaskRunner(max_workers=max_workers)
-                logger.info(f"Running with ThreadPoolTaskRunner with {max_workers} workers")
             elif params.task_runner == "dask":
                 from prefect_dask import DaskTaskRunner
 
