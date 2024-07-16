@@ -230,8 +230,8 @@ class Dataset(ABC):
         func: Callable,
         input_list: Iterable[Any],
         force_sequential: bool,
-        prefect_concurrency_tag: bool,
-        prefect_concurrency_task_value: int,
+        prefect_concurrency_tag: str = None,
+        prefect_concurrency_task_value: int = 1,
     ):
         """
         Run tasks using Prefect, using whichever task runner decided in self.run()
@@ -243,22 +243,36 @@ class Dataset(ABC):
 
         logger = self.get_logger()
 
-        def cfunc(*args):
+        def cfunc(wrapper_args, func_args):
+            func, prefect_concurrency_tag, prefect_concurrency_task_value = wrapper_args
             with concurrency(prefect_concurrency_tag, occupy=prefect_concurrency_task_value):
-                return func(*args)
+                return func(*func_args)
 
-        task_wrapper = task(
-            cfunc,
-            name=name,
-            retries=self.retries,
-            retry_delay_seconds=self.retry_delay,
-            persist_result=True,
+        if not prefect_concurrency_tag:
+            task_wrapper = task(
+                func,
+                name=name,
+                retries=self.retries,
+                retry_delay_seconds=self.retry_delay,
+                persist_result=True,
+            )
+        else:
+            task_wrapper = task(
+                cfunc,
+                name=name,
+                retries=self.retries,
+                retry_delay_seconds=self.retry_delay,
+                persist_result=True,
         )
 
         futures = []
         for i in input_list:
-            w = [i[1] for i in futures] if force_sequential else None
-            futures.append((i, task_wrapper.submit(*i, wait_for=w, return_state=False)))
+            w = [f[1] for f in futures] if force_sequential else None
+            if prefect_concurrency_tag:
+                args = ((func, prefect_concurrency_tag, prefect_concurrency_task_value), i)
+            else:
+                args = i
+            futures.append((args, task_wrapper.submit(*args, wait_for=w, return_state=False)))
 
         results = []
 
@@ -363,7 +377,7 @@ class Dataset(ABC):
         force_sequential: bool = False,
         force_serial: bool = False,
         max_workers: Optional[int] = None,
-        prefect_concurrency_tag: bool = None,
+        prefect_concurrency_tag: str = None,
         prefect_concurrency_task_value: int = None,
     ):
         """
