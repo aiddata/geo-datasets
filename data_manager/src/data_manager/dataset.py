@@ -609,7 +609,7 @@ class Dataset(ABC):
             if params.task_runner == "sequential":
                 tr = SequentialTaskRunner
             elif params.task_runner == "concurrent" or params.task_runner is None:
-                tr = ThreadPoolTaskRunner(max_workers=max_workers)
+                tr = ThreadPoolTaskRunner(max_workers=5)
             elif params.task_runner == "dask":
                 from prefect_dask import DaskTaskRunner
 
