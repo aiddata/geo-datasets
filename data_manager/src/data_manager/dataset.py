@@ -578,7 +578,6 @@ class Dataset(ABC):
         This is how Datasets should usually be run
         Eventually calls _check_env_and_run(), starting dataset (see below)
         """
-        logger = self.get_logger()
 
         # get current timestamp and initialize log directory
         timestamp = datetime.today()
@@ -605,8 +604,6 @@ class Dataset(ABC):
 
         if params.backend == "prefect":
             self.backend = "prefect"
-
-            logger.info(f"Running with {params.task_runner} task runner with {max_workers} workers")
 
             from prefect import flow
             from prefect.task_runners import SequentialTaskRunner, ConcurrentTaskRunner#, ThreadPoolTaskRunner
