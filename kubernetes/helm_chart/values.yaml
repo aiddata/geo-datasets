@@ -1,0 +1,16 @@
+workerContainer: "prefecthq/prefect:2.19.6-python3.10-kubernetes"
+
+prefect:
+  apiURL: "[YOUR_API_URL]"
+  apiKey: "[YOUR_API_KEY]"
+  workPool: "geodata-pool"
+  replicas: 3
+
+prod:
+  nfs:
+    address: 128.239.59.130
+    mountPath: /sciclone/nova/test/geo
+
+dev:
+  enabled: false
+  localDir: /tmp/data/

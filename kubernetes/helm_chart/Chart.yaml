@@ -1,0 +1,7 @@
+apiVersion: v2
+name: geodata
+version: 0.0.1
+description: A chart for GeoQuery's ingest infrastructure
+maintainers:
+  - name: Jacob Hall
+    email: jwhall@wm.edu

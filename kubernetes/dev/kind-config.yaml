@@ -1,0 +1,15 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role:  worker
+  extraMounts:
+  # change this to you preferred local path
+  - hostPath: ./data
+    # no need to change this
+    containerPath: /tmp/data
+- role:  worker
+  extraMounts:
+  # do the same changes here as above!
+  - hostPath: ./data
+    containerPath: /tmp/data

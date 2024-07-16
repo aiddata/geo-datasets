@@ -1,0 +1,8 @@
+prefect:
+  apiURL: "[YOUR_API_URL]"
+  apiKey: "[YOUR_API_KEY]"
+
+dev:
+  enabled: false
+  # likely no need to change this. see info in /dev/README.md
+  localDir: /tmp/data/
