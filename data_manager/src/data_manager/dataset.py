@@ -357,6 +357,8 @@ class Dataset(ABC):
         force_sequential: bool = False,
         force_serial: bool = False,
         max_workers: Optional[int] = None,
+        prefect_concurrency_tag: bool = None,
+        prefect_concurrency_task_value: bool = None,
     ):
         """
         Run a bunch of tasks, calling one of the above run_tasks functions
@@ -396,7 +398,10 @@ class Dataset(ABC):
                 name, func, input_list, force_sequential, max_workers=max_workers
             )
         elif self.backend == "prefect":
-            results = self.run_prefect_tasks(name, func, input_list, force_sequential)
+            from prefect.concurrency.asyncio import concurrency
+            with concurrency(prefect_concurrency_tag, occupy=prefect_concurrency_task_value):
+                results = self.run_prefect_tasks(name, func, input_list, force_sequential)
+
         elif self.backend == "mpi":
             results = self.run_mpi_tasks(name, func, input_list, force_sequential, max_workers=max_workers)
         else:

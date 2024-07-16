@@ -221,7 +221,7 @@ class WorldPopAgeSex(Dataset):
         self.raw_dir.mkdir(parents=True, exist_ok=True)
 
         logger.info("Running data download")
-        downloads = self.run_tasks(self.manage_download, download_flist)
+        downloads = self.run_tasks(self.manage_download, download_flist, prefect_concurrency_tag="worldpop_download", prefect_concurrency_task_value=1)
         self.log_run(downloads, expand_args=["url", "download_path"])
 
         logger.info("Preparing for processing")
