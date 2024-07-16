@@ -388,8 +388,8 @@ class Dataset(ABC):
         elif not isinstance(name, str):
             raise TypeError("Name of task run must be a string")
 
-        if max_workers is None:
-            max_workers = self.max_workers
+        # if max_workers is None:
+        #     max_workers = self.max_workers
 
         if self.backend == "serial" or force_serial:
             results = self.run_serial_tasks(name, func, input_list)
@@ -597,6 +597,7 @@ class Dataset(ABC):
             max_workers = self.max_workers
         else:
             max_workers = params.max_workers
+            self.max_workers = max_workers
 
         # If dataset doesn't come with a name use its class name
         if not self.name:
