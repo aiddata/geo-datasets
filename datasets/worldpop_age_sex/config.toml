@@ -29,4 +29,4 @@ version = 3
 flow_file_name = "main"
 flow_name = "worldpop_age_sex"
 work_pool = "geodata-pool"
-data_manager_version = "0.4.2"
+data_manager_version = "0.4.4"

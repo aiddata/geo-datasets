@@ -214,8 +214,7 @@ class Dataset(ABC):
         Run tasks concurrently (locally), given a function a list of inputs
         This will always return a list of TaskResults!
         """
-        if max_workers is None:
-            max_workers = self.max_workers
+
         pool_size = 1 if force_sequential else max_workers
         with multiprocessing.Pool(pool_size) as pool:
             results = pool.starmap(
@@ -388,8 +387,9 @@ class Dataset(ABC):
         elif not isinstance(name, str):
             raise TypeError("Name of task run must be a string")
 
-        # if max_workers is None:
-        #     max_workers = self.max_workers
+
+        if max_workers is None and hasattr(self, "max_workers"):
+            max_workers = self.max_workers
 
         if self.backend == "serial" or force_serial:
             results = self.run_serial_tasks(name, func, input_list)
@@ -398,7 +398,7 @@ class Dataset(ABC):
                 name, func, input_list, force_sequential, max_workers=max_workers
             )
         elif self.backend == "prefect":
-            from prefect.concurrency.asyncio import concurrency
+            from prefect.concurrency.sync import concurrency
             with concurrency(prefect_concurrency_tag, occupy=prefect_concurrency_task_value):
                 results = self.run_prefect_tasks(name, func, input_list, force_sequential)
 
