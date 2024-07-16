@@ -573,6 +573,7 @@ class Dataset(ABC):
         This is how Datasets should usually be run
         Eventually calls _check_env_and_run(), starting dataset (see below)
         """
+        logger = self.get_logger()
 
         # get current timestamp and initialize log directory
         timestamp = datetime.today()
@@ -607,6 +608,7 @@ class Dataset(ABC):
                 tr = SequentialTaskRunner
             elif params.task_runner == "concurrent" or params.task_runner is None:
                 tr = ThreadPoolTaskRunner(max_workers=max_workers)
+                logger.info(f"Running with ThreadPoolTaskRunner with {max_workers} workers")
             elif params.task_runner == "dask":
                 from prefect_dask import DaskTaskRunner
 
