@@ -13,7 +13,7 @@ else
 fi
 
 git clone --branch $branch https://github.com/aiddata/geo-datasets.git --depth 1 || { echo "ERROR: Failed to download data_manager package. Does that tag exist in the git repository? Exiting..."; exit 1; }
-pip install ./geo-datasets/global_scripts/data_manager
+pip install ./geo-datasets/data_manager
 
 # run args
 exec "$@"
