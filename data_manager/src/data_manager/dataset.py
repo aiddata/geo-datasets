@@ -230,6 +230,8 @@ class Dataset(ABC):
         func: Callable,
         input_list: Iterable[Any],
         force_sequential: bool,
+        prefect_concurrency_tag: bool,
+        prefect_concurrency_task_value: int,
     ):
         """
         Run tasks using Prefect, using whichever task runner decided in self.run()
@@ -237,11 +239,16 @@ class Dataset(ABC):
         """
 
         from prefect import task
+        from prefect.concurrency.sync import concurrency
 
         logger = self.get_logger()
 
+        def cfunc(*args):
+            with concurrency(prefect_concurrency_tag, occupy=prefect_concurrency_task_value):
+                return func(*args)
+
         task_wrapper = task(
-            func,
+            cfunc,
             name=name,
             retries=self.retries,
             retry_delay_seconds=self.retry_delay,
@@ -357,7 +364,7 @@ class Dataset(ABC):
         force_serial: bool = False,
         max_workers: Optional[int] = None,
         prefect_concurrency_tag: bool = None,
-        prefect_concurrency_task_value: bool = None,
+        prefect_concurrency_task_value: int = None,
     ):
         """
         Run a bunch of tasks, calling one of the above run_tasks functions
@@ -398,9 +405,7 @@ class Dataset(ABC):
                 name, func, input_list, force_sequential, max_workers=max_workers
             )
         elif self.backend == "prefect":
-            from prefect.concurrency.sync import concurrency
-            with concurrency(prefect_concurrency_tag, occupy=prefect_concurrency_task_value):
-                results = self.run_prefect_tasks(name, func, input_list, force_sequential)
+            results = self.run_prefect_tasks(name, func, input_list, force_sequential, prefect_concurrency_tag, prefect_concurrency_task_value)
 
         elif self.backend == "mpi":
             results = self.run_mpi_tasks(name, func, input_list, force_sequential, max_workers=max_workers)
