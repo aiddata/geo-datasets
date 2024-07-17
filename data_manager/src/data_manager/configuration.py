@@ -8,6 +8,11 @@ from pydantic import BaseModel
 
 
 class RunParameters(BaseModel):
+    """
+    This is a pydantic BaseModel that represents the run
+    parameters for a Dataset. This model is consumed by
+    Dataset.run() as settings for how to run the Dataset.
+    """
     backend: Literal["local", "mpi", "prefect"] = "prefect"
     task_runner: Literal[
         "concurrent",
@@ -30,12 +35,29 @@ class RunParameters(BaseModel):
 
 
 class BaseDatasetConfiguration(BaseModel):
+    """
+    This is the class that should be imported into
+    `main.py` files within dataset directories, and
+    built upon with Dataset-specific parameters.
+    Common examples are `overwrite_download`,
+    `overwrite_processing`, or `year_list`.
+    """
     run: RunParameters
 
 
 def get_config(
     model: BaseDatasetConfiguration, config_path: Union[Path, str] = "config.toml"
 ):
+    """
+    Load the configuration for a Dataset.
+
+    This function reads a TOML configuration
+    file (usually `config.toml`) out of the
+    same directory as the `main.py` file, and
+    returns a `BaseDatasetConfiguration` model
+    filled in with the values from that
+    configuration file.
+    """
     config_path = Path(config_path)
     if config_path.exists():
         with open(config_path, "rb") as src:
