@@ -31,7 +31,10 @@ class ResultTuple(Sequence):
     """
     This is an immutable sequence designed to hold TaskResults
     It also keeps track of the name of a run and the time it started
-    ResultTuple.results() returns a list of results from each task
+    ResultTuple.results() returns a list of results from each task.
+
+    Inherits the `Sequence` class, and therefore provides methods
+    such as `__len__` and `__getitem__`.
     """
 
     def __init__(
@@ -40,6 +43,12 @@ class ResultTuple(Sequence):
         name: str,
         timestamp: datetime = datetime.today(),
     ):
+        """
+        Parameters:
+            iterable: Itererable of `TaskResult`s to store.
+            name: Name of this `ResultTuple`.
+            timestamp: Timestamp of the task run that produced these results.
+        """
         self.elements = []
         for value in iterable:
             if isinstance(value, TaskResult):
@@ -54,10 +63,13 @@ class ResultTuple(Sequence):
     def __getitem__(self, key: int):
         return self.elements[key]
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Returns the number of results in this `ResultTuple`.
+        """
         return len(self.elements)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         success_count = sum(1 for t in self.elements if t.status_code == 0)
         error_count = len(self.elements) - success_count
         return f'<ResultTuple named "{self.name}" with {success_count} successes, {error_count} errors>'
@@ -81,7 +93,7 @@ class ResultTuple(Sequence):
 
 class Dataset(ABC):
     """
-    This is the base class for Datasets, providing functions that manage task runs and logs
+    This is the base class for Datasets, providing functions that manage task runs and logs.
     """
 
     backend: str
@@ -119,6 +131,31 @@ class Dataset(ABC):
         tmp_dir: Optional[str | os.PathLike] = None,
         validate_cog: bool = False,
     ):
+        """
+        Context manager that provides a temporary file path to write
+        output files to, that is automatically moved to a final destination
+        once the context is exited. This prevents interrupted jobs
+        from leaving partially-written files in the filesystem where
+        they might be mistaken for complete files.
+
+        Additionally, this context manager can create output directories
+        that don't exist yet, or validate COG files after they've been
+        written. See the list of parameters below for more information.
+
+        Here is an example of its use:
+
+        ```python
+        with self.tmp_to_dst_file(final_dst, validate_cog=True) as tmp_dst:
+            with rasterio.open(tmp_dst, "w", **meta) as dst:
+                ...
+        ```
+
+        Parameters:
+            final_dst: Path to where the file should be written.
+            make_dst_dir: If set to true, the parent directory of `final_dst` will be created (and any of its parents, as necessary)
+            tmp_dir: Path to directory where file should be temporarily stored. If set to `None`, a default directory will be used.
+            validate_cog: If set to `True`, the written file will be validated as a COG, and an exception will be raised if this validation fails.
+        """
         logger = self.get_logger()
 
         final_dst = Path(final_dst)
@@ -193,7 +230,9 @@ class Dataset(ABC):
                     logger.error(f"Task failed with exception (giving up): {repr(e)}")
                     return TaskResult(1, repr(e), args, None)
 
-    def run_serial_tasks(self, name, func: Callable, input_list: Iterable[Any]):
+    def run_serial_tasks(
+        self, name, func: Callable, input_list: Iterable[Dict[str, Any]]
+    ):
         """
         Run tasks in serial (locally), given a function and list of inputs
         This will always return a list of TaskResults!
@@ -206,7 +245,7 @@ class Dataset(ABC):
         self,
         name: str,
         func: Callable,
-        input_list: Iterable[Any],
+        input_list: Iterable[Dict[str, Any]],
         force_sequential: bool,
         max_workers: int = None,
     ):
@@ -228,7 +267,7 @@ class Dataset(ABC):
         self,
         name: str,
         func: Callable,
-        input_list: Iterable[Any],
+        input_list: Iterable[Dict[str, Any]],
         force_sequential: bool,
         prefect_concurrency_tag: str = None,
         prefect_concurrency_task_value: int = 1,
@@ -245,7 +284,9 @@ class Dataset(ABC):
 
         def cfunc(wrapper_args, func_args):
             func, prefect_concurrency_tag, prefect_concurrency_task_value = wrapper_args
-            with concurrency(prefect_concurrency_tag, occupy=prefect_concurrency_task_value):
+            with concurrency(
+                prefect_concurrency_tag, occupy=prefect_concurrency_task_value
+            ):
                 return func(*func_args)
 
         if not prefect_concurrency_tag:
@@ -263,16 +304,21 @@ class Dataset(ABC):
                 retries=self.retries,
                 retry_delay_seconds=self.retry_delay,
                 persist_result=True,
-        )
+            )
 
         futures = []
         for i in input_list:
             w = [f[1] for f in futures] if force_sequential else None
             if prefect_concurrency_tag:
-                args = ((func, prefect_concurrency_tag, prefect_concurrency_task_value), i)
+                args = (
+                    (func, prefect_concurrency_tag, prefect_concurrency_task_value),
+                    i,
+                )
             else:
                 args = i
-            futures.append((args, task_wrapper.submit(*args, wait_for=w, return_state=False)))
+            futures.append(
+                (args, task_wrapper.submit(*args, wait_for=w, return_state=False))
+            )
 
         results = []
 
@@ -341,7 +387,7 @@ class Dataset(ABC):
         self,
         name: str,
         func: Callable,
-        input_list: Iterable[Any],
+        input_list: Iterable[Dict[str, Any]],
         force_sequential: bool,
         max_workers: int = None,
     ):
@@ -355,9 +401,7 @@ class Dataset(ABC):
         if not max_workers:
             max_workers = self.mpi_max_workers
 
-        with MPIPoolExecutor(
-            max_workers=max_workers, chunksize=self.chunksize
-        ) as pool:
+        with MPIPoolExecutor(max_workers=max_workers, chunksize=self.chunksize) as pool:
             futures = []
             for i in input_list:
                 f = pool.submit(self.error_wrapper, func, i)
@@ -369,21 +413,32 @@ class Dataset(ABC):
     def run_tasks(
         self,
         func: Callable,
-        input_list: Iterable[Any],
-        allow_futures: bool = True,
+        input_list: Iterable[Dict[str, Any]],
         name: Optional[str] = None,
         retries: int = 3,
         retry_delay: int = 60,
         force_sequential: bool = False,
         force_serial: bool = False,
         max_workers: Optional[int] = None,
-        prefect_concurrency_tag: str = None,
-        prefect_concurrency_task_value: int = None,
-    ):
+        prefect_concurrency_tag: Optional[str] = None,
+        prefect_concurrency_task_value: Optional[int] = None,
+    ) -> ResultTuple:
         """
         Run a bunch of tasks, calling one of the above run_tasks functions
         This is the function that should be called most often from self.main()
         It will return a ResultTuple of TaskResults
+
+        Parameters:
+            func: The function to run for each task.
+            input_list: An iterable of function inputs. For each input, a new task will be created with that input passed as the only parameter.
+            name: A name for this task run, for easier reference.
+            retries: Number of times to retry a task before giving up.
+            retry_delay: Delay (in seconds) to wait between task retries.
+            force_sequential: If set to `True`, all tasks in this run will be run in sequence, regardless of backend.
+            force_serial: If set to `True`, all tasks will be run locally (using the internal "serial runner") rather than with this Dataset's usual backend. **Please avoid using this parameter, it will likely be deprecated soon!**
+            max_workers: Maximum number of tasks to run at once, if using a concurrent mode. This value will not override `force_sequential` or `force_serial`. **Warning: This is not yet supported by the Prefect backend. We hope to fix this soon.**
+            prefect_concurrency_tag: If using the Prefect backend, this tag will be used to limit the concurrency of this task. **This will eventually be deprecated in favor of `max_workers` once we have implemented that for the Prefect backend.**
+            prefect_concurrency_task_value: If using the Prefect backend, this sets the maximum number of tasks to run at once, similar to `max_workers`. **See warning above.**
         """
 
         timestamp = datetime.today()
@@ -408,7 +463,6 @@ class Dataset(ABC):
         elif not isinstance(name, str):
             raise TypeError("Name of task run must be a string")
 
-
         if max_workers is None and hasattr(self, "max_workers"):
             max_workers = self.max_workers
 
@@ -419,10 +473,19 @@ class Dataset(ABC):
                 name, func, input_list, force_sequential, max_workers=max_workers
             )
         elif self.backend == "prefect":
-            results = self.run_prefect_tasks(name, func, input_list, force_sequential, prefect_concurrency_tag, prefect_concurrency_task_value)
+            results = self.run_prefect_tasks(
+                name,
+                func,
+                input_list,
+                force_sequential,
+                prefect_concurrency_tag,
+                prefect_concurrency_task_value,
+            )
 
         elif self.backend == "mpi":
-            results = self.run_mpi_tasks(name, func, input_list, force_sequential, max_workers=max_workers)
+            results = self.run_mpi_tasks(
+                name, func, input_list, force_sequential, max_workers=max_workers
+            )
         else:
             raise ValueError(
                 "Requested backend not recognized. Have you called this Dataset's run function?"
@@ -626,8 +689,10 @@ class Dataset(ABC):
             self.backend = "prefect"
 
             from prefect import flow
-            from prefect.task_runners import SequentialTaskRunner, ConcurrentTaskRunner#, ThreadPoolTaskRunner
-
+            from prefect.task_runners import (  # , ThreadPoolTaskRunner
+                ConcurrentTaskRunner,
+                SequentialTaskRunner,
+            )
 
             if params.task_runner == "sequential":
                 tr = SequentialTaskRunner
