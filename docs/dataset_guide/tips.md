@@ -49,4 +49,18 @@ example_path.stem # (4)!
 3. This returns the string `"hello_world.txt"`
 4. This returns the string `"hello_world"`
 
-To see a full list of `pathlib` features, checkout out its documentation [here](https://docs.python.org/3.11/library/pathlib.html).
+To see a full list of `pathlib` features, checkout out its documentation [here](https://docs.python.org/3/library/pathlib.html).
+
+## The Python Debugger
+
+An underappreciated feature of Python is the [Python Debugger](https://docs.python.org/3/library/pdb.html), a tool that allows you to stop execution of a Python program wherever you like and inspect it line-by-line.
+It can be invoked by inserting `#!python breakpoint()` anywhere in your script, like this:
+
+```python
+str_var = "Hello, World!"
+breakpoint()
+```
+
+When executing this code block, Python will set the `str_var` variable and then stop execution, dropping you into an interactive debugging tool.
+There are [many commands](https://docs.python.org/3/library/pdb.html#debugger-commands) you can use in this tool, or if you enter valid Python code it will execute normally.
+The `interact` command will switch you to a normal Python interpreter, preserving variables and other elements from the current scope.

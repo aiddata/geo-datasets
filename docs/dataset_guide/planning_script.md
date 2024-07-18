@@ -1,4 +1,4 @@
-# Structure of an Ingest Script
+# Planning Your Ingest Script
 
 Most data pipelines we write for GeoQuery have a similar structure.
 Without delving into too many implementation specifics (yet!), let's take a look at the common elements of these scripts.
@@ -87,16 +87,3 @@ with rasterio.open(src_path, "r") as src:
     with rasterio.open(dst_path, "w", **profile) as dst:
         src.write(dst)
 ```
-
-It's important to make sure that the source data is converted properly to the desired format.
-Datasets have varied levels of complexity, and
-
-
-# Connective tissue
-
-`get_config()` is a boilerplate function that we use to read configuration variables from a config file, usually `config.ini`.
-It lives outside of the class definition in `dataset_dir/main.py`, and returns a dictionary of configuation variable names and their values.
-
-
-flow.py is a boilerplate module that we add to each dataset's directory that defines a Prefect flow for that module.
-If imports the class definition from main.py and runs it using parameters passed to the flow.

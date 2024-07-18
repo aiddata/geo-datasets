@@ -23,7 +23,8 @@ nav:
   - Writing Pipelines:
       - dataset_guide/index.md
       - dataset_guide/dev_env.md
-      - dataset_guide/script_pieces.md
+      - dataset_guide/planning_script.md
+      - dataset_guide/writing_code.md
       - dataset_guide/dataset_class.md
       - dataset_guide/adding_boilerplate.md
       - dataset_guide/running.md
