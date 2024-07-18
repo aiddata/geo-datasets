@@ -67,3 +67,6 @@ plugins:
             show_symbol_type_heading: true
   - search
   - section-index
+
+watch:
+  - data_manager
