@@ -21,20 +21,20 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Writing Pipelines:
-      - dataset_guide/index.md
-      - dataset_guide/dev_env.md
-      - dataset_guide/planning_script.md
-      - dataset_guide/writing_code.md
-      - dataset_guide/dataset_class.md
-      - dataset_guide/adding_boilerplate.md
-      - dataset_guide/running.md
-      - dataset_guide/tips.md
+      - dataset-guide/index.md
+      - dataset-guide/dev-env.md
+      - dataset-guide/planning-script.md
+      - dataset-guide/writing-code.md
+      - dataset-guide/dataset-class.md
+      - dataset-guide/adding-boilerplate.md
+      - dataset-guide/running.md
+      - dataset-guide/tips.md
   - Deploying Pipelines:
-      - deployment_guide/index.md
-      - deployment_guide/build-container.md
-      - deployment_guide/prefect.md
-      - deployment_guide/helm-chart.md
-      - deployment_guide/k8s-debug.md
+      - deployment-guide/index.md
+      - deployment-guide/build-container.md
+      - deployment-guide/prefect.md
+      - deployment-guide/helm-chart.md
+      - deployment-guide/k8s-debug.md
   - Code Reference: reference/
 
 theme:
