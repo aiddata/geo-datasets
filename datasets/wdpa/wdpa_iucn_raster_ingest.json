@@ -1,8 +1,9 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/wdpa/Jun2024/iucn_cat",
+    "path": "/geo-datasets/data/rasters/wdpa",
+    "is_global": true,
     "type": "raster",
     "file_extension": ".tif",
-    "file_mask": "None",
+    "file_mask": "JunYYYY/iucn_cat/wdpa_iucn_cat.tif",
     "name": "wdpa_iucn_cat_202406",
     "title": "Protected Areas (IUCN Categories) - June 2024",
     "description": "The World Database on Protected Areas (WDPA) is the most comprehensive global database of marine and terrestrial protected areas. Dataset downloaded June 2024. This is a categorical raster indicating the IUCN category (or relevant information when no category exists) of the protected area covering each pixel. ",
