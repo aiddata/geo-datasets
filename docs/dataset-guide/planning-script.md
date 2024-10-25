@@ -11,9 +11,20 @@ In many cases the download step takes the longest, since it requires transferrin
 It's also important for us to respect the data providers by keeping our requests to reasonable volume.
 For these reasons, it can be a challenge to write an efficient and reliable download script.
 
+### Choosing Packages
+
+The download step is often the most dataset-specific aspect of an ingest pipeline, because the actual process of downloading can vary so much between sources.
+For this reason, we often need to find and use existing Python packages that are designed to support a specific protocol, for example [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) for downloading from AWS, or [cdsapi](https://cds.climate.copernicus.eu/how-to-api) for downloading from the Climate Data Store.
+On the other hand, we try to reduce the number of packages used by the geo-datasets project where possible in order to keep long-term maintenance easier.
+When in doubt, get in touch with us and let's chat about what makes most sense for your dataset.
+
+For downloading files directly over HTTP, please use the popular [requests](https://requests.readthedocs.io/en/latest/) package.
+requests is very well-documented, and provides a convenient interface for handling HTTP requests.
+
 ### Example
 
 Below is an example of some Python code that downloads a website, http://example.com, to /path/to/dst.
+This example uses the requests package noted above.
 Click on the plus signs to read annotations describing what is going on.
 
 ```python
@@ -67,10 +78,13 @@ Especially when we are downloading thousands of images at once, it's possible fo
 In some cases, the data source provides a checksum of the files, so that we can confirm that our copy is correct.
 When it's possible, this is great functionality to include in the download step.
 If the data has already been downloaded, it's faster to check that it matches a checksum rather than download it all over again.
-If it doesn't match the checksum, we can queue to be redownloaded before moving on to the processing stage.
+If the file(s) don't match the checksum, we can write code to automatically download them again before moving on to the processing stage.
 
+If checksums are not available for the data, that is ok.
+In this case, it can be helpful to consider what happens when a download job gets interrupted.
+For example, we can download files to a temporary location and then move them to their permanent home once the download is complete, preventing the rest of ingest pipeline from trying to use partial files.
 
-## Process
+## Processing
 
 The primary work a processing task accomplishes is reading the raw data, and writing it into COG files.
 To accomplish this, we primarily use the [rasterio](https://github.com/rasterio/rasterio) package.
