@@ -14,8 +14,9 @@ There are two main ways you can help out:
 1. [File an issue](https://github.com/aiddata/geo-datasets/issues/new/choose) to request a new or updated dataset, or report a bug.
 2. Contribute your own changes by opening a pull request. If you are not familar with how this works, please [get in touch](mailto:geo@aiddata.wm.edu).
 
-These pipelines are designed to run on [William & Mary's HPC clusters](https://www.wm.edu/offices/it/services/researchcomputing/), and supporting other systems is out of scope for this project.
+These pipelines are designed to run on [William & Mary's HPC clusters](https://www.wm.edu/offices/it/services/researchcomputing/), we cannot guarantee support for other environments.
 
 ## License
 
-This repository is released under the MIT license. Please see [LICENSE.md](LICENSE.md) for more information.
+This repository is released under the MIT license.
+Please see [LICENSE.md](LICENSE.md) for more information.
