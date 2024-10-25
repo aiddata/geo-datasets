@@ -11,7 +11,10 @@ The `Dataset` class is provided by a Python package called data_manager, stored 
 By updating the data_manager package, we can update the behavior of all pipelines at once.
 Each dataset (in `/datasets`) can choose to use any version of data_manager using a configuration parameter (more on that later).
 
-## The `Dataset` Class
+## `Dataset` Class Functions
+
+This is a high-level overview of the functions within the `Dataset` class.
+For technical details, please refer to the [corresponding reference page](/geo-datasets/reference/data_manager/dataset/).
 
 ### Required Functions
 
@@ -20,16 +23,17 @@ Each dataset (in `/datasets`) can choose to use any version of data_manager usin
 When a `Dataset` is run, `Dataset.main()` gets called.
 `main()` defines the game plan for a dataset run, describing the order of each set of tasks.
 To do this, `main()` contains function calls wrapped with `self.run_tasks()` to manage groups of tasks.
+It might be helpful to read the `main()` function in the script template below to see how this works.
 
 ### Provided Functions
 
 #### `run_tasks()`
 
-...
+*todo*
 
 #### `tmp_to_dst_file()`
 
-...
+*todo*
 
 ### Adding Your Own Functions
 
