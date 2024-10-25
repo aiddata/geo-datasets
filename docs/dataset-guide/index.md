@@ -3,11 +3,11 @@
 !!! info
 
     This guide is written with a general audience in mind, including folks who are new to data pipelines or programming in Python.
+    If you already have experience writing Python, you may want to skip to the [overview of the Dataset class](/geo-datasets/dataset-guide/dataset-class/).
 
 GeoQuery is, to end users, a website that allows them to download prepared geospatial data.
-On the backend side, our job is to make sure this data is available (and current).
-We collect data from various sources, converting it to a standard format, and ingest it into the system that runs the website.
-
+On the backend side, our job is to make this data is available (and, keep it up-to-date).
+We collect data from various sources, convert it to a standard format, and ingest it into the system that runs the GeoQuery website.
 
 # Overview
 
@@ -30,4 +30,12 @@ Here is an overview of what this looks like:
     - If necessary, apply any filters or quality assurance logic to the data
     - Write it out in a standard format (COG, more on that later)
 
-Loading this data into the website infrastucture is done separately so that we can manually check everything before publishing it.
+Loading this data into the website infrastucture is done manually so we can check everything before publishing it.
+
+This guide will walk you through the process of writing an ingest pipeline for GeoQuery, from making a plan to testing your code.
+
+# Updating This Guide
+
+This guide is a perpetual work-in-progress.
+**Please** let us know if you spot missing or inaccurate information!
+Contact information can be found in the README of the [geo-datasets repository](https://github.com/aiddata/geo-datasets).
