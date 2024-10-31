@@ -1,9 +1,10 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to_country_borders/geoBoundaries_borders",
+    "path": "/geo-datasets/data/rasters/distance_to_country_borders/geoboundaries_borders_distance.tif",
+    "is_global": true,
     "type": "raster",
     "file_extension": ".tif",
-    "file_mask": "None",
-    "name": "dist_to_geoBoundaries_borders",
+    "file_mask": null,
+    "name": "dist_to_geoboundaries_borders",
     "title": "Distance to Country Borders (geoBoundaries)",
     "description": "Distance to country borders, measured in meters. Derived using geoBoundaries ADM0 (Country) boundaries.",
     "details": "",
