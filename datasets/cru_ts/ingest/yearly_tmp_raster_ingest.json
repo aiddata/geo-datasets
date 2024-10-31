@@ -1,29 +1,30 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts/cru_ts_4.07/yearly/tmp/mean",
+	"path": "/geo-datasets/data/rasters/cru_ts/cru_ts_4.07/yearly/tmp/mean",
+	"is_global": true,
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "cru.tmp.YYYY.tif",
 	"name": "cru_ts_407_tmp_yearly_mean",
 	"title": "Yearly Mean Temperature - CRU TS (v4.07)",
 	"description": "Yearly mean temperature from Climate Research Unit (CRU) in degrees Celsius. Version 4.07",
-    "details": "Created by aggregating (mean) monthly mean daily temperature data from CRU TS",
+	"details": "Created by aggregating (mean) monthly mean daily temperature data from CRU TS",
 	"version": "4.07",
 	"options": {
-	    "resolution": 0.5,
-        "extract_types": ["max", "mean", "min"],
-        "extract_types_info" : {
-            "max" : "maximum temperature value per unit of analysis",
-            "mean" : "average temperature value per unit of analysis",
-            "min" : "minimum temperature value per unit of analysis"
-        },
-	    "factor": 1,
-        "variable_description": "degrees Celsius"
+		"resolution": 0.5,
+		"extract_types": ["max", "mean", "min"],
+		"extract_types_info" : {
+			"max" : "maximum temperature value per unit of analysis",
+			"mean" : "average temperature value per unit of analysis",
+			"min" : "minimum temperature value per unit of analysis"
+		},
+		"factor": 1,
+		"variable_description": "degrees Celsius"
 	},
 	"extras": {
-        "citation": "Harris, I., Osborn, T.J., Jones, P. et al. Version 4 of the CRU TS monthly high-resolution gridded multivariate climate dataset. Sci Data 7, 109 (2020). https://doi.org/10.1038/s41597-020-0453-3",
-	    "sources_web": "https://crudata.uea.ac.uk/cru/data/hrg/",
-	    "sources_name": "Climate Research Unit",
-	    "tags": ["cru", "temperature", "environment", "yearly"]
+	"citation": "Harris, I., Osborn, T.J., Jones, P. et al. Version 4 of the CRU TS monthly high-resolution gridded multivariate climate dataset. Sci Data 7, 109 (2020). https://doi.org/10.1038/s41597-020-0453-3",
+		"sources_web": "https://crudata.uea.ac.uk/cru/data/hrg/",
+		"sources_name": "Climate Research Unit",
+		"tags": ["cru", "temperature", "environment", "yearly"]
 	},
 	"active": 1
 }
