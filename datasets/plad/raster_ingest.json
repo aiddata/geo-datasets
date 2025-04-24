@@ -1,27 +1,28 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/plad/v70",
+	"path": "/geo-datasets/data/rasters/plad/v70",
+	"is_global": true,
 	"type": "raster",
 	"file_extension": ".tif",
 	"file_mask": "leader_birthplace_data_YYYY.tif",
 	"name": "plad_v70_leader_birthplace",
 	"title": "Presence of a political leader's birthplace (ADM1/ADM2 use only)",
 	"description": "The Political Leaders Affiliation Database (PLAD) contains information on the birthplaces of the effective leaders of 177 countries around the world in the 1989-2023 period. Birthplace coordinates with precision at the ADM2 level or finer were rasterized to support aggregation in GeoQuery at the ADM2 (or coarser) units.",
-    "details": "Note: more than one birthplace may exist in a given year during transition years. However, the data is only binary, indicating the presence of birthplace of any leader during the given year.",
+	"details": "Note: more than one birthplace may exist in a given year during transition years. However, the data is only binary, indicating the presence of birthplace of any leader during the given year.",
 	"version": "7.0",
 	"options": {
-	    "resolution": 0.05,
-        "extract_types": ["max"],
-        "extract_types_info" : {
-            "max" : "presence of a leader birthplace in unit of analysis"
-        },
-	    "factor": 1,
-        "variable_description": "binary indicating presence of a leader's birthplace"
+		"resolution": 0.05,
+		"extract_types": ["max"],
+		"extract_types_info" : {
+			"max" : "presence of a leader birthplace in unit of analysis"
+		},
+		"factor": 1,
+		"variable_description": "binary indicating presence of a leader's birthplace"
 	},
 	"extras": {
-        "citation": "Bomprezzi, Pietro; Dreher, Axel; Fuchs, Andreas; Hailer, Teresa; Kammerlander, Andreas; Kaplan, Lennart; Marchesi, Silvia; Masi, Tania; Robert, Charlotte; Unfried, Kerstin, 2020, The Political Leaders Affiliation Database (PLAD), https://doi.org/10.7910/DVN/YUS575, Harvard Dataverse, V7",
-	    "sources_web": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575",
-	    "sources_name": "The Political Leaders Affiliation Database (PLAD)",
-	    "tags": ["political", "leaders", "affiliation", "birthplace", "influence", "yearly"]
+		"citation": "Bomprezzi, Pietro; Dreher, Axel; Fuchs, Andreas; Hailer, Teresa; Kammerlander, Andreas; Kaplan, Lennart; Marchesi, Silvia; Masi, Tania; Robert, Charlotte; Unfried, Kerstin, 2020, The Political Leaders Affiliation Database (PLAD), https://doi.org/10.7910/DVN/YUS575, Harvard Dataverse, V7",
+			"sources_web": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575",
+			"sources_name": "The Political Leaders Affiliation Database (PLAD)",
+			"tags": ["political", "leaders", "affiliation", "birthplace", "influence", "yearly"]
 	},
 	"active": 1
 }
