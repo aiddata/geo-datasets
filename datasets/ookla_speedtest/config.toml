@@ -11,7 +11,7 @@ overwrite_processing = false
 
 
 [run]
-backend = "prefect"
+backend = "local"
 task_runner = "concurrent"
 run_parallel = false
 max_workers = 4
