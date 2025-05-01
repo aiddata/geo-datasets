@@ -11,9 +11,10 @@ dependencies = [
     "numpy>=2.2.4",
     "pandas>=2.2.3",
     "prefect==2",
+    "pyarrow>=19.0.1",
     "pyquadkey2>=0.3.2",
     "rasterio>=1.4.3",
-    "sparse>=0.16.0",
+    "scipy>=1.15.2",
     "tqdm>=4.67.1",
 ]
 

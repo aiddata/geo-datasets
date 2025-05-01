@@ -85,7 +85,7 @@ def write_multiband_raster_chunks(
         for i, col in enumerate(band32_cols):
             logger.info(f"Writing uint32 band {i + 1}: {col}")
             band_sparse = create_band_array(gdf, col, dtype=np.uint32)
-            band_dense = band_sparse.todense()
+            band_dense = band_sparse.toarray()
             band_dense = np.flip(band_dense, axis=0)
             dst.write(band_dense.astype(np.uint32), i + 1)
             del band_sparse, band_dense
@@ -95,7 +95,7 @@ def write_multiband_raster_chunks(
             band_index = len(band32_cols) + j + 1
             logger.info(f"Writing uint16 band {band_index}: {col}")
             band_sparse = create_band_array(gdf, col, dtype=np.uint16)
-            band_dense = band_sparse.todense()
+            band_dense = band_sparse.toarray()
             band_dense = np.flip(band_dense, axis=0)
             dst.write(band_dense.astype(np.uint16), band_index)
             del band_sparse, band_dense

@@ -53,23 +53,14 @@ def download_files(year: int, quarters: dict = QUARTERS) -> None:
     """
     s3_client = create_s3_client()
     downloaded_files = []
-    formats = ["parquet"] # "shapefiles" is an option to download too\
+    formats = ["parquet"] # "shapefiles" is an option to download too
     service_types = ["mobile", "fixed"]
     for quarter, month in quarters.items():
         for format_type in formats:
             for service_type in service_types:
                 filename = f"{year}-{month}-01_performance_{service_type}_tiles.parquet"
                 s3_key = f"{format_type}/performance/type={service_type}/year={year}/quarter={quarter}/{filename}"
+                prepare_download(s3_client, s3_key, GEOPARQUET_DIR, BUCKET_NAME)
                 local_file_path = Path(GEOPARQUET_DIR) / filename
-                # checking if file exists and writing if not
-                if local_file_path.exists():
-                    logger.info(f'File already exists: {local_file_path}')
-                else:
-                    logger.info(f'Downloading s3://{BUCKET_NAME}/{s3_key} to {local_file_path}')
-                    try:
-                        s3_client.download_file(BUCKET_NAME, s3_key, str(local_file_path))
-                    except Exception as e:
-                        logger.error(f"Error downloading {s3_key}: {e}")
-                        continue
                 downloaded_files.append(local_file_path)
     return downloaded_files
