@@ -14,7 +14,6 @@ logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 logger = logging.getLogger(__name__)
 
 
-
 def read_parquet(parquet_file: str) -> gpd.GeoDataFrame:
     """
     Reads the Parquet file and converts the 'tile' column into a geometry column
@@ -90,9 +89,7 @@ def create_band_array(
         except Exception as e:
             logger.error(f"Error  processing row {idx} for band '{band_column}': {e} ")
     sparse_array = coo_matrix(
-        (values, (coords_y, coords_x)),
-        shape=(grid_size, grid_size),
-        dtype=dtype
+        (values, (coords_y, coords_x)), shape=(grid_size, grid_size), dtype=dtype
     )
     logger.info(f"Successfully created sparse array for band '{band_column}'")
     return sparse_array

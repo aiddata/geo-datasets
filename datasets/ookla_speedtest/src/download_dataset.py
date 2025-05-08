@@ -26,9 +26,12 @@ def create_s3_client() -> BaseClient:
 
 
 # Creating the download file function and creating the loggers
-def prepare_download(s3_client: BaseClient, s3_key: str,
-                     output_path: str = GEOPARQUET_DIR,
-                     target_bucket_name = BUCKET_NAME) -> None:
+def prepare_download(
+    s3_client: BaseClient,
+    s3_key: str,
+    output_path: str = GEOPARQUET_DIR,
+    target_bucket_name=BUCKET_NAME,
+) -> None:
     filename = os.path.basename(s3_key)
     # checking if directory exists
     os.makedirs(output_path, exist_ok=True)
@@ -44,16 +47,16 @@ def prepare_download(s3_client: BaseClient, s3_key: str,
         logger.error(f"Error downloading s3://{target_bucket_name}/{s3_key}: {e}")
 
 
-# Doing the actual donwloading; calling the S3 client, and putting the S3 filenames together
+# Doing the actual downloading; calling the S3 client, and putting the S3 filenames together
 def download_files(year: int, quarters: dict = QUARTERS) -> None:
     """
-    Donwnloads the performance data files from the target Ookla S3 bucket for 1 year to a local directory
+    Downloads the performance data files from the target Ookla S3 bucket for 1 year to a local directory
     Disclaimer: there is similarity in the naming convention download_file and download_files, which cannot be changed
     because of a requirement by botocore. Please note the difference.
     """
     s3_client = create_s3_client()
     downloaded_files = []
-    formats = ["parquet"] # "shapefiles" is an option to download too
+    formats = ["parquet"]  # "shapefiles" is an option to download too
     service_types = ["mobile", "fixed"]
     for quarter, month in quarters.items():
         for format_type in formats:
