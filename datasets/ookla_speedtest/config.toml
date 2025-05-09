@@ -1,0 +1,37 @@
+# Paths of input and output directories
+# raw_dir = "/sciclone/aiddata10/REU/geo/raw/esa_landcover"
+# process_dir = "/tmp"
+# output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/esa_landcover"
+
+years = [ 2019]
+# 2020, 2021, 2022, 2023, 2024 
+
+# Overwrite existing files?
+overwrite_download = false
+overwrite_processing = false
+
+
+[run]
+backend = "local"
+task_runner = "concurrent"
+run_parallel = false
+max_workers = 4
+bypass_error_wrapper = true
+# log_dir = "/sciclone/aiddata10/REU/geo/raw/ookla_speedtest/logs"
+log_dir = "./logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/ookla_speedtest"
+
+
+[deploy]
+deployment_name = "ookla_speedtest"
+image_tag = "05dea6e"
+version = 3
+flow_file_name = "main"
+flow_name = "ookla_speedtest"
+work_pool = "geodata-pool"
+data_manager_version = "0.4.0"
