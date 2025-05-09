@@ -31,7 +31,7 @@ class OoklaSpeedtest(Dataset):
         logger = self.get_logger()
         logger.info(f"Downloading parquet files for year {year}")
         return download_files(year)
-    
+
     def process(self, input_path: Path, output_path: Path):
         logger = self.get_logger()
 
@@ -40,24 +40,29 @@ class OoklaSpeedtest(Dataset):
         if output_path.exists() and not self.overwrite_processing:
             logger.info(f"Processed layer exists: {output_path}")
         else:
-            logger.info(f"Processing file: {input_path}. Ouput will be saved to: {output_path}")
+            logger.info(
+                f"Processing file: {input_path}. Ouput will be saved to: {output_path}"
+            )
 
         # importing from src files
         from src.helpers import GRID_SIZE, NUM_BANDS, BAND16_COLS, BAND32_COLS
         from src.transform_populate import read_parquet
-        from src.generate_raster import make_raster_profile, write_multiband_raster_chunks
+        from src.generate_raster import (
+            make_raster_profile,
+            write_multiband_raster_chunks,
+        )
 
         # going through pipeline processing steps
         gdf = read_parquet(str(input_path))
         profile = make_raster_profile(num_bands=NUM_BANDS, grid_size=GRID_SIZE)
 
         write_multiband_raster_chunks(
-        gdf=gdf,
-        band32_cols=BAND32_COLS,
-        band16_cols=BAND16_COLS,
-        profile=profile,
-        output_path=output_path,
-    )
+            gdf=gdf,
+            band32_cols=BAND32_COLS,
+            band16_cols=BAND16_COLS,
+            profile=profile,
+            output_path=output_path,
+        )
         return
 
     def main(self):
@@ -65,7 +70,7 @@ class OoklaSpeedtest(Dataset):
 
         # os.makedirs(self.raw_dir / "compressed", exist_ok=True)
         # os.makedirs(self.raw_dir / "uncompressed", exist_ok=True)
-        os.makedirs(self.raw_dir, exist_ok=True) # maybe necessary?
+        os.makedirs(self.raw_dir, exist_ok=True)  # maybe necessary?
 
         # Download data
         logger.info("Running data download")
@@ -89,18 +94,15 @@ class OoklaSpeedtest(Dataset):
 # ---- BEGIN BOILERPLATE ----
 try:
     from prefect import flow
-except:
+except Exception as e:
     pass
 else:
+
     @flow
     def ookla_speedtest(config: OoklaSpeedtestConfiguration):
         OoklaSpeedtest(config).run(config.run)
 
+
 if __name__ == "__main__":
     config = get_config(OoklaSpeedtestConfiguration)
     OoklaSpeedtest(config).run(config.run)
-
-    # # testing
-    # test_input = Path("data/datasets/2019-01-01_performance_fixed_tiles.parquet")
-    # test_output = Path("visualizations/2019-01-01_performance_fixed_tiles.tif")
-    # OoklaSpeedtest(config).process(test_input, test_output)
