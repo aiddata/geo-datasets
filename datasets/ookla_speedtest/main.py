@@ -94,7 +94,7 @@ class OoklaSpeedtest(Dataset):
 # ---- BEGIN BOILERPLATE ----
 try:
     from prefect import flow
-except Exception as e:
+except Exception:
     pass
 else:
 
