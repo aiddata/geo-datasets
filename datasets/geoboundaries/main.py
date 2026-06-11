@@ -51,6 +51,7 @@ class geoBoundariesDataset(Dataset):
             "active": 0,
             "public": 0,
             "name": None,
+            "short_name": None,
             "path": None,
             "file_extension": ".gpkg",
             "title": None,
@@ -99,6 +100,7 @@ class geoBoundariesDataset(Dataset):
         adm_meta = self.default_meta.copy()
 
         adm_meta["name"] = f"gB_v6_{iso3}_{item['boundaryType']}"
+        adm_meta["short_name"] = f"gB6 {iso3} {item['boundaryType']}"
 
         logger.info(f"Processing geoBoundaries item: {adm_meta['name']}")
 
