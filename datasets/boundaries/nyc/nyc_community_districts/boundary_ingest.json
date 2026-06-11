@@ -24,5 +24,6 @@
         "sources_name": "NYC Open Data",
         "sources_web": "https://data.cityofnewyork.us/City-Government/Community-Districts/yfnk-k7r4"
     },
-    "active": 1
+    "active": 1,
+    "short_name": "NYC Community Districts"
 }

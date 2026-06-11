@@ -10,12 +10,17 @@
     "version": 1,
     "options": {
         "resolution": 0.01,
-        "extract_types": ["mean", "max", "min", "count"],
-        "extract_types_info" : {
-            "mean" : "average distance per unit of analysis",
-            "max" : "maximum distance per unit of analysis",
-            "min" : "minimum distance per unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+        "extract_types": [
+            "mean",
+            "max",
+            "min",
+            "count"
+        ],
+        "extract_types_info": {
+            "mean": "average distance per unit of analysis",
+            "max": "maximum distance per unit of analysis",
+            "min": "minimum distance per unit of analysis",
+            "count": "total count of pixels per unit of analysis"
         },
         "factor": 1,
         "variable_description": "distance in meters"
@@ -24,7 +29,11 @@
         "citation": "geoBoundaries https://www.geoboundaries.org/index.htmlg.",
         "sources_web": "https://www.geoboundaries.org/index.html",
         "sources_name": "geoBoundaries",
-        "tags": ["accessibility", "other"]
+        "tags": [
+            "accessibility",
+            "other"
+        ]
     },
-    "active": 1
+    "active": 1,
+    "short_name": "Distance to Country Border"
 }

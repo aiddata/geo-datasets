@@ -23,5 +23,6 @@
         "sources_name": "NYC Open Data",
         "sources_web": "https://data.cityofnewyork.us/City-Government/Borough-Boundaries/tqmj-j8zm"
     },
-    "active": 1
+    "active": 1,
+    "short_name": "NYC Boroughs"
 }

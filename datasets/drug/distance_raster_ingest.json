@@ -10,22 +10,35 @@
     "version": "201708",
     "options": {
         "resolution": 0.01,
-        "extract_types": ["mean", "max", "min", "count"],
-        "extract_types_info" : {
-            "mean" : "average distance per unit of analysis",
-            "max" : "maximum distance per unit of analysis",
-            "min" : "minimum distance per unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+        "extract_types": [
+            "mean",
+            "max",
+            "min",
+            "count"
+        ],
+        "extract_types_info": {
+            "mean": "average distance per unit of analysis",
+            "max": "maximum distance per unit of analysis",
+            "min": "minimum distance per unit of analysis",
+            "count": "total count of pixels per unit of analysis"
         },
         "factor": 1,
         "variable_description": "distance in meters"
     },
     "extras": {
-        "citation": "Buhaug, Halvard & Päivi Lujala 2005. Accounting for Scale: Measuring Geography in Quantitative Studies of Civil War. Political Geography 24: 399-418.",
+        "citation": "Buhaug, Halvard & P\u00e4ivi Lujala 2005. Accounting for Scale: Measuring Geography in Quantitative Studies of Civil War. Political Geography 24: 399-418.",
         "sources_web": "http://www.paivilujala.com/drugdata.html",
         "sources_name": "DRUGDATA",
-        "tags": ["environment", "distance", "resources", "drug", "coca bush", "opium poppy", "cannabis"]
+        "tags": [
+            "environment",
+            "distance",
+            "resources",
+            "drug",
+            "coca bush",
+            "opium poppy",
+            "cannabis"
+        ]
     },
-    "active": 1
+    "active": 1,
+    "short_name": "Drug Crops: Distance"
 }
-

@@ -1,32 +1,42 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/GDP_grid",
-	"type": "raster",
-	"file_extension": ".tif",
-	"file_mask": "None",
-	"name": "gdp_grid",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/GDP_grid",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "gdp_grid",
     "title": "Gross Domestic Product",
-	"description": "Map of total economic activity in millions of dollars per square kilometers pixel, including both formal and informal economic activity for ~2006; created from nighttime lights and LandScan population grid.",
+    "description": "Map of total economic activity in millions of dollars per square kilometers pixel, including both formal and informal economic activity for ~2006; created from nighttime lights and LandScan population grid.",
     "details": "No additional processing of raw data.",
-	"version": 1,
-	"options": {
-	    "resolution": 0.00833333,
-        "extract_types": ["sum", "mean", "max", "min", "count"],
-        "extract_types_info" : {
+    "version": 1,
+    "options": {
+        "resolution": 0.00833333,
+        "extract_types": [
+            "sum",
+            "mean",
+            "max",
+            "min",
+            "count"
+        ],
+        "extract_types_info": {
             "sum": "total gdp for each unit of analysis",
-            "mean" : "average gdp within each unit of analysis",
-            "max" : "maximum gdp assigned to a pixel within each unit of analysis",
-            "min" : "minimum gdp assigned to a pixel within each unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+            "mean": "average gdp within each unit of analysis",
+            "max": "maximum gdp assigned to a pixel within each unit of analysis",
+            "min": "minimum gdp assigned to a pixel within each unit of analysis",
+            "count": "total count of pixels per unit of analysis"
         },
-	    "factor": 1,
+        "factor": 1,
         "variable_description": "millions of dollars"
-	},
-	"extras": {
-	    "citation": "Ghosh, T., Powell, R.L., Elvidge, C.D., Baugh, K.E., Sutton, P.C., Anderson, S.: Shedding light on the global distribution of economic activity. The Open Geography Journal 3, 148-161 (2010)",
-	    "sources_web": "http://ngdc.noaa.gov/eog/data/GDP/",
-	    "sources_name": "Cooperative Institute for Research in Environmental Sciences, University of Colorado",
-	    "tags": ["gdp", "economics", "welfare"]
-	},
-	"active": 1
+    },
+    "extras": {
+        "citation": "Ghosh, T., Powell, R.L., Elvidge, C.D., Baugh, K.E., Sutton, P.C., Anderson, S.: Shedding light on the global distribution of economic activity. The Open Geography Journal 3, 148-161 (2010)",
+        "sources_web": "http://ngdc.noaa.gov/eog/data/GDP/",
+        "sources_name": "Cooperative Institute for Research in Environmental Sciences, University of Colorado",
+        "tags": [
+            "gdp",
+            "economics",
+            "welfare"
+        ]
+    },
+    "active": 1,
+    "short_name": "Global Gridded GDP"
 }
-

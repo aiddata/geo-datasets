@@ -10,20 +10,30 @@
     "version": "2",
     "options": {
         "resolution": 0.0025,
-        "extract_types": ["mean", "max", "min"],
-        "extract_types_info" : {
-            "mean" : "average wind speed per unit of analysis",
-            "max" : "maximum wind speed per unit of analysis",
-            "min" : "minimum wind speed per unit of analysis"
+        "extract_types": [
+            "mean",
+            "max",
+            "min"
+        ],
+        "extract_types_info": {
+            "mean": "average wind speed per unit of analysis",
+            "max": "maximum wind speed per unit of analysis",
+            "min": "minimum wind speed per unit of analysis"
         },
         "factor": 1,
         "variable_description": "wind speed in meters per second"
     },
     "extras": {
-        "citation": "Wind data obtained from the “Global Wind Atlas 2.0, a free, web-based application developed, owned and operated by the Technical University of Denmark (DTU) in partnership with the World Bank Group, utilizing data provided by Vortex, with funding provided by the Energy Sector Management Assistance Program (ESMAP). https://globalsolaratlas.info. Accessed online 2019-03-05.",
+        "citation": "Wind data obtained from the \u201cGlobal Wind Atlas 2.0, a free, web-based application developed, owned and operated by the Technical University of Denmark (DTU) in partnership with the World Bank Group, utilizing data provided by Vortex, with funding provided by the Energy Sector Management Assistance Program (ESMAP). https://globalsolaratlas.info. Accessed online 2019-03-05.",
         "sources_web": "https://globalwindatlas.info/about/",
         "sources_name": "Global Wind Atlas",
-        "tags": ["resources", "environment", "energy", "wind"]
+        "tags": [
+            "resources",
+            "environment",
+            "energy",
+            "wind"
+        ]
     },
-    "active": 1
+    "active": 1,
+    "short_name": "Global Wind Atlas: Wind Speed"
 }

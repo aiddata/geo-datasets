@@ -4,6 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "dist_to_all_rivers",
+    "short_name": "Distance to Rivers",
     "title": "Distance to All Rivers",
     "description": "Distance to rivers of any size, measured in meters, based on the HydroSHEDS product.  HydroSHEDS is a mapping product that provides hydrographic information for regional and global-scale applications in a consistent format. It offers a suite of geo-referenced data sets (vector & raster) at various scales, including river networks, watershed boundaries, drainage directions, and flow accumulations. HydroSHEDS is based on high-resolution elevation data obtained during a Space Shuttle flight for NASA's Shuttle Radar Topography Mission (SRTM).",
     "version": 1,

@@ -4,6 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "Global_Pf_Incidence_Rate_YYYY.tif",
 	"name": "map_pf_incidence_rate",
+	"short_name": "Malaria Atlas: Pf Incidence Rate",
     "title": "Malaria Atlas Project - Malaria (Pf) Incidence Rate",
     "description": "Number of newly diagnosed Malaria (Plasmodium falciparum) cases per 1,000 population, in a given year",
     "details": "",

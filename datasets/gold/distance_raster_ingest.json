@@ -4,6 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "distance_to_gold_v12",
+    "short_name": "Gold Mines: Distance",
     "title": "Distance to Lootable Gold Deposit",
     "description": "Distance to nearest lootable or surface gold deposit. Derived from GOLDATA dataset which consists of 2969 entries for gold occurrences in 108 countries.",
     "details": "Dataset downloaded September 2017.",

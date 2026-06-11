@@ -4,6 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "udcp_One-sided_YYYY.tif",
     "name": "udcp_One-sided_binary",
+    "short_name": "UCDP Conflict: One-Sided (Binary)",
     "title": "UDCP One-sided Conflict Events",
     "description": "Number of one-sided conflict event counts per 0.01 decimal degree grid cell using UCDP GED polygon 1.1. Definition of ucdp violence type can be found: http://www.pcr.uu.se/research/ucdp/definitions/",
     "version": 1,

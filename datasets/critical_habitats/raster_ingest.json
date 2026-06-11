@@ -9,11 +9,14 @@
     "details": "",
     "version": 2.0,
     "options": {
-        "resolution":  0.008333333333333333,
-        "extract_types": ["categorical", "count"],
-        "extract_types_info" : {
-            "categorical" : "number of pixels associated with each category of the likelihood of critical habitat presence",
-            "count" : "total count of pixels per unit of analysis"
+        "resolution": 0.008333333333333333,
+        "extract_types": [
+            "categorical",
+            "count"
+        ],
+        "extract_types_info": {
+            "categorical": "number of pixels associated with each category of the likelihood of critical habitat presence",
+            "count": "total count of pixels per unit of analysis"
         },
         "factor": 1,
         "variable_description": "Categorized likelihood of the presence of habitats of significant importance to threatened, endemic, congregatory and migratory species, threatened or unique ecosystems, and key evolutionary processes (may be: unclassified, potential, or likely)"
@@ -22,12 +25,19 @@
         "citation": "UNEP-WCMC (2023) Global Critical Habitat screening layer (Version 2.0). Cambridge (UK): UN Environment Programme World Conservation Monitoring Centre. Data DOI: https://doi.org/10.34892/d3xm-qm60 . Other cited reference(s): UNEP-WCMC (2017) Global Critical Habitat screening layer (Version 1.0). Cambridge (UK): UN Environment Programme World Conservation Monitoring Centre. Data DOI:https://doi.org/10.34892/nc6d-0z73 .",
         "sources_web": "https://resources.unep-wcmc.org/products/77c18300cc28469097fa92ba47b3f278",
         "sources_name": "UN Environment Programme World Conservation Monitoring Centre (UNEP-WCMC) ",
-        "tags": ["critical", "habitats", "conservation", "environment", "ifc"],
+        "tags": [
+            "critical",
+            "habitats",
+            "conservation",
+            "environment",
+            "ifc"
+        ],
         "category_map": {
             "unclassified": 0,
             "potential": 1,
             "likely": 10
         }
     },
-    "active": 1
+    "active": 1,
+    "short_name": "IFC Critical Habitats v2"
 }

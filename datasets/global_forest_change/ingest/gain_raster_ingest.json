@@ -10,19 +10,25 @@
     "version": "1.8",
     "options": {
         "resolution": 0.00025,
-        "extract_types": ["categorical"],
-        "extract_types_info" : {
-            "categorical" : "number of pixels of forest loss which occured in each year",
-            "count" : "total count of pixels per unit of analysis"
+        "extract_types": [
+            "categorical"
+        ],
+        "extract_types_info": {
+            "categorical": "number of pixels of forest loss which occured in each year",
+            "count": "total count of pixels per unit of analysis"
         },
         "factor": 1,
         "variable_description": "pixels of forest loss"
     },
     "extras": {
-        "citation": "Hansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavina, D. Thau, S. V. Stehman, S. J. Goetz, T. R. Loveland, A. Kommareddy, A. Egorov, L. Chini, C. O. Justice, and J. R. G. Townshend. 2013. “High-Resolution Global Maps of 21st-Century Forest Cover Change.” Science 342 (15 November): 850–53.",
+        "citation": "Hansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavina, D. Thau, S. V. Stehman, S. J. Goetz, T. R. Loveland, A. Kommareddy, A. Egorov, L. Chini, C. O. Justice, and J. R. G. Townshend. 2013. \u201cHigh-Resolution Global Maps of 21st-Century Forest Cover Change.\u201d Science 342 (15 November): 850\u201353.",
         "sources_web": "https://storage.googleapis.com/earthenginepartners-hansen/GFC-2020-v1.8/download.html",
         "sources_name": "Hansen/UMD/Google/USGS/NASA",
-        "tags": ["enivronment", "forest", "loss"],
+        "tags": [
+            "enivronment",
+            "forest",
+            "loss"
+        ],
         "category_map": {
             "no_loss": 0,
             "loss_2001": 1,
@@ -39,5 +45,6 @@
             "loss_2012": 12
         }
     },
-    "active": 1
+    "active": 1,
+    "short_name": "Global Forest Change v18 - Forest Gain"
 }

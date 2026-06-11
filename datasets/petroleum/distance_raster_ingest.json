@@ -4,6 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "dist_to_onshore_petroleum_v12",
+    "short_name": "Petroleum Deposits: Distance",
     "title": "Distance to On-shore Petroleum",
     "description": "Distance to on-shore petroleum, measured in meters. Derived from PRIO global on-shore petroleum dataset.",
     "details": "Dataset downloaded August 2017.",

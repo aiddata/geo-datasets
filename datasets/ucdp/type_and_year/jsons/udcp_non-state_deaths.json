@@ -4,6 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "ucdp_fatality_Non-state_YYYY.tif",
+    "short_name": "UCDP Conflict Deaths: Non-State",
     "title": "UCDP Non-state Conflict Events deaths",
     "description": "Number of total fatalities per 0.01 decimal degree grid cell resulting from non-state conflict event using UCDP Georeferenced Event Dataset (GED) global version 17.1. Definition of ucdp violence type can be found: http://www.pcr.uu.se/research/ucdp/definitions/",
     "version": 1,

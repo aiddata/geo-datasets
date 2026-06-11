@@ -4,6 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "gpm_precipitation_YYYY_MM.tif",
 	"name": "gpm_precipitation_v07b_monthly",
+	"short_name": "GPM Precipitation v07B (Monthly)",
 	"title": "Monthly IMERG (GPM) precipitation (v07B)",
 	"description": "Monthly IMERG GPM (v07B) precipitation - research version",
     "details": "Created by extracting monthly IMERG V07B GPM data",

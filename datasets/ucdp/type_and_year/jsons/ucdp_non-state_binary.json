@@ -4,6 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "udcp_Non-state_YYYY.tif",
     "name": "udcp_Non-state_binary",
+    "short_name": "UCDP Conflict: Non-State (Binary)",
     "title": "UDCP Non-state Conflict Events",
     "description": "Number of non-state conflict event counts per 0.01 decimal degree grid cell using UCDP GED polygon 1.1. Definition of ucdp violence type can be found: http://www.pcr.uu.se/research/ucdp/definitions/",
     "version": 1,

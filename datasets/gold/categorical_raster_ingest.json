@@ -4,6 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "categorical_gold_v12",
+    "short_name": "Gold Mines: Categorical",
     "title": "Gold Deposits",
     "description": "Categorical layer where cells are defined as lootable, surface, or non-lootable gold deposits (or mix). Derived from GOLDATA dataset which consists of 2969 entries for gold occurrences in 108 countries.",
     "details": "Dataset downloaded September 2017.",

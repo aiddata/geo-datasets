@@ -10,21 +10,29 @@
     "version": 3,
     "options": {
         "resolution": 0.1,
-        "extract_types": ["sum", "mean", "count"],
-        "extract_types_info" : {
+        "extract_types": [
+            "sum",
+            "mean",
+            "count"
+        ],
+        "extract_types_info": {
             "sum": "count of conflict events per unit of analysis",
-            "mean" : "ratio of count of conflict events to pixel count within each unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+            "mean": "ratio of count of conflict events to pixel count within each unit of analysis",
+            "count": "total count of pixels per unit of analysis"
         },
         "factor": 1,
         "variable_description": "count of conflict events"
     },
     "extras": {
-        "citation": "Raleigh, Clionadh, Andrew Linke, Håvard Hegre and Joakim Karlsen. 2010. Introducing ACLED-Armed Conflict Location and Event Data. Journal of Peace Research 47(5) 651-660.",
+        "citation": "Raleigh, Clionadh, Andrew Linke, H\u00e5vard Hegre and Joakim Karlsen. 2010. Introducing ACLED-Armed Conflict Location and Event Data. Journal of Peace Research 47(5) 651-660.",
         "sources_web": "http://www.acleddata.com",
         "sources_name": "ACLED",
-        "tags": ["acled", "conflict", "africa"]
+        "tags": [
+            "acled",
+            "conflict",
+            "africa"
+        ]
     },
-    "active": 1
+    "active": 1,
+    "short_name": "ACLED Conflict Event Count"
 }
-

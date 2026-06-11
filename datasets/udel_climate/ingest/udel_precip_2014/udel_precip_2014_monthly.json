@@ -1,25 +1,34 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/udel_climate/precip_2014_v4.01/monthly",
-	"type": "raster",
-	"file_extension": ".tif",
-	"file_mask": "xxxx/precip_YYYY_MM.tif",
-	"name": "udel_precip_v401",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/udel_climate/precip_2014_v4.01/monthly",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "xxxx/precip_YYYY_MM.tif",
+    "name": "udel_precip_v401",
     "title": "Monthly Precipitation",
     "description": "Monthly precipitation from UDel v4.01.",
     "details": "",
-	"version": 4.01,
-	"options": {
-	    "resolution": 0.5,
-        "extract_types": ["max", "mean", "min"],
-	    "factor": 1,
-	    "variable_description": "millimeters"
-	},
-	"extras": {
-	    "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
-	    "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html#P2014",
-	    "sources_name": "University of Delaware",
-	    "tags": ["precipitation", "udel", "climate", "environment"]
-	},
-	"active": 0
+    "version": 4.01,
+    "options": {
+        "resolution": 0.5,
+        "extract_types": [
+            "max",
+            "mean",
+            "min"
+        ],
+        "factor": 1,
+        "variable_description": "millimeters"
+    },
+    "extras": {
+        "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
+        "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html#P2014",
+        "sources_name": "University of Delaware",
+        "tags": [
+            "precipitation",
+            "udel",
+            "climate",
+            "environment"
+        ]
+    },
+    "active": 0,
+    "short_name": "UDel Precipitation v4.01 (Monthly)"
 }
-

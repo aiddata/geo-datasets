@@ -1,25 +1,34 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/udel_climate/air_temp_2014_v4.01/monthly",
-	"type": "raster",
-	"file_extension": ".tif",
-	"file_mask": "xxxx/air_temp_YYYY_MM.tif",
-	"name": "udel_air_temp_v401",
-	"title": "Monthly Air Temperature",
-	"description": "Monthly air temperature from UDel v4.01.",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/udel_climate/air_temp_2014_v4.01/monthly",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "xxxx/air_temp_YYYY_MM.tif",
+    "name": "udel_air_temp_v401",
+    "title": "Monthly Air Temperature",
+    "description": "Monthly air temperature from UDel v4.01.",
     "details": "",
-	"version": 4.01,
-	"options": {
-	    "resolution": 0.5,
-        "extract_types": ["max", "mean", "min"],
-	    "factor": 1,
-	    "variable_description": "degrees Celsius"
-	},
-	"extras": {
-	    "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
-	    "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html#T2014",
-	    "sources_name": "University of Delaware",
-	    "tags": ["temperature", "udel", "climate", "environment"]
-	},
-	"active": 0
+    "version": 4.01,
+    "options": {
+        "resolution": 0.5,
+        "extract_types": [
+            "max",
+            "mean",
+            "min"
+        ],
+        "factor": 1,
+        "variable_description": "degrees Celsius"
+    },
+    "extras": {
+        "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
+        "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html#T2014",
+        "sources_name": "University of Delaware",
+        "tags": [
+            "temperature",
+            "udel",
+            "climate",
+            "environment"
+        ]
+    },
+    "active": 0,
+    "short_name": "UDel Air Temperature v4.01 (Monthly)"
 }
-

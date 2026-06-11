@@ -10,20 +10,27 @@
     "version": "201708",
     "options": {
         "resolution": 0.01,
-        "extract_types": ["count", "sum"],
-        "extract_types_info" : {
-            "count" : "total count of pixels per unit of analysis",
-            "sum" : "number of pixels containing diamond deposits for each unit of analysis"
+        "extract_types": [
+            "count",
+            "sum"
+        ],
+        "extract_types_info": {
+            "count": "total count of pixels per unit of analysis",
+            "sum": "number of pixels containing diamond deposits for each unit of analysis"
         },
         "factor": 1,
         "variable_description": "binary"
     },
     "extras": {
-        "citation": "Gilmore, Elisabeth; Nils Petter Gleditsch, Päivi Lujala & Jan Ketil Rød, 2005. ‘Conflict Diamonds: A New Dataset’, Conflict Management and Peace Science 22(3): 257–292",
+        "citation": "Gilmore, Elisabeth; Nils Petter Gleditsch, P\u00e4ivi Lujala & Jan Ketil R\u00f8d, 2005. \u2018Conflict Diamonds: A New Dataset\u2019, Conflict Management and Peace Science 22(3): 257\u2013292",
         "sources_web": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Diamond-Resources/",
         "sources_name": "Peace Research Institute Oslo (PRIO)",
-        "tags": ["environment", "resources", "diamond"]
+        "tags": [
+            "environment",
+            "resources",
+            "diamond"
+        ]
     },
-    "active": 1
+    "active": 1,
+    "short_name": "Diamond Mines: Binary"
 }
-

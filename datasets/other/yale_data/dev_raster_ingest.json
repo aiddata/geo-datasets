@@ -4,6 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "GHS_BUILT_LDS2014_GLOBE_R2016A_54009_1k_v1_0_bin",
+    "short_name": "GHS Built-Up Area 2014",
     "title": "Human Settlement Agglomeration Units",
     "description": "Human Settlement Agglomeration Units at 1km resolution",
     "details": "Derived using multi-level classification algorithm to identify human settlement agglomeration units",

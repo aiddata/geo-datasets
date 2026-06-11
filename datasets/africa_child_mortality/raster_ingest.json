@@ -10,10 +10,13 @@
     "version": 1,
     "options": {
         "resolution": 0.1,
-        "extract_types": ["mean", "count"],
-        "extract_types_info" : {
-            "mean" : "average under-5 mortality for each unit of analysis",
-            "count" : "total count of pixels per unit of analysis",
+        "extract_types": [
+            "mean",
+            "count"
+        ],
+        "extract_types_info": {
+            "mean": "average under-5 mortality for each unit of analysis",
+            "count": "total count of pixels per unit of analysis",
             "max": "maximum under-5 mortality per unit of analysis",
             "min": "minimum under-5 mortality per unit of analysis"
         },
@@ -24,8 +27,14 @@
         "citation": "Marshall Burke, Sam Heft-Neal, and Eran Bendavid. Understanding variation in child mortality across Sub-Saharan Africa: A spatial analysis. The Lancet Global Health, 2016, Volume 4, Issue 12, e936-e94.",
         "sources_web": "http://sheftneal9.wixsite.com/fse-data/paper-1",
         "sources_name": "Stanford Data Portal",
-        "tags": ["africa", "child", "mortality", "population", "welfare"]
+        "tags": [
+            "africa",
+            "child",
+            "mortality",
+            "population",
+            "welfare"
+        ]
     },
-    "active": 1
+    "active": 1,
+    "short_name": "Africa Under-5 Mortality Rate"
 }
-

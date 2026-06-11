@@ -4,6 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "YYYY.xx.xx.tif",
     "name": "modis_landcover_51",
+    "short_name": "MODIS Land Cover v051",
     "title": "MODIS Land Cover (GLCF, Version 5.1)",
     "description": "Standard MODIS land cover type data product (MCD12Q1) in the IGBP Land Cover Type Classification.",
     "details": "No additional processing of raw data.",

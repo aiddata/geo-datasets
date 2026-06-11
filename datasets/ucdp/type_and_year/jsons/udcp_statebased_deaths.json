@@ -4,6 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "ucdp_fatality_State-based_YYYY.tif",
+    "short_name": "UCDP Conflict Deaths: State-Based",
     "title": "UCDP State-based Conflict Events deaths",
     "description": "Number of total fatalities per 0.01 decimal degree grid cell resulting from state-based conflict event using UCDP Georeferenced Event Dataset (GED) global version 17.1. Definition of ucdp violence type can be found: http://www.pcr.uu.se/research/ucdp/definitions/",
     "version": 1,

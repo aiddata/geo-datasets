@@ -4,6 +4,7 @@
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "srtm_slope_500m",
+    "short_name": "SRTM Slope 500m",
     "title": "Ground Slope",
     "description": "Global slope (in degrees) derived from Shuttle Radar Topography Mission (SRTM) dataset (v4.1) at 500m resolution.",
     "details": "Created using SRTM elevation data and generating slope in QGIS (which uses gdaldem tool)",

@@ -24,5 +24,6 @@
         "sources_name": "NYC Open Data",
         "sources_web": "https://data.cityofnewyork.us/City-Government/Congressional-Districts/qd3c-zuu7"
     },
-    "active": 1
+    "active": 1,
+    "short_name": "NYC Congressional Districts"
 }

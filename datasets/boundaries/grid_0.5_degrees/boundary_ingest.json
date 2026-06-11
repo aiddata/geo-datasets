@@ -17,10 +17,10 @@
             "grid",
             "prio"
         ],
-        "citation": "Tollefsen, Andreas Forø; Håvard Strand & Halvard Buhaug (2012) PRIO-GRID: A unified spatial data structure. Journal of Peace Research, 49(2): 363-374. doi: 10.1177/0022343311431287",
+        "citation": "Tollefsen, Andreas For\u00f8; H\u00e5vard Strand & Halvard Buhaug (2012) PRIO-GRID: A unified spatial data structure. Journal of Peace Research, 49(2): 363-374. doi: 10.1177/0022343311431287",
         "sources_name": "PRIO-GRID",
         "sources_web": "http://grid.prio.org"
     },
-    "active": 1
+    "active": 1,
+    "short_name": "Global 0.5-Degree Grid"
 }
-

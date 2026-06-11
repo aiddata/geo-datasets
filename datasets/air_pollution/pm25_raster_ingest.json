@@ -10,10 +10,13 @@
     "version": 2013,
     "options": {
         "resolution": 0.1,
-        "extract_types": ["mean", "count"],
-        "extract_types_info" : {
-            "mean" : "average PM2.5 concentration for each unit of analysis",
-            "count" : "total count of pixels per unit of analysis",
+        "extract_types": [
+            "mean",
+            "count"
+        ],
+        "extract_types_info": {
+            "mean": "average PM2.5 concentration for each unit of analysis",
+            "count": "total count of pixels per unit of analysis",
             "max": "maximum PM2.5 concentration per unit of analysis",
             "min": "minimum PM2.5 concentration per unit of analysis"
         },
@@ -24,8 +27,14 @@
         "citation": "Brauer M, Freedman G, Frostad J, van Donkelaar A, Martin RV, Dentener F, Van Dingenen R, Estep K, Amini H, Apte JS, Balakrishnan K, Barregard L, Broday DM, Feigin V, Ghosh S, Hopke PK, Knibbs LD, Kokubo Y, Liu Y, Ma S, Morawska L, Sangrador JLT, Shaddick G, Anderson HR, Vos T, Forouzanfar MH, Burnett RT, Cohen A. Ambient air pollution exposure estimation for the Global Burden of Disease 2013. Environmental Science & Technology. 2015 Nov 23. doi: 10.1021/acs.est.5b03709.",
         "sources_web": "http://www.healthdata.org/research-article/ambient-air-pollution-exposure-estimation-global-burden-disease-2013",
         "sources_name": "Ambient air pollution exposure estimation for the Global Burden of Disease 2013",
-        "tags": ["pollution", "air", "environment", "disease", "particulate"]
+        "tags": [
+            "pollution",
+            "air",
+            "environment",
+            "disease",
+            "particulate"
+        ]
     },
-    "active": 1
+    "active": 1,
+    "short_name": "Ambient Air Pollution 2013: PM2.5"
 }
-

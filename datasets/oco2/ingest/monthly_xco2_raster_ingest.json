@@ -10,11 +10,15 @@
     "version": "11.1r",
     "options": {
         "resolution": 0.1,
-        "extract_types": ["mean", "max", "min"],
-        "extract_types_info" : {
-            "mean" : "average co2 concentration (ppm) per unit of analysis",
-            "max" : "maximum co2 concentration (ppm) per unit of analysis",
-            "min" : "minimum co2 concentration (ppm) per unit of analysis"
+        "extract_types": [
+            "mean",
+            "max",
+            "min"
+        ],
+        "extract_types_info": {
+            "mean": "average co2 concentration (ppm) per unit of analysis",
+            "max": "maximum co2 concentration (ppm) per unit of analysis",
+            "min": "minimum co2 concentration (ppm) per unit of analysis"
         },
         "factor": 1,
         "variable_description": "co2 concentration in parts per million (ppm)"
@@ -23,7 +27,11 @@
         "citation": "OCO-2/OCO-3 Science Team, Vivienne Payne, Abhishek Chatterjee (2022), OCO-2 Level 2 bias-corrected XCO2 and other select fields from the full-physics retrieval aggregated as daily files, Retrospective processing V11.1r, Greenbelt, MD, USA, Goddard Earth Sciences Data and Information Services Center (GES DISC),  Accessed: [2024-06-18], 10.5067/8E4VLCK16O6Q",
         "sources_web": "https://disc.gsfc.nasa.gov/datasets/OCO2_L2_Lite_FP_11.1r/summary",
         "sources_name": "NASA Goddard Earth Science Data and Information Services Center",
-        "tags": ["environment", "co2"]
+        "tags": [
+            "environment",
+            "co2"
+        ]
     },
-    "active": 1
+    "active": 1,
+    "short_name": "OCO-2 v11.1r CO2 Concentration (Monthly)"
 }

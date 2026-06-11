@@ -1,25 +1,34 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/udel_climate/air_temp_2014_v4.01/yearly/var",
-	"type": "raster",
-	"file_extension": ".tif",
-	"file_mask": "air_temp_YYYY_var.tif",
-	"name": "udel_air_temp_v401_var",
+    "base": "/sciclone/aiddata10/REU/geo/data/rasters/udel_climate/air_temp_2014_v4.01/yearly/var",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "air_temp_YYYY_var.tif",
+    "name": "udel_air_temp_v401_var",
     "title": "Air Temperature (Yearly Variance)",
     "description": "Variance of monthly air temperature per year. Created using UDel Air Temperature dataset (v4.01)",
     "details": "",
-	"version": 4.01,
-	"options": {
-	    "resolution": 0.5,
-	    "extract_types": ["max", "mean", "min"],
-	    "factor": 1,
+    "version": 4.01,
+    "options": {
+        "resolution": 0.5,
+        "extract_types": [
+            "max",
+            "mean",
+            "min"
+        ],
+        "factor": 1,
         "variable_description": "degrees Celsius"
-	},
-	"extras": {
-	    "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
-	    "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html#T2014",
-	    "sources_name": "University of Delaware",
-	    "tags": ["temperature", "udel", "climate", "environment"]
-	},
-	"active": 1
+    },
+    "extras": {
+        "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
+        "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html#T2014",
+        "sources_name": "University of Delaware",
+        "tags": [
+            "temperature",
+            "udel",
+            "climate",
+            "environment"
+        ]
+    },
+    "active": 1,
+    "short_name": "UDel Air Temperature v4.01 Annual Variance"
 }
-

@@ -4,6 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "None",
 	"name": "srtm_elevation_500m",
+	"short_name": "SRTM Elevation 500m",
 	"title": "Physical Elevation",
 	"description": "Global elevation (in meters) from Shuttle Radar Topography Mission (SRTM) dataset (v4.1) at 500m resolution.",
     "details": "No additional processing of raw data.",

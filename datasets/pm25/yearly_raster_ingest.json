@@ -4,6 +4,7 @@
 	"file_extension": ".tif",
 	"file_mask": "V5GL04.HybridPM25.Global.201001-YYYY12.tif",
 	"name": "surface_pm25_annual_V5GL04",
+	"short_name": "Surface PM2.5 v5GL04 (Yearly)",
 	"title": "Annual Surface PM2.5 Estimates (V5.GL.04)",
 	"description": "Yearly average of monthly estimates of ground-level fine particulate matter (PM2.5) for 1998-2022 produced by combining Aerosol Optical Depth (AOD) retrievals from the NASA MODIS, MISR, and SeaWIFS instruments with the GEOS-Chem chemical transport model, and subsequently calibrating to global ground-based observations using a Geographically Weighted Regression (GWR).",
     "details": "",

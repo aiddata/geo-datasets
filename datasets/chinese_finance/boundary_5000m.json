@@ -24,5 +24,6 @@
         "sources_name": "AidData",
         "sources_web": "https://github.com/aiddata/gcdf-geospatial-data"
     },
-    "active": 1
+    "active": 1,
+    "short_name": "AidData China Finance v3.01: 5000m Buffer"
 }

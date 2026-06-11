@@ -10,12 +10,17 @@
     "version": 1,
     "options": {
         "resolution": 0.008333333333333,
-        "extract_types": ["mean", "max", "min", "count"],
-        "extract_types_info" : {
-            "mean" : "average travel time per unit of analysis",
-            "max" : "maximum travel time per unit of analysis",
-            "min" : "minimum travel time per unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+        "extract_types": [
+            "mean",
+            "max",
+            "min",
+            "count"
+        ],
+        "extract_types_info": {
+            "mean": "average travel time per unit of analysis",
+            "max": "maximum travel time per unit of analysis",
+            "min": "minimum travel time per unit of analysis",
+            "count": "total count of pixels per unit of analysis"
         },
         "factor": 1,
         "variable_description": "time in minutes"
@@ -24,7 +29,12 @@
         "citation": "Nelson, A. (2008) Estimated travel time to the nearest city of 50,000 or more people in year 2000. Global Environment Monitoring Unit - Joint Research Centre of the European Commission, Ispra Italy. Available at http://forobs.jrc.ec.europa.eu/products/gam/",
         "sources_web": "http://forobs.jrc.ec.europa.eu/products/gam",
         "sources_name": " Global Environment Monitoring Unit - Joint Research Centre of the European Commission",
-        "tags": ["jrc", "accessibility", "economics"]
+        "tags": [
+            "jrc",
+            "accessibility",
+            "economics"
+        ]
     },
-    "active": 1
+    "active": 1,
+    "short_name": "Travel Time to Cities 2010"
 }
