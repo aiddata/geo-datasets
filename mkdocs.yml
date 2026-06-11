@@ -1,0 +1,73 @@
+site_name: GeoQuery Dataset Ingest Pipelines
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Writing Pipelines:
+      - dataset-guide/index.md
+      - dataset-guide/dev-env.md
+      - dataset-guide/planning-script.md
+      - dataset-guide/writing-code.md
+      - dataset-guide/dataset-class.md
+      - dataset-guide/adding-boilerplate.md
+      - dataset-guide/running.md
+      - dataset-guide/tips.md
+  - Deploying Pipelines:
+      - deployment-guide/index.md
+      - deployment-guide/build-container.md
+      - deployment-guide/prefect.md
+      - deployment-guide/helm-chart.md
+      - deployment-guide/k8s-debug.md
+  - Code Reference: reference/
+
+theme:
+  name: "material"
+  palette:
+    primary: white
+  logo: https://cdn.prod.website-files.com/5914719ba6e62162556bd443/5b71a50b4c381931b61a7a9a_triangles.svg
+  features:
+    - content.code.annotate
+    - navigation.footer
+    - navigation.instant
+    - navigation.tabs
+    - toc.follow
+    - toc.integrate
+
+extra:
+  homepage: https://aiddata.org
+
+repo_url: https://github.com/aiddata/geo-datasets
+
+plugins:
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_symbol_type_heading: true
+  - search
+  - section-index
+
+watch:
+  - data_manager
