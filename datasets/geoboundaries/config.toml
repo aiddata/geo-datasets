@@ -6,7 +6,7 @@ dl_iso3_list = []
 
 output_dir = "/sciclone/aiddata10/REU/geo/data/boundaries/geoboundaries"
 
-overwrite_existing = false
+skip_existing = false
 
 
 [run]
@@ -24,7 +24,7 @@ directory = "datasets/geoboundaries"
 deployment_name = "geoBoundaries"
 image_tag = "05dea6e"
 version = 2
-flow_file_name = "main"
-flow_name = "geoBoundariesFlow"
+flow_file_name = "download_geoboundaries"
+flow_name = "geoBoundariesDownloadFlow"
 work_pool = "geodata-pool"
 data_manager_version = "0.4.0"
