@@ -11,7 +11,6 @@ from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
 class geoBoundariesDownloadConfiguration(BaseDatasetConfiguration):
     version: str
-    gb_data_hash: str
     gb_web_hash: str
     output_dir: str
     skip_existing: bool
@@ -30,7 +29,7 @@ class geoBoundariesDownloadDataset(Dataset):
     def __init__(self, config: geoBoundariesDownloadConfiguration):
         self.config = config
         self.output_tag = f"gB{config.version}"
-        self.output_path = config.output_dir / f"{self.output_tag}_{config.gb_data_hash}_{config.gb_web_hash}"
+        self.output_path = config.output_dir / config.gb_web_hash
         self.skip_existing = config.skip_existing
         self.dl_iso3_list = config.dl_iso3_list or []
         self.api_url = f"https://raw.githubusercontent.com/wmgeolab/gbWeb/{config.gb_web_hash}/api/current/gbOpen/ALL/ALL/index.json"
@@ -62,27 +61,27 @@ class geoBoundariesDownloadDataset(Dataset):
 
         logger.info(f"Processing: {fc_name}")
 
-        commit_dl_url = item["gjDownloadURL"]
-        gpkg_path = self.output_path / f"{Path(commit_dl_url).stem}.gpkg"
-        raw_meta_path = self.output_path / f"raw_{Path(commit_dl_url).stem}.json"
+        dl_url = item["gjDownloadURL"]
+        gpkg_path = self.output_path / f"{Path(dl_url).stem}.gpkg"
+        raw_meta_path = self.output_path / f"raw_{Path(dl_url).stem}.json"
 
         if self.skip_existing and gpkg_path.exists() and raw_meta_path.exists():
             logger.warning(f"Skipping existing: {fc_name}")
             return
 
-        logger.debug(f"Downloading {commit_dl_url}")
+        logger.debug(f"Downloading {dl_url}")
         try:
-            gdf = gpd.read_file(commit_dl_url)
+            gdf = gpd.read_file(dl_url)
         except Exception:
-            if requests.get(commit_dl_url).status_code == 404:
-                logger.error(f"404: {commit_dl_url}")
+            if requests.get(dl_url).status_code == 404:
+                logger.error(f"404: {dl_url}")
                 return
             else:
                 try:
-                    raw_json = requests.get(commit_dl_url).json()
+                    raw_json = requests.get(dl_url).json()
                     gdf = gpd.GeoDataFrame.from_features(raw_json["features"])
                 except Exception as e:
-                    logger.error(f"Failed to download {commit_dl_url}: {e}")
+                    logger.error(f"Failed to download {dl_url}: {e}")
                     return
 
         if "shapeName" not in gdf.columns:
