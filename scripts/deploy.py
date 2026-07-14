@@ -59,7 +59,7 @@ with open(config_file, "rb") as src:
 # load flow
 module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
-flow_image = "docker.io/jacobwhall/geodata-container:{}".format(
+flow_image = "ghcr.io/aiddata/geodata-container:{}".format(
     config["deploy"]["image_tag"]
 )
 data_manager_version = config["deploy"]["data_manager_version"]

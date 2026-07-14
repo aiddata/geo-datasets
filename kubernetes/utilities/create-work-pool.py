@@ -1,10 +1,25 @@
+"""
+Create or update the Kubernetes work pool that geo-datasets flows run on.
+
+The pool's base job template lives in base-job-template.json, which already
+carries the SciClone volume mount and the securityContext that flow pods need.
+This script applies that template, overriding a few values that are handy to
+set per-environment (namespace, image, concurrency).
+
+Usage:
+    python create-work-pool.py --namespace geo-datasets
+"""
+
 import asyncio
 import json
+from pathlib import Path
 
 import click
 from prefect import get_client
 from prefect.client.schemas.actions import WorkPoolCreate, WorkPoolUpdate
 from prefect.exceptions import ObjectAlreadyExists
+
+BASE_JOB_TEMPLATE = Path(__file__).parent / "base-job-template.json"
 
 
 async def create_work_pool(wp_kwargs):
@@ -24,74 +39,48 @@ async def create_work_pool(wp_kwargs):
 
 
 @click.command()
-@click.option("--pool-name", default="geodata-pool", help="Name of work pool", type=str)
+@click.option("--pool-name", default="geodata", help="Name of work pool", type=str)
 @click.option(
     "--concurrency-limit",
     default=None,
     help="Concurrency maximum for work pool",
     type=int,
 )
-@click.option("--namespace", required=True, help="Name of k8s namespace", type=str)
+@click.option(
+    "--namespace",
+    default="geo-datasets",
+    help="Kubernetes namespace to run flow jobs in",
+    type=str,
+)
 @click.option(
     "--image",
-    default="jacobwhall/geodata-container",
-    help="Name of image to run jobs in",
+    default=None,
+    help="Image to run jobs in. Defaults to the value in base-job-template.json.",
     type=str,
 )
-@click.option("--cpu-request", default=None, help="CPU request", type=int)
-@click.option("--cpu-limit", default=None, help="CPU limit", type=int)
-@click.option("--memory-request", default=None, help="Memory request", type=int)
-@click.option("--memory-limit", default=None, help="Memory limit", type=int)
 @click.option(
     "--persistent-volume-claim",
-    default="nova-geodata-prod",
-    help="Name of PersistentVolumeClaim in Kubernetes to mount to /sciclone/aiddata10/REU/geo in the image.",
+    default=None,
+    help="PersistentVolumeClaim to mount at /sciclone/nova/REU/geo. Defaults to the value in base-job-template.json.",
     type=str,
 )
-def main(
-    pool_name,
-    concurrency_limit,
-    namespace,
-    image,
-    cpu_request,
-    cpu_limit,
-    memory_request,
-    memory_limit,
-    persistent_volume_claim,
-):
-    # should we have requests and limits?
-    requests_and_limits: bool = False
+def main(pool_name, concurrency_limit, namespace, image, persistent_volume_claim):
+    with open(BASE_JOB_TEMPLATE) as src:
+        base_job_template = json.load(src)
 
-    with open("base-job-template.json") as src:
-        base_job_template = json.loads(src.read())
+    properties = base_job_template["variables"]["properties"]
+    properties["namespace"]["default"] = namespace
 
-    # set default namespace
-    base_job_template["variables"]["properties"]["namespace"]["default"] = namespace
+    if image:
+        properties["image"]["default"] = image
 
-    # set default image
-    base_job_template["variables"]["properties"]["image"]["default"] = image
-
-    # set PersistentVolumeClaim to mount to /sciclone in the image
-    pvc_template = {
-        "name": "sciclone",
-        "persistentVolumeClaim": {
-            "claimName": persistent_volume_claim,
-        },
-    }
-    base_job_template["job_configuration"]["job_manifest"]["spec"]["template"]["spec"][
-        "volumes"
-    ].append(pvc_template)
-
-    # TODO: set cpu request
-
-    # TODO: set cpu limit
-
-    # TODO: set memory request
-
-    # TODO: set memory limit
-
-    # whether or not to use volume
-    use_volume = True
+    if persistent_volume_claim:
+        pod_spec = base_job_template["job_configuration"]["job_manifest"]["spec"][
+            "template"
+        ]["spec"]
+        pod_spec["volumes"][0]["persistentVolumeClaim"][
+            "claimName"
+        ] = persistent_volume_claim
 
     wp_kwargs = {
         "name": pool_name,

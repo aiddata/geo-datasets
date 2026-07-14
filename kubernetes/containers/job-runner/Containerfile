@@ -1,8 +1,15 @@
-FROM prefecthq/prefect:2.14.21-python3.11
+# Image that geo-datasets flow runs execute in.
+#
+# Build from the repository root, so that the lockfile and the data_manager
+# source are in the build context:
+#
+#   podman build -f kubernetes/containers/job-runner/Containerfile \
+#       -t ghcr.io/aiddata/geodata-container:$(git rev-parse --short HEAD) .
 
-# install gdal, git, wget
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
+FROM docker.io/prefecthq/prefect:3.7.4-python3.11
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     gdal-bin \
     libgdal-dev \
     openssh-client \
@@ -10,29 +17,25 @@ RUN apt-get install -y --no-install-recommends \
     wget \
 && rm -rf /var/lib/apt/lists/*
 
-RUN sed -i -e 's/^UID_MAX.*$/&0/g' /etc/login.defs
+COPY --from=ghcr.io/astral-sh/uv:0.9.5 /uv /usr/local/bin/uv
 
-RUN useradd jwhall -ms /bin/bash -u 220294
-RUN groupadd ad-reu -g 9915
+# Dependencies come from the lockfile rather than a hand-maintained
+# requirements.txt, so this image cannot drift from what the datasets resolve
+# against locally.
+WORKDIR /opt/geo-datasets
+COPY pyproject.toml uv.lock ./
+COPY data_manager/ data_manager/
+RUN uv export --frozen --no-editable --no-emit-project -o /tmp/requirements.txt \
+ && uv pip install --system --no-cache -r /tmp/requirements.txt \
+ && rm /tmp/requirements.txt
 
-# RUN chown -R jwhall /home/jwhall
+# Flow pods run as the SciClone user (set by the work pool base job template),
+# not as a user baked into this image, so anything written at runtime has to
+# live somewhere world-writable rather than in a fixed home directory.
+ENV HOME=/tmp \
+    PREFECT_HOME=/tmp/.prefect \
+    PYTHONUSERBASE=/tmp/python-user \
+    PATH=/tmp/python-user/bin:$PATH
 
-# jwhall and ad-reu
-USER jwhall:ad-reu
-
-WORKDIR /home/jwhall
-
-ENV PATH /home/jwhall/.local/bin:$PATH
-
-# install python packages
-COPY requirements.txt requirements.txt
-
-# install numpy beforehand, otherwise netcdf4 build step will complain for some reason
-RUN pip install numpy
-RUN pip install -r requirements.txt --no-cache-dir --no-binary rasterio
-
-COPY prepare.sh /usr/bin/prepare.sh
+COPY kubernetes/containers/job-runner/prepare.sh /usr/bin/prepare.sh
 ENTRYPOINT ["/usr/bin/prepare.sh"]
-
-# run prefect agent
-CMD ["prefect", "worker", "start", "-p", "geodata-pool"]
