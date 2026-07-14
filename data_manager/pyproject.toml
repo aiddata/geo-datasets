@@ -6,5 +6,5 @@ build-backend = "hatchling.build"
 name = "data_manager"
 version = "0.4.7"
 dependencies = [
-  "rio-cogeo ~= 5.3.0",
+  "rio-cogeo ~= 7.0.2",
 ]

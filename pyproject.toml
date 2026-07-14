@@ -3,7 +3,7 @@ name = "geo-datasets"
 version = "0.1.0"
 description = "Dataset import scripts for GeoQuery"
 readme = "README.md"
-requires-python = ">=3.11.9"
+requires-python = ">=3.12"
 dependencies = [
     "affine>=2.4.0",
     "beautifulsoup4>=4.13.4",
@@ -14,7 +14,7 @@ dependencies = [
     "dask-jobqueue>=0.8.1",
     "dask-kubernetes>=2025.4.1",
     "data-manager",
-    "distancerasters>=0.3.3",
+    "distancerasters~=0.4.1",
     "distributed>=2023.3.1",
     "fiona>=1.10.1",
     "geopandas>=1.0.1",
