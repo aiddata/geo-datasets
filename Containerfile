@@ -17,7 +17,12 @@
 # resolve to wheels in uv.lock, and those wheels vendor their own GDAL / GEOS /
 # PROJ / HDF. That means no system GDAL/HDF dev packages are required here.
 
-FROM python:3.11-slim-bookworm
+# The Python version is NOT pinned here: it is read from .python-version so that
+# file stays the single source of truth for the whole project. Rather than base
+# on a python:X.Y image (which would bake the version into this Containerfile),
+# we start from plain debian-slim and let uv install the interpreter that
+# .python-version requests (uv sync reads it automatically).
+FROM debian:bookworm-slim
 
 # Pin uv to the same version used to author uv.lock for reproducible installs.
 COPY --from=ghcr.io/astral-sh/uv:0.10.2 /uv /uvx /bin/
@@ -33,10 +38,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
+# UV_PYTHON is intentionally unset so it does not override the .python-version
+# request; UV_PYTHON_DOWNLOADS=automatic lets uv fetch that interpreter.
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
-    UV_PYTHON_DOWNLOADS=never \
-    UV_PYTHON=python3.11 \
+    UV_PYTHON_DOWNLOADS=automatic \
     PYTHONUNBUFFERED=1
 
 WORKDIR /app
@@ -44,13 +50,15 @@ WORKDIR /app
 # Install the locked dependencies plus the local data_manager package. Only the
 # files needed for that are copied in, so the build context (and what can bust
 # this layer) is limited to the things that actually define the environment.
+# .python-version selects the interpreter uv installs and builds the venv with.
 # The root geo-datasets project is virtual (no [build-system]), so uv installs
 # its dependencies without trying to build it; --no-install-project makes that
 # explicit. data_manager is a path dependency, so its source must be present.
-COPY pyproject.toml uv.lock README.md ./
+COPY .python-version pyproject.toml uv.lock README.md ./
 COPY data_manager/ ./data_manager/
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-install-project --no-dev
+    uv python install \
+    && uv sync --frozen --no-install-project --no-dev
 
 # Put the project venv first on PATH so `python`, `prefect`, etc. resolve to it.
 ENV PATH="/app/.venv/bin:$PATH"
