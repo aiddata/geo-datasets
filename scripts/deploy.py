@@ -60,7 +60,6 @@ with open(config_file, "rb") as src:
 module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
 flow_image = "ghcr.io/aiddata/geo-datasets:{}".format(config["deploy"]["image_tag"])
-data_manager_version = config["deploy"]["data_manager_version"]
 
 
 # create and load storage block
@@ -104,7 +103,6 @@ flow.from_source(
     name=dataset_name,
     work_pool_name=config["deploy"]["work_pool"],
     image=flow_image,
-    job_variables={"env": {"DATA_MANAGER_VERSION": data_manager_version}},
     parameters={"config": config},
     version=str(config["deploy"]["version"]),
     # The image is built and pushed by CI (.github/workflows/build-image.yml),
