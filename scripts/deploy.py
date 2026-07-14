@@ -52,8 +52,6 @@ sys.path.insert(
     ),
 )
 
-from main import get_config
-
 config_file = dataset_dir / "config.toml"
 with open(config_file, "rb") as src:
     config = tomllib.load(src)
@@ -110,6 +108,6 @@ flow.from_source(
     image=flow_image,
     job_variables={"env": {"DATA_MANAGER_VERSION": data_manager_version}},
     parameters={"config": config},
-    version=config["deploy"]["version"],
+    version=str(config["deploy"]["version"]),
     build=False,
 )

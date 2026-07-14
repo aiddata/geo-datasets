@@ -322,29 +322,22 @@ class Dataset(ABC):
 
         results = []
 
-        states = [(i[0], i[1].wait()) for i in futures]
+        for ix, (inputs, future) in enumerate(futures):
+            # in Prefect 3, wait() blocks until the state is terminal and returns None,
+            # so the state has to be read off the future afterwards
+            future.wait()
+            state = future.state
 
-        while states:
-            for ix, (inputs, state) in enumerate(states):
-                if state.is_completed():
-                    # print('complete', ix, inputs)
-                    logger.info(f"complete - {ix} - {inputs}")
-
-                    results.append(TaskResult(0, "Success", inputs, state.result()))
-                elif state.is_failed() or state.is_crashed() or state.is_cancelled():
-                    # print('fail', ix, inputs)
-                    logger.info(f"fail - {ix} - {inputs}")
-
-                    try:
-                        msg = repr(state.result(raise_on_failure=True))
-                    except Exception as e:
-                        msg = f"Unable to retrieve error message - {e}"
-                    results.append(TaskResult(1, msg, inputs, None))
-                else:
-                    # print('not ready', ix, inputs)
-                    continue
-                _ = states.pop(ix)
-            time.sleep(5)
+            if state.is_completed():
+                logger.info(f"complete - {ix} - {inputs}")
+                results.append(TaskResult(0, "Success", inputs, state.result()))
+            else:
+                logger.info(f"fail - {ix} - {inputs}")
+                try:
+                    msg = repr(state.result(raise_on_failure=True))
+                except Exception as e:
+                    msg = f"Unable to retrieve error message - {e}"
+                results.append(TaskResult(1, msg, inputs, None))
 
         # for inputs, future in futures:
         #     state = future.wait(60*60*2)
@@ -436,9 +429,9 @@ class Dataset(ABC):
             retry_delay: Delay (in seconds) to wait between task retries.
             force_sequential: If set to `True`, all tasks in this run will be run in sequence, regardless of backend.
             force_serial: If set to `True`, all tasks will be run locally (using the internal "serial runner") rather than with this Dataset's usual backend. **Please avoid using this parameter, it will likely be deprecated soon!**
-            max_workers: Maximum number of tasks to run at once, if using a concurrent mode. This value will not override `force_sequential` or `force_serial`. **Warning: This is not yet supported by the Prefect backend. We hope to fix this soon.**
-            prefect_concurrency_tag: If using the Prefect backend, this tag will be used to limit the concurrency of this task. **This will eventually be deprecated in favor of `max_workers` once we have implemented that for the Prefect backend.**
-            prefect_concurrency_task_value: If using the Prefect backend, this sets the maximum number of tasks to run at once, similar to `max_workers`. **See warning above.**
+            max_workers: Maximum number of tasks to run at once, if using a concurrent mode. This value will not override `force_sequential` or `force_serial`.
+            prefect_concurrency_tag: If using the Prefect backend, this tag will be used to limit the concurrency of this task, using a global concurrency limit shared across flow runs.
+            prefect_concurrency_task_value: If using the Prefect backend, this sets how many slots of `prefect_concurrency_tag` each task occupies.
         """
 
         timestamp = datetime.today()
@@ -689,17 +682,12 @@ class Dataset(ABC):
             self.backend = "prefect"
 
             from prefect import flow
-            from prefect.task_runners import (  # , ThreadPoolTaskRunner
-                ConcurrentTaskRunner,
-                SequentialTaskRunner,
-            )
+            from prefect.task_runners import ThreadPoolTaskRunner
 
             if params.task_runner == "sequential":
-                tr = SequentialTaskRunner
+                tr = ThreadPoolTaskRunner(max_workers=1)
             elif params.task_runner == "concurrent" or params.task_runner is None:
-                # placeholder for actual ThreadPoolTaskRunner release in future Prefect versions
-                # tr = ThreadPoolTaskRunner(max_workers=max_workers)
-                tr = ConcurrentTaskRunner()
+                tr = ThreadPoolTaskRunner(max_workers=max_workers)
 
             elif params.task_runner == "dask":
                 from prefect_dask import DaskTaskRunner

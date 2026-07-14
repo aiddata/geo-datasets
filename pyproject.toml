@@ -22,7 +22,7 @@ dependencies = [
     "lz4>=4.3.2",
     "netcdf4>=1.7.2",
     "pandas>=2.1.0",
-    "prefect>=2.20.10",
+    "prefect>=3.7.4,<4",
     "proj>=0.2.0",
     "pyhdf>=0.11.6",
     "requests>=2.28.1",
@@ -32,4 +32,4 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-data-manager = { path = "data_manager" }
+data-manager = { path = "data_manager", editable = true }
