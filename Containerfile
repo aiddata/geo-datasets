@@ -40,9 +40,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # UV_PYTHON is intentionally unset so it does not override the .python-version
 # request; UV_PYTHON_DOWNLOADS=automatic lets uv fetch that interpreter.
+#
+# UV_PYTHON_INSTALL_DIR moves that interpreter out of /root, which is mode 0700.
+# Flow pods run as the SciClone uid rather than root (see the work pool base job
+# template), and .venv/bin/python is a symlink to the uv-managed interpreter, so
+# leaving it under /root makes the venv unusable to every non-root user:
+# "exec .venv/bin/python: Permission denied".
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=automatic \
+    UV_PYTHON_INSTALL_DIR=/opt/uv/python \
     PYTHONUNBUFFERED=1
 
 WORKDIR /app
@@ -62,6 +69,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # Put the project venv first on PATH so `python`, `prefect`, etc. resolve to it.
 ENV PATH="/app/.venv/bin:$PATH"
+
+# Flow pods run as a uid that has no entry in /etc/passwd, so HOME would
+# otherwise resolve to the root-owned WORKDIR and Prefect could not create its
+# home directory. Point both at a world-writable location.
+ENV HOME=/tmp \
+    PREFECT_HOME=/tmp/.prefect
 
 # Default command. When this image is used as a Prefect Kubernetes work-pool job
 # image, Prefect overrides the command to execute the flow run; this CMD is the
