@@ -1,0 +1,82 @@
+name: "Build platform image"
+
+# Build and publish the geo-datasets *platform* image to GHCR.
+#
+# This image is the slow-moving half of the deployment model: it carries the
+# Python environment (Prefect + geospatial deps from uv.lock) and the
+# data_manager framework, but NOT the dataset pipeline code. Dataset code is
+# pulled fresh from git at flow-run time (see scripts/deploy.py), so editing a
+# pipeline never needs an image rebuild. Only changes to the environment or the
+# framework rebuild this image, which is why the path filter below is narrow.
+#
+# Images are tagged with the short commit SHA (immutable, pin these in a
+# deployment's config.toml `image_tag`) plus a moving `latest` tag.
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - pyproject.toml
+      - uv.lock
+      - data_manager/**
+      - Containerfile
+      - .dockerignore
+      - .github/workflows/build-image.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute image name and tags
+        id: meta
+        run: |
+          # GHCR requires a lowercase image path.
+          image="ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')"
+          short_sha="$(git rev-parse --short HEAD)"
+          echo "image=${image}" >> "$GITHUB_OUTPUT"
+          echo "sha=${short_sha}" >> "$GITHUB_OUTPUT"
+          {
+            echo "tags<<EOF"
+            echo "${image}:${short_sha}"
+            echo "${image}:latest"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Containerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Summary
+        run: |
+          {
+            echo "### Pushed platform image"
+            echo ""
+            echo "Immutable tag (set this as \`image_tag\` in a dataset's config.toml):"
+            echo ""
+            echo "    ${{ steps.meta.outputs.sha }}"
+            echo ""
+            echo "Full reference: \`${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,61 @@
+# syntax=docker/dockerfile:1
+#
+# Environment image for running geo-datasets Prefect flows (one per dataset).
+#
+# This image carries ONLY the dependency environment (pyproject.toml / uv.lock
+# + the local data_manager package). It deliberately does NOT bake in the
+# dataset code under datasets/: at flow-run time the deployment's git pull step
+# (flow.from_source(GitRepository(...)) in scripts/deploy.py) clones the repo
+# fresh into the job pod and runs from that clone. So rebuild this image only
+# when the dependencies change, not when dataset code changes.
+#
+# Build from the repository root:
+#
+#   podman build -t geodata-jobs -f Containerfile .
+#
+# All of the geospatial deps (fiona, rasterio, geopandas, pyhdf, netcdf4, ...)
+# resolve to wheels in uv.lock, and those wheels vendor their own GDAL / GEOS /
+# PROJ / HDF. That means no system GDAL/HDF dev packages are required here.
+
+FROM python:3.11-slim-bookworm
+
+# Pin uv to the same version used to author uv.lock for reproducible installs.
+COPY --from=ghcr.io/astral-sh/uv:0.10.2 /uv /uvx /bin/
+
+# Runtime system libraries:
+#  - libexpat1: needed by the GDAL bundled inside the fiona/rasterio wheels
+#  - ca-certificates: TLS for flows that fetch data over HTTPS
+#  - git, wget: commonly invoked by dataset download/processing steps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libexpat1 \
+        ca-certificates \
+        git \
+        wget \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_PYTHON=python3.11 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install the locked dependencies plus the local data_manager package. Only the
+# files needed for that are copied in, so the build context (and what can bust
+# this layer) is limited to the things that actually define the environment.
+# The root geo-datasets project is virtual (no [build-system]), so uv installs
+# its dependencies without trying to build it; --no-install-project makes that
+# explicit. data_manager is a path dependency, so its source must be present.
+COPY pyproject.toml uv.lock README.md ./
+COPY data_manager/ ./data_manager/
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project --no-dev
+
+# Put the project venv first on PATH so `python`, `prefect`, etc. resolve to it.
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Default command. When this image is used as a Prefect Kubernetes work-pool job
+# image, Prefect overrides the command to execute the flow run; this CMD is the
+# fallback when the container is run directly (e.g. to start a worker locally).
+CMD ["prefect", "worker", "start", "--pool", "geodata-pool"]

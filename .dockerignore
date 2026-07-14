@@ -1,0 +1,33 @@
+# Keep the build context small and avoid copying host-specific or large files
+# into the image. Podman reads this file when no .containerignore is present.
+
+# Virtual environments (host venvs have absolute paths baked in)
+**/.venv
+
+# Version control
+.git
+.gitignore
+
+# Python / tooling caches
+**/__pycache__
+**/*.pyc
+**/.mypy_cache
+**/.pytest_cache
+**/.ruff_cache
+
+# Built docs / site output
+/site
+
+# Built distribution artifacts
+**/dist
+
+# Large dataset payloads pulled at runtime, not part of the image
+datasets/*/data/
+
+# Editor / OS cruft
+.DS_Store
+**/*.swp
+
+# The image is self-describing; no need to ship the build files themselves
+Containerfile
+.dockerignore
