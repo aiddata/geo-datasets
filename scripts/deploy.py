@@ -107,5 +107,8 @@ flow.from_source(
     job_variables={"env": {"DATA_MANAGER_VERSION": data_manager_version}},
     parameters={"config": config},
     version=str(config["deploy"]["version"]),
+    # The image is built and pushed by CI (.github/workflows/build-image.yml),
+    # so deploying must neither rebuild it nor try to push it.
     build=False,
+    push=False,
 )
