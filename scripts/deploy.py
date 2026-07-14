@@ -52,8 +52,6 @@ sys.path.insert(
     ),
 )
 
-from main import get_config
-
 config_file = dataset_dir / "config.toml"
 with open(config_file, "rb") as src:
     config = tomllib.load(src)
@@ -61,9 +59,7 @@ with open(config_file, "rb") as src:
 # load flow
 module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
-flow_image = "docker.io/jacobwhall/geodata-container:{}".format(
-    config["deploy"]["image_tag"]
-)
+flow_image = "ghcr.io/aiddata/geo-datasets:{}".format(config["deploy"]["image_tag"])
 data_manager_version = config["deploy"]["data_manager_version"]
 
 
@@ -110,6 +106,6 @@ flow.from_source(
     image=flow_image,
     job_variables={"env": {"DATA_MANAGER_VERSION": data_manager_version}},
     parameters={"config": config},
-    version=config["deploy"]["version"],
+    version=str(config["deploy"]["version"]),
     build=False,
 )

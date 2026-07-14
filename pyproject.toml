@@ -32,4 +32,4 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-data-manager = { path = "data_manager" }
+data-manager = { path = "data_manager", editable = true }
