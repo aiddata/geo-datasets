@@ -26,4 +26,4 @@ version = 2
 flow_file_name = "main"
 flow_name = "geoBoundariesDownloadFlow"
 work_pool = "geodata"
-data_manager_version = "0.4.6"
+data_manager_version = "0.4.7"

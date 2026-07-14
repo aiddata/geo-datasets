@@ -668,7 +668,7 @@ wheels = [
 
 [[package]]
 name = "data-manager"
-version = "0.4.6"
+version = "0.4.7"
 source = { editable = "data_manager" }
 dependencies = [
     { name = "rio-cogeo" },
