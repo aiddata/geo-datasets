@@ -1,0 +1,28 @@
+year = "2025"
+dataset = "COUNTY"
+
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/boundaries/tiger/raw"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/boundaries/tiger"
+
+overwrite_download = false
+overwrite_process = true
+
+
+[run]
+max_workers = 1
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/boundaries/tiger/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/TIGER"
+
+
+[deploy]
+deployment_name = "TIGER"
+image_tag = "01654d2"
+version = 1
+flow_file_name = "main"
+flow_name = "TIGERDownloadFlow"
+work_pool = "geodata"

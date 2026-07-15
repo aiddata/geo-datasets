@@ -3,129 +3,153 @@ US Census Bureau TIGER/Line Shapefiles
 
 https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html
 
-County
-https://www2.census.gov/geo/tiger/TIGER2025/COUNTY/tl_2025_us_county.zip
+Downloads a national TIGER/Line layer (e.g. COUNTY, STATE) for a given year,
+processes it to a GeoPackage, and writes an ingest JSON. Runs a single layer per
+flow run; per-state layers (tract, block group) are out of scope.
+
+    County: https://www2.census.gov/geo/tiger/TIGER2025/COUNTY/tl_2025_us_county.zip
 """
-import argparse
-from ast import arg
+import json
 from datetime import datetime
 from pathlib import Path
-import requests
 
-
-import pandas as pd
 import geopandas as gpd
-from shapely.geometry import shape, Point, Polygon, MultiPolygon
+import pandas as pd
+import requests
+from pydantic import field_validator
 
-# parse args
-arg_parser = argparse.ArgumentParser(description="Download TIGER/Line shapefiles")
-arg_parser.add_argument("--year", help="Year of the TIGER/Line shapefiles to download", default="2025")
-arg_parser.add_argument("--dataset", help="Dataset to download (e.g., COUNTY, STATE)", default="COUNTY")
-arg_parser.add_argument("--raw-dir", help="Directory for downloaded shapefiles")
-arg_parser.add_argument("--output-dir", help="Directory for processed shapefiles")
-arg_parser.add_argument("--overwrite", action="store_true", help="Overwrite existing files", default=False)
-arg_parser.add_argument("--overwrite-download", action="store_true", help="Overwrite existing files", default=False)
-arg_parser.add_argument("--overwrite-process", action="store_true", help="Overwrite existing files", default=True)
-
-args = arg_parser.parse_args()
-
-# download TIGER/Line shapefiles
-def download_tiger_shapefiles(download_path, overwrite=False):
-
-    if not overwrite and download_path.exists():
-        print(f"File {download_path} already exists. Skipping...")
-        return
-
-    print(f"Downloading {url} to {download_path}...")
-    response = requests.get(url)
-    response.raise_for_status()  # Raise an error for bad responses
-
-    with open(download_path, 'wb') as f:
-        f.write(response.content)
-
-    print(f"Downloaded {download_path}")
-
-# open, check features, and save to GeoPackage
-def process_shapefile(zip_path, output_path, overwrite=False):
-
-    if not overwrite and output_path.exists():
-        print(f"GeoPackage {output_path} already exists. Skipping...")
-        return
-
-    gdf = gpd.read_file(zip_path)
-    print(f"Loaded {len(gdf)} features from {zip_path}")
-
-    # Check for valid geometries
-    assert gdf.is_valid.all(), "Some geometries are invalid. Consider filtering them out."
-
-    # fill null values in each column based on data type it should be without nulls
-    for column in gdf.columns:
-        if column == "geometry":
-            continue
-        elif pd.api.types.is_numeric_dtype(gdf[column]):
-            gdf[column] = gdf[column].fillna(0)
-        else:
-            gdf[column] = gdf[column].fillna("")
+from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
 
-    # Save to GeoPackage
-    gdf.to_file(output_path, driver="GPKG")
-    print(f"Saved to {output_path}")
+class TIGERDownloadConfiguration(BaseDatasetConfiguration):
+    year: str
+    dataset: str
+    raw_dir: str
+    output_dir: str
+    overwrite_download: bool
+    overwrite_process: bool
+
+    @field_validator("raw_dir", "output_dir")
+    @classmethod
+    def validate_path(cls, f: str) -> Path:
+        return Path(f)
 
 
-# create ingest json
-def create_ingest_json(output_path, year, dataset):
+class TIGERDownloadDataset(Dataset):
 
-    defaults={
-        "name": f"TIGER_{year}_{dataset}",
-        "short_name": f"TIGER_{year}_{dataset}",
-        "file_mask": "None",
-        "active": 1,
-        "public": 1,
-        "path": str(Path("/data/TIGER") / output_path.name),
-        "file_extension": ".gpkg",
-        "title": f"US CENSUS TIGER/Line {year} {dataset}",
-        "description": f"US CENSUS TIGER/Line shapefiles for {dataset} in {year}",
-        "details": "",
-        "tags": ["TIGER", "Census", dataset, f"{year}", "USA"],
-        "citation": f"U.S. Census Bureau. ({year}). {year} TIGER/Line Shapefiles: {dataset} (machine readable data files). U.S. Department of Commerce. census.gov (Accessed {datetime.now().strftime('%Y-%m-%d')}).",
-        "source_name": "United States Census Bureau",
-        "source_url": "https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html",
-        "other": {},
-        "ingest_src": "geoquery_automated",
-        "is_global": False,
-        "spatial_extent": None,
-        "group_name": "TIGER",
-        "group_title": "US TIGER/Line Shapefiles",
-        "group_class": "parent",
-        "group_level": "2",
-    }
+    name = "TIGERDownload"
 
-    ingest_json_path = Path(output_path).parent / f"ingest_{year}_{dataset.lower()}.json"
-    with open(ingest_json_path, 'w') as f:
-        import json
-        json.dump(defaults, f, indent=4)
+    def __init__(self, config: TIGERDownloadConfiguration):
+        self.config = config
+        self.year = config.year
+        self.dataset = config.dataset
+        self.overwrite_download = config.overwrite_download
+        self.overwrite_process = config.overwrite_process
 
-    print(f"Ingest JSON created at {ingest_json_path}")
+        stem = f"tl_{self.year}_us_{self.dataset.lower()}"
+        self.url = f"https://www2.census.gov/geo/tiger/TIGER{self.year}/{self.dataset}/{stem}.zip"
+        self.download_path = config.raw_dir / "TIGER" / f"{stem}.zip"
+        self.output_path = config.output_dir / "TIGER" / f"{stem}.gpkg"
+
+    def download(self):
+        logger = self.get_logger()
+
+        if not self.overwrite_download and self.download_path.exists():
+            logger.info(f"File {self.download_path} already exists. Skipping download.")
+            return
+
+        logger.info(f"Downloading {self.url} to {self.download_path}")
+        response = requests.get(self.url)
+        response.raise_for_status()
+
+        with open(self.download_path, "wb") as f:
+            f.write(response.content)
+
+        logger.info(f"Downloaded {self.download_path}")
+
+    def process(self):
+        logger = self.get_logger()
+
+        if not self.overwrite_process and self.output_path.exists():
+            logger.info(f"GeoPackage {self.output_path} already exists. Skipping processing.")
+            return
+
+        gdf = gpd.read_file(self.download_path)
+        logger.info(f"Loaded {len(gdf)} features from {self.download_path}")
+
+        assert gdf.is_valid.all(), "Some geometries are invalid. Consider filtering them out."
+
+        # fill nulls per column based on the dtype it should hold without nulls
+        for column in gdf.columns:
+            if column == "geometry":
+                continue
+            elif pd.api.types.is_numeric_dtype(gdf[column]):
+                gdf[column] = gdf[column].fillna(0)
+            else:
+                gdf[column] = gdf[column].fillna("")
+
+        gdf.to_file(self.output_path, driver="GPKG")
+        logger.info(f"Saved to {self.output_path}")
+
+    def create_ingest_json(self):
+        logger = self.get_logger()
+
+        defaults = {
+            "name": f"TIGER_{self.year}_{self.dataset}",
+            "short_name": f"TIGER_{self.year}_{self.dataset}",
+            "file_mask": "None",
+            "active": 1,
+            "public": 1,
+            "path": str(Path("/data/TIGER") / self.output_path.name),
+            "file_extension": ".gpkg",
+            "title": f"US CENSUS TIGER/Line {self.year} {self.dataset}",
+            "description": f"US CENSUS TIGER/Line shapefiles for {self.dataset} in {self.year}",
+            "details": "",
+            "tags": ["TIGER", "Census", self.dataset, f"{self.year}", "USA"],
+            "citation": f"U.S. Census Bureau. ({self.year}). {self.year} TIGER/Line Shapefiles: {self.dataset} (machine readable data files). U.S. Department of Commerce. census.gov (Accessed {datetime.now().strftime('%Y-%m-%d')}).",
+            "source_name": "United States Census Bureau",
+            "source_url": "https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html",
+            "other": {},
+            "ingest_src": "geoquery_automated",
+            "is_global": False,
+            "spatial_extent": None,
+            "group_name": "TIGER",
+            "group_title": "US TIGER/Line Shapefiles",
+            "group_class": "parent",
+            "group_level": "2",
+        }
+
+        ingest_json_path = (
+            self.output_path.parent / f"ingest_{self.year}_{self.dataset.lower()}.json"
+        )
+        with open(ingest_json_path, "w") as f:
+            json.dump(defaults, f, indent=4)
+
+        logger.info(f"Ingest JSON created at {ingest_json_path}")
+
+    def main(self):
+        logger = self.get_logger()
+
+        self.download_path.parent.mkdir(parents=True, exist_ok=True)
+        self.output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        logger.info(f"Running TIGER download for {self.year} {self.dataset}")
+        self.download()
+        self.process()
+        self.create_ingest_json()
+
+
+try:
+    from prefect import flow
+except ImportError:
+    pass
+else:
+
+    @flow
+    def TIGERDownloadFlow(config: TIGERDownloadConfiguration):
+        TIGERDownloadDataset(config).run(config.run)
+
 
 if __name__ == "__main__":
-    if args.raw_dir is None or args.output_dir is None:
-        raise ValueError("Please specify both raw and output directories using --raw-dir and --output-dir")
-
-    if args.overwrite:
-        args.overwrite_download = True
-        args.overwrite_process = True
-
-    url = f"https://www2.census.gov/geo/tiger/TIGER{args.year}/{args.dataset}/tl_{args.year}_us_{args.dataset.lower()}.zip"
-    download_path = Path(args.raw_dir) / "TIGER" / f"tl_{args.year}_us_{args.dataset.lower()}.zip"
-    download_path.parent.mkdir(parents=True, exist_ok=True)
-
-    download_tiger_shapefiles(download_path, args.overwrite_download)
-
-    output_dir = Path(args.output_dir) / "TIGER"
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = Path(output_dir) / f"{download_path.stem}.gpkg"
-
-    process_shapefile(download_path, output_path, args.overwrite_process)
-
-    create_ingest_json(output_path, args.year, args.dataset)
+    config = get_config(TIGERDownloadConfiguration)
+    TIGERDownloadDataset(config).run(config.run)
