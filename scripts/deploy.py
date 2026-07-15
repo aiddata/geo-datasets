@@ -56,6 +56,14 @@ config_file = dataset_dir / "config.toml"
 with open(config_file, "rb") as src:
     config = tomllib.load(src)
 
+# check for .env file and load it if present
+if (dataset_dir / ".env").exists():
+    with open(dataset_dir / ".env", "r") as f:
+        for line in f:
+            if "=" in line:
+                key, value = line.strip().split("=", 1)
+                config[key] = value
+
 # load flow
 module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
