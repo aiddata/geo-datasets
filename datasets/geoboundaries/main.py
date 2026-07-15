@@ -4,7 +4,7 @@ from typing import List, Optional
 
 import geopandas as gpd
 import requests
-from pydantic import field_validator
+from pydantic import Field, field_validator
 
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
@@ -14,7 +14,7 @@ class geoBoundariesDownloadConfiguration(BaseDatasetConfiguration):
     gb_web_hash: str
     output_dir: str
     skip_existing: bool
-    dl_iso3_list: Optional[List[str]] = None
+    dl_iso3_list: Optional[List[str]] = Field(default_factory=list)
 
     @field_validator("output_dir")
     @classmethod

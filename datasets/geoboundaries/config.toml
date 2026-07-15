@@ -22,7 +22,7 @@ directory = "datasets/geoboundaries"
 [deploy]
 deployment_name = "geoBoundaries"
 image_tag = "01654d2"
-version = 2
+version = 3
 flow_file_name = "main"
 flow_name = "geoBoundariesDownloadFlow"
 work_pool = "geodata"
