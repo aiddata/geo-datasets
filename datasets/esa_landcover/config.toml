@@ -9,7 +9,7 @@ years = [ 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 overwrite_download = false
 overwrite_processing = false
 
-CDSAPI_KEY = "<ADD-API-KEY>"
+CDSAPI_KEY = "<ADD-API-KEY-TO-ENV-OR-PREFECT>"
 
 
 [run]
@@ -29,8 +29,8 @@ directory = "datasets/esa_landcover"
 
 [deploy]
 deployment_name = "esa_landcover"
-image_tag = "01654d2"
-version = 3
+image_tag = "7da1736"
+version = 4
 flow_file_name = "main"
 flow_name = "esa_landcover"
 work_pool = "geodata"
