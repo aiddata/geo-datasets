@@ -14,7 +14,7 @@ class geoBoundariesDownloadConfiguration(BaseDatasetConfiguration):
     gb_web_hash: str
     output_dir: str
     skip_existing: bool
-    dl_iso3_list: Optional[List[str]] = Field(default_factory=list)
+    dl_iso3_list: List[str] = []
 
     @field_validator("output_dir")
     @classmethod
