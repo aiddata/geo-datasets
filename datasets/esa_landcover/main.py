@@ -19,8 +19,7 @@ class ESALandcoverConfiguration(BaseDatasetConfiguration):
     process_dir: str
     output_dir: str
     years: List[int]
-    api_key: str
-    api_uid: str
+    CDSAPI_KEY: str
     overwrite_download: bool
     overwrite_processing: bool
 
@@ -33,8 +32,7 @@ class ESALandcover(Dataset):
         self.process_dir = Path(config.process_dir)
         self.output_dir = Path(config.output_dir)
         self.years = config.years
-        self.api_key = config.api_key
-        self.api_uid = config.api_uid
+        self.CDSAPI_KEY = config.CDSAPI_KEY
         self.overwrite_download = config.overwrite_download
         self.overwrite_processing = config.overwrite_processing
 
@@ -44,7 +42,7 @@ class ESALandcover(Dataset):
         cdsapi_path = Path.home() / ".cdsapirc"
         with open(cdsapi_path, "w") as f:
             f.write(
-                f"url: https://cds.climate.copernicus.eu/api/v2 \nkey: {self.api_uid}:{self.api_key}"
+                f"url: https://cds.climate.copernicus.eu/api \nkey: {self.CDSAPI_KEY}"
             )
 
         self.cdsapi_client = cdsapi.Client()
@@ -81,7 +79,7 @@ class ESALandcover(Dataset):
             logger.warning(f"Assuming that {year} is v2.1.1")
 
         dl_path = self.raw_dir / "compressed" / f"{year}.zip"
-        print(dl_path)
+        logger.info(f"Downloading {year} data to {dl_path}")
 
         if not dl_path.exists() or self.overwrite_download:
             dl_meta = {
@@ -192,4 +190,7 @@ else:
 
 if __name__ == "__main__":
     config = get_config(ESALandcoverConfiguration)
+    import dotenv
+    dotenv.load_dotenv()
+    config.CDSAPI_KEY = os.environ.get("CDSAPI_KEY")
     ESALandcover(config).run(config.run)

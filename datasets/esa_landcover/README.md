@@ -19,24 +19,10 @@ This dataset describes global land use since 1992 using 22 categories. It is [av
     - **If you are on Windows or Mac, follow the appropriate link for instructions, but this readme has only been tested using Linux.**
     - [cdsapi GitHub repo](https://github.com/ecmwf/cdsapi)
 
-4. Create Conda environment
-	- First make sure [Conda](https://docs.conda.io/en/latest/) (and optionally MPI) is available. If on W&M HPC's Vortex nodes for example:
-		```sh
-		module load anaconda3/2021.05
-		# if you will be using the MPI backend:
-		module load openmpi/3.1.4/gcc-9.3.0
-		```
-	- To create a new environment:
-		```sh
-		conda env create -f environment.yml
-		conda activate esa_lc
-		# if you will be using MPI:
-		pip install mpi4py
-        pip install cdsapi
-		```
+4. Make sure uv environment is synced
+    - `uv sync`
 
-
-6. Edit the variables in `config.ini`
+6. Edit the variables in `config.toml`
     - `raw_dir` is the directory where the raw data will be downloaded and unzipped in
     - `output_dir` (prepare.py only) is the directory where the final data will be saved
     - `overwrite`, if True, will overwrite existing files rather than skip them
@@ -44,20 +30,20 @@ This dataset describes global land use since 1992 using 22 categories. It is [av
 
 7. Run `main.py`
    ```sh
-   python main.py
+   uv run main.py
    ```
    **API requests for downloads can take a while to work through queue, run, and be completed before download actually begins.**
 
 ## Deploying to Prefect Cloud
 
-1. Log in to Prefect Cloud
+1. Log in to Prefect Cloud/Server
 
 2. Run `deploy.py`
    ```sh
-   python esa_landcover/deploy.py
+   uv run scripts/deploy.py esa_landcover
    ```
 
-3. From the Deployments menu in Prefect Cloud, select which parameters you'd like to use, then submit the run
+3. From the Deployments menu in Prefect, select which parameters you'd like to use, then submit the run
 
 ## Important Notes
 
