@@ -1,10 +1,9 @@
 import json
 from pathlib import Path
-from typing import List, Optional
 
 import geopandas as gpd
 import requests
-from pydantic import Field, field_validator
+from pydantic import field_validator
 
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
@@ -14,7 +13,10 @@ class geoBoundariesDownloadConfiguration(BaseDatasetConfiguration):
     gb_web_hash: str
     output_dir: str
     skip_existing: bool
-    dl_iso3_list: List[str] = []
+    # Comma-separated ISO3 codes (e.g. "AFG,GHA"); empty means download all.
+    # Kept as a string rather than a list so the Prefect run form renders a text
+    # input instead of the array widget, whose "add item" button submits the form.
+    dl_iso3_list: str = ""
 
     @field_validator("output_dir")
     @classmethod
@@ -31,7 +33,9 @@ class geoBoundariesDownloadDataset(Dataset):
         self.output_tag = f"gB{config.version}"
         self.output_path = config.output_dir / config.gb_web_hash
         self.skip_existing = config.skip_existing
-        self.dl_iso3_list = config.dl_iso3_list or []
+        self.dl_iso3_list = [
+            code.strip() for code in config.dl_iso3_list.split(",") if code.strip()
+        ]
         self.api_url = f"https://raw.githubusercontent.com/wmgeolab/gbWeb/{config.gb_web_hash}/api/current/gbOpen/ALL/ALL/index.json"
 
     def prepare(self):

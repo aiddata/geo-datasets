@@ -1,7 +1,7 @@
 version = "v6"
 gb_web_hash = "57dcd43"
 
-dl_iso3_list = ["AFG", "GHA", "ETH", "HND"]
+dl_iso3_list = "AFG,GHA,ETH,HND,KEN,MWI"
 
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/boundaries/geoboundaries"
 
@@ -22,7 +22,7 @@ directory = "datasets/geoboundaries"
 [deploy]
 deployment_name = "geoBoundaries"
 image_tag = "01654d2"
-version = 5
+version = 6
 flow_file_name = "main"
 flow_name = "geoBoundariesDownloadFlow"
 work_pool = "geodata"
