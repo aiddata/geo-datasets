@@ -71,12 +71,12 @@ class ESALandcover(Dataset):
         logger = self.get_logger()
 
         if year in self.v207_years:
-            version = "v2.0.7cds"
+            version = "v2_0_7cds"
         elif year in self.v211_years:
-            version = "v2.1.1"
+            version = "v2_1_1"
         else:
-            version = "v2.1.1"
-            logger.warning(f"Assuming that {year} is v2.1.1")
+            version = "v2_1_1"
+            logger.warning(f"Assuming that {year} is v2_1_1")
 
         dl_path = self.raw_dir / "compressed" / f"{year}.zip"
         logger.info(f"Downloading {year} data to {dl_path}")
@@ -85,8 +85,8 @@ class ESALandcover(Dataset):
             dl_meta = {
                 "variable": "all",
                 "format": "zip",
-                "version": version,
-                "year": year,
+                "version": [version],
+                "year": [year],
             }
             self.cdsapi_client.retrieve("satellite-land-cover", dl_meta, dl_path)
 
