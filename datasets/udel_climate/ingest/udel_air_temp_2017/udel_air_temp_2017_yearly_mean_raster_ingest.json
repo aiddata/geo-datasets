@@ -1,39 +1,62 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/udel_climate/air_temp_2017/yearly/mean",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/udel_air_temp_v501_mean",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "air_temp_YYYY_mean.tif",
     "name": "udel_air_temp_v501_mean",
+    "short_name": "UDel Air Temperature v5.01 Annual Mean",
     "title": "Air Temperature (Yearly Average) - UDel",
     "description": "Average monthly air temperature per year in degrees Celsius. Created using UDel Air Temperature dataset (v5.01)",
     "details": "",
-    "version": 5.01,
-    "options": {
-        "resolution": 0.5,
-        "extract_types": [
-            "max",
-            "mean",
-            "min"
-        ],
-        "extract_types_info": {
-            "max": "maximum air temperature per unit of analysis",
-            "mean": "average air temperature per unit of analysis",
-            "min": "minimum air temperature per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum air temperature per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "degrees Celsius"
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average air temperature per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum air temperature per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        }
+    ],
+    "other": {
+        "resolution": 0.5
     },
-    "extras": {
-        "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
-        "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html",
-        "sources_name": "University of Delaware",
-        "tags": [
-            "temperature",
-            "udel",
-            "climate",
-            "environment"
-        ]
-    },
-    "active": 1,
-    "short_name": "UDel Air Temperature v5.01 Annual Mean"
+    "variable_factor": 1,
+    "variable_description": "degrees Celsius",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Willmott, C. J. and K. Matsuura (2001) Terrestrial Air Temperature and Precipitation: Monthly and Annual Time Series (1950 - 1999), http://climate.geog.udel.edu/~climate/html_pages/README.ghcn_ts2.html.",
+    "sources_web": "http://climate.geog.udel.edu/~climate/html_pages/download.html",
+    "sources_name": "University of Delaware",
+    "tags": [
+        "temperature",
+        "udel",
+        "climate",
+        "environment"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

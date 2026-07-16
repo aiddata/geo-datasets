@@ -1,43 +1,73 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/ltdr/avhrr_ndvi_v5/monthly",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/ltdr_avhrr_ndvi_v5_monthly",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "avhrr_ndvi_v5_YYYY_MM.tif",
     "name": "ltdr_avhrr_ndvi_v5_monthly",
+    "short_name": "LTDR NDVI v5 (Monthly)",
     "title": "Monthly Maximum Normalized Difference Vegetation Index - NDVI (LTDR v5 - AVHRR)",
     "description": "Monthly value for Normalized Difference Vegetation Index (NDVI). Created using the NASA Long Term Data Record (v5) AVHRR data. Created by aggregating daily data to monthly by taking the maximum value.",
     "details": "All negative NDVI values were truncated to 0 and saturated pixels were adjusted to the max of the normal NDVI range (10000).",
-    "version": 5,
-    "options": {
-        "resolution": 0.05,
-        "extract_types": [
-            "max",
-            "mean",
-            "min",
-            "count"
-        ],
-        "extract_types_info": {
-            "max": "maximum NDVI value per unit of analysis",
-            "mean": "average NDVI value per unit of analysis",
-            "min": "minimum NDVI value per unit of analysis",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum NDVI value per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 10000,
-        "variable_description": "positive NDVI values 0:10000"
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average NDVI value per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum NDVI value per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.05
     },
-    "extras": {
-        "citation": "Pedelty JA, Devadiga S, Masuoka E et al. (2007) Generating a Long-term Land Data Record from the AVHRR and MODIS Instruments. Proceedings of IGARRS 2007, pp. 1021\u20131025. Institute of Electrical and Electronics Engineers, NY, USA.",
-        "sources_web": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/applications/ltdr/",
-        "sources_name": "NASA LAADS DAAC",
-        "tags": [
-            "nasa",
-            "ltdr",
-            "ndvi",
-            "avhrr",
-            "vegetation",
-            "environment"
-        ]
-    },
-    "active": 1,
-    "short_name": "LTDR NDVI v5 (Monthly)"
+    "variable_factor": 10000,
+    "variable_description": "positive NDVI values 0:10000",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Pedelty JA, Devadiga S, Masuoka E et al. (2007) Generating a Long-term Land Data Record from the AVHRR and MODIS Instruments. Proceedings of IGARRS 2007, pp. 1021\u20131025. Institute of Electrical and Electronics Engineers, NY, USA.",
+    "sources_web": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/applications/ltdr/",
+    "sources_name": "NASA LAADS DAAC",
+    "tags": [
+        "nasa",
+        "ltdr",
+        "ndvi",
+        "avhrr",
+        "vegetation",
+        "environment"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

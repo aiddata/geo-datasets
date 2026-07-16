@@ -1,39 +1,62 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/cru_ts/cru_ts_4.07/monthly/tmp",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/cru_ts_407_tmp_monthly_mean",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "cru.tmp.YYYYMM.tif",
     "name": "cru_ts_407_tmp_monthly_mean",
+    "short_name": "CRU TS Temperature (Monthly)",
     "title": "Monthly Temperature - CRU TS (v4.07)",
     "description": "Montly temperature from Climate Research Unit (CRU) in degrees Celsius. Version 4.07",
     "details": "Created by extracting monthly temperature data from CRU",
-    "version": "4.07",
-    "options": {
-        "resolution": 0.5,
-        "extract_types": [
-            "max",
-            "mean",
-            "min"
-        ],
-        "extract_types_info": {
-            "max": "maximum temperature value per unit of analysis",
-            "mean": "average temperature value per unit of analysis",
-            "min": "minimum temperature value per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum temperature value per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "degrees Celsius"
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average temperature value per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum temperature value per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        }
+    ],
+    "other": {
+        "resolution": 0.5
     },
-    "extras": {
-        "citation": "Harris, I., Osborn, T.J., Jones, P. et al. Version 4 of the CRU TS monthly high-resolution gridded multivariate climate dataset. Sci Data 7, 109 (2020). https://doi.org/10.1038/s41597-020-0453-3",
-        "sources_web": "https://crudata.uea.ac.uk/cru/data/hrg/",
-        "sources_name": "Climate Research Unit",
-        "tags": [
-            "cru",
-            "temperature",
-            "environment",
-            "monthly"
-        ]
-    },
-    "active": 1,
-    "short_name": "CRU TS Temperature (Monthly)"
+    "variable_factor": 1,
+    "variable_description": "degrees Celsius",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Harris, I., Osborn, T.J., Jones, P. et al. Version 4 of the CRU TS monthly high-resolution gridded multivariate climate dataset. Sci Data 7, 109 (2020). https://doi.org/10.1038/s41597-020-0453-3",
+    "sources_web": "https://crudata.uea.ac.uk/cru/data/hrg/",
+    "sources_name": "Climate Research Unit",
+    "tags": [
+        "cru",
+        "temperature",
+        "environment",
+        "monthly"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

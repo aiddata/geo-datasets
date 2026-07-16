@@ -1,43 +1,58 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/critical_habitats/2023",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/critical_habitats_v2",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "critical_habitats_v2",
+    "short_name": "IFC Critical Habitats v2",
     "title": "Global Critical Habitats Screening - Version 2.0",
     "description": "The International Finance Corporation's (IFC's) Performance Standard 6 (PS6) is one of the most influential biodiversity standards of current time, particularly within large-scale infrastructure and the extractive sector. Within PS6, biodiversity significance is articulated through the concept of 'Critical Habitat,' a definition developed by the IFC and detailed through criteria aligned with those that support internationally accepted biodiversity designations. Critical Habitat criteria identify habitats of significant importance to threatened, endemic, congregatory and migratory species, threatened or unique ecosystems, and key evolutionary processes. PS6 requires projects to achieve net gains in the biodiversity values for which Critical Habitat is identified.",
     "details": "",
-    "version": 2.0,
-    "options": {
-        "resolution": 0.008333333333333333,
-        "extract_types": [
-            "categorical",
-            "count"
-        ],
-        "extract_types_info": {
-            "categorical": "number of pixels associated with each category of the likelihood of critical habitat presence",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_categorical",
+            "short_name": "categorical",
+            "description": "number of pixels associated with each category of the likelihood of critical habitat presence",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "int"
         },
-        "factor": 1,
-        "variable_description": "Categorized likelihood of the presence of habitats of significant importance to threatened, endemic, congregatory and migratory species, threatened or unique ecosystems, and key evolutionary processes (may be: unclassified, potential, or likely)"
-    },
-    "extras": {
-        "citation": "UNEP-WCMC (2023) Global Critical Habitat screening layer (Version 2.0). Cambridge (UK): UN Environment Programme World Conservation Monitoring Centre. Data DOI: https://doi.org/10.34892/d3xm-qm60 . Other cited reference(s): UNEP-WCMC (2017) Global Critical Habitat screening layer (Version 1.0). Cambridge (UK): UN Environment Programme World Conservation Monitoring Centre. Data DOI:https://doi.org/10.34892/nc6d-0z73 .",
-        "sources_web": "https://resources.unep-wcmc.org/products/77c18300cc28469097fa92ba47b3f278",
-        "sources_name": "UN Environment Programme World Conservation Monitoring Centre (UNEP-WCMC) ",
-        "tags": [
-            "critical",
-            "habitats",
-            "conservation",
-            "environment",
-            "ifc"
-        ],
-        "category_map": {
-            "unclassified": 0,
-            "potential": 1,
-            "likely": 10
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
         }
+    ],
+    "other": {
+        "resolution": 0.008333333333333333
     },
-    "active": 1,
-    "short_name": "IFC Critical Habitats v2"
+    "variable_factor": 1,
+    "variable_description": "Categorized likelihood of the presence of habitats of significant importance to threatened, endemic, congregatory and migratory species, threatened or unique ecosystems, and key evolutionary processes (may be: unclassified, potential, or likely)",
+    "mapped": true,
+    "mappings": {
+        "unclassified": 0,
+        "potential": 1,
+        "likely": 10
+    },
+    "citation": "UNEP-WCMC (2023) Global Critical Habitat screening layer (Version 2.0). Cambridge (UK): UN Environment Programme World Conservation Monitoring Centre. Data DOI: https://doi.org/10.34892/d3xm-qm60 . Other cited reference(s): UNEP-WCMC (2017) Global Critical Habitat screening layer (Version 1.0). Cambridge (UK): UN Environment Programme World Conservation Monitoring Centre. Data DOI:https://doi.org/10.34892/nc6d-0z73 .",
+    "sources_web": "https://resources.unep-wcmc.org/products/77c18300cc28469097fa92ba47b3f278",
+    "sources_name": "UN Environment Programme World Conservation Monitoring Centre (UNEP-WCMC) ",
+    "tags": [
+        "critical",
+        "habitats",
+        "conservation",
+        "environment",
+        "ifc"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

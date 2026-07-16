@@ -1,43 +1,80 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/viirs/eogdata/annual/v20/avg_masked",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/viirs_ntl_annual_v20_avg_masked",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "YYYY.tif",
     "name": "viirs_ntl_annual_v20_avg_masked",
+    "short_name": "VIIRS NTL v2.0 Annual Average (Masked)",
     "title": "Annual VIIRS Nighttime Lights v2 - Average Value",
     "description": "Annual VIIRS nighttime lights product Version 2. Average value with background pixels masked. Please use in combination with VIIRS Nighttime Light Cloud Free Coverage product to confirm sufficient cloud free measurements are available within your boundary features.",
     "details": "",
-    "version": 2,
-    "options": {
-        "resolution": 0.0041666667,
-        "extract_types": [
-            "max",
-            "mean",
-            "min",
-            "sum",
-            "count"
-        ],
-        "extract_types_info": {
-            "max": "maximum value measured within each unit of analysis",
-            "mean": "average value measured  within each unit of analysis",
-            "min": "minimum value measured  within each unit of analysis",
-            "sum": "sum of values measured within each unit of analysis",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum value measured within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "Radiance (nW cm^-2 sr^-1)"
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average value measured  within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum value measured  within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_sum",
+            "short_name": "sum",
+            "description": "sum of values measured within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.0041666667
     },
-    "extras": {
-        "citation": "C. D. Elvidge, M. Zhizhin, T. Ghosh, F-C. Hsu, Annual time series of global VIIRS nighttime lights derived from monthly averages: 2012 to 2019, Remote Sensing",
-        "sources_web": "https://eogdata.mines.edu/products/vnl/",
-        "sources_name": "Earth Observation Group - VIIRS Nighttime Lights",
-        "tags": [
-            "nighttimelights",
-            "viirs",
-            "economics",
-            "welfare"
-        ]
-    },
-    "active": 1,
-    "short_name": "VIIRS NTL v2.0 Annual Average (Masked)"
+    "variable_factor": 1,
+    "variable_description": "Radiance (nW cm^-2 sr^-1)",
+    "mapped": false,
+    "mappings": {},
+    "citation": "C. D. Elvidge, M. Zhizhin, T. Ghosh, F-C. Hsu, Annual time series of global VIIRS nighttime lights derived from monthly averages: 2012 to 2019, Remote Sensing",
+    "sources_web": "https://eogdata.mines.edu/products/vnl/",
+    "sources_name": "Earth Observation Group - VIIRS Nighttime Lights",
+    "tags": [
+        "nighttimelights",
+        "viirs",
+        "economics",
+        "welfare"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

@@ -1,42 +1,65 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/MODIS/terra/MOLT/MOD11C3.006/monthly/day",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/modis_lst_mod11c3_006_day_monthly",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "modis_lst_day_cmg_YYYYMM.tif",
     "name": "modis_lst_mod11c3_006_day_monthly",
+    "short_name": "MODIS LST v006 Daytime (Monthly)",
     "title": "Monthly daytime land surface temperature - MODIS v6.0",
     "description": "Monthly daytime land surface temperature in Kelvins. Produced using MOD11C3.006 CMG LST product",
     "details": "",
-    "version": "MOD11C3.006",
-    "options": {
-        "resolution": 0.05,
-        "extract_types": [
-            "max",
-            "mean",
-            "min"
-        ],
-        "extract_types_info": {
-            "max": "maximum land surface temperature value per unit of analysis",
-            "mean": "average land surface temperature value per unit of analysis",
-            "min": "minimum land surface temperature value per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum land surface temperature value per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "temperature in Kelvins"
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average land surface temperature value per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum land surface temperature value per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        }
+    ],
+    "other": {
+        "resolution": 0.05
     },
-    "extras": {
-        "citation": "Wan, Z., Hook, S., Hulley, G. (2015). MOD11C3 MODIS/Terra Land Surface Temperature/Emissivity Monthly L3 Global 0.05Deg CMG V006 [Data set]. NASA EOSDIS LP DAAC. doi: 10.5067/MODIS/MOD11C3.006",
-        "sources_web": "https://lpdaac.usgs.gov/products/mod11c3v006/",
-        "sources_name": "Land Processes Distributed Active Archive Center",
-        "tags": [
-            "nasa",
-            "earthdata",
-            "modis",
-            "lst",
-            "land surface temperature",
-            "environment",
-            "monthly"
-        ]
-    },
-    "active": 1,
-    "short_name": "MODIS LST v006 Daytime (Monthly)"
+    "variable_factor": 1,
+    "variable_description": "temperature in Kelvins",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Wan, Z., Hook, S., Hulley, G. (2015). MOD11C3 MODIS/Terra Land Surface Temperature/Emissivity Monthly L3 Global 0.05Deg CMG V006 [Data set]. NASA EOSDIS LP DAAC. doi: 10.5067/MODIS/MOD11C3.006",
+    "sources_web": "https://lpdaac.usgs.gov/products/mod11c3v006/",
+    "sources_name": "Land Processes Distributed Active Archive Center",
+    "tags": [
+        "nasa",
+        "earthdata",
+        "modis",
+        "lst",
+        "land surface temperature",
+        "environment",
+        "monthly"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

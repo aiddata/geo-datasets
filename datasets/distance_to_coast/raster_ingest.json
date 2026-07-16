@@ -1,39 +1,69 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to_coast/2.3.7/distance",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/dist_to_coast_237",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "dist_to_coast_237",
+    "short_name": "Distance to Coast",
     "title": "Distance to Coast",
     "description": "Distance to coast (on land only), measured in meters. Derived using World Vector Shorelines.",
     "details": "Distance is only measured for land. Pixels in the ocean will always have a distance of zero.",
-    "version": "2.3.7",
-    "options": {
-        "resolution": 0.01,
-        "extract_types": [
-            "mean",
-            "max",
-            "min",
-            "count"
-        ],
-        "extract_types_info": {
-            "mean": "average distance per unit of analysis",
-            "max": "maximum distance per unit of analysis",
-            "min": "minimum distance per unit of analysis",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "distance in meters"
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.01
     },
-    "extras": {
-        "citation": "Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical, High-resolution Shoreline Database, J. Geophys. Res., 101, #B4, pp. 8741-8743, 1996.",
-        "sources_web": "http://www.soest.hawaii.edu/pwessel/gshhg/",
-        "sources_name": "GSHHG: A Global Self-consistent, Hierarchical, High-resolution Geography Database",
-        "tags": [
-            "accessibility",
-            "other"
-        ]
-    },
-    "active": 1,
-    "short_name": "Distance to Coast"
+    "variable_factor": 1,
+    "variable_description": "distance in meters",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical, High-resolution Shoreline Database, J. Geophys. Res., 101, #B4, pp. 8741-8743, 1996.",
+    "sources_web": "http://www.soest.hawaii.edu/pwessel/gshhg/",
+    "sources_name": "GSHHG: A Global Self-consistent, Hierarchical, High-resolution Geography Database",
+    "tags": [
+        "accessibility",
+        "other"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }
