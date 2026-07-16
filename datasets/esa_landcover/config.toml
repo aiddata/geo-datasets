@@ -18,7 +18,7 @@ task_runner = "concurrent"
 run_parallel = false
 max_workers = 4
 bypass_error_wrapper = true
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/raw/esa_landcover/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/esa_landcover/logs"
 
 
 [repo]

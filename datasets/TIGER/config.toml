@@ -1,8 +1,8 @@
 year = "2025"
 dataset = "COUNTY"
 
-raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/boundaries/tiger/raw"
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/boundaries/tiger"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/boundaries/tiger/raw"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/boundaries/tiger"
 
 overwrite_download = false
 overwrite_process = true
@@ -10,7 +10,7 @@ overwrite_process = true
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/boundaries/tiger/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/boundaries/tiger/logs"
 
 
 [repo]

@@ -100,7 +100,7 @@ class TIGERDownloadDataset(Dataset):
             "file_mask": "None",
             "active": 1,
             "public": 1,
-            "path": str(Path("/data/TIGER") / self.output_path.name),
+            "path": str(Path("/data/datasets/TIGER") / self.output_path.name),
             "file_extension": ".gpkg",
             "title": f"US CENSUS TIGER/Line {self.year} {self.dataset}",
             "description": f"US CENSUS TIGER/Line shapefiles for {self.dataset} in {self.year}",

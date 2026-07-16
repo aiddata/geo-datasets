@@ -3,14 +3,14 @@ gb_web_hash = "57dcd43"
 
 dl_iso3_list = "AFG,GHA,ETH,HND,KEN,MWI"
 
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/boundaries/geoboundaries"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/boundaries/geoboundaries"
 
 skip_existing = true
 
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/boundaries/geoboundaries/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/boundaries/geoboundaries/logs"
 
 
 [repo]
