@@ -115,4 +115,23 @@ descriptions) for review. Convert each alongside its dataset's migration.
 - One commit for the Workstream A common config sweep.
 - One dep commit (`scipy`, plus anything found later) → one image rebuild →
   pin all `image_tag`s to that SHA.
-- Secrets rotation for `ltdr_ndvi`, `viirs_ntl`, `oco2` as each is migrated.
+- Secrets rotation for `gpw` (`sedac_cookie`), `ltdr_ndvi` (`token`),
+  `viirs_ntl` (`username`/`password`/`client_secret`), `oco2` (`password`) —
+  all committed to git history, so rotate the credential AND move to the `.env`
+  pattern (see checklist item 4). `gpw` was missed by the first audit (the
+  secret is named `sedac_cookie`). The auto-generated READMEs for these still
+  list the secret as a config var; fix when moving to `.env`.
+
+## Sweep completed 2026-07-16 (commits 4ccd6c5, 2fe3bfc, 7682144, 3e88649, d42ae20)
+
+- **Ingest JSONs**: all 47 workstream-A files converted to the current schema
+  via `scripts/convert_ingest_json.py` (zero drift). Per-dataset `path`,
+  `description`, `is_global` still worth a human pass.
+- **List → comma-string**: every UI-editable list field converted (years,
+  months, methods, download/raster/file lists) across the 15 datasets that had
+  them; parse restored in each `__init__`.
+- **READMEs**: boilerplate stripped from the 10 that had one; 9 missing ones
+  generated from ingest content. All drafts — enrich run-specific detail.
+
+Still per-dataset: deploy + cluster smoke, secrets rotation (above), and
+reviewing the generated README/ingest content.
