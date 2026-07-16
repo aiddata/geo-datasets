@@ -193,6 +193,14 @@ class Dataset(ABC):
             for warning in warnings:
                 logger.warning(f"Warning encountered when validating COG: {warning}")
 
+        # mkstemp creates files with mode 0600 and shutil.move preserves it,
+        # which would leave files on shared storage unreadable by the group.
+        # Widen to what a plain open() would have produced under the current
+        # umask, so using this context manager doesn't change file permissions.
+        umask = os.umask(0)
+        os.umask(umask)
+        os.chmod(tmp_path, 0o666 & ~umask)
+
         # move file from tmp_path to final_dst
         try:
             logger.debug(f"Attempting to move {tmp_path} to {str(final_dst)}")
@@ -205,6 +213,13 @@ class Dataset(ABC):
             logger.debug(
                 f"Successfully transferred {tmp_path} to final destination {str(final_dst)}"
             )
+
+        # remove the per-file temporary subdirectory; if the move failed the
+        # directory is not empty, and is deliberately left behind for debugging
+        try:
+            os.rmdir(tmp_sub_dir)
+        except OSError:
+            pass
 
     def error_wrapper(self, func: Callable, args: Dict[str, Any]):
         """
