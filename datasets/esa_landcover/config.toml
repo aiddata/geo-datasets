@@ -30,7 +30,7 @@ directory = "datasets/esa_landcover"
 [deploy]
 deployment_name = "esa_landcover"
 image_tag = "7da1736"
-version = 4
+version = 5
 flow_file_name = "main"
 flow_name = "esa_landcover"
 work_pool = "geodata"
