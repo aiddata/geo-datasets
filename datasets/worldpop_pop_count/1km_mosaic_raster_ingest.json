@@ -1,29 +1,48 @@
 {
-	"base": "/sciclone/aiddata10/REU/geo/data/rasters/worldpop/population_counts/1km_mosaic/",
-	"type": "raster",
-	"file_extension": ".tif",
-	"file_mask": "ppp_YYYY_1km_Aggregated.tif",
-	"name": "worldpop_pop_count_1km_mosaic",
-	"short_name": "WorldPop Population Count 1km",
-	"title": "WorldPop Population Count",
-	"description": "Estimated population count from WorldPop. Underlying dataset provides number of people per 1km pixel. The mapping approach is Random Forest-based dasymetric redistribution",
-    "details": "No additional processing of raw data.",
-	"version": 2020,
-	"options": {
-	    "resolution": 0.00833,
-	    "extract_types": ["sum", "count"],
-        "extract_types_info": {
-            "sum": "total population per unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/worldpop_pop_count",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "ppp_YYYY_1km_Aggregated.tif",
+    "name": "worldpop_pop_count_1km_mosaic",
+    "short_name": "WorldPop Population Count 1km",
+    "title": "WorldPop Population Count",
+    "description": "Estimated population count from WorldPop. Underlying dataset provides number of people per 1km pixel. The mapping approach is Random Forest-based dasymetric redistribution",
+    "details": "Raw data converted to Cloud Optimized GeoTIFFs; values are unchanged from the source data.",
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_sum",
+            "short_name": "sum",
+            "description": "total population per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-	    "factor": 1,
-        "variable_description": "number of people"
-	},
-	"extras": {
-	    "citation": "WorldPop (www.worldpop.org - School of Geography and Environmental Science, University of Southampton; Department of Geography and Geosciences, University of Louisville; Departement de Geographie, Universite de Namur) and Center for International Earth Science Information Network (CIESIN), Columbia University (2018). Global High Resolution Population Denominators Project - Funded by The Bill and Melinda Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00647",
-	    "sources_web": "https://www.worldpop.org/geodata/listing?id=64",
-	    "sources_name": "WorldPop",
-	    "tags": ["population", "count", "worldpop", "economics"]
-	},
-	"active": 1
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.00833
+    },
+    "variable_factor": 1,
+    "variable_description": "number of people",
+    "mapped": false,
+    "mappings": {},
+    "citation": "WorldPop (www.worldpop.org - School of Geography and Environmental Science, University of Southampton; Department of Geography and Geosciences, University of Louisville; Departement de Geographie, Universite de Namur) and Center for International Earth Science Information Network (CIESIN), Columbia University (2018). Global High Resolution Population Denominators Project - Funded by The Bill and Melinda Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00647",
+    "sources_web": "https://www.worldpop.org/geodata/listing?id=64",
+    "sources_name": "WorldPop",
+    "tags": [ "population", "count", "worldpop", "economics" ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

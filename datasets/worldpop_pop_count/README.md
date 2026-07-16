@@ -1,29 +1,19 @@
+# WorldPop Population Count (1km mosaic)
 
-## WorldPop 1km Mosaic of Population Count
+Estimated population count per 1km pixel, produced by [WorldPop](https://www.worldpop.org/geodata/listing?id=64) using Random Forest-based dasymetric redistribution. Global coverage for the years 2000-2020.
 
-To run:
-1.  If on HPC (vortex-alpha nodes), prepare modules and base environment
-```
-source "/opt/anaconda3-2021.05/etc/profile.d/conda.csh"
-module unload gcc/4.7.3 python/2.7.8 openmpi-1.10.0-gcc mpi4py-2.0.0-gcc acml/5.3.1 numpy/1.9.2 gdal-nograss/1.11.2 proj/4.7.0 geos/3.5.0
-module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05
-unsetenv PYTHONPATH
-```
+## Quick start
 
-2. Create Conda environment (if does not exist yet):
-```
-conda create -n va_geo python=3.9 -c conda-forge
-conda activate va_geo
-conda install -c conda-forge rasterio pandas geopandas shapely fiona pyproj requests
-```
+1. Review and edit the variables in `config.toml` as needed
+    - `years` is a comma-separated list of years to download and process
+    - `raw_dir` is the directory where the raw GeoTIFFs will be downloaded
+    - `output_dir` is the directory where the final COGs will be saved
+    - `overwrite_download` / `overwrite_processing`, if true, will overwrite existing files rather than skip them
 
-3. Load Conda environment:
-```
-conda activate va_geo
-```
+## Important notes
 
-4. Download data:
-```
- python data_download.py
-```
+- Downloads come from `https://data.worldpop.org/GIS/Population/Global_2000_2020/{YEAR}/0_Mosaicked/` (one GeoTIFF per year at 1km resolution).
 
+- Processing converts each raw GeoTIFF to a Cloud Optimized GeoTIFF; pixel values are unchanged from the source data.
+
+- WorldPop's Global 2000-2020 mosaics end at 2020; later years are published under different projects and would need a new URL template.

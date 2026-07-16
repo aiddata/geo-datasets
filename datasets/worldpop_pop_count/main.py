@@ -7,7 +7,6 @@ worldpop: https://www.worldpop.org/geodata/listing?id=64
 import os
 from copy import copy
 from pathlib import Path
-from typing import List
 
 import requests
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
@@ -16,7 +15,10 @@ from data_manager import BaseDatasetConfiguration, Dataset, get_config
 class WorldPopCountConfiguration(BaseDatasetConfiguration):
     raw_dir: str
     output_dir: str
-    years: List[int]
+    # Comma-separated years (e.g. "2000,2001"). Kept as a string rather than a
+    # list so the Prefect run form renders a text input instead of the array
+    # widget, whose "add item" button submits the form.
+    years: str
     overwrite_download: bool
     overwrite_processing: bool
 
@@ -31,7 +33,7 @@ class WorldPopCount(Dataset):
 
         self.raw_dir = Path(config.raw_dir)
         self.output_dir = Path(config.output_dir)
-        self.years = config.years
+        self.years = [int(y.strip()) for y in config.years.split(",") if y.strip()]
         self.overwrite_download = config.overwrite_download
         self.overwrite_processing = config.overwrite_processing
 
@@ -79,13 +81,19 @@ class WorldPopCount(Dataset):
 
     def download_file(self, url, local_filename):
         """Download a file from url to local_filename
-        Downloads in chunks
+        Downloads in chunks. The file is written to a temporary path and only
+        moved to local_filename once complete, so an interrupted download
+        cannot leave a partial file that a later run would mistake for a
+        complete one. tmp_dir is on the same filesystem as the destination:
+        the final move stays a cheap rename, and large files don't accumulate
+        in the pod's local /tmp.
         """
-        with requests.get(url, stream=True, verify=True) as r:
-            r.raise_for_status()
-            with open(local_filename, "wb") as f:
-                for chunk in r.iter_content(chunk_size=1024 * 1024):
-                    f.write(chunk)
+        with self.tmp_to_dst_file(local_filename, tmp_dir=self.raw_dir) as tmp_path:
+            with requests.get(url, stream=True, verify=True) as r:
+                r.raise_for_status()
+                with open(tmp_path, "wb") as f:
+                    for chunk in r.iter_content(chunk_size=1024 * 1024):
+                        f.write(chunk)
 
     def create_process_list(self):
         logger = self.get_logger()
@@ -131,15 +139,20 @@ class WorldPopCount(Dataset):
                     }
                 )
 
-                # These creation options are not supported by the COG driver
-                for k in ["BLOCKXSIZE", "BLOCKYSIZE", "TILED", "INTERLEAVE"]:
+                # These creation options are not supported by the COG driver.
+                # rasterio profile keys are lowercase; with the uppercase names
+                # this loop never matched, and GDAL warned about the unsupported
+                # options on every conversion (it ignored them, so outputs were
+                # unaffected).
+                for k in ["blockxsize", "blockysize", "tiled", "interleave"]:
                     if k in profile:
                         del profile[k]
 
-                print(profile)
                 logger.info(profile)
 
-                with rasterio.open(dst_path, "w+", **profile) as dst:
+                with self.tmp_to_dst_file(
+                    dst_path, tmp_dir=self.output_dir, validate_cog=True
+                ) as tmp_dst_path, rasterio.open(tmp_dst_path, "w+", **profile) as dst:
 
                     for ji, src_window in src.block_windows(1):
                         # convert relative input window location to relative output window location
