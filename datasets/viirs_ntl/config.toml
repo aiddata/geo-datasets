@@ -21,8 +21,8 @@ annual_files = [ "average_masked", "cf_cvg" ]
 monthly_files = [ "avg_rade9h.masked", "cf_cvg" ]
 
 # change var - set to intended output directories
-raw_dir = "/sciclone/aiddata10/REU/geo/raw/viirs_ntl"
-output_dir = "/sciclone/aiddata10/REU/geo/viirs_ntl"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/viirs_ntl"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/viirs_ntl"
 overwrite_download = true
 overwrite_extract = true
 overwrite_processing = true
@@ -39,7 +39,7 @@ client_secret = "2677ad81-521b-4869-8480-6d05b9e57d48"
 
 [run]
 max_workers = 6
-log_dir = "/sciclone/aiddata10/REU/geo/raw/viirs_ntl/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/viirs_ntl/logs"
 
 
 [repo]
@@ -50,9 +50,8 @@ directory = "datasets/viirs_ntl"
 
 [deploy]
 deployment_name = "viirs_ntl"
-image_tag = "05dea6e"
+image_tag = "a0ac2bb"
 version = 4
 flow_file_name = "main"
 flow_name = "viirs_ntl"
-work_pool = "geodata-pool"
-data_manager_version = "0.4.0"
+work_pool = "geodata"

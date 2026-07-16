@@ -4,9 +4,9 @@ years = [ 2019, 2020 ]
 
 # output directories
 # process_dir = /local/scr/smgoodman/TMPDIR/worldpop/population_age_sex
-process_dir =  "/sciclone/aiddata10/REU/geo/raw/worldpop/population_age_sex/tmp"
-raw_dir = "/sciclone/aiddata10/REU/geo/raw/worldpop/population_age_sex/"
-output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/worldpop/population_age_sex/"
+process_dir =  "/sciclone/nova/REU/geo/geoquery/staging/data/raw/worldpop/population_age_sex/tmp"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/worldpop/population_age_sex/"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/worldpop/population_age_sex/"
 
 overwrite_download = false
 overwrite_processing = false
@@ -14,7 +14,7 @@ overwrite_processing = false
 
 [run]
 max_workers = 10
-log_dir = "/sciclone/aiddata10/REU/geo/raw/worldpop/population_age_sex/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/worldpop/population_age_sex/logs"
 
 
 [repo]
@@ -25,9 +25,8 @@ directory = "datasets/worldpop_age_sex"
 
 [deploy]
 deployment_name = "worldpop_age_sex"
-image_tag = "3617c59"
+image_tag = "a0ac2bb"
 version = 3
 flow_file_name = "main"
 flow_name = "worldpop_age_sex"
-work_pool = "geodata-pool"
-data_manager_version = "0.4.6"
+work_pool = "geodata"

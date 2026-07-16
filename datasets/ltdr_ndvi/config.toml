@@ -7,10 +7,8 @@ data_num = 466
 years = [2000, 2022]
 
 # output directories
-# raw_dir = "/sciclone/aiddata10/REU/geo/raw/ltdr_ndvi"
-raw_dir = "/home/jacob/Documents/aiddata/geo-datasets/ltdr_ndvi/raw"
-# output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/ltdr_ndvi"
-output_dir = "/home/jacob/Documents/aiddata/geo-datasets/ltdr_ndvi/out"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ltdr_ndvi"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ltdr_ndvi"
 
 # create a token at the LAADS DAAC site
 # https://ladsweb.modaps.eosdis.nasa.gov/
@@ -25,8 +23,7 @@ overwrite_processing = true
 [run]
 backend = "local"
 max_workers = 4
-# log_dir = "/sciclone/aiddata10/REU/geo/raw/ltdr_ndvi/logs"
-log_dir = "/home/jacob/Documents/aiddata/geo-datasets/ltdr_ndvi/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ltdr_ndvi/logs"
 
 
 [repo]
@@ -38,8 +35,7 @@ directory = "datasets/ltdr_ndvi"
 [deploy]
 deployment_name = "ltdr_ndvi"
 version = 2
-image_tag = "05dea6e"
+image_tag = "a0ac2bb"
 flow_file_name = "main"
 flow_name = "ltdr_ndvi"
-work_pool = "geodata-pool"
-data_manager_version = "0.4.0"
+work_pool = "geodata"

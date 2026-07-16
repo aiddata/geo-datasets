@@ -2,8 +2,8 @@ username = "jacobhall"
 password = "PASSWORD"
 
 data_url = "https://oco2.gesdisc.eosdis.nasa.gov/data/OCO2_DATA/OCO2_L2_Lite_FP.11.1r/"
-raw_dir = "/sciclone/aiddata10/REU/geo/raw/gesdisc/OCO2_L2_Lite_FP.11.1r/"
-output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/gesdisc/OCO2_L2_Lite_FP.11.1r/xco2"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gesdisc/OCO2_L2_Lite_FP.11.1r/"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gesdisc/OCO2_L2_Lite_FP.11.1r/xco2"
 
 overwrite_download = false
 overwrite_processing = false
@@ -25,7 +25,7 @@ run_g = true
 
 [run]
 max_workers = 6
-log_dir = "/sciclone/aiddata10/REU/geo/raw/gesdisc/OCO2_L2_Lite_FP.11.1r/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gesdisc/OCO2_L2_Lite_FP.11.1r/logs"
 
 
 [repo]
@@ -36,9 +36,8 @@ directory = "datasets/oco2"
 
 [deploy]
 deployment_name = "oco2"
-image_tag = "05dea6e"
+image_tag = "a0ac2bb"
 version = 2
 flow_file_name = "main"
 flow_name = "oco2"
-work_pool = "geodata-pool"
-data_manager_version = "0.4.0"
+work_pool = "geodata"

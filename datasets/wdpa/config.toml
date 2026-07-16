@@ -1,7 +1,7 @@
 download_url = "https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_Jun2024_Public.zip"
 
-raw_dir = "/sciclone/aiddata10/REU/geo/raw/wdpa/"
-output_dir = "/sciclone/aiddata10/REU/geo/data/rasters/wdpa"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/wdpa/"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/wdpa"
 
 max_retries = 5
 overwrite_download = false
@@ -10,7 +10,7 @@ overwrite_output = true
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/aiddata10/REU/geo/data/rasters/wdpa/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/wdpa/logs"
 
 
 [repo]
@@ -21,9 +21,8 @@ directory = "datasets/wdpa"
 
 [deploy]
 deployment_name = "WDPA"
-image_tag = "05dea6e"
+image_tag = "a0ac2bb"
 version = 1
 flow_file_name = "main"
 flow_name = "wdpa"
-work_pool = "geodata-pool"
-data_manager_version = "0.4.0"
+work_pool = "geodata"
