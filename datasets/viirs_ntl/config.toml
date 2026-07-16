@@ -50,7 +50,7 @@ directory = "datasets/viirs_ntl"
 
 [deploy]
 deployment_name = "viirs_ntl"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 4
 flow_file_name = "main"
 flow_name = "viirs_ntl"

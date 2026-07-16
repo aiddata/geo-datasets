@@ -26,7 +26,7 @@ directory = "datasets/worldpop_pop_count_new"
 
 [deploy]
 deployment_name = "worldpop_pop_count_r2025a"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 1
 flow_file_name = "main"
 flow_name = "worldpop_pop_count_r2025a"

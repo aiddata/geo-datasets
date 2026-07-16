@@ -28,7 +28,7 @@ directory = "datasets/gpw"
 
 [deploy]
 deployment_name = "GPWv4"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 2
 flow_file_name = "main"
 flow_name = "gpwv4"

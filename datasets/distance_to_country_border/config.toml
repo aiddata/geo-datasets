@@ -19,7 +19,7 @@ directory = "datasets/distance_to_country_border"
 
 [deploy]
 deployment_name = "distance_to_country_border"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 2
 flow_file_name = "main"
 flow_name = "distance_to_country_border"

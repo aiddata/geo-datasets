@@ -21,7 +21,7 @@ directory = "datasets/critical_habitats"
 
 [deploy]
 deployment_name = "Critical Habitats"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 2
 flow_file_name = "main"
 flow_name = "critical_habitats"

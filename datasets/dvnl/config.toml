@@ -21,7 +21,7 @@ directory = "datasets/dvnl"
 
 [deploy]
 deployment_name = "dvnl"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 2
 flow_file_name = "main"
 flow_name = "dvnl"

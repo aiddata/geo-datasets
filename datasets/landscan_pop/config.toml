@@ -23,7 +23,7 @@ directory = "datasets/landscan_pop"
 
 [deploy]
 deployment_name = "landscan_pop"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 3
 flow_file_name = "main"
 flow_name = "landscan_pop"

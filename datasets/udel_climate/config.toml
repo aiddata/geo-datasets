@@ -23,7 +23,7 @@ directory = "datasets/udel_climate"
 
 [deploy]
 deployment_name = "udel_climate"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 2
 flow_file_name = "main"
 flow_name = "udel_climate"

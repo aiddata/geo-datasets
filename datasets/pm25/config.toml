@@ -22,7 +22,7 @@ directory = "datasets/pm25"
 
 [deploy]
 deployment_name = "PM25"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 3
 flow_file_name = "main"
 flow_name = "pm25"

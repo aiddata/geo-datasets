@@ -24,7 +24,7 @@ directory = "datasets/gpm"
 
 [deploy]
 deployment_name = "GPM"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 2
 flow_file_name = "main"
 flow_name = "gpm"

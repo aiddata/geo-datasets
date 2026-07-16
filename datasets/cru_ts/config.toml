@@ -28,7 +28,7 @@ directory = "datasets/cru_ts"
 
 [deploy]
 deployment_name = "cru_ts"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 4
 flow_file_name = "main"
 flow_name = "cru_ts"

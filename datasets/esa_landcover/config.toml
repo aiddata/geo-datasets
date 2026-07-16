@@ -29,7 +29,7 @@ directory = "datasets/esa_landcover"
 
 [deploy]
 deployment_name = "esa_landcover"
-image_tag = "7da1736"
+image_tag = "083d531"
 version = 6
 flow_file_name = "main"
 flow_name = "esa_landcover"

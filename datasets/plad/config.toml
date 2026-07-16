@@ -23,7 +23,7 @@ directory = "datasets/plad"
 [deploy]
 
 deployment_name = "PLAD"
-image_tag = "a0ac2bb"
+image_tag = "083d531"
 version = 1
 flow_file_name = "main"
 flow_name = "plad"
