@@ -5,20 +5,20 @@ annual_version = "v21"
 # change var = set to year range wanted - range available 2012 - 2021 for montly, 2012-2021 for annual
 # IMPORTANT: we may not want to include 2012 because it uses a different range of months!!!
 # It is possible to download EITHER Apr-Dec 2012 OR Apr 2012 - Mar 2013 for the year 2012. This can be adjusted in main.py
-years = [ 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 ]
+years = "2012,2013,2014,2015,2016,2017,2018,2019,2020,2021"
 
 run_monthly = true
 # change var = set to month range wanted - range available 1 - 12 except 1 - 3 for 2012 and 10-12 for 2022
-months = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]
+months = "1,2,3,4,5,6,7,8,9,10,11,12"
 
 # cloud-free measurements threshold
 cf_minimum = 1
 
 # change var = set variables to file type, options - only cf_cvg, average_masked needed
-annual_files = [ "average_masked", "cf_cvg" ]
+annual_files = "average_masked,cf_cvg"
 
 # change var = set variables to file type, options - only avg_rade9h.masked, cf_cvg needed (2021 and 2022 don't have avg_rade9h.masked yet)
-monthly_files = [ "avg_rade9h.masked", "cf_cvg" ]
+monthly_files = "avg_rade9h.masked,cf_cvg"
 
 # change var - set to intended output directories
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/viirs_ntl"

@@ -1,7 +1,7 @@
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/udel_climate"
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/udel_climate"
 
-methods = [ "mean", "min", "max", "sum", "var" ]
+methods = "mean,min,max,sum,var"
 
 build_monthly = true
 build_yearly = true

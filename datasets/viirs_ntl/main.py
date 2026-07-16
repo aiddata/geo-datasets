@@ -23,12 +23,24 @@ class VIIRS_NTL_Configuration(BaseDatasetConfiguration):
     raw_dir: str
     output_dir: str
     run_annual: bool
-    annual_files: List[str]
+    # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
+    # form renders a text input rather than the array widget, whose "add
+    # item" button submits the form.
+    annual_files: str
     annual_version: str
     run_monthly: bool
-    monthly_files: List[str]
-    months: List[int]
-    years: List[int]
+    # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
+    # form renders a text input rather than the array widget, whose "add
+    # item" button submits the form.
+    monthly_files: str
+    # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
+    # form renders a text input rather than the array widget, whose "add
+    # item" button submits the form.
+    months: str
+    # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
+    # form renders a text input rather than the array widget, whose "add
+    # item" button submits the form.
+    years: str
     username: str
     password: str
     client_secret: str
@@ -47,11 +59,11 @@ class VIIRS_NTL(Dataset):
         self.output_dir = Path(config.output_dir)
         self.run_annual: bool = config.run_annual
         self.annual_version: str = config.annual_version
-        self.annual_files: List[str] = config.annual_files
+        self.annual_files = [v.strip() for v in config.annual_files.split(",") if v.strip()]
         self.run_monthly: bool = config.run_monthly
-        self.monthly_files: List[str] = config.monthly_files
-        self.months: List[int] = config.months
-        self.years: List[int] = config.years
+        self.monthly_files = [v.strip() for v in config.monthly_files.split(",") if v.strip()]
+        self.months = [int(v.strip()) for v in config.months.split(",") if v.strip()]
+        self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
         self.username: str = config.username
         self.password: str = config.password
         self.client_secret: str = config.client_secret

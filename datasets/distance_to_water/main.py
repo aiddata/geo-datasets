@@ -17,8 +17,14 @@ class DISTANCE_TO_WATER_Configuration(BaseDatasetConfiguration):
     gshhg_version: str
     ne_hash: str
     pixel_size: float
-    download_files: List[str]
-    raster_type: List[str]
+    # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
+    # form renders a text input rather than the array widget, whose "add
+    # item" button submits the form.
+    download_files: str
+    # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
+    # form renders a text input rather than the array widget, whose "add
+    # item" button submits the form.
+    raster_type: str
     overwrite_download: bool
     overwrite_extract: bool
     overwrite_binary_raster: bool
@@ -40,8 +46,8 @@ class DISTANCE_TO_WATER(Dataset):
         self.output_dir = Path(config.output_dir) / self.version
 
         self.pixel_size = config.pixel_size
-        self.download_list = config.download_files
-        self.raster_type = config.raster_type
+        self.download_list = [v.strip() for v in config.download_files.split(",") if v.strip()]
+        self.raster_type = [v.strip() for v in config.raster_type.split(",") if v.strip()]
 
         self.overwrite_download = config.overwrite_download
         self.overwrite_extract = config.overwrite_extract

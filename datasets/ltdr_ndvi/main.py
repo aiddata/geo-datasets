@@ -47,7 +47,10 @@ from rasterio.crs import CRS
 class LTDR_NDVI_Configuration(BaseDatasetConfiguration):
     token: str
     data_num: int
-    years: List[int]
+    # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
+    # form renders a text input rather than the array widget, whose "add
+    # item" button submits the form.
+    years: str
     raw_dir: str
     output_dir: str
     overwrite_download: bool
@@ -66,7 +69,7 @@ class LTDR_NDVI(Dataset):
 
         self.auth_headers = {"Authorization": f"Bearer {config.token}"}
 
-        self.years = config.years
+        self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
 
         # TODO: warn if raw_dir already points to a directory named [data_num], it's probably one too deep
         self.raw_dir = Path(config.raw_dir) / str(config.data_num)

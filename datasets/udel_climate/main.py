@@ -14,7 +14,10 @@ from rasterio import features
 class UDelClimateConfiguration(BaseDatasetConfiguration):
     raw_dir: str
     output_dir: str
-    methods: List[str]
+    # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
+    # form renders a text input rather than the array widget, whose "add
+    # item" button submits the form.
+    methods: str
     build_monthly: bool
     build_yearly: bool
     overwrite_download: bool
@@ -28,7 +31,7 @@ class UDelClimate(Dataset):
 
         self.raw_dir = Path(config.raw_dir)
         self.output_dir = Path(config.output_dir)
-        self.methods = config.methods
+        self.methods = [v.strip() for v in config.methods.split(",") if v.strip()]
         self.build_monthly = config.build_monthly
         self.build_yearly = config.build_yearly
         self.overwrite_download = config.overwrite_download
