@@ -1,5 +1,5 @@
-username = "jacobhall"
-password = "PASSWORD"
+username = "<ADD-USERNAME>"
+password = "<ADD-PASSWORD>"
 
 data_url = "https://oco2.gesdisc.eosdis.nasa.gov/data/OCO2_DATA/OCO2_L2_Lite_FP.11.1r/"
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gesdisc/OCO2_L2_Lite_FP.11.1r/"

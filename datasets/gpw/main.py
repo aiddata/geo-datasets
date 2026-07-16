@@ -1,3 +1,4 @@
+import os
 import zipfile
 from copy import copy
 from pathlib import Path
@@ -226,5 +227,9 @@ else:
 
 
 if __name__ == "__main__":
+    import dotenv
+    dotenv.load_dotenv()
     config = get_config(GPWConfiguration)
+    # secrets come from the gitignored .env for local runs
+    config.sedac_cookie = os.environ.get("sedac_cookie")
     GPWv4(config).run(config.run)

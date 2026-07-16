@@ -535,5 +535,9 @@ else:
 
 
 if __name__ == "__main__":
+    import dotenv
+    dotenv.load_dotenv()
     config = get_config(LTDR_NDVI_Configuration)
+    # secrets come from the gitignored .env for local runs
+    config.token = os.environ.get("token")
     LTDR_NDVI(config).run(config.run)

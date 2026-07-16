@@ -8,7 +8,7 @@ output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gpw/gpw_v4_r
 # Years to process
 years = "2000,2005,2010,2015,2020"
 
-sedac_cookie = "None"
+sedac_cookie = "<ADD-SEDAC_COOKIE>"
 
 # Overwrite existing files?
 overwrite_download = false

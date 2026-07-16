@@ -544,5 +544,10 @@ else:
 
 
 if __name__ == "__main__":
+    import dotenv
+    dotenv.load_dotenv()
     config = get_config(OCO2Configuration)
+    # secrets come from the gitignored .env for local runs
+    config.username = os.environ.get("username")
+    config.password = os.environ.get("password")
     OCO2(config).run(config.run)

@@ -13,7 +13,7 @@ output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ltdr_ndvi"
 # create a token at the LAADS DAAC site
 # https://ladsweb.modaps.eosdis.nasa.gov/
 # once logged in, click on "Login" and click "Generate Token"
-token = "eyJ0eXAiOiJKV1QiLCJvcmlnaW4iOiJFYXJ0aGRhdGEgTG9naW4iLCJzaWciOiJlZGxqd3RwdWJrZXlfb3BzIiwiYWxnIjoiUlMyNTYifQ.eyJ0eXBlIjoiVXNlciIsInVpZCI6ImphY29iaGFsbCIsImV4cCI6MTcyNDUxNTkzNywiaWF0IjoxNzE5MzMxOTM3LCJpc3MiOiJFYXJ0aGRhdGEgTG9naW4ifQ.0u2kfqtKVjNmBexnsTeaYp44EJm3NSFLwtCRkp7NX9zuhdmrv1HUXMjYNxyIhxGjWk2pdIPDYNNAJ8siHWlsmxuiVsX0WsFuETz1y4McPTeIzEi0-1vefhKhHU6Otls_H5EmuAafTBFfokdmYR5ZiZ2Z4c3TnzwNcPmpyQEeYft2EE1B1dpCmsSy3JDILuUpJSictlRdfvM0NYy3vwOBPMC-cVBPmPeoFparb17KaI6SkbOpO811P-OVdC1YSO3j8Bbl4ShZRfyiFkbyNx_c0FryzUkslaGHV-XM0yb1UMaaGKtMieWC4TZw3jaa33PdV4tLLm20FXm15BxBk4mzkQ"
+token = "<ADD-TOKEN>"
 
 overwrite_download = false
 validate_download = true

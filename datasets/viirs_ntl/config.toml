@@ -30,11 +30,11 @@ max_retries = 5
 
 # fill with personal username and password, register account here: https://eogdata.mines.edu/eog/EOG_sensitive_contents
 # see README.md for more in-depth instructions
-username = "username"
-password = "password"
+username = "<ADD-USERNAME>"
+password = "<ADD-PASSWORD>"
 
 # check https://eogdata.mines.edu/products/register/ to ensure most updated client_secret used here
-client_secret = "2677ad81-521b-4869-8480-6d05b9e57d48"
+client_secret = "<ADD-CLIENT_SECRET>"
 
 
 [run]
