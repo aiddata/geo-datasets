@@ -31,11 +31,21 @@ Audited 2026-07-16.
    (all legacy files uniformly miss the same 16 keys — `tags`, `path`,
    `is_global`, `sources_name`, `mapped`, `coverage_dependency`,
    `processing_options`, ... — and carry 5 stale ones: `version`, `options`,
-   `base`, `short_name`, `extras`).
-8. **README**: strip generic uv/deploy boilerplate (lives in central docs);
+   `base`, `extras`; keep `short_name`). `path` uses the `/data/datasets/<name>`
+   convention. `processing_options[].function` must be one of the
+   `rasterstats_default_*` functions in the GeoQuery backend
+   (`min`/`max`/`mean`/`sum`/`count`/`categorical`).
+8. **Interruption-safe writes**: downloads and processing outputs should go
+   through `Dataset.tmp_to_dst_file` so an interrupted task cannot leave a
+   partial file that a later run mistakes for a complete one. Pass
+   `tmp_dir=<dir on the destination filesystem>` — the default `/tmp` is pod
+   ephemeral storage, and with many workers × GB-scale files that gets pods
+   evicted. (Fixed in data_manager: the helper now preserves umask-standard
+   file modes and cleans up its per-file temp directory.)
+9. **README**: strip generic uv/deploy boilerplate (lives in central docs);
    keep dataset-specific config documentation and data-source notes. Pattern:
    commit `3778296` (esa_landcover).
-9. Deploy and smoke-run on the cluster; verify output lands on the share with
+10. Deploy and smoke-run on the cluster; verify output lands on the share with
    `9198:9915` ownership.
 
 ## Done
