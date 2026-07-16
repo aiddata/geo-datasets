@@ -56,34 +56,37 @@ Audited 2026-07-16.
 | TIGER | rewritten from argparse script; national layers only |
 | esa_landcover | CDS API v2→new endpoint; `CDSAPI_KEY` secret pattern; reference for ingest JSON + README format |
 
-## Workstream A — datasets with configs (14 remaining)
+## Workstream A — datasets with configs
 
-Common sweep for all: `work_pool` → `geodata`, `aiddata10` → `nova` paths,
-`image_tag` bump, drop `data_manager_version`.
+**Common sweep completed 2026-07-16** (commit `32f7b5e`): `work_pool` →
+`geodata`, `aiddata10` → nova staging paths, `data_manager_version` dropped.
+All datasets pinned to image `083d531` (includes cdsapi, scipy, python-dotenv,
+and the tmp_to_dst fixes). Remaining per-dataset work is listed below.
 
-| dataset | beyond the common sweep | status |
+| dataset | remaining work | status |
 |---|---|---|
-| worldpop_pop_count | `List[]` field; ingest JSON; README | in progress |
-| critical_habitats | — | |
-| cru_ts | — | |
-| distance_to_country_border | — | |
-| wdpa | — | |
+| worldpop_pop_count | — | migrated; cluster smoke pending |
+| worldpop_pop_count_new | — | new: Global 2015-2030 R2025A; cluster smoke pending |
+| critical_habitats | deploy + smoke | |
+| cru_ts | deploy + smoke | |
+| distance_to_country_border | deploy + smoke | |
+| wdpa | deploy + smoke | |
 | ookla_speedtest | **anomaly**: has config.toml but zero .py files — investigate | |
-| distance_to_coast | `List[]` field | |
-| distance_to_water | `List[]` field | |
-| dvnl | `List[]` field | |
-| gpm | `List[]` field | |
-| gpw | `List[]` field | |
-| landscan_pop | `List[]` field | |
-| malaria_atlas_project | `List[]` field | |
-| modis_lst | `List[]` field | |
-| pm25 | `List[]` field | |
-| plad | `List[]` field | |
-| udel_climate | `List[]` field | |
-| worldpop_age_sex | `List[]` field | |
-| ltdr_ndvi | `List[]` field; **plaintext `token` in git — rotate** → `.env` | |
-| viirs_ntl | `List[]` field; **plaintext `password` + `client_secret` in git — rotate** → `.env` | |
-| oco2 | `List[]` field; **plaintext `password` in git — rotate** → `.env`; `scipy` missing from image | |
+| distance_to_coast | `List[]` field; ingest JSON; README; deploy + smoke | |
+| distance_to_water | `List[]` field; ingest JSON; README; deploy + smoke | |
+| dvnl | `List[]` field; ingest JSON; README; deploy + smoke | |
+| gpm | `List[]` field; ingest JSON; README; deploy + smoke | |
+| gpw | `List[]` field; ingest JSON; README; deploy + smoke | |
+| landscan_pop | `List[]` field; ingest JSON; README; deploy + smoke | |
+| malaria_atlas_project | `List[]` field; ingest JSON; README; deploy + smoke | |
+| modis_lst | `List[]` field; ingest JSON; README; deploy + smoke | |
+| pm25 | `List[]` field; ingest JSON; README; deploy + smoke | |
+| plad | `List[]` field; ingest JSON; README; deploy + smoke | |
+| udel_climate | `List[]` field; ingest JSON; README; deploy + smoke | |
+| worldpop_age_sex | `List[]` field; ingest JSON; README; deploy + smoke | |
+| ltdr_ndvi | `List[]` field; ingest JSON; README; **rotate `token`** → `.env`; deploy + smoke | |
+| viirs_ntl | `List[]` field; ingest JSON; README; **rotate `password` + `client_secret`** → `.env`; deploy + smoke | |
+| oco2 | `List[]` field; ingest JSON; README; **rotate `password`** → `.env`; deploy + smoke (scipy now in image) | |
 
 ## Workstream B — legacy, never migrated (~30 dirs)
 
