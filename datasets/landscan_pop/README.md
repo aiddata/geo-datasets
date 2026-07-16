@@ -1,28 +1,16 @@
-## LandScan Population Count
+# LandScan Population Count
 
-To run:
-1.  If on HPC (vortex-alpha nodes), prepare modules and base environment
-```
-source "/opt/anaconda3-2021.05/etc/profile.d/conda.csh"
-module unload gcc/4.7.3 python/2.7.8 openmpi-1.10.0-gcc mpi4py-2.0.0-gcc acml/5.3.1 numpy/1.9.2 gdal-nograss/1.11.2 proj/4.7.0 geos/3.5.0
-module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05
-unsetenv PYTHONPATH
-```
+Annual global population count grids from [LandScan](https://landscan.ornl.gov/) (Oak Ridge National Laboratory).
 
-2. Create Conda environment (if does not exist yet):
-```
-conda create -n va_geo python=3.9 -c conda-forge
-conda activate va_geo
-conda install -c conda-forge rasterio pandas geopandas shapely fiona pyproj requests
-```
+## Quick start
 
-3. Load Conda environment:
-```
-conda activate va_geo
-```
-4. Review script instructions in `prepare_data.py` to create LandScan user account and define user variables
+1. A LandScan account is required to download the data; register at https://landscan.ornl.gov/ and place credentials as expected by the download step.
 
-5. Download, extract, and convert data:
-    - In serial or using default Python parallelization: `python prepare_data.py`
-    - Using parallelization (mpi4py or default) on HPC: `qsub jobscript`
-```
+2. Review and edit the variables in `config.toml` as needed
+    - `years` is a comma-separated list of years to process
+    - `raw_dir` / `output_dir` are the download and output directories
+    - `run_extract` / `overwrite_extract` control the extraction step
+
+## Important notes
+
+- Data is distributed as per-year zip archives that are extracted and converted to Cloud Optimized GeoTIFFs.

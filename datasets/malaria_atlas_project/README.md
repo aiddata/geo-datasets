@@ -1,31 +1,15 @@
+# Malaria Atlas - PF Incidence
 
-## Malaria Atlas - PF Incidence Dataset
+Plasmodium falciparum incidence rasters from the [Malaria Atlas Project](https://data.malariaatlas.org).
 
-Data from [Malaria Atlas Project](https://data.malariaatlas.org)
+## Quick start
 
-To run:
-1.  If on HPC (vortex-alpha nodes), prepare modules and base environment
-```
-source "/opt/anaconda3-2021.05/etc/profile.d/conda.csh"
-module unload gcc/4.7.3 python/2.7.8 openmpi-1.10.0-gcc mpi4py-2.0.0-gcc acml/5.3.1 numpy/1.9.2 gdal-nograss/1.11.2 proj/4.7.0 geos/3.5.0
-module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05
-```
+1. Review and edit the variables in `config.toml` as needed
+    - `dataset` selects the Malaria Atlas data product to download
+    - `years` is a comma-separated list of years to process
+    - `raw_dir` / `output_dir` are the download and output directories
+    - `overwrite_download` / `overwrite_processing`, if true, overwrite existing files rather than skip them
 
-2. Create Conda environment (if does not exist yet):
-```
-conda create -n va_geo python=3.9 -c conda-forge
-conda activate va_geo
-conda install -c conda-forge rasterio pandas geopandas shapely fiona pyproj requests prefect prefect-dask dask-jobqueue
-```
+## Important notes
 
-3. Load Conda environment:
-```
-conda activate va_geo
-```
-
-4. Update config options in `main.py`
-
-5. Run `main.py`:
-```
- python main.py
-```
+- Data is retrieved through the Malaria Atlas Project API and converted to Cloud Optimized GeoTIFFs.

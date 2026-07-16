@@ -1,31 +1,14 @@
+# DMSP-like Nighttime Lights Derived from VNL (DVNL)
 
-## DMSP-like Nighttime Lights Derived from VNL (DVNL)
+DMSP-like nighttime lights derived from VIIRS, from the [Earth Observation Group](https://payneinstitute.mines.edu/eog/) (available years 2013-2019).
 
-Data from [Earth Observation Group](https://payneinstitute.mines.edu/eog/)
+## Quick start
 
-To run:
-1.  If on HPC (vortex-alpha nodes), prepare modules and base environment
-```
-source "/opt/anaconda3-2021.05/etc/profile.d/conda.csh"
-module unload gcc/4.7.3 python/2.7.8 openmpi-1.10.0-gcc mpi4py-2.0.0-gcc acml/5.3.1 numpy/1.9.2 gdal-nograss/1.11.2 proj/4.7.0 geos/3.5.0
-module load gcc/9.3.0 openmpi/3.1.4/gcc-9.3.0 anaconda3/2021.05
-```
+1. Review and edit the variables in `config.toml` as needed
+    - `years` is a comma-separated list of years to download and process
+    - `raw_dir` / `output_dir` are the download and output directories
+    - `overwrite_download` / `overwrite_processing`, if true, overwrite existing files rather than skip them
 
-2. Create Conda environment (if does not exist yet):
-```
-conda create -n va_geo python=3.9 -c conda-forge
-conda activate va_geo
-conda install -c conda-forge rasterio pandas geopandas shapely fiona pyproj requests prefect prefect-dask dask-jobqueue
-```
+## Important notes
 
-3. Load Conda environment:
-```
-conda activate va_geo
-```
-
-4. Update config options in `config.ini`
-
-5. Run `main.py`:
-```
- python main.py
-```
+- Processing converts each annual raster to a Cloud Optimized GeoTIFF.

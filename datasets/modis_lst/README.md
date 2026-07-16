@@ -15,7 +15,7 @@ Note: MOD11C3.061 is newer, and strongly recommended as of November 2022. We wil
 
 1. Create an account for (https://urs.earthdata.nasa.gov/)[https://urs.earthdata.nasa.gov/]
 
-2. Review the config.ini file
+2. Review the config.toml file
     - Add your Earthdata username and password (remember not to share these, e.g. in code contributions!)
     - Specify which years you'd like to process as a comma-separated list
     - Pick which run parameters you'd like, in accordance to the Dataset class

@@ -1,48 +1,23 @@
-# CRU TS Data Ingest
+# CRU TS
 
-CRU TS (Climatic Research Unit gridded Time Series) is a dataset of monthly climate anomalies on a 0.5x0.5° grid covering the entire world except Antarctica.
-It spans the years 1901-2021, and is updated annually.
-These scripts download and unzip CRU TS data, convert each month's data from NetCDF to COG, and create yearly aggregates.
+CRU TS (Climatic Research Unit gridded Time Series) is a dataset of monthly climate variables on a 0.5x0.5° grid covering the entire world except Antarctica, spanning 1901-present and updated annually. See the [data source](https://crudata.uea.ac.uk/cru/data/hrg/).
 
-## Info
+These scripts download and unzip CRU TS data, convert each month from NetCDF to COG, and create yearly aggregates.
 
-Current version:
-CRU TS v. 4.06
+## Quick start
 
-Link to data source:
-https://crudata.uea.ac.uk/cru/data/hrg/
+1. Set the CRU TS version in `config.toml` (`cru_url_dir`) — see below if updating to a new release.
 
-## Instructions
+2. Review and edit the variables in `config.toml` as needed
+    - `start_year` / `end_year` set the range to process (all years are downloaded regardless)
+    - `raw_dir` / `output_dir` are the download and output directories
+    - `overwrite_download` / `overwrite_unzip` / `overwrite_processing`, if true, overwrite existing files rather than skip them
 
-*The previous versions of code for processing this dataset can be found the archive folder.
-These instructions are for running the current Python 3 script using the `Dataset` class.*
+## Important notes
 
-1. Download and unzip the CRU TS data
+- The download links differ between versions, so a new release may require revising the link construction in `CRU_TS.download()` in `main.py`.
 
-2. [Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), and the conda environment, this should be the same as other datasets that use the shared Dataset class.
-   ```sh
-   # env.yml is in root of repository
-   cd geo-datasets
-   conda env create -f env.yml
-   conda activate geodata38
-   # config.ini and main.py, for example, are in cru_ts
-   cd cru_ts
-   ```
-   Alternatively, you can install the appropriate Python 3 version and packages yourself.
-
-3. Make sure config.ini lists the version of CRU TS that you desire. If it doesn't, see below for instructions on updating the version
-
-4. Set the source/destination folders and the range of years you'd like to process in `config.ini`. Note that all years will be downloaded regardless of how many you'd like to process.
-
-5. Run `main.py`
-   ```
-   python main.py
-   ```
-
-## Downloading new versions
-
-The download links for different versions are a bit complex, so you may have to revise the code to make the new version work properly. In `main.py`, look in the `CRU_TS.download()` function, and adjust the download link formation to point to the latest downloads.
-
+- Previous (pre-`Dataset`-class) versions of this code are in the `archive/` folder.
 
 ## Reference
 
