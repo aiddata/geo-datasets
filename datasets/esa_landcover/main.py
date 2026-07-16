@@ -84,9 +84,9 @@ class ESALandcover(Dataset):
         if not dl_path.exists() or self.overwrite_download:
             dl_meta = {
                 "variable": "all",
-                "format": "zip",
-                "version": [version],
-                "year": [year],
+                # "format": "zip",
+                "year": [str(year)],
+                "version": [version]
             }
             self.cdsapi_client.retrieve("satellite-land-cover", dl_meta, dl_path)
 
