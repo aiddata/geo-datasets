@@ -1,0 +1,48 @@
+{
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/worldpop_pop_count_r2025a",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "global_pop_YYYY_CN_1km_R2025A_v1.tif",
+    "name": "worldpop_pop_count_1km_mosaic_r2025a",
+    "short_name": "WorldPop Population Count 1km (R2025A)",
+    "title": "WorldPop Population Count (2015-2030, R2025A)",
+    "description": "Estimated population count from WorldPop global 1km mosaics, 2015-2030 (R2025A v1). Underlying dataset provides constrained number of people per 1km pixel, mosaiced from the 100m resolution country datasets. Years past the release date are projections.",
+    "details": "Raw data converted to Cloud Optimized GeoTIFFs; values are unchanged from the source data.",
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_sum",
+            "short_name": "sum",
+            "description": "total population per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.00833
+    },
+    "variable_factor": 1,
+    "variable_description": "number of people",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Bondarenko M., Priyatikanto R., Tejedor-Garavito N., Zhang W., McKeen T., Cunningham A., Woods T., Hilton J., Cihan D., Nosatiuk B., Brinkhoff T., Tatem A., Sorichetta A. (2025). The spatial distribution of population in 2015-2030 at a resolution of 30 arc (approximately 1km at the equator) R2025A version v1. Global Demographic Data Project - Funded by The Bill and Melinda Gates Foundation (INV-045237). WorldPop - School of Geography and Environmental Science, University of Southampton. https://dx.doi.org/10.5258/SOTON/WP00845",
+    "sources_web": "https://hub.worldpop.org/geodata/listing?id=137",
+    "sources_name": "WorldPop",
+    "tags": [ "population", "count", "worldpop", "economics" ],
+    "ingest_src": null,
+    "coverage_dependency": null
+}

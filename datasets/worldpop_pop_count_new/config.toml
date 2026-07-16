@@ -1,0 +1,33 @@
+# Comma-separated years to download and process (2015-2030 available;
+# years past the release date are projections)
+years = "2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030"
+
+# If true, download the UN-adjusted (UA) variant of the mosaics
+un_adjusted = false
+
+# input and output directories
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/worldpop/population_counts/1km_mosaic_r2025a"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/worldpop/population_counts/1km_mosaic_r2025a"
+
+overwrite_download = false
+overwrite_processing = true
+
+
+[run]
+max_workers = 25
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/worldpop/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/worldpop_pop_count_new"
+
+
+[deploy]
+deployment_name = "worldpop_pop_count_r2025a"
+image_tag = "a0ac2bb"
+version = 1
+flow_file_name = "main"
+flow_name = "worldpop_pop_count_r2025a"
+work_pool = "geodata"
