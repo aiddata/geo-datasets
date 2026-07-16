@@ -17,7 +17,10 @@ from shapely.geometry import Point
 class PLADConfiguration(BaseDatasetConfiguration):
     raw_dir: str
     output_dir: str
-    years: List[int]
+    # Comma-separated years (e.g. "2000,2001"). String, not list, so the
+    # Prefect run form renders a text input rather than the array widget,
+    # whose "add item" button submits the form.
+    years: str
     max_retries: int
     overwrite_download: bool
     overwrite_output: bool
@@ -31,7 +34,7 @@ class PLAD(Dataset):
 
         self.raw_dir = Path(config.raw_dir)
         self.output_dir = Path(config.output_dir)
-        self.years = config.years
+        self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
         self.max_retries = config.max_retries
         self.overwrite_download = config.overwrite_download
         self.overwrite_output = config.overwrite_output

@@ -2,7 +2,7 @@
 dataset = "pf_incidence_rate"
 
 # change var = set to year range wanted
-years = [ 2000, 2001, 2002, 2021 ]
+years = "2000,2001,2002,2021"
 
 # output directories
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/malaria_atlas_project"

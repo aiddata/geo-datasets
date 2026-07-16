@@ -1,5 +1,5 @@
 # change var = set to year range wanted - range available 2013 - 2019
-years = [ 2013, 2014, 2015, 2016, 2017, 2018, 2019 ]
+years = "2013,2014,2015,2016,2017,2018,2019"
 
 # change var - set to intended output directories
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/dvnl"

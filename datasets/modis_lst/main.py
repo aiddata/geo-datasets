@@ -176,7 +176,10 @@ class MODISLandSurfaceTempConfiguration(BaseDatasetConfiguration):
     output_dir: str
     username: str
     password: str
-    years: List[int]
+    # Comma-separated years (e.g. "2000,2001"). String, not list, so the
+    # Prefect run form renders a text input rather than the array widget,
+    # whose "add item" button submits the form.
+    years: str
     overwrite_download: bool
     overwrite_monthly: bool
     overwrite_yearly: bool
@@ -189,7 +192,7 @@ class MODISLandSurfaceTemp(Dataset):
         self.username = config.username
         self.password = config.password
 
-        self.years = [str(y) for y in config.years]
+        self.years = [v.strip() for v in config.years.split(",") if v.strip()]
 
         self.overwrite_download = config.overwrite_download
         self.overwrite_monthly = config.overwrite_monthly

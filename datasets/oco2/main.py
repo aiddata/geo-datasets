@@ -57,7 +57,10 @@ class OCO2Configuration(BaseDatasetConfiguration):
     output_dir: str
     overwrite_download: bool
     overwrite_processing: bool
-    year_list: List[int]
+    # Comma-separated years (e.g. "2000,2001"). String, not list, so the
+    # Prefect run form renders a text input rather than the array widget,
+    # whose "add item" button submits the form.
+    year_list: str
     interp_method: str
     run_a: bool
     run_b: bool
@@ -83,7 +86,7 @@ class OCO2(Dataset):
         self.password = config.password
         self.raw_dir = Path(config.raw_dir)
         self.output_dir = Path(config.output_dir)
-        self.year_list = config.year_list
+        self.year_list = [int(v.strip()) for v in config.year_list.split(",") if v.strip()]
         self.overwrite_download = config.overwrite_download
         self.overwrite_processing = config.overwrite_processing
 

@@ -87,7 +87,10 @@ class PM25Configuration(BaseDatasetConfiguration):
     output_dir: str
     box_config: BoxConfig
     version: str
-    years: List[int]
+    # Comma-separated years (e.g. "2000,2001"). String, not list, so the
+    # Prefect run form renders a text input rather than the array widget,
+    # whose "add item" button submits the form.
+    years: str
     overwrite_downloads: bool
     verify_existing_downloads: bool
     overwrite_processing: bool
@@ -103,7 +106,7 @@ class PM25(Dataset):
         self.raw_dir = Path(config.raw_dir) / self.version
         self.output_dir = Path(config.output_dir) / self.version
 
-        self.years = config.years
+        self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
 
         self.box_config = config.box_config
 

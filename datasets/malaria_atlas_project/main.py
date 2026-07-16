@@ -32,7 +32,10 @@ from data_manager import BaseDatasetConfiguration, Dataset, get_config
 class MalariaAtlasProjectConfiguration(BaseDatasetConfiguration):
     raw_dir: str
     output_dir: str
-    years: List[int]
+    # Comma-separated years (e.g. "2000,2001"). String, not list, so the
+    # Prefect run form renders a text input rather than the array widget,
+    # whose "add item" button submits the form.
+    years: str
     dataset: str
     overwrite_download: bool
     overwrite_processing: bool
@@ -45,7 +48,7 @@ class MalariaAtlasProject(Dataset):
 
         self.raw_dir = Path(config.raw_dir)
         self.output_dir = Path(config.output_dir)
-        self.years = config.years
+        self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
         self.dataset = config.dataset
         self.overwrite_download = config.overwrite_download
         self.overwrite_processing = config.overwrite_processing

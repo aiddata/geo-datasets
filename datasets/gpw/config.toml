@@ -6,7 +6,7 @@ raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gpw/gpw_v4_rev11"
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gpw/gpw_v4_rev11"
 
 # Years to process
-years = [ 2000, 2005, 2010, 2015, 2020 ]
+years = "2000,2005,2010,2015,2020"
 
 sedac_cookie = "None"
 

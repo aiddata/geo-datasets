@@ -18,7 +18,10 @@ class WorldPopAgeSexConfiguration(BaseDatasetConfiguration):
     process_dir: str
     raw_dir: str
     output_dir: str
-    years: List[int]
+    # Comma-separated years (e.g. "2000,2001"). String, not list, so the
+    # Prefect run form renders a text input rather than the array widget,
+    # whose "add item" button submits the form.
+    years: str
     overwrite_download: bool
     overwrite_processing: bool
 
@@ -33,7 +36,7 @@ class WorldPopAgeSex(Dataset):
         self.process_dir = Path(config.process_dir)
         self.raw_dir = Path(config.raw_dir)
         self.output_dir = Path(config.output_dir)
-        self.years = config.years
+        self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
         self.overwrite_download = config.overwrite_download
         self.overwrite_processing = config.overwrite_processing
 
