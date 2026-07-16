@@ -19,33 +19,17 @@ This dataset describes global land use since 1992 using 22 categories. It is [av
     - **If you are on Windows or Mac, follow the appropriate link for instructions, but this readme has only been tested using Linux.**
     - [cdsapi GitHub repo](https://github.com/ecmwf/cdsapi)
 
-4. Make sure uv environment is synced
-    - `uv sync`
 
-6. Edit the variables in `config.toml`
+4. Review and edit the variables in `config.toml` as needed
     - `raw_dir` is the directory where the raw data will be downloaded and unzipped in
     - `output_dir` (prepare.py only) is the directory where the final data will be saved
     - `overwrite`, if True, will overwrite existing files rather than skip them
     - `years` is a comma-separated list of years to be processed
 
-7. Run `main.py`
-   ```sh
-   uv run main.py
-   ```
-   **API requests for downloads can take a while to work through queue, run, and be completed before download actually begins.**
-
-## Deploying to Prefect Cloud
-
-1. Log in to Prefect Cloud/Server
-
-2. Run `deploy.py`
-   ```sh
-   uv run scripts/deploy.py esa_landcover
-   ```
-
-3. From the Deployments menu in Prefect, select which parameters you'd like to use, then submit the run
 
 ## Important Notes
+
+-  **API requests for downloads can take a while to work through queue, run, and be completed before download actually begins.**
 
 - **At the time of writing, years 2016 and on use an updated "v2.1.1" version. When you run this script, check the dataset information page in case another version applies to a year you are processing.**
 
