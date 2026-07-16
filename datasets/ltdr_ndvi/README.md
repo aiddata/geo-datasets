@@ -2,9 +2,20 @@
 
 Yearly value for Normalized Difference Vegetation Index (NDVI). Created using the NASA Long Term Data Record (v5) AVHRR data.
 
-## Quick start
+[LTDR (Long-Term Data Record)](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/applications/ltdr/) is a project at NASA that "produces, validates and distributes a climate data record." [NDVI (Normalized Difference Vegetation Index)](https://modis-land.gsfc.nasa.gov/vi.html) "provides continuity with NOAA's AVHRR NDVI time series record for historical and climate applications."
+This script downloads daily NDVI data, unpacks them from HDF containers into the GeoTIFF format, and create monthly and yearly aggregates.
 
-1. Review and edit the variables in `config.toml` as needed
+## Instructions
+
+1. [Create EarthData login for LAADS](https://urs.earthdata.nasa.gov/users/new)
+
+2. Generate a token:
+   - Navigate to the [LAADS DAAC website](https://ladsweb.modaps.eosdis.nasa.gov/)
+   - Click on "Login" at the top right of the screen
+   - Click on "Generate Token"
+   - Copy the generated token into `config.toml`
+
+3. Review and edit the variables in `config.toml` as needed
     - `data_num`
     - `years` is a comma-separated list of years to process
     - `raw_dir` is a working/output directory

@@ -1,6 +1,6 @@
 # Distance to Water
 
-Distance to water, measured in meters. Derived using World Vector Shorelines combined with rivers and lakes from World Data Bank 2 (via Natural Earth).
+Distance to water, measured in meters. Derived using World Vector Shorelines from [GSHHG](http://www.soest.hawaii.edu/pwessel/gshhg/) combined with rivers and lakes from World Data Bank 2 (via [Natural Earth](https://github.com/nvkelso/natural-earth-vector)).
 
 ## Quick start
 

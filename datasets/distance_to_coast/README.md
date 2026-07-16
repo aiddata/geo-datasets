@@ -1,6 +1,7 @@
 # Distance to Coast
 
-Distance to coast (on land only), measured in meters. Derived using World Vector Shorelines.
+
+Distance to coast (on land only), measured in meters. Derived using World Vector Shorelines from [GSHHG](http://www.soest.hawaii.edu/pwessel/gshhg/).
 
 ## Quick start
 
