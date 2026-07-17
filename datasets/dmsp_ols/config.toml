@@ -1,0 +1,37 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/dmsp_ols"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/dmsp_ols"
+
+# download the v4 composites and build the Elvidge-2014 calibrated stable-lights product
+run_composites = true
+# download + extract the avg_lights_x_pct archives (no output product built)
+run_avg_x_pct = true
+
+# Browser session cookie for eogdata.mines.edu. Log in at
+# https://eogdata.mines.edu, then copy the mod_auth_openidc_session cookie
+# value into .env (see README). Kept out of git; placeholder here.
+mod_auth_openidc_session = "<ADD-MOD_AUTH_OPENIDC_SESSION>"
+
+overwrite_download = false
+overwrite_processing = true
+
+
+[run]
+backend = "prefect"
+task_runner = "concurrent"
+max_workers = 4
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/dmsp_ols/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/dmsp_ols"
+
+
+[deploy]
+deployment_name = "dmsp_ols"
+image_tag = "083d531"
+version = 1
+flow_file_name = "main"
+flow_name = "dmsp_ols"
+work_pool = "geodata"
