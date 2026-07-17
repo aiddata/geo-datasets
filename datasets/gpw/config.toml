@@ -35,7 +35,7 @@ directory = "datasets/gpw"
 [deploy]
 deployment_name = "GPWv4"
 image_tag = "083d531"
-version = 2
+version = 3
 flow_file_name = "main"
 flow_name = "gpwv4"
 work_pool = "geodata"
