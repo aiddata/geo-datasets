@@ -13,7 +13,7 @@ This script downloads daily NDVI data, unpacks them from HDF containers into the
    - Navigate to the [LAADS DAAC website](https://ladsweb.modaps.eosdis.nasa.gov/)
    - Click on "Login" at the top right of the screen
    - Click on "Generate Token"
-   - Copy the generated token into `config.toml`
+   - Copy the generated token into `.env` file in the `datasets/ltdr_ndvi` directory using the format `EARTHDATA_TOKEN=your_token_here`
 
 3. Review and edit the variables in `config.toml` as needed
     - `data_num`

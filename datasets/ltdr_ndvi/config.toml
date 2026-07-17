@@ -1,3 +1,9 @@
+# create an Earth Data token at the LAADS DAAC site
+# https://ladsweb.modaps.eosdis.nasa.gov/
+# once logged in, click on "Login" and click "Generate Token"
+# add the token to the .env file in this directory using the following format:
+# EARTHDATA_TOKEN=<your-token-here>
+
 # number corresponding to data folder
 # ...nasa.gov/api/v2/content/archives/allData/XXX
 data_num = 466
@@ -9,11 +15,6 @@ years = "2000,2022"
 # output directories
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ltdr_ndvi"
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ltdr_ndvi"
-
-# create a token at the LAADS DAAC site
-# https://ladsweb.modaps.eosdis.nasa.gov/
-# once logged in, click on "Login" and click "Generate Token"
-token = "<ADD-TOKEN>"
 
 overwrite_download = false
 validate_download = true
