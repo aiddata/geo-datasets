@@ -138,11 +138,20 @@ Triage which are still wanted before investing:
 
 \* `black_marble` and `kummu_gdp_hdi` have partial scripts (no Dataset class).
 
-## Workstream C — ingest JSONs
+## Workstream C — ingest JSONs — DONE
 
-All 46 legacy `*ingest*.json` files share one old schema; a single conversion
-script can restructure them, leaving per-dataset content (tags, citations,
-descriptions) for review. Convert each alongside its dataset's migration.
+All 87 ingest JSONs in the repo are now on the current schema (commits
+`4ccd6c5` for the 47 Workstream-A files, `52f939d` for the remaining 36 in
+Workstream-B dirs). Rasters use the esa `raster_ingest.json` schema; the 4
+atlasofurbanexpansion `*_boundary_ingest.json` files (`type: boundary`) use
+GeoQuery's `IngestFeatureCollection` schema instead.
+
+**Review flags (fill when the owning dataset is migrated):**
+- Raster ingests: per-dataset `path`, `description`, `is_global` were carried
+  over mechanically — worth a human pass.
+- atlasofurbanexpansion boundaries: `spatial_extent` left `""` (needs the WKT
+  extent, derivable from the `.geojson`) and `is_global` set `false` for a
+  200-city sample (confirm).
 
 ## Recently completed (beyond the sweep)
 
