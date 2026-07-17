@@ -2,21 +2,26 @@
 # data from: https://eogdata.mines.edu/nighttime_light/
 
 import gzip
-import json
 import os
 import shutil
-import sys
+import threading
 import urllib.parse
-from configparser import ConfigParser
-from datetime import datetime
 from pathlib import Path
-from typing import List, Literal, Union
+from typing import List, Optional
 
 import numpy as np
 import rasterio
 import requests
 from bs4 import BeautifulSoup
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
+
+# EOG (eogdata.mines.edu) moved programmatic access behind a paid OAuth tier, so
+# downloads now authenticate with a browser session cookie (mod_auth_openidc)
+# instead. The session has a short inactivity timeout, so a background thread
+# pings a protected URL on this interval to keep it warm for the duration of a
+# run. Grab a fresh cookie right before running — see the README.
+KEEPALIVE_URL = "https://eogdata.mines.edu/nighttime_light/"
+KEEPALIVE_INTERVAL = 30  # seconds
 
 
 class VIIRS_NTL_Configuration(BaseDatasetConfiguration):
@@ -41,9 +46,9 @@ class VIIRS_NTL_Configuration(BaseDatasetConfiguration):
     # form renders a text input rather than the array widget, whose "add
     # item" button submits the form.
     years: str
-    username: str
-    password: str
-    client_secret: str
+    # Browser session cookie (mod_auth_openidc_session) for eogdata.mines.edu.
+    # Provided via the gitignored .env / deployment parameter, not committed.
+    mod_auth_openidc_session: str
     max_retries: int
     cf_minimum: int
     overwrite_download: bool
@@ -64,9 +69,7 @@ class VIIRS_NTL(Dataset):
         self.monthly_files = [v.strip() for v in config.monthly_files.split(",") if v.strip()]
         self.months = [int(v.strip()) for v in config.months.split(",") if v.strip()]
         self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
-        self.username: str = config.username
-        self.password: str = config.password
-        self.client_secret: str = config.client_secret
+        self.cookies = {"mod_auth_openidc_session": config.mod_auth_openidc_session}
         self.max_retries: int = config.max_retries
         self.cf_minimum = config.cf_minimum
         self.overwrite_download: bool = config.overwrite_download
@@ -74,32 +77,51 @@ class VIIRS_NTL(Dataset):
         self.overwrite_processing: bool = config.overwrite_processing
 
     def test_connection(self):
-        # test connection
+        # A protected path redirects (302) to the login when the session cookie
+        # is missing/expired; requests follows that to a 200 login page, so
+        # disable redirects and treat a redirect as an auth failure. This is the
+        # earliest signal that the cookie is bad, so fail fast here.
         test_request = requests.get(
-            "https://eogdata.mines.edu/nighttime_light/", verify=True
+            "https://eogdata.mines.edu/nighttime_light/",
+            cookies=self.cookies,
+            allow_redirects=False,
+            verify=True,
         )
+        if test_request.is_redirect:
+            raise RuntimeError(
+                "eogdata redirected to login: the mod_auth_openidc_session cookie "
+                "is missing or expired. Grab a fresh one (see README)."
+            )
         test_request.raise_for_status()
 
-    def get_token(self):
+    def start_keepalive(self):
         """
-        retrieves access token for data download
+        Start a background thread that pings a protected URL every
+        KEEPALIVE_INTERVAL seconds to keep the EOG session cookie warm for the
+        duration of a run. Returns a threading.Event; set it to stop pinging.
         """
-        params = {
-            "client_id": "eogdata_oidc",
-            "client_secret": self.client_secret,
-            "username": self.username,
-            "password": self.password,
-            "grant_type": "password",
-        }
+        logger = self.get_logger()
+        stop = threading.Event()
 
-        token_url = (
-            "https://eogauth.mines.edu/auth/realms/master/protocol/openid-connect/token"
-        )
-        response = requests.post(token_url, data=params)
-        access_token_dict = json.loads(response.text)
-        access_token = access_token_dict.get("access_token")
+        def ping():
+            while not stop.wait(KEEPALIVE_INTERVAL):
+                try:
+                    r = requests.get(
+                        KEEPALIVE_URL,
+                        cookies=self.cookies,
+                        allow_redirects=False,
+                        timeout=30,
+                    )
+                    if r.is_redirect:
+                        logger.warning(
+                            "Keep-alive ping was redirected to login: the EOG "
+                            "session cookie appears to have expired mid-run."
+                        )
+                except Exception as e:
+                    logger.warning(f"Keep-alive ping failed: {e}")
 
-        return access_token
+        threading.Thread(target=ping, name="eog-keepalive", daemon=True).start()
+        return stop
 
     def build_download_list(self):
         task_list = []
@@ -158,10 +180,17 @@ class VIIRS_NTL(Dataset):
                     attempts = 1
                     while attempts <= self.max_retries:
                         try:
-                            session = requests.Session()
-                            r = session.get(
-                                download_url, headers={"User-Agent": "Mozilla/5.0"}
+                            r = requests.get(
+                                download_url,
+                                headers={"User-Agent": "Mozilla/5.0"},
+                                cookies=self.cookies,
+                                allow_redirects=False,
                             )
+                            if r.is_redirect:
+                                raise RuntimeError(
+                                    "Redirected to login listing "
+                                    f"{download_url}: EOG session cookie expired."
+                                )
                             soup = BeautifulSoup(r.content, "html.parser")
 
                             items = soup.find_all("tr")
@@ -210,18 +239,24 @@ class VIIRS_NTL(Dataset):
 
         logger = self.get_logger()
 
-        logger.info("Retrieving token")
-        token = self.get_token()
-        headers = {
-            "Authorization": f"Bearer {token}",
-        }
-
         if local_filename.exists() and not self.overwrite_download:
             logger.info(f"Download Exists: {local_filename}")
         else:
             logger.info(f"Attempting to download from {download_dest}...")
             try:
-                with requests.get(download_dest, headers=headers, stream=True) as src:
+                with requests.get(
+                    download_dest,
+                    cookies=self.cookies,
+                    stream=True,
+                    allow_redirects=False,
+                ) as src:
+                    # A redirect here is the login page: the session cookie is
+                    # missing/expired. Fail the task loudly rather than writing
+                    # an HTML login page to a .tif.gz.
+                    if src.is_redirect:
+                        raise RuntimeError(
+                            "redirected to login (EOG session cookie expired?)"
+                        )
                     # raise an exception (fail this task) if HTTP response indicates that an error occured
                     src.raise_for_status()
                     with open(local_filename, "wb") as dst:
@@ -436,16 +471,22 @@ class VIIRS_NTL(Dataset):
     def main(self):
         logger = self.get_logger()
 
-        logger.info("Testing Connection...")
-        self.test_connection()
+        # Keep the EOG session cookie warm for every step that touches
+        # eogdata.mines.edu (connection test, directory listing, downloads).
+        stop_keepalive = self.start_keepalive()
+        try:
+            logger.info("Testing Connection...")
+            self.test_connection()
 
-        os.makedirs(self.raw_dir, exist_ok=True)
-        logger.info("Building download list...")
-        dl_list = self.build_download_list()
+            os.makedirs(self.raw_dir, exist_ok=True)
+            logger.info("Building download list...")
+            dl_list = self.build_download_list()
 
-        logger.info("Running data download")
-        download = self.run_tasks(self.manage_download, dl_list)
-        self.log_run(download)
+            logger.info("Running data download")
+            download = self.run_tasks(self.manage_download, dl_list)
+            self.log_run(download)
+        finally:
+            stop_keepalive.set()
 
         logger.info("Building extract list...")
         extract_list = self.build_extract_list()
@@ -478,8 +519,6 @@ if __name__ == "__main__":
     import dotenv
     dotenv.load_dotenv()
     config = get_config(VIIRS_NTL_Configuration)
-    # secrets come from the gitignored .env for local runs
-    config.username = os.environ.get("username")
-    config.password = os.environ.get("password")
-    config.client_secret = os.environ.get("client_secret")
+    # secret comes from the gitignored .env for local runs
+    config.mod_auth_openidc_session = os.environ.get("mod_auth_openidc_session")
     VIIRS_NTL(config).run(config.run)

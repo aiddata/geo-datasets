@@ -14,30 +14,39 @@ Product abbreviations:
 	- vcmcfg = excludes any data contaminated by stray light
 	- vcmslcfg = data impacted by stray light are corrected but not removed
 
+## Authentication
+
+EOG moved programmatic (OAuth) access behind a paid tier, so downloads now use a
+browser **session cookie** instead. Because that session times out quickly when
+idle, a background thread pings EOG every 30 seconds to keep it warm for the
+duration of a run — so **grab the cookie immediately before running**, not ahead
+of time.
+
+1. Log in at [https://eogdata.mines.edu/nighttime_light](https://eogdata.mines.edu/nighttime_light) (register [here](https://eogdata.mines.edu/eog/EOG_sensitive_contents) if needed).
+2. In your browser's DevTools → Application → Cookies → `eogdata.mines.edu`, copy the value of the `mod_auth_openidc_session` cookie.
+3. Put it in a gitignored `.env` in this directory:
+   ```
+   mod_auth_openidc_session=<the cookie value>
+   ```
+   For a Prefect deployment it is supplied as the `mod_auth_openidc_session` parameter (overlaid from `.env` at deploy time).
+
+Note: the cookie's server-side session expires after a period of inactivity that
+EOG controls (kept warm by the keep-alive during a run). If a run fails with a
+"redirected to login" error, the cookie has expired — grab a fresh one and rerun.
+
 ## Quick start
 
+Review and edit the variables in `config.toml` as needed:
 
-1. Create an account for [https://eogdata.mines.edu/nighttime_light](https://eogdata.mines.edu/nighttime_light)
-	- Add username and password to get_token.py (Do not share your password publicly on GitHub or elsewhere)
-
-2. Review and edit the variables in `config.toml` as needed
-    - `run_annual`
-    - `annual_version`
-    - `years` is a comma-separated list of years to process
-    - `run_monthly`
-    - `months`
-    - `cf_minimum`
-    - `annual_files`
-    - `monthly_files`
-    - `raw_dir` is a working/output directory
-    - `output_dir` is a working/output directory
-    - `overwrite_download`, if true, overwrites existing files rather than skipping
-    - `overwrite_extract`, if true, overwrites existing files rather than skipping
-    - `overwrite_processing`, if true, overwrites existing files rather than skipping
-    - `max_retries`
-    - `username`
-    - `password`
-    - `client_secret`
+- `run_annual` / `run_monthly` toggle the two products
+- `annual_version` selects the annual release (e.g. `v22`)
+- `years` / `months` are comma-separated lists to process
+- `annual_files` / `monthly_files` are comma-separated file types to fetch
+- `cf_minimum` is the cloud-free-coverage threshold used to binarize the `cf_cvg` product
+- `raw_dir` / `output_dir` are the download and output directories
+- `overwrite_download` / `overwrite_extract` / `overwrite_processing`, if true, overwrite existing files rather than skipping
+- `max_retries` is the retry count for the monthly directory listing
+- `mod_auth_openidc_session` — the EOG cookie; leave the `<ADD-…>` placeholder in `config.toml` and set the real value in `.env` (see Authentication)
 
 ## Source
 
