@@ -55,38 +55,51 @@ Audited 2026-07-16.
 | geoboundaries | first migration; comma-separated `dl_iso3_list` |
 | TIGER | rewritten from argparse script; national layers only |
 | esa_landcover | CDS API v2→new endpoint; `CDSAPI_KEY` secret pattern; reference for ingest JSON + README format |
+| worldpop_pop_count | migrated; **cluster smoke passed 2026-07-16** |
 
 ## Workstream A — datasets with configs
 
-**Common sweep completed 2026-07-16** (commit `32f7b5e`): `work_pool` →
-`geodata`, `aiddata10` → nova staging paths, `data_manager_version` dropped.
-All datasets pinned to image `083d531` (includes cdsapi, scipy, python-dotenv,
-and the tmp_to_dst fixes). Remaining per-dataset work is listed below.
+All code-prep waves are **done** across the datasets below: common config sweep
+(commit `32f7b5e`), ingest JSONs → current schema (`4ccd6c5`), list fields →
+comma strings (`2fe3bfc`, `7682144`), READMEs (`3e88649`, `d42ae20`), and the
+`.env` secret pattern (`a0b010e`). All pinned to image `083d531` (cdsapi, scipy,
+python-dotenv, tmp_to_dst fixes). What remains is per-dataset **deploy + cluster
+smoke**, plus the specific notes below.
 
 | dataset | remaining work | status |
 |---|---|---|
-| worldpop_pop_count | — | migrated; cluster smoke pending |
-| worldpop_pop_count_new | — | new: Global 2015-2030 R2025A; cluster smoke pending |
+| worldpop_pop_count_new | deploy + smoke | new: Global 2015-2030 R2025A |
 | critical_habitats | deploy + smoke | |
 | cru_ts | deploy + smoke | |
 | distance_to_country_border | deploy + smoke | |
 | wdpa | deploy + smoke | |
-| ookla_speedtest | **anomaly**: has config.toml but zero .py files — investigate | |
-| distance_to_coast | `List[]` field; ingest JSON; README; deploy + smoke | |
-| distance_to_water | `List[]` field; ingest JSON; README; deploy + smoke | |
-| dvnl | `List[]` field; ingest JSON; README; deploy + smoke | |
-| gpm | `List[]` field; ingest JSON; README; deploy + smoke | |
-| gpw | `List[]` field; ingest JSON; README; deploy + smoke | |
-| landscan_pop | `List[]` field; ingest JSON; README; deploy + smoke | |
-| malaria_atlas_project | `List[]` field; ingest JSON; README; deploy + smoke | |
-| modis_lst | `List[]` field; ingest JSON; README; deploy + smoke | |
-| pm25 | `List[]` field; ingest JSON; README; deploy + smoke | |
-| plad | `List[]` field; ingest JSON; README; deploy + smoke | |
-| udel_climate | `List[]` field; ingest JSON; README; deploy + smoke | |
-| worldpop_age_sex | `List[]` field; ingest JSON; README; deploy + smoke | |
-| ltdr_ndvi | `List[]` field; ingest JSON; README; **rotate `token`** → `.env`; deploy + smoke | |
-| viirs_ntl | `List[]` field; ingest JSON; README; **rotate `password` + `client_secret`** → `.env`; deploy + smoke | |
-| oco2 | `List[]` field; ingest JSON; README; **rotate `password`** → `.env`; deploy + smoke (scipy now in image) | |
+| distance_to_coast | deploy + smoke | |
+| distance_to_water | deploy + smoke | |
+| gpm | deploy + smoke | |
+| landscan_pop | deploy + smoke | |
+| malaria_atlas_project | deploy + smoke | |
+| modis_lst | deploy + smoke | |
+| pm25 | deploy + smoke | Box app setup for download |
+| plad | deploy + smoke | |
+| udel_climate | deploy + smoke | |
+| worldpop_age_sex | deploy + smoke | per sex×age×year — large |
+| dvnl | deploy + smoke | EOG cookie auth done + live-verified |
+| viirs_ntl | deploy + smoke | EOG cookie auth done + live-verified |
+| gpw | deploy + smoke | `.env` cookie/secret; switched to Earthdata dl |
+| ltdr_ndvi | **rotate `token`**; deploy + smoke | `.env` done; token was expired anyway |
+| oco2 | rotate `password` if real; deploy + smoke | `.env` done; scipy now in image |
+| ookla_speedtest | **anomaly**: config.toml but zero .py files — investigate | |
+
+### EOG (eogdata.mines.edu) cookie auth — dvnl, viirs_ntl
+
+EOG moved programmatic OAuth access behind a paid tier. Both datasets now
+authenticate with a browser `mod_auth_openidc_session` cookie: config field →
+`.env` / deploy param, all EOG GETs send the cookie with `allow_redirects=False`
++ a redirect-to-login guard, and a 30s keep-alive daemon thread holds the
+short-lived session open during the download phase. A 30s ping was confirmed to
+keep a session alive for a full hour. **Operational:** grab a fresh cookie
+immediately before a run (it idles out in minutes); a stale cookie fails loudly
+with "redirected to login" rather than writing a login page over a raster.
 
 ## Workstream B — legacy, never migrated (~30 dirs)
 
