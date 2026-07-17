@@ -83,16 +83,30 @@ smoke**, plus the specific notes below.
 | plad | deploy + smoke | |
 | udel_climate | deploy + smoke | |
 | worldpop_age_sex | deploy + smoke | per sex×age×year — large |
+| dmsp_ols | deploy + smoke | **rebuilt** from EOG; cookie auth + our Elvidge-2014 calibration; live-verified |
 | dvnl | deploy + smoke | EOG cookie auth done + live-verified |
 | viirs_ntl | deploy + smoke | EOG cookie auth done + live-verified |
 | gpw | deploy + smoke | `.env` cookie/secret; switched to Earthdata dl |
-| ltdr_ndvi | **rotate `token`**; deploy + smoke | `.env` done; token was expired anyway |
-| oco2 | rotate `password` if real; deploy + smoke | `.env` done; scipy now in image |
+| ltdr_ndvi | deploy + smoke | Earthdata token via `.env`; naming bug fixed |
+| oco2 | deploy + smoke | Earthdata token; bumped to 11.2r/11.3r version-by-year; live-verified |
 | ookla_speedtest | **anomaly**: config.toml but zero .py files — investigate | |
 
-### EOG (eogdata.mines.edu) cookie auth — dvnl, viirs_ntl
+### Secret handling — settled design
 
-EOG moved programmatic OAuth access behind a paid tier. Both datasets now
+`.env` (gitignored, per dataset) → `deploy.py` overlays each line onto the
+config → the value becomes a **deployment parameter**. The `.env` key MUST equal
+the config model field name (deploy overlays by key match) — the recurring bug
+(esa `CDSAPI_KEY`, ltdr `token`/`EARTHDATA_TOKEN`). The token/cookie is stored in
+the deployment params (server DB, visible in the Prefect UI); **accepted** since
+Prefect access is controlled. No Secret blocks. No outstanding credential
+rotations (the previously-flagged ones were placeholders or already expired; a
+working token now lives in each `.env`). **Token freshness:** Earthdata tokens
+expire (~60 days) and are not auto-refreshed — re-run `deploy.py` with a fresh
+`.env` token to rotate oco2/ltdr.
+
+### EOG (eogdata.mines.edu) cookie auth — dvnl, viirs_ntl, dmsp_ols
+
+EOG moved programmatic OAuth access behind a paid tier. These datasets
 authenticate with a browser `mod_auth_openidc_session` cookie: config field →
 `.env` / deploy param, all EOG GETs send the cookie with `allow_redirects=False`
 + a redirect-to-login guard, and a 30s keep-alive daemon thread holds the
@@ -100,6 +114,13 @@ short-lived session open during the download phase. A 30s ping was confirmed to
 keep a session alive for a full hour. **Operational:** grab a fresh cookie
 immediately before a run (it idles out in minutes); a stale cookie fails loudly
 with "redirected to login" rather than writing a login page over a raster.
+
+### Earthdata bearer token — oco2, ltdr_ndvi
+
+Both pull from NASA Earthdata Login services (oco2 = GES DISC, ltdr = LAADS); a
+single token from urs.earthdata.nasa.gov authenticates both listing and
+downloads via `Authorization: Bearer <token>`. Field/`.env` key/`__main__`
+lookup all named `earthdata_token`.
 
 ## Workstream B — legacy, never migrated (~30 dirs)
 
@@ -109,7 +130,7 @@ Triage which are still wanted before investing:
 `accessibility_map`, `accessibility_to_cities_2015_v1.0`, `acled`,
 `africa_child_mortality`, `afrobarometer`, `air_pollution`,
 `atlasofurbanexpansion`, `black_marble`*, `boundaries`, `diamond`,
-`distance_to_groads`, `dmsp_ols`, `drug`, `gcdf_v3`, `gdp_grid`, `gem`,
+`distance_to_groads`, `drug`, `gcdf_v3`, `gdp_grid`, `gem`,
 `ghs_pop`, `gimms_modis_ndvi`, `global_forest_change`, `globalsolaratlas`,
 `globalwindatlas`, `gold`, `historic_gimms_ndvi`, `kummu_gdp_hdi`*,
 `landsat7`, `modis_landcover`, `other`, `petroleum`, `speibase`, `srtm`,
@@ -123,17 +144,16 @@ All 46 legacy `*ingest*.json` files share one old schema; a single conversion
 script can restructure them, leaving per-dataset content (tags, citations,
 descriptions) for review. Convert each alongside its dataset's migration.
 
-## Batch opportunities
+## Recently completed (beyond the sweep)
 
-- One commit for the Workstream A common config sweep.
-- One dep commit (`scipy`, plus anything found later) → one image rebuild →
-  pin all `image_tag`s to that SHA.
-- Secrets rotation for `gpw` (`sedac_cookie`), `ltdr_ndvi` (`token`),
-  `viirs_ntl` (`username`/`password`/`client_secret`), `oco2` (`password`) —
-  all committed to git history, so rotate the credential AND move to the `.env`
-  pattern (see checklist item 4). `gpw` was missed by the first audit (the
-  secret is named `sedac_cookie`). The auto-generated READMEs for these still
-  list the secret as a config var; fix when moving to `.env`.
+- **dmsp_ols rebuilt** (commit `d3c3010`): moved from Workstream B into A. Was
+  two dead-repo shell scripts + a Py2 processing.py; now a Dataset/flow pulling
+  v4 composites from EOG (cookie auth), applying our Elvidge-2014 calibration →
+  COG, plus avg_lights_x_pct download-only. Old scripts in `archive/`.
+- **EOG cookie auth** for viirs_ntl (`a231975`), dvnl (`46e15d2`), dmsp_ols.
+- **Earthdata token** for oco2 + ltdr_ndvi (`a3383c7`); oco2 also bumped to the
+  11.2r/11.3r version-by-year layout (11.1r was removed from GES DISC).
+- **Secret naming/rotation thread closed** — see "Secret handling" above.
 
 ## Sweep completed 2026-07-16 (commits 4ccd6c5, 2fe3bfc, 7682144, 3e88649, d42ae20)
 
