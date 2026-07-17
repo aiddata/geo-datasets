@@ -31,7 +31,7 @@ max_retries = 5
 # Browser session cookie for eogdata.mines.edu. Log in at
 # https://eogdata.mines.edu, then copy the mod_auth_openidc_session cookie
 # value into .env (see README). Kept out of git; placeholder here.
-mod_auth_openidc_session = "<ADD-MOD_AUTH_OPENIDC_SESSION>"
+mod_auth_openidc_session="<ADD-MOD_AUTH_OPENIDC_SESSION>"
 
 
 [run]
