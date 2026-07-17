@@ -1,8 +1,10 @@
-# create an Earth Data token at the LAADS DAAC site
-# https://ladsweb.modaps.eosdis.nasa.gov/
-# once logged in, click on "Login" and click "Generate Token"
-# add the token to the .env file in this directory using the following format:
-# EARTHDATA_TOKEN=<your-token-here>
+# create an Earthdata token at the LAADS DAAC site
+# https://ladsweb.modaps.eosdis.nasa.gov/ (Login -> Generate Token), then add
+# it to the gitignored .env in this directory as:
+#   earthdata_token=<your-token-here>
+# The placeholder below is overlaid from .env at deploy time; keep it here so
+# the config validates.
+earthdata_token = "<ADD-EARTHDATA_TOKEN>"
 
 # number corresponding to data folder
 # ...nasa.gov/api/v2/content/archives/allData/XXX

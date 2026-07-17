@@ -1,9 +1,6 @@
 import glob
 import os
-from configparser import ConfigParser
-from datetime import datetime
 from pathlib import Path
-from typing import List, Literal, Union
 
 import h5py
 import numpy as np
@@ -17,42 +14,18 @@ from scipy.interpolate import griddata
 from utility import file_exists, find_files, get_current_timestamp
 
 
-class SessionWithHeaderRedirection(requests.Session):
-    """
-    overriding requests.Session.rebuild_auth to mantain headers when redirected
-    from: https://wiki.earthdata.nasa.gov/display/EL/How+To+Access+Data+With+Python
-    """
-
-    AUTH_HOST = "urs.earthdata.nasa.gov"
-
-    def __init__(self, username, password):
-        super().__init__()
-        self.auth = (username, password)
-
-    def rebuild_auth(self, prepared_request, response):
-        """
-        Overrides from the library to keep headers when redirected to or from
-        the NASA auth host.
-        """
-
-        headers = prepared_request.headers
-        url = prepared_request.url
-        if "Authorization" in headers:
-            original_parsed = requests.utils.urlparse(response.request.url)
-            redirect_parsed = requests.utils.urlparse(url)
-            if (
-                (original_parsed.hostname != redirect_parsed.hostname)
-                and redirect_parsed.hostname != self.AUTH_HOST
-                and original_parsed.hostname != self.AUTH_HOST
-            ):
-                del headers["Authorization"]
-        return
-
-
 class OCO2Configuration(BaseDatasetConfiguration):
-    data_url: str
-    username: str
-    password: str
+    # GES DISC base path up to (but not including) the version suffix
+    data_base_url: str
+    # OCO2_L2_Lite_FP version to use for years before recent_start_year, and for
+    # recent_start_year and later. 11.3r only reprocessed the most recent years,
+    # so older years come from 11.2r.
+    base_version: str
+    recent_version: str
+    recent_start_year: int
+    # NASA Earthdata Login bearer token (works across Earthdata services).
+    # Provided via the gitignored .env / deployment parameter, not committed.
+    earthdata_token: str
     raw_dir: str
     output_dir: str
     overwrite_download: bool
@@ -81,9 +54,11 @@ class OCO2(Dataset):
         self.timestamp = get_current_timestamp("%Y_%m_%d_%H_%M")
 
         self.interp_method = config.interp_method
-        self.data_url = config.data_url
-        self.username = config.username
-        self.password = config.password
+        self.data_base_url = config.data_base_url
+        self.base_version = config.base_version
+        self.recent_version = config.recent_version
+        self.recent_start_year = config.recent_start_year
+        self.auth_headers = {"Authorization": f"Bearer {config.earthdata_token}"}
         self.raw_dir = Path(config.raw_dir)
         self.output_dir = Path(config.output_dir)
         self.year_list = [int(v.strip()) for v in config.year_list.split(",") if v.strip()]
@@ -116,18 +91,24 @@ class OCO2(Dataset):
 
         os.makedirs(os.path.join(self.raw_dir, "results"), exist_ok=True)
 
+    def version_url(self, year):
+        """GES DISC directory URL for a year, choosing the dataset version."""
+        version = (
+            self.recent_version
+            if year >= self.recent_start_year
+            else self.base_version
+        )
+        return f"{self.data_base_url}.{version}/{year}"
+
     def test_connection(self) -> None:
-        """Verify that we can connect to the given data URL"""
-        test_request = requests.get(self.data_url)
+        """Verify that the token authenticates against GES DISC."""
+        test_request = requests.get(
+            f"{self.data_base_url}.{self.base_version}/", headers=self.auth_headers
+        )
         test_request.raise_for_status()
 
     def manage_download(self, url, local_filename):
-        """download individual file using session created
-
-        this needs to be a standalone function rather than a method
-        of SessionWithHeaderRedirection because we need to be able
-        to pass it to our mpi4py map function
-        """
+        """Download an individual file, authenticating with the Earthdata token."""
 
         logger = self.get_logger()
 
@@ -141,9 +122,7 @@ class OCO2(Dataset):
         ):
             logger.info(f"File already exists: {local_filename}. Skipping...")
         else:
-            session = SessionWithHeaderRedirection(self.username, self.password)
-
-            with session.get(url, stream=True) as r:
+            with requests.get(url, headers=self.auth_headers, stream=True) as r:
                 r.raise_for_status()
                 with open(local_filename, "wb") as f:
                     for chunk in r.iter_content(chunk_size=1024 * 1024):
@@ -179,11 +158,8 @@ class OCO2(Dataset):
 
         year_file_list = []
         for year in self.year_list:
-            year_url = os.path.join(self.data_url, str(year))
-            print(f"data_url is {self.data_url}")
-            print(f"year is {year}")
-            print(f"year_url is {year_url}")
-            year_files = find_files(year_url, ".nc4")
+            year_url = self.version_url(year)
+            year_files = find_files(year_url, ".nc4", headers=self.auth_headers)
             year_file_list.extend(year_files)
 
         df = pd.DataFrame({"raw_url": year_file_list})
@@ -547,7 +523,6 @@ if __name__ == "__main__":
     import dotenv
     dotenv.load_dotenv()
     config = get_config(OCO2Configuration)
-    # secrets come from the gitignored .env for local runs
-    config.username = os.environ.get("username")
-    config.password = os.environ.get("password")
+    # secret comes from the gitignored .env for local runs
+    config.earthdata_token = os.environ.get("earthdata_token")
     OCO2(config).run(config.run)

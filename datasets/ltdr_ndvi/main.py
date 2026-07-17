@@ -45,7 +45,9 @@ from rasterio.crs import CRS
 
 
 class LTDR_NDVI_Configuration(BaseDatasetConfiguration):
-    token: str
+    # NASA Earthdata Login bearer token (LAADS DAAC). Provided via the
+    # gitignored .env / deployment parameter, not committed.
+    earthdata_token: str
     data_num: int
     # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
     # form renders a text input rather than the array widget, whose "add
@@ -67,7 +69,7 @@ class LTDR_NDVI(Dataset):
     ):
         self.build_list = ["daily", "monthly", "yearly"]
 
-        self.auth_headers = {"Authorization": f"Bearer {config.token}"}
+        self.auth_headers = {"Authorization": f"Bearer {config.earthdata_token}"}
 
         self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
 
@@ -539,5 +541,5 @@ if __name__ == "__main__":
     dotenv.load_dotenv()
     config = get_config(LTDR_NDVI_Configuration)
     # secrets come from the gitignored .env for local runs
-    config.token = os.environ.get("EARTHDATA_TOKEN")
+    config.earthdata_token = os.environ.get("earthdata_token")
     LTDR_NDVI(config).run(config.run)

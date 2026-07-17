@@ -1,9 +1,17 @@
-username = "<ADD-USERNAME>"
-password = "<ADD-PASSWORD>"
+# NASA Earthdata Login bearer token for GES DISC. Create one at
+# https://urs.earthdata.nasa.gov (Generate Token) and put it in .env as
+# earthdata_token=<token>. Kept out of git; placeholder here.
+earthdata_token = "<ADD-EARTHDATA_TOKEN>"
 
-data_url = "https://oco2.gesdisc.eosdis.nasa.gov/data/OCO2_DATA/OCO2_L2_Lite_FP.11.1r/"
-raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gesdisc/OCO2_L2_Lite_FP.11.1r/"
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gesdisc/OCO2_L2_Lite_FP.11.1r/xco2"
+# GES DISC OCO2_L2_Lite_FP base path (version suffix appended per year). 11.3r
+# only reprocessed the most recent years, so earlier years use 11.2r.
+data_base_url = "https://oco2.gesdisc.eosdis.nasa.gov/data/OCO2_DATA/OCO2_L2_Lite_FP"
+base_version = "11.2r"
+recent_version = "11.3r"
+recent_start_year = 2024
+
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gesdisc/OCO2_L2_Lite_FP/xco2"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gesdisc/OCO2_L2_Lite_FP/xco2"
 
 overwrite_download = false
 overwrite_processing = false

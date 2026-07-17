@@ -1,71 +1,28 @@
 # OCO-2 Carbon Dioxide
 
-Data product: OCO-2 LITE Level 2 version 10r
+OCO-2 Lite Level 2 (Full Physics) column-averaged CO2 (XCO2) from NASA GES DISC. This script downloads the daily `.nc4` lite files, grids and interpolates them, and produces monthly and yearly rasters.
 
+Product page: https://disc.gsfc.nasa.gov/datasets/OCO2_L2_Lite_FP_11.2r/summary
 
-Product page, documentation, and user guide:
-https://disc.gsfc.nasa.gov/datasets/OCO2_L2_Lite_FP_10r/summary
+## Authentication
 
-Download base:
-https://oco2.gesdisc.eosdis.nasa.gov/data/OCO2_DATA/OCO2_L2_Lite_FP.10r/
+Downloads use a **NASA Earthdata Login bearer token** (works across Earthdata services, GES DISC included).
 
+1. Log in at [https://urs.earthdata.nasa.gov](https://urs.earthdata.nasa.gov) (register if needed) and, under Applications → Authorized Apps, authorize the "NASA GESDISC DATA ARCHIVE".
+2. Generate a token (Earthdata profile → Generate Token) and put it in a gitignored `.env` in this directory:
+   ```
+   earthdata_token=<the token>
+   ```
+   For a Prefect deployment it is supplied as the `earthdata_token` parameter (overlaid from `.env` at deploy time).
 
+## Quick start
 
-# Steps:
+Review and edit the variables in `config.toml` as needed:
 
-1. Link the NASA GESDISC DATA ARCHIVE to your EarthData account as described [here](https://disc.gsfc.nasa.gov/earthdata-login)
-    - Login to https://urs.earthdata.nasa.gov/.  If you do not have account then you need to register first.
-    - Go to the "Applications" tab and select "Authorized Apps"
-    - Click on the "APPROVE MORE APPLICATIONS" button near the bottom of the page
-    - Find the "NASA GESDISC DATA ARCHIVE" by scrolling or search and click on the "AUTHORIZE" button for it
-    - Agree to the terms and conditions
-
-2. Add your EarthData username and password to the `~/.netrc` file
-    - Add `machine urs.earthdata.nasa.gov login <uid> password <password>` to ~/.netrc, where uid and password are your EarthData username and password
-    - Do not share your username and password with others
-
-3. Create Conda environment
-	- First make sure Anaconda and MPI implementation are available. If on W&M HPC's Vortex nodes for example:
-		```
-		module load anaconda3/2020.02
-		module load openmpi/3.1.4/gcc-9.3.0
-		```
-	- To create a new environment:
-		```
-		conda env create -f environment.yml
-		conda activate oco2
-		pip install mpi4py
-        pip install rasterio
-		```
-    - Note: you may need to install rasterio manually using pip as Conda seems to have an issue with it sometimes
-        - rasterio may also appear to install correctly via Conda (either specified under conda packages or pip packages, but fail when actually used
-        - To install manually: `pip install rasterio`)
-
-4. If running on W&M HPC, edit jobscript
-    - Adjust the resources for the job based on what you would like to request from HPC
-    - Edit the `src_dir` variable to the appropriate path for your environment
-    - Comment out relevant `mpirun` commands for downloading, processing, or aggregating data based on what you intend to run (see following steps)
-	- **Note: If not running on W&M's HPC, please examine the jobscript files for additional environmental configurations. Modifications may be neccesary for running in different environments beyond what is covered in this readme.**
-
-
-5. Edit the `year_list`, `mode`, `max_workers`, and input/output directory variables in data_download.py and data_prepare.py
-    - `year_list`: earliest complete year is 2015 (int or str)
-    - `mode` can be either "parallel" or "serial"
-    - `max_workers` is the maximum number of processes to use when running in parallel mode. Set this based on the resources you request in your jobscript or what is available in your environment.
-    - Note: data_prepare.py has other variables you can edit to alter what stages of data preparation are run, and how data is processed. This is beyond the scope of the readme for reproducing existing data products, but the code is readable and fairly self-explanatory.
-
-
-6. Run data_download.py,  and data_prepare.py
-    - For each stage, comment out unused `mpirun` commands
-    - **Note: You may chose to leave all `mpirun` commands uncommented and run the entire pipeline at once.**
-    - After the jobscript is edited, start the job:
-        - `qsub jobscript`
-
-7. CSV files with the results from each stage can be found in the `results` dir within path specified by the `raw_dir` variable
-
-
-
-
-
-
-
+- `year_list` is a comma-separated list of years to process (earliest complete year is 2015)
+- `data_base_url` is the GES DISC path up to the version suffix
+- `base_version` / `recent_version` / `recent_start_year` — the OCO2_L2_Lite_FP version to use per year. 11.3r only reprocessed the most recent years, so years `>= recent_start_year` use `recent_version` and earlier years use `base_version`.
+- `interp_method` is the interpolation method for the gridding step
+- `raw_dir` / `output_dir` are the download and output directories
+- `overwrite_download` / `overwrite_processing`, if true, overwrite existing files rather than skip them
+- `earthdata_token` — leave the `<ADD-…>` placeholder in `config.toml` and set the real value in `.env` (see Authentication)

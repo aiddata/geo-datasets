@@ -13,14 +13,14 @@ This script downloads daily NDVI data, unpacks them from HDF containers into the
    - Navigate to the [LAADS DAAC website](https://ladsweb.modaps.eosdis.nasa.gov/)
    - Click on "Login" at the top right of the screen
    - Click on "Generate Token"
-   - Copy the generated token into `.env` file in the `datasets/ltdr_ndvi` directory using the format `EARTHDATA_TOKEN=your_token_here`
+   - Copy the generated token into a gitignored `.env` file in this directory using the format `earthdata_token=your_token_here` (for a Prefect deployment it is supplied as the `earthdata_token` parameter, overlaid from `.env` at deploy time)
 
 3. Review and edit the variables in `config.toml` as needed
     - `data_num`
     - `years` is a comma-separated list of years to process
     - `raw_dir` is a working/output directory
     - `output_dir` is a working/output directory
-    - `token`
+    - `earthdata_token` — leave the `<ADD-…>` placeholder in `config.toml` and set the real value in `.env`
     - `overwrite_download`, if true, overwrites existing files rather than skipping
     - `validate_download`
     - `overwrite_processing`, if true, overwrites existing files rather than skipping
