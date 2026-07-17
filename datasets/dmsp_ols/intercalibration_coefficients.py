@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 @author: nik | Created on Wed Feb 25 23:20:05 2015
 

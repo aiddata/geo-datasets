@@ -1,43 +1,80 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/dmsp_ntl/v4composites_calibrated_201709",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/dmsp_ols",
     "type": "raster",
     "file_extension": ".tif",
-    "file_mask": "FxxYYYY.v4x_web.stable_lights.avg_vis_calibrated.tif",
-    "name": "v4composites_calibrated_201709",
+    "file_mask": "dmsp_ols_FxxYYYY_stable_lights_calibrated.tif",
+    "name": "dmsp_ols_stable_lights_calibrated",
+    "short_name": "DMSP-OLS Nighttime Lights",
     "title": "DMSP-OLS Nighttime Lights",
     "description": "Version 4 DMSP-OLS Nighttime Lights composites. The lights from cities, towns, and other sites with persistent lighting, including gas flares. Ephemeral events, such as fires have been discarded. Calibrated across sensors and years using Elvidge 2014 coeficients.",
     "details": "Calibrated across sensors and years using Elvidge 2014 coeficients (coefficients for 2014 acquired via communications with Elvidge, 2016). Values greater than 63 after calibration were truncated to 63. Calibration formula fixed from previous processing of raw v4composites dataset. Calibration citation: Elvidge, Christopher D., Feng-Chi Hsu, Kimberly E. Baugh, and Tilottama Ghosh. 'National trends in satellite-observed lighting.' Global urban monitoring and assessment through earth observation 23 (2014): 97-118.",
-    "version": 4,
-    "options": {
-        "resolution": 0.008333333333333,
-        "extract_types": [
-            "max",
-            "mean",
-            "min",
-            "sum",
-            "count"
-        ],
-        "extract_types_info": {
-            "max": "maximum value measured within each unit of analysis",
-            "mean": "average value measured  within each unit of analysis",
-            "min": "minimum value measured  within each unit of analysis",
-            "sum": "sum of values measured within each unit of analysis",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum value measured within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "digital number 0-63."
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average value measured  within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum value measured  within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_sum",
+            "short_name": "sum",
+            "description": "sum of values measured within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.008333333333333
     },
-    "extras": {
-        "citation": "Image and Data processing by NOAA's National Geophysical Data Center. DMSP data collected by the US Air Force Weather Agency.",
-        "sources_web": "https://ngdc.noaa.gov/eog/dmsp/downloadV4composites.html",
-        "sources_name": "NOAA National Geophysical Data Center",
-        "tags": [
-            "nighttimelights",
-            "dmsp",
-            "economics",
-            "welfare"
-        ]
-    },
-    "active": 1,
-    "short_name": "DMSP-OLS Nighttime Lights"
+    "variable_factor": 1,
+    "variable_description": "digital number 0-63.",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Image and Data processing by NOAA's National Geophysical Data Center. DMSP data collected by the US Air Force Weather Agency.",
+    "sources_web": "https://eogdata.mines.edu/products/dmsp/",
+    "sources_name": "Earth Observation Group (EOG), Colorado School of Mines",
+    "tags": [
+        "nighttimelights",
+        "dmsp",
+        "economics",
+        "welfare"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

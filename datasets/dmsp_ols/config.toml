@@ -18,7 +18,7 @@ overwrite_processing = true
 [run]
 backend = "prefect"
 task_runner = "concurrent"
-max_workers = 4
+max_workers = 5
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/dmsp_ols/logs"
 
 
