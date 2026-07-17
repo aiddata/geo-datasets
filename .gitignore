@@ -4,3 +4,4 @@ secret_*
 /site
 .mypy_cache
 .vscode/
+.env
