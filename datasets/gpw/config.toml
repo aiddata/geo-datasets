@@ -1,3 +1,10 @@
+# create an Earth Data token at the LAADS DAAC site
+# https://ladsweb.modaps.eosdis.nasa.gov/
+# once logged in, click on "Login" and click "Generate Token"
+# tokens last for ~2 months
+# add the token to the .env file in this directory using the following format:
+# EARTHDATA_TOKEN=<your-token-here>
+
 # Name of dataset
 name = "GPWv4"
 
@@ -8,7 +15,6 @@ output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gpw/gpw_v4_r
 # Years to process
 years = "2000,2005,2010,2015,2020"
 
-sedac_cookie = "<ADD-SEDAC_COOKIE>"
 
 # Overwrite existing files?
 overwrite_download = false

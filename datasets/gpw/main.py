@@ -2,20 +2,20 @@ import os
 import zipfile
 from copy import copy
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 import requests
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
 
 class GPWConfiguration(BaseDatasetConfiguration):
+    token: str
     raw_dir: str
     output_dir: str
     # Comma-separated years (e.g. "2000,2001"). String, not list, so the
     # Prefect run form renders a text input rather than the array widget,
     # whose "add item" button submits the form.
     years: str
-    sedac_cookie: str
     overwrite_download: bool
     overwrite_extract: bool
     overwrite_processing: bool
@@ -29,7 +29,7 @@ class GPWv4(Dataset):
         :param raw_dir: directory to download files to
         :param output_dir: directory to unzip files to
         :param years: list of years to download
-        :param sedac_cookie: sedac cookie value acquired using steps documented in readme
+        :param token: Earthdata token for authentication
         :param only_unzip: if you already downloaded files and just want to unzip them, set this to true
         :param overwrite_download: if you want to overwrite files that have already been downloaded, set this to true
         :param overwrite_extract: if you want to overwrite files that have already been extracted, set this to true
@@ -41,24 +41,12 @@ class GPWv4(Dataset):
 
         self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
 
-        self.sedac_cookie = config.sedac_cookie
+        self.auth_headers = {"Authorization": f"Bearer {config.token}"}
 
         self.overwrite_download = config.overwrite_download
         self.overwrite_extract = config.overwrite_extract
         self.overwrite_processing = config.overwrite_processing
 
-    def download_docs(self):
-        documentation_url = "https://sedac.ciesin.columbia.edu/downloads/docs/gpw-v4/gpw-v4-documentation-rev11.zip"
-
-        # download documentation
-        response = requests.get(
-            documentation_url,
-            headers={"Cookie": f"sedac={self.sedac_cookie}"},
-            allow_redirects=True,
-        )
-        open(f"{self.raw_dir}/gpw-v4-documentation-rev11.zip", "wb").write(
-            response.content
-        )
 
     def build_download_list(self):
 
@@ -73,7 +61,8 @@ class GPWv4(Dataset):
             var_dl_dir.mkdir(parents=True, exist_ok=True)
             var_extract_dir.mkdir(parents=True, exist_ok=True)
 
-            var_base_url = f"https://sedac.ciesin.columbia.edu/downloads/data/gpw-v4/gpw-v4-population-{var}-adjusted-to-2015-unwpp-country-totals-rev11"
+            # var_base_url = f"https://sedac.ciesin.columbia.edu/downloads/data/gpw-v4/gpw-v4-population-{var}-adjusted-to-2015-unwpp-country-totals-rev11"
+            var_base_url = f"https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/gpw-v4-population-{var}-adjusted-to-2015-unwpp-country-totals-rev11"
 
             for year in self.years:
 
@@ -85,31 +74,34 @@ class GPWv4(Dataset):
 
         return task_list
 
-    def download(self, src, dst, extract_dir):
+    def download_and_extract(self, src_url: str, dst_path: Union[str, os.PathLike], extract_dir: Union[str, os.PathLike]) -> None:
+        self.download(src_url, dst_path)
+        self.extract(dst_path, extract_dir)
 
+    def download(self, src_url: str, dst_path: Union[str, os.PathLike]) -> None:
         logger = self.get_logger()
+        logger.info(f"Downloading {str(dst_path)}...")
+        with requests.get(src_url, headers=self.auth_headers, stream=True) as src:
+            src.raise_for_status()
+            with self.tmp_to_dst_file(dst_path, make_dst_dir=True) as dst_path:
+                with open(dst_path, "wb") as dst:
+                    for chunk in src.iter_content(chunk_size=8192):
+                        dst.write(chunk)
 
-        if not dst.exists() or self.overwrite_download:
-            logger.info(f"Downloading {src}")
-            response = requests.get(
-                src,
-                headers={"Cookie": f"sedac={self.sedac_cookie}"},
-                allow_redirects=True,
-            )
-            with open(dst, "wb") as dst_file:
-                dst_file.write(response.content)
-        else:
-            logger.info(f"Download Exists {src}")
+    def extract(self, zip_path: Union[str, os.PathLike], extract_dir: Union[str, os.PathLike]) -> None:
+        logger = self.get_logger()
+        logger.info(f"Extracting {str(zip_path)} to {str(extract_dir)}...")
 
-        with zipfile.ZipFile(dst, "r") as zip_ref:
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_member = [
                 member for member in zip_ref.namelist() if member.endswith(".tif")
             ][0]
             if not (extract_dir / zip_member).exists() or self.overwrite_extract:
-                logger.info(f"Extracting {dst}")
+                logger.info(f"Extracting {zip_member}")
                 zip_ref.extract(zip_member, path=extract_dir)
             else:
-                logger.info(f"Extract Exists {dst}")
+                logger.info(f"Extract exists for {zip_member}")
+
 
     def create_process_list(self):
         logger = self.get_logger()
@@ -198,14 +190,11 @@ class GPWv4(Dataset):
 
         logger = self.get_logger()
 
-        logger.info("Download documentation...")
-        self.download_docs()
-
         logger.info("Building download list...")
         dl_list = self.build_download_list()
 
         logger.info("Running download and extract...")
-        dl = self.run_tasks(self.download, dl_list)
+        dl = self.run_tasks(self.download_and_extract, dl_list)
         self.log_run(dl)
 
         logger.info("Building COG conversion list...")
@@ -231,5 +220,5 @@ if __name__ == "__main__":
     dotenv.load_dotenv()
     config = get_config(GPWConfiguration)
     # secrets come from the gitignored .env for local runs
-    config.sedac_cookie = os.environ.get("sedac_cookie")
+    config.token = os.environ.get("EARTHDATA_TOKEN")
     GPWv4(config).run(config.run)
