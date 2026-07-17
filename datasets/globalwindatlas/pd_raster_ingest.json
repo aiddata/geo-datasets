@@ -1,39 +1,62 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/globalwindatlas/GWA2.1/power_density/gwa2_250_pd_NONE_50m.tif",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/globalwindatlas_powerdensity",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "globalwindatlas_powerdensity",
+    "short_name": "Global Wind Atlas: Power Density",
     "title": "Wind Power Density Potential",
     "description": "Wind power density potential at 50m",
     "details": "The mean wind power density is a measure of the wind resource. Higher mean wind power densities indicate better wind resource.",
-    "version": "2",
-    "options": {
-        "resolution": 0.0025,
-        "extract_types": [
-            "mean",
-            "max",
-            "min"
-        ],
-        "extract_types_info": {
-            "mean": "average power density per unit of analysis",
-            "max": "maximum power density per unit of analysis",
-            "min": "minimum power density per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average power density per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "power density in Watts per meter squared"
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum power density per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum power density per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        }
+    ],
+    "other": {
+        "resolution": 0.0025
     },
-    "extras": {
-        "citation": "Wind data obtained from the \u201cGlobal Wind Atlas 2.0, a free, web-based application developed, owned and operated by the Technical University of Denmark (DTU) in partnership with the World Bank Group, utilizing data provided by Vortex, with funding provided by the Energy Sector Management Assistance Program (ESMAP). https://globalsolaratlas.info. Accessed online 2019-03-05.",
-        "sources_web": "https://globalwindatlas.info/about/",
-        "sources_name": "Global Wind Atlas",
-        "tags": [
-            "resources",
-            "environment",
-            "energy",
-            "wind"
-        ]
-    },
-    "active": 1,
-    "short_name": "Global Wind Atlas: Power Density"
+    "variable_factor": 1,
+    "variable_description": "power density in Watts per meter squared",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Wind data obtained from the \u201cGlobal Wind Atlas 2.0, a free, web-based application developed, owned and operated by the Technical University of Denmark (DTU) in partnership with the World Bank Group, utilizing data provided by Vortex, with funding provided by the Energy Sector Management Assistance Program (ESMAP). https://globalsolaratlas.info. Accessed online 2019-03-05.",
+    "sources_web": "https://globalwindatlas.info/about/",
+    "sources_name": "Global Wind Atlas",
+    "tags": [
+        "resources",
+        "environment",
+        "energy",
+        "wind"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

@@ -1,36 +1,52 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/diamond_201708/diamond_binary.tif",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/diamond_binary_201708",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "diamond_binary_201708",
+    "short_name": "Diamond Mines: Binary",
     "title": "Diamond Deposits",
     "description": "The diamonds dataset contains a list of all known diamond deposits throughout the world. Layer is a binary indicating areas with diamond deposits.",
     "details": "Dataset downloaded August 2017.",
-    "version": "201708",
-    "options": {
-        "resolution": 0.01,
-        "extract_types": [
-            "count",
-            "sum"
-        ],
-        "extract_types_info": {
-            "count": "total count of pixels per unit of analysis",
-            "sum": "number of pixels containing diamond deposits for each unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
         },
-        "factor": 1,
-        "variable_description": "binary"
+        {
+            "function": "rasterstats_default_sum",
+            "short_name": "sum",
+            "description": "number of pixels containing diamond deposits for each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        }
+    ],
+    "other": {
+        "resolution": 0.01
     },
-    "extras": {
-        "citation": "Gilmore, Elisabeth; Nils Petter Gleditsch, P\u00e4ivi Lujala & Jan Ketil R\u00f8d, 2005. \u2018Conflict Diamonds: A New Dataset\u2019, Conflict Management and Peace Science 22(3): 257\u2013292",
-        "sources_web": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Diamond-Resources/",
-        "sources_name": "Peace Research Institute Oslo (PRIO)",
-        "tags": [
-            "environment",
-            "resources",
-            "diamond"
-        ]
-    },
-    "active": 1,
-    "short_name": "Diamond Mines: Binary"
+    "variable_factor": 1,
+    "variable_description": "binary",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Gilmore, Elisabeth; Nils Petter Gleditsch, P\u00e4ivi Lujala & Jan Ketil R\u00f8d, 2005. \u2018Conflict Diamonds: A New Dataset\u2019, Conflict Management and Peace Science 22(3): 257\u2013292",
+    "sources_web": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Diamond-Resources/",
+    "sources_name": "Peace Research Institute Oslo (PRIO)",
+    "tags": [
+        "environment",
+        "resources",
+        "diamond"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

@@ -1,38 +1,61 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/acled/v3/count",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/acled_v3_count",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "acled_v3_count",
+    "short_name": "ACLED Conflict Event Count",
     "title": "ACLED Conflict Events (Africa)",
     "description": "Number of conflict event counts per 0.1 decimal degree grid cell using ACLED (Armed Conflict Location & Event Data Project) v3. For subsets or other permutations of ACLED, please contact us at geo@aiddata.org.",
     "details": "Rasterization of ACLED point data.",
-    "version": 3,
-    "options": {
-        "resolution": 0.1,
-        "extract_types": [
-            "sum",
-            "mean",
-            "count"
-        ],
-        "extract_types_info": {
-            "sum": "count of conflict events per unit of analysis",
-            "mean": "ratio of count of conflict events to pixel count within each unit of analysis",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_sum",
+            "short_name": "sum",
+            "description": "count of conflict events per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "count of conflict events"
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "ratio of count of conflict events to pixel count within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.1
     },
-    "extras": {
-        "citation": "Raleigh, Clionadh, Andrew Linke, H\u00e5vard Hegre and Joakim Karlsen. 2010. Introducing ACLED-Armed Conflict Location and Event Data. Journal of Peace Research 47(5) 651-660.",
-        "sources_web": "http://www.acleddata.com",
-        "sources_name": "ACLED",
-        "tags": [
-            "acled",
-            "conflict",
-            "africa"
-        ]
-    },
-    "active": 1,
-    "short_name": "ACLED Conflict Event Count"
+    "variable_factor": 1,
+    "variable_description": "count of conflict events",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Raleigh, Clionadh, Andrew Linke, H\u00e5vard Hegre and Joakim Karlsen. 2010. Introducing ACLED-Armed Conflict Location and Event Data. Journal of Peace Research 47(5) 651-660.",
+    "sources_web": "http://www.acleddata.com",
+    "sources_name": "ACLED",
+    "tags": [
+        "acled",
+        "conflict",
+        "africa"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

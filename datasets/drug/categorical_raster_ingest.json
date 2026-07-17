@@ -1,43 +1,58 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/drugdata_201708/drug_categorical.tif",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/drugdata_categorical_201708",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "drugdata_categorical_201708",
+    "short_name": "Drug Crops: Categorical",
     "title": "Drug Cultivation Sites",
     "description": "The drug cultivation dataset contains information on coca bush, opium poppy, and cannabis cultivation through the world. ",
     "details": "Dataset downloaded August 2017. This is a categorical raster dataset indicating drug type covering each pixel.",
-    "version": "201708",
-    "options": {
-        "resolution": 0.01,
-        "extract_types": [
-            "categorical",
-            "count"
-        ],
-        "extract_types_info": {
-            "categorical": "Drug type. Note: 'mix' is an additional category for cells that contain more than one drug type.",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_categorical",
+            "short_name": "categorical",
+            "description": "Drug type. Note: 'mix' is an additional category for cells that contain more than one drug type.",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "int"
         },
-        "factor": 1,
-        "variable_description": "drug category (cannabis, coca bush, opium, mix)"
-    },
-    "extras": {
-        "citation": "Buhaug, Halvard & P\u00e4ivi Lujala 2005. Accounting for Scale: Measuring Geography in Quantitative Studies of Civil War. Political Geography 24: 399-418.",
-        "sources_web": "http://www.paivilujala.com/drugdata.html",
-        "sources_name": "DRUGDATA",
-        "tags": [
-            "environment",
-            "resources",
-            "drug"
-        ],
-        "category_map": {
-            "none": 0,
-            "cannabis": 1,
-            "coca_bush": 2,
-            "opium": 3,
-            "mix": 4
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
         }
+    ],
+    "other": {
+        "resolution": 0.01
     },
-    "active": 1,
-    "short_name": "Drug Crops: Categorical"
+    "variable_factor": 1,
+    "variable_description": "drug category (cannabis, coca bush, opium, mix)",
+    "mapped": true,
+    "mappings": {
+        "none": 0,
+        "cannabis": 1,
+        "coca_bush": 2,
+        "opium": 3,
+        "mix": 4
+    },
+    "citation": "Buhaug, Halvard & P\u00e4ivi Lujala 2005. Accounting for Scale: Measuring Geography in Quantitative Studies of Civil War. Political Geography 24: 399-418.",
+    "sources_web": "http://www.paivilujala.com/drugdata.html",
+    "sources_name": "DRUGDATA",
+    "tags": [
+        "environment",
+        "resources",
+        "drug"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

@@ -1,44 +1,74 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/drugdata_201708/drug_distance.tif",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/distance_to_drugdata_201708",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "distance_to_drugdata_201708",
+    "short_name": "Drug Crops: Distance",
     "title": "Distance to Drug Cultivation Sites",
     "description": "Distance to drug cultivation sites (any drug type). The drug cultivation dataset contains information on coca bush, opium poppy, and cannabis cultivation through the world. ",
     "details": "Dataset downloaded August 2017.",
-    "version": "201708",
-    "options": {
-        "resolution": 0.01,
-        "extract_types": [
-            "mean",
-            "max",
-            "min",
-            "count"
-        ],
-        "extract_types_info": {
-            "mean": "average distance per unit of analysis",
-            "max": "maximum distance per unit of analysis",
-            "min": "minimum distance per unit of analysis",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "distance in meters"
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.01
     },
-    "extras": {
-        "citation": "Buhaug, Halvard & P\u00e4ivi Lujala 2005. Accounting for Scale: Measuring Geography in Quantitative Studies of Civil War. Political Geography 24: 399-418.",
-        "sources_web": "http://www.paivilujala.com/drugdata.html",
-        "sources_name": "DRUGDATA",
-        "tags": [
-            "environment",
-            "distance",
-            "resources",
-            "drug",
-            "coca bush",
-            "opium poppy",
-            "cannabis"
-        ]
-    },
-    "active": 1,
-    "short_name": "Drug Crops: Distance"
+    "variable_factor": 1,
+    "variable_description": "distance in meters",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Buhaug, Halvard & P\u00e4ivi Lujala 2005. Accounting for Scale: Measuring Geography in Quantitative Studies of Civil War. Political Geography 24: 399-418.",
+    "sources_web": "http://www.paivilujala.com/drugdata.html",
+    "sources_name": "DRUGDATA",
+    "tags": [
+        "environment",
+        "distance",
+        "resources",
+        "drug",
+        "coca bush",
+        "opium poppy",
+        "cannabis"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

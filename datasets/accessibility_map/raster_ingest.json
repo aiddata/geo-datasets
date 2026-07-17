@@ -1,40 +1,70 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/external/global/accessibility_map",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/access_50k",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "access_50k",
+    "short_name": "Travel Time to Cities 2010",
     "title": "Travel time to major cities",
     "description": "Estimated travel time (in minutes) to the nearest city of 50,000 or more people in year 2000.",
     "details": "No additional processing of raw data.",
-    "version": 1,
-    "options": {
-        "resolution": 0.008333333333333,
-        "extract_types": [
-            "mean",
-            "max",
-            "min",
-            "count"
-        ],
-        "extract_types_info": {
-            "mean": "average travel time per unit of analysis",
-            "max": "maximum travel time per unit of analysis",
-            "min": "minimum travel time per unit of analysis",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average travel time per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "time in minutes"
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum travel time per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum travel time per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.008333333333333
     },
-    "extras": {
-        "citation": "Nelson, A. (2008) Estimated travel time to the nearest city of 50,000 or more people in year 2000. Global Environment Monitoring Unit - Joint Research Centre of the European Commission, Ispra Italy. Available at http://forobs.jrc.ec.europa.eu/products/gam/",
-        "sources_web": "http://forobs.jrc.ec.europa.eu/products/gam",
-        "sources_name": " Global Environment Monitoring Unit - Joint Research Centre of the European Commission",
-        "tags": [
-            "jrc",
-            "accessibility",
-            "economics"
-        ]
-    },
-    "active": 1,
-    "short_name": "Travel Time to Cities 2010"
+    "variable_factor": 1,
+    "variable_description": "time in minutes",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Nelson, A. (2008) Estimated travel time to the nearest city of 50,000 or more people in year 2000. Global Environment Monitoring Unit - Joint Research Centre of the European Commission, Ispra Italy. Available at http://forobs.jrc.ec.europa.eu/products/gam/",
+    "sources_web": "http://forobs.jrc.ec.europa.eu/products/gam",
+    "sources_name": " Global Environment Monitoring Unit - Joint Research Centre of the European Commission",
+    "tags": [
+        "jrc",
+        "accessibility",
+        "economics"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

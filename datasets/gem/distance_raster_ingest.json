@@ -1,40 +1,70 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/gemdata_201708/gemstone_distance.tif",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/distance_to_gemdata_201708",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "distance_to_gemdata_201708",
+    "short_name": "Gemstone Mines: Distance",
     "title": "Distance to Gemstone Deposits",
     "description": "Distance to gemstone deposits, measured in meters.",
     "details": "Consists of 1022 gemstone sites in 61 countries. It include ruby, sapphire, emerald, aquamarine, heliodor, moganite, goshenite, nephrite, jadeite, lapis lazuli, opal, tourmaline, periodit, topaz, pearl, garnet, zircon, spinel, amber, and quartz. It excludes diamonds, which are included in the diamond deposit dataset. Dataset downloaded August 2017.",
-    "version": "201708",
-    "options": {
-        "resolution": 0.01,
-        "extract_types": [
-            "mean",
-            "max",
-            "min",
-            "count"
-        ],
-        "extract_types_info": {
-            "mean": "average distance per unit of analysis",
-            "max": "maximum distance per unit of analysis",
-            "min": "minimum distance per unit of analysis",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "distance in meters"
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.01
     },
-    "extras": {
-        "citation": "Lujala, P\u00e4ivi 2009. Deadly Combat over Natural Resources: Gems, Petroleum, Drugs, and the Severity of Armed Civil Conflict. Journal of Conflict Resolution 53(1): 50-71.",
-        "sources_web": "http://www.paivilujala.com/gemdata.html",
-        "sources_name": "GEMDATA",
-        "tags": [
-            "environment",
-            "resources",
-            "gemstone"
-        ]
-    },
-    "active": 1,
-    "short_name": "Gemstone Mines: Distance"
+    "variable_factor": 1,
+    "variable_description": "distance in meters",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Lujala, P\u00e4ivi 2009. Deadly Combat over Natural Resources: Gems, Petroleum, Drugs, and the Severity of Armed Civil Conflict. Journal of Conflict Resolution 53(1): 50-71.",
+    "sources_web": "http://www.paivilujala.com/gemdata.html",
+    "sources_name": "GEMDATA",
+    "tags": [
+        "environment",
+        "resources",
+        "gemstone"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

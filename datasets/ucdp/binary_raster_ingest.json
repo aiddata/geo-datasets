@@ -1,5 +1,8 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/ucdp/ged_polygons_v-1-1",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/ucdp_conflict_binary_11",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "ucdp_conflict_YYYY.tif",
@@ -8,23 +11,42 @@
     "title": "UCDP Conflict Events (in Africa)",
     "description": "Binary indicating areas of conflict event based on UCDP GED Polygons v1.1.",
     "details": "Definition of ucdp violence type can be found: http://www.pcr.uu.se/research/ucdp/definitions/",
-    "version": 1,
-    "options": {
-        "resolution": 0.01,
-        "extract_types": ["sum", "count"],
-        "extract_types_info" : {
-            "sum": "count of pixels where conflict occured per unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_sum",
+            "short_name": "sum",
+            "description": "count of pixels where conflict occured per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "binary indicating conflict events"
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.01
     },
-    "extras": {
-        "citation": "Croicu, Mihai and Ralph Sundberg, 2012, 'UCDP GED Conflict Polygons Dataset', Department of Peace and Conflict Research, Uppsala University",
-        "sources_web": "http://ucdp.uu.se/downloads/",
-        "sources_name": "UCDP",
-        "tags": ["ucdp", "conflict", "africa"]
-    },
-    "active": 1
+    "variable_factor": 1,
+    "variable_description": "binary indicating conflict events",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Croicu, Mihai and Ralph Sundberg, 2012, 'UCDP GED Conflict Polygons Dataset', Department of Peace and Conflict Research, Uppsala University",
+    "sources_web": "http://ucdp.uu.se/downloads/",
+    "sources_name": "UCDP",
+    "tags": [
+        "ucdp",
+        "conflict",
+        "africa"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }
-

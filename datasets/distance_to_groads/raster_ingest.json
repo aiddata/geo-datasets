@@ -1,39 +1,69 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/distance_to/groads",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/dist_to_groads",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "dist_to_groads",
+    "short_name": "Distance to Roads",
     "title": "Distance to Roads",
     "description": "Distance to roads, measured in meters, based on the Global Roads Open Access Dataset (gRoads) version 1.0.",
     "details": "The gRoads data set combines the best available roads data by country into a global roads coverage map. Because the data are compiled from multiple sources, the date range for road network representations ranges from the 1980s to 2010 depending on the country (most countries have no confirmed date), and spatial accuracy varies.",
-    "version": 1,
-    "options": {
-        "resolution": 0.01,
-        "extract_types": [
-            "mean",
-            "max",
-            "min",
-            "count"
-        ],
-        "extract_types_info": {
-            "mean": "average distance per unit of analysis",
-            "max": "maximum distance per unit of analysis",
-            "min": "minimum distance per unit of analysis",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "distance in meters"
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.01
     },
-    "extras": {
-        "citation": "Center for International Earth Science Information Network - CIESIN - Columbia University, and Information Technology Outreach Services - ITOS - University of Georgia. 2013. Global Roads Open Access Data Set, Version 1 (gROADSv1). Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). http://dx.doi.org/10.7927/H4VD6WCT. Accessed DAY MONTH YEAR.",
-        "sources_web": "http://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1",
-        "sources_name": "Center for International Earth Science Information Network - CIESIN",
-        "tags": [
-            "accessibility",
-            "other"
-        ]
-    },
-    "active": 1,
-    "short_name": "Distance to Roads"
+    "variable_factor": 1,
+    "variable_description": "distance in meters",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Center for International Earth Science Information Network - CIESIN - Columbia University, and Information Technology Outreach Services - ITOS - University of Georgia. 2013. Global Roads Open Access Data Set, Version 1 (gROADSv1). Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). http://dx.doi.org/10.7927/H4VD6WCT. Accessed DAY MONTH YEAR.",
+    "sources_web": "http://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1",
+    "sources_name": "Center for International Earth Science Information Network - CIESIN",
+    "tags": [
+        "accessibility",
+        "other"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

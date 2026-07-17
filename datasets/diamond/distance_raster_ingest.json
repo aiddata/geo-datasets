@@ -1,40 +1,70 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/diamond_201708/diamond_distance.tif",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/diamond_distance_201708",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "diamond_distance_201708",
+    "short_name": "Diamond Mines: Distance",
     "title": "Distance to Diamond Deposits",
     "description": "Distance to known diamond deposits, measured in meters.",
     "details": "Dataset downloaded August 2017.",
-    "version": "201708",
-    "options": {
-        "resolution": 0.01,
-        "extract_types": [
-            "mean",
-            "max",
-            "min",
-            "count"
-        ],
-        "extract_types_info": {
-            "mean": "average distance per unit of analysis",
-            "max": "maximum distance per unit of analysis",
-            "min": "minimum distance per unit of analysis",
-            "count": "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "distance in meters"
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.01
     },
-    "extras": {
-        "citation": "Gilmore, Elisabeth; Nils Petter Gleditsch, P\u00e4ivi Lujala & Jan Ketil R\u00f8d, 2005. \u2018Conflict Diamonds: A New Dataset\u2019, Conflict Management and Peace Science 22(3): 257\u2013292",
-        "sources_web": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Diamond-Resources/",
-        "sources_name": "Peace Research Institute Oslo (PRIO)",
-        "tags": [
-            "environment",
-            "resources",
-            "diamond"
-        ]
-    },
-    "active": 1,
-    "short_name": "Diamond Mines: Distance"
+    "variable_factor": 1,
+    "variable_description": "distance in meters",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Gilmore, Elisabeth; Nils Petter Gleditsch, P\u00e4ivi Lujala & Jan Ketil R\u00f8d, 2005. \u2018Conflict Diamonds: A New Dataset\u2019, Conflict Management and Peace Science 22(3): 257\u2013292",
+    "sources_web": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Diamond-Resources/",
+    "sources_name": "Peace Research Institute Oslo (PRIO)",
+    "tags": [
+        "environment",
+        "resources",
+        "diamond"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

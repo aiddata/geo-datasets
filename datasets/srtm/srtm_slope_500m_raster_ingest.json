@@ -1,5 +1,8 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/srtm/srtm_slope_500m",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/srtm_slope_500m",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
@@ -8,24 +11,64 @@
     "title": "Ground Slope",
     "description": "Global slope (in degrees) derived from Shuttle Radar Topography Mission (SRTM) dataset (v4.1) at 500m resolution.",
     "details": "Created using SRTM elevation data and generating slope in QGIS (which uses gdaldem tool)",
-    "version": 1,
-    "options": {
-        "resolution": 0.004166,
-        "extract_types": ["mean", "max", "min", "count"],
-        "extract_types_info" : {
-            "mean" : "average slope within each unit of analysis",
-            "max" : "maximum slope within each unit of analysis",
-            "min" : "minimum slope within each unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average slope within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "degrees"
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum slope within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum slope within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.004166
     },
-    "extras": {
-        "citation": "Jarvis A., H.I. Reuter, A. Nelson, E. Guevara, 2008, Hole-filled seamless SRTM data V4, International Centre for Tropical Agriculture (CIAT), available from http://srtm.csi.cgiar.org.",
-        "sources_web": "http://www.cgiar-csi.org/data/srtm-90m-digital-elevation-database-v4-1",
-        "sources_name": "CGIAR-CSI",
-        "tags": ["nasa", "srtm", "dem", "slope", "cgiar", "csi", "environment"]
-    },
-    "active": 1
+    "variable_factor": 1,
+    "variable_description": "degrees",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Jarvis A., H.I. Reuter, A. Nelson, E. Guevara, 2008, Hole-filled seamless SRTM data V4, International Centre for Tropical Agriculture (CIAT), available from http://srtm.csi.cgiar.org.",
+    "sources_web": "http://www.cgiar-csi.org/data/srtm-90m-digital-elevation-database-v4-1",
+    "sources_name": "CGIAR-CSI",
+    "tags": [
+        "nasa",
+        "srtm",
+        "dem",
+        "slope",
+        "cgiar",
+        "csi",
+        "environment"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

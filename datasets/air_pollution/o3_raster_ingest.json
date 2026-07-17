@@ -1,40 +1,54 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/ambient_air_pollution_2013/o3/",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/ambient_air_pollution_2013_o3",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "o3_YYYY.tif",
     "name": "ambient_air_pollution_2013_o3",
+    "short_name": "Ambient Air Pollution 2013: Ozone",
     "title": "Ozone Concentration",
     "description": "Ozone concentration (ug/m3) from TM5 FASST simulation. Since the ozone (summer) season varies throughout the globe, it was calculated using a running 3-month average (of daily 1 hour max values) for each grid cell over a full year and the maximum of these values was selected.",
     "details": "",
-    "version": 2013,
-    "options": {
-        "resolution": 0.1,
-        "extract_types": [
-            "mean",
-            "count"
-        ],
-        "extract_types_info": {
-            "mean": "average ozone concentration for each unit of analysis",
-            "count": "total count of pixels per unit of analysis",
-            "max": "maximum ozone concentration per unit of analysis",
-            "min": "minimum ozone concentration per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average ozone concentration for each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "Ozone concentration (ug/m3)"
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.1
     },
-    "extras": {
-        "citation": "Brauer M, Freedman G, Frostad J, van Donkelaar A, Martin RV, Dentener F, Van Dingenen R, Estep K, Amini H, Apte JS, Balakrishnan K, Barregard L, Broday DM, Feigin V, Ghosh S, Hopke PK, Knibbs LD, Kokubo Y, Liu Y, Ma S, Morawska L, Sangrador JLT, Shaddick G, Anderson HR, Vos T, Forouzanfar MH, Burnett RT, Cohen A. Ambient air pollution exposure estimation for the Global Burden of Disease 2013. Environmental Science & Technology. 2015 Nov 23. doi: 10.1021/acs.est.5b03709.",
-        "sources_web": "http://www.healthdata.org/research-article/ambient-air-pollution-exposure-estimation-global-burden-disease-2013",
-        "sources_name": "Ambient air pollution exposure estimation for the Global Burden of Disease 2013",
-        "tags": [
-            "pollution",
-            "air",
-            "environment",
-            "disease",
-            "ozone"
-        ]
-    },
-    "active": 1,
-    "short_name": "Ambient Air Pollution 2013: Ozone"
+    "variable_factor": 1,
+    "variable_description": "Ozone concentration (ug/m3)",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Brauer M, Freedman G, Frostad J, van Donkelaar A, Martin RV, Dentener F, Van Dingenen R, Estep K, Amini H, Apte JS, Balakrishnan K, Barregard L, Broday DM, Feigin V, Ghosh S, Hopke PK, Knibbs LD, Kokubo Y, Liu Y, Ma S, Morawska L, Sangrador JLT, Shaddick G, Anderson HR, Vos T, Forouzanfar MH, Burnett RT, Cohen A. Ambient air pollution exposure estimation for the Global Burden of Disease 2013. Environmental Science & Technology. 2015 Nov 23. doi: 10.1021/acs.est.5b03709.",
+    "sources_web": "http://www.healthdata.org/research-article/ambient-air-pollution-exposure-estimation-global-burden-disease-2013",
+    "sources_name": "Ambient air pollution exposure estimation for the Global Burden of Disease 2013",
+    "tags": [
+        "pollution",
+        "air",
+        "environment",
+        "disease",
+        "ozone"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

@@ -1,5 +1,8 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/goldata_v12/gold_distance.tif",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/distance_to_gold_v12",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
@@ -8,24 +11,62 @@
     "title": "Distance to Lootable Gold Deposit",
     "description": "Distance to nearest lootable or surface gold deposit. Derived from GOLDATA dataset which consists of 2969 entries for gold occurrences in 108 countries.",
     "details": "Dataset downloaded September 2017.",
-    "version": "1.2",
-    "options": {
-        "resolution": 0.01,
-        "extract_types": ["mean", "max", "min", "count"],
-        "extract_types_info" : {
-            "mean" : "average distance per unit of analysis",
-            "max" : "maximum distance per unit of analysis",
-            "min" : "minimum distance per unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "distance in meters"
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.01
     },
-    "extras": {
-        "citation": "Balestri Sara & Mario A. Maggioni, 2014. ‘Blood diamonds, dirty gold and spatial spill-overs: Measuring conflict dynamics in Western Africa’, in Peace Economics, Peace science and Public Policy, Vol. 20 (4): 551-564.",
-        "sources_web": "https://www.researchgate.net/publication/281849073_GOLDATA_12_v",
-        "sources_name": "GOLDATA",
-        "tags": ["environment", "distance", "resources", "gold", "conflict"]
-    },
-    "active": 1
+    "variable_factor": 1,
+    "variable_description": "distance in meters",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Balestri Sara & Mario A. Maggioni, 2014. \u2018Blood diamonds, dirty gold and spatial spill-overs: Measuring conflict dynamics in Western Africa\u2019, in Peace Economics, Peace science and Public Policy, Vol. 20 (4): 551-564.",
+    "sources_web": "https://www.researchgate.net/publication/281849073_GOLDATA_12_v",
+    "sources_name": "GOLDATA",
+    "tags": [
+        "environment",
+        "distance",
+        "resources",
+        "gold",
+        "conflict"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

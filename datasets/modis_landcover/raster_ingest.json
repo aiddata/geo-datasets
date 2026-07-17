@@ -1,5 +1,8 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/glcf/modis_landcover_5.1",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/modis_landcover_51",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "YYYY.xx.xx.tif",
@@ -8,43 +11,63 @@
     "title": "MODIS Land Cover (GLCF, Version 5.1)",
     "description": "Standard MODIS land cover type data product (MCD12Q1) in the IGBP Land Cover Type Classification.",
     "details": "No additional processing of raw data.",
-    "version": 5.1,
-    "options": {
-        "resolution": 0.00416667,
-        "extract_types": ["categorical", "count"],
-        "extract_types_info" : {
-            "categorical" : "categories based on IGBP Land Cover Type Classification. Warning: provides 19 category columns for each year selected",
-            "count" : "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_categorical",
+            "short_name": "categorical",
+            "description": "categories based on IGBP Land Cover Type Classification. Warning: provides 19 category columns for each year selected",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "int"
         },
-        "factor": 1,
-        "variable_description": "IGBP Land Cover Type Classification"
-    },
-    "extras": {
-        "citation": "Friedl, M.A., D. Sulla-Menashe, B. Tan, A. Schneider, N. Ramankutty, A. Sibley and X. Huang (2010), MODIS Collection 5 global land cover: Algorithm refinements and characterization of new datasets, 2001-2012, Collection 5.1 IGBP Land Cover, Boston University, Boston, MA, USA.",
-        "sources_web": "http://www.landcover.org",
-        "sources_name": "Global Land Cover Facility",
-        "tags": [ "glcf", "modis", "land cover", "environment"],
-        "category_map": {
-            "water": 0,
-            "evergreen_needleleaf_forest": 1,
-            "evergreen_broadleaf_forest": 2,
-            "deciduous_needleleaf_forest": 3,
-            "deciduous_broadleaf_forest": 4,
-            "mixed_forest": 5,
-            "closed_shrublands": 6,
-            "open_shrublands": 7,
-            "woody_savannas": 8,
-            "savannas": 9,
-            "grasslands": 10,
-            "permanent_wetlands": 11,
-            "croplands": 12,
-            "urban_and_builtup": 13,
-            "cropland_natural_vegetation_mosaic": 14,
-            "snow_and_ice": 15,
-            "barren_or_sparsely_vegetated": 16,
-            "unclassified": 254,
-            "fill_value": 255
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
         }
+    ],
+    "other": {
+        "resolution": 0.00416667
     },
-    "active": 1
+    "variable_factor": 1,
+    "variable_description": "IGBP Land Cover Type Classification",
+    "mapped": true,
+    "mappings": {
+        "water": 0,
+        "evergreen_needleleaf_forest": 1,
+        "evergreen_broadleaf_forest": 2,
+        "deciduous_needleleaf_forest": 3,
+        "deciduous_broadleaf_forest": 4,
+        "mixed_forest": 5,
+        "closed_shrublands": 6,
+        "open_shrublands": 7,
+        "woody_savannas": 8,
+        "savannas": 9,
+        "grasslands": 10,
+        "permanent_wetlands": 11,
+        "croplands": 12,
+        "urban_and_builtup": 13,
+        "cropland_natural_vegetation_mosaic": 14,
+        "snow_and_ice": 15,
+        "barren_or_sparsely_vegetated": 16,
+        "unclassified": 254,
+        "fill_value": 255
+    },
+    "citation": "Friedl, M.A., D. Sulla-Menashe, B. Tan, A. Schneider, N. Ramankutty, A. Sibley and X. Huang (2010), MODIS Collection 5 global land cover: Algorithm refinements and characterization of new datasets, 2001-2012, Collection 5.1 IGBP Land Cover, Boston University, Boston, MA, USA.",
+    "sources_web": "http://www.landcover.org",
+    "sources_name": "Global Land Cover Facility",
+    "tags": [
+        "glcf",
+        "modis",
+        "land cover",
+        "environment"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

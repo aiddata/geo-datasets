@@ -1,39 +1,62 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/globalsolaratlas/pvout/PVOUT.tif",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/globalsolaratlas_pvout",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
     "name": "globalsolaratlas_pvout",
+    "short_name": "Global Solar Atlas: PV Output",
     "title": "Photovoltaic power potential",
     "description": "Longterm yearly average of daily totals of potential photovoltaic electricity production (kWh/kWp).",
     "details": "Longterm yearly average of potential photovoltaic electricity production (PVOUT) in kWh/kWp, covering the period from 1994/1999/2007 (depending on the region) to 2015.",
-    "version": "1",
-    "options": {
-        "resolution": 0.00833333,
-        "extract_types": [
-            "mean",
-            "max",
-            "min"
-        ],
-        "extract_types_info": {
-            "mean": "average potential photovoltaic electricity production (kWh/kWp) per unit of analysis",
-            "max": "maximum potential photovoltaic electricity production (kWh/kWp) per unit of analysis",
-            "min": "minimum potential photovoltaic electricity production (kWh/kWp) per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average potential photovoltaic electricity production (kWh/kWp) per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "potential photovoltaic electricity production in kWh/kWp"
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum potential photovoltaic electricity production (kWh/kWp) per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum potential photovoltaic electricity production (kWh/kWp) per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        }
+    ],
+    "other": {
+        "resolution": 0.00833333
     },
-    "extras": {
-        "citation": "Solar resource data obtained from the Global Solar Atlas, owned by the World Bank Group and provided by Solargis. https://globalsolaratlas.info. Accessed online 2019-03-04.",
-        "sources_web": "https://globalsolaratlas.info/about/",
-        "sources_name": "Global Solar Atlas",
-        "tags": [
-            "resources",
-            "environment",
-            "energy",
-            "solar"
-        ]
-    },
-    "active": 1,
-    "short_name": "Global Solar Atlas: PV Output"
+    "variable_factor": 1,
+    "variable_description": "potential photovoltaic electricity production in kWh/kWp",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Solar resource data obtained from the Global Solar Atlas, owned by the World Bank Group and provided by Solargis. https://globalsolaratlas.info. Accessed online 2019-03-04.",
+    "sources_web": "https://globalsolaratlas.info/about/",
+    "sources_name": "Global Solar Atlas",
+    "tags": [
+        "resources",
+        "environment",
+        "energy",
+        "solar"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }

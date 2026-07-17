@@ -1,5 +1,8 @@
 {
-    "base": "/sciclone/aiddata10/REU/geo/data/rasters/petroleum_v12/onshore/petroleum_distance.tif",
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/dist_to_onshore_petroleum_v12",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
@@ -8,24 +11,60 @@
     "title": "Distance to On-shore Petroleum",
     "description": "Distance to on-shore petroleum, measured in meters. Derived from PRIO global on-shore petroleum dataset.",
     "details": "Dataset downloaded August 2017.",
-    "version": "1.2",
-    "options": {
-        "resolution": 0.01,
-        "extract_types": ["mean", "max", "min", "count"],
-        "extract_types_info" : {
-            "mean" : "average distance per unit of analysis",
-            "max" : "maximum distance per unit of analysis",
-            "min" : "minimum distance per unit of analysis",
-            "count" : "total count of pixels per unit of analysis"
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
         },
-        "factor": 1,
-        "variable_description": "distance in meters"
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.01
     },
-    "extras": {
-        "citation": "Lujala, Päivi; Jan Ketil Rød & Nadia Thieme, 2007. ‘Fighting over Oil: Introducing A New Dataset’, Conflict Management and Peace Science 24(3), 239-256.",
-        "sources_web": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Petroleum-Dataset/",
-        "sources_name": "Peace Research Institute Oslo (PRIO)",
-        "tags": ["resources", "environment", "petroleum"]
-    },
-    "active": 1
+    "variable_factor": 1,
+    "variable_description": "distance in meters",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Lujala, P\u00e4ivi; Jan Ketil R\u00f8d & Nadia Thieme, 2007. \u2018Fighting over Oil: Introducing A New Dataset\u2019, Conflict Management and Peace Science 24(3), 239-256.",
+    "sources_web": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Petroleum-Dataset/",
+    "sources_name": "Peace Research Institute Oslo (PRIO)",
+    "tags": [
+        "resources",
+        "environment",
+        "petroleum"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
 }
