@@ -1,0 +1,89 @@
+{
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "dev_data/gcdf_v301_dynamic/gcdf_v301_dynamic.gpkg",
+    "type": "feature",
+    "file_extension": ".gpkg",
+    "file_mask": null,
+    "name": "gcdf_v301_dynamic",
+    "short_name": "AidData China Finance v3.01: Filtered Project Commitments",
+    "title": "Monetary value of Chinese ODA and OOF-financed development projects (GeoGCDF v3.0.1)",
+    "description": "Monetary commitment value of Chinese ODA- and OOF-financed projects from AidData's Geospatial Global Chinese Development Finance Dataset v3.0.1. These constant 2021 USD values are associated with projects from the dataset for which locations were found using OpenStreetMap (OSM).",
+    "details": "",
+    "other": {
+        "version": "v301",
+        "filters": {
+            "Commitment Year": {
+                "type": "range",
+                "min": 2000,
+                "max": 2021
+            },
+            "Completion Year": {
+                "type": "range",
+                "min": 2000,
+                "max": 2023
+            },
+            "Project Status": {
+                "type": "categorical",
+                "categories": [
+                    "Completion",
+                    "Implementation",
+                    "Pipeline: Commitment"
+                ]
+            },
+            "Sector Name": {
+                "type": "categorical",
+                "categories": [
+                    "HEALTH",
+                    "EMERGENCY RESPONSE",
+                    "GOVERNMENT AND CIVIL SOCIETY",
+                    "INDUSTRY, MINING, CONSTRUCTION",
+                    "COMMUNICATIONS",
+                    "OTHER SOCIAL INFRASTRUCTURE AND SERVICES",
+                    "EDUCATION",
+                    "ENERGY",
+                    "AGRICULTURE, FORESTRY, FISHING",
+                    "WATER SUPPLY AND SANITATION",
+                    "TRANSPORT AND STORAGE",
+                    "OTHER MULTISECTOR",
+                    "TRADE POLICIES AND REGULATIONS",
+                    "BUSINESS AND OTHER SERVICES",
+                    "DEVELOPMENTAL FOOD AID/FOOD SECURITY ASSISTANCE",
+                    "OTHER COMMODITY ASSISTANCE",
+                    "RECONSTRUCTION RELIEF AND REHABILITATION",
+                    "GENERAL ENVIRONMENTAL PROTECTION",
+                    "GENERAL BUDGET SUPPORT",
+                    "POPULATION POLICIES/PROGRAMMES AND REPRODUCTIVE HEALTH",
+                    "DISASTER PREVENTION AND PREPAREDNESS"
+                ]
+            }
+        }
+    },
+    "variable_factor": 1,
+    "variable_description": "constant 2021 USD commitment value",
+    "processing_class": "filter_and_agg",
+    "processing_options": [
+        {
+            "function": "gcdf_v301_dynamic_filter_and_agg",
+            "short_name": "gcdfv301_filter_agg",
+            "description": "Filter projects based on user selection and aggregate total commitment values in 2021 USD",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "int"
+        }
+    ],
+    "mapped": false,
+    "citation": "Goodman, S., Zhang, S., Malik, A.A., Parks, B.C., Hall, J. 2024. AidData's Geospatial Global Chinese Development Finance Dataset. Scientific Data. https://doi.org/10.1038/s41597-024-03341-w",
+    "sources_web": "https://github.com/aiddata/gcdf-geospatial-data",
+    "sources_name": "AidData",
+    "tags": [
+        "aiddata",
+        "china",
+        "geocoded",
+        "osm"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
+}
