@@ -158,6 +158,7 @@ class OCO2(Dataset):
 
         year_file_list = []
         for year in self.year_list:
+            print(f"\tFinding files for year {year}")
             year_url = self.version_url(year)
             year_files = find_files(year_url, ".nc4", headers=self.auth_headers)
             year_file_list.extend(year_files)
