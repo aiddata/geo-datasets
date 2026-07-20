@@ -69,6 +69,7 @@ smoke**, plus the specific notes below.
 | dataset | remaining work | status |
 |---|---|---|
 | accessibility_map | deploy + smoke | **rebuilt** from a comment stub (JRC access_50k, year 2000); moved from Workstream B |
+| africa_child_mortality | deploy + smoke | **rebuilt** from a standalone Py2 rasterize script; moved from Workstream B |
 | worldpop_pop_count_new | deploy + smoke | new: Global 2015-2030 R2025A |
 | critical_habitats | deploy + smoke | |
 | cru_ts | deploy + smoke | |
@@ -129,7 +130,7 @@ No config.toml / no data_manager usage; each is a TIGER-style rewrite.
 Triage which are still wanted before investing:
 
 `acled`,
-`africa_child_mortality`, `afrobarometer`, `air_pollution`,
+`afrobarometer`, `air_pollution`,
 `atlasofurbanexpansion`, `black_marble`*, `boundaries`, `diamond`,
 `distance_to_groads`, `drug`, `gcdf_v3`, `gdp_grid`, `gem`,
 `ghs_pop`, `gimms_modis_ndvi`, `global_forest_change`, `globalsolaratlas`,
@@ -181,6 +182,15 @@ GeoQuery's `IngestFeatureCollection` schema instead.
   design is meant to be extended further — adding another MAP product (of
   either shape) needs only a new `DATASET_LOOKUP` entry and ingest JSON, no
   other code changes. See `malaria_atlas_project/README.md`.
+- **africa_child_mortality rebuilt**: moved from Workstream B into A. Was a
+  standalone Py2 script (`rasterize_childmortality.py`) reading a point file
+  from a fixed local path; now a Dataset/flow that downloads the source text
+  file directly from its Dropbox share link (`?dl=1`, stable — no need for the
+  ephemeral pre-signed `dl.dropboxusercontent.com` URL a browser session
+  generates) and rasterizes it per decade with `distancerasters`, reusing the
+  original rasterization logic.
+- **acled README** refreshed with source/citation/status; still Workstream B
+  (no flow — rasterization was done manually in QGIS from point data).
 
 ## Sweep completed 2026-07-16 (commits 4ccd6c5, 2fe3bfc, 7682144, 3e88649, d42ae20)
 
