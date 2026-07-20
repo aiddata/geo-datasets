@@ -78,6 +78,7 @@ smoke**, plus the specific notes below.
 | accessibility_map | deploy + smoke | **rebuilt** from a comment stub (JRC access_50k, year 2000); moved from Workstream B |
 | africa_child_mortality | deploy + smoke | **rebuilt** from a standalone Py2 rasterize script; moved from Workstream B |
 | air_pollution | deploy + smoke | **rebuilt** from a standalone Py2 rasterize script; moved from Workstream B. Source CSV requires a **manual download** (ACS supplementary file is behind a Cloudflare bot challenge, no mirror found) |
+| atlasofurbanexpansion | deploy + smoke | **rebuilt** from Py2 `cities_prep.py`/`col_order.py` (200-city sample, 4 boundary levels); moved from Workstream B; live-verified metadata merge + geometry pipeline against real source data |
 | worldpop_pop_count_new | deploy + smoke | new: Global 2015-2030 R2025A |
 | critical_habitats | deploy + smoke | |
 | cru_ts | deploy + smoke | |
@@ -139,7 +140,7 @@ Triage which are still wanted before investing:
 
 `acled`,
 `afrobarometer`,
-`atlasofurbanexpansion`, `black_marble`*, `boundaries`, `diamond`,
+`black_marble`*, `boundaries`, `diamond`,
 `distance_to_groads`, `drug`, `gcdf_v3`, `gdp_grid`, `gem`,
 `ghs_pop`, `gimms_modis_ndvi`, `global_forest_change`, `globalsolaratlas`,
 `globalwindatlas`, `gold`, `historic_gimms_ndvi`, `kummu_gdp_hdi`*,
@@ -206,6 +207,18 @@ GeoQuery's `IngestFeatureCollection` schema instead.
   `air_pollution/README.md`.
 - **acled README** refreshed with source/citation/status; still Workstream B
   (no flow — rasterization was done manually in QGIS from point data).
+- **atlasofurbanexpansion rebuilt**: moved from Workstream B into A. Was two
+  standalone Py2 scripts (`cities_prep.py`, `col_order.py`, the latter tied to
+  the old GeoQuery pipeline and dropped). Now a Dataset/flow: downloads the
+  Areas & Densities / Blocks & Roads metadata tables and each of the 200
+  cities' GIS archives, dissolves each city's boundary per level (`studyArea`,
+  `urban_edge_t1/t2/t3`) with `shapely.ops.unary_union`, reprojects to
+  EPSG:4326 with `geopandas`, and writes one GeoJSON `FeatureCollection` per
+  level. Metadata-merge and geometry logic were verified end-to-end against
+  live source data (200 cities, correct dissolve/reproject/MultiPolygon
+  output) before committing. The Workstream C review flag on
+  `spatial_extent`/`is_global` for the 4 boundary ingests (above) is now
+  actionable since the dataset produces the GeoJSONs directly.
 
 ## Sweep completed 2026-07-16 (commits 4ccd6c5, 2fe3bfc, 7682144, 3e88649, d42ae20)
 

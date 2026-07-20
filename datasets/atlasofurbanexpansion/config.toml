@@ -1,0 +1,25 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/atlasofurbanexpansion"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/atlasofurbanexpansion"
+
+overwrite_download = false
+overwrite_process = true
+
+
+[run]
+max_workers = 12
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/atlasofurbanexpansion/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/atlasofurbanexpansion"
+
+
+[deploy]
+deployment_name = "atlasofurbanexpansion"
+image_tag = "083d531"
+version = 1
+flow_file_name = "main"
+flow_name = "atlasofurbanexpansion"
+work_pool = "geodata"
