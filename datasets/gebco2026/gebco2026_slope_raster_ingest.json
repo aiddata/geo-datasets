@@ -1,0 +1,71 @@
+{
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/gebco/gebco2026_slope",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "gebco2026_slope",
+    "short_name": "GEBCO 2026 Slope",
+    "title": "Ground Slope",
+    "description": "Global slope (in degrees) derived from the GEBCO_2026 Grid elevation data, at 15 arc-second (~450m) resolution.",
+    "details": "Computed from the mosaicked global GEBCO_2026 elevation raster using Horn's method, with a latitude-dependent correction for the varying real-world width of a degree of longitude.",
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average slope within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum slope within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum slope within each unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.004166667
+    },
+    "variable_factor": 1,
+    "variable_description": "degrees",
+    "mapped": false,
+    "mappings": {},
+    "citation": "GEBCO Compilation Group (2026) GEBCO_2026 Grid (doi:10.5285/gebco2026-grid).",
+    "sources_web": "https://www.gebco.net/data-products-gridded-bathymetry-data/gebco2026-grid",
+    "sources_name": "GEBCO (General Bathymetric Chart of the Oceans)",
+    "tags": [
+        "gebco",
+        "dem",
+        "slope",
+        "environment"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
+}

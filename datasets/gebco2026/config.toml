@@ -1,0 +1,26 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gebco/gebco2026"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gebco/gebco2026"
+
+overwrite_download = false
+overwrite_elevation = false
+overwrite_slope = true
+
+
+[run]
+max_workers = 1
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gebco/gebco2026/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/gebco2026"
+
+
+[deploy]
+deployment_name = "gebco2026"
+image_tag = "083d531"
+version = 1
+flow_file_name = "main"
+flow_name = "gebco2026"
+work_pool = "geodata"
