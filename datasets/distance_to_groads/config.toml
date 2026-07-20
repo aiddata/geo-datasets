@@ -1,0 +1,31 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/distance_to_groads"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/distance_to_groads"
+
+pixel_size = 0.01
+
+# leave the placeholder here and set the real value in .env (see README)
+earthdata_token = "<ADD-EARTHDATA-TOKEN>"
+
+overwrite_download = false
+overwrite_binary_raster = false
+overwrite_distance_raster = true
+
+
+[run]
+max_workers = 1
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/distance_to_groads/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/distance_to_groads"
+
+
+[deploy]
+deployment_name = "distance_to_groads"
+image_tag = "083d531"
+version = 1
+flow_file_name = "main"
+flow_name = "distance_to_groads"
+work_pool = "geodata"

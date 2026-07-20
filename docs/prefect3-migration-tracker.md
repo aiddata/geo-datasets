@@ -79,6 +79,7 @@ smoke**, plus the specific notes below.
 | africa_child_mortality | deploy + smoke | **rebuilt** from a standalone Py2 rasterize script; moved from Workstream B |
 | air_pollution | deploy + smoke | **rebuilt** from a standalone Py2 rasterize script; moved from Workstream B. Source CSV requires a **manual download** (ACS supplementary file is behind a Cloudflare bot challenge, no mirror found) |
 | atlasofurbanexpansion | deploy + smoke | **rebuilt** from Py2 `cities_prep.py`/`col_order.py` (200-city sample, 4 boundary levels); moved from Workstream B; live-verified metadata merge + geometry pipeline against real source data |
+| distance_to_groads | deploy + smoke | **rebuilt** from `build_dist_to_groads.py` (per-continent shapefiles, dead source); now pulls the single global gROADS v1 file geodatabase via Earthdata bearer token, rasterized directly from the zip (`/vsizip/`, no extraction); moved from Workstream B; COG output; live-verified download + rasterize against real source data |
 | worldpop_pop_count_new | deploy + smoke | new: Global 2015-2030 R2025A |
 | critical_habitats | deploy + smoke | |
 | cru_ts | deploy + smoke | |
@@ -125,25 +126,28 @@ keep a session alive for a full hour. **Operational:** grab a fresh cookie
 immediately before a run (it idles out in minutes); a stale cookie fails loudly
 with "redirected to login" rather than writing a login page over a raster.
 
-### Earthdata bearer token — oco2, ltdr_ndvi
+### Earthdata bearer token — oco2, ltdr_ndvi, distance_to_groads
 
-Both pull from NASA Earthdata Login services (oco2 = GES DISC, ltdr = LAADS); a
-single token from urs.earthdata.nasa.gov authenticates both listing and
-downloads via `Authorization: Bearer <token>`. Field/`.env` key/`__main__`
-lookup all named `earthdata_token`.
+All three pull from NASA Earthdata Login services (oco2 = GES DISC, ltdr =
+LAADS, distance_to_groads = SEDAC via data.earthdata.nasa.gov); a single token
+from urs.earthdata.nasa.gov authenticates listing and downloads across all of
+them via `Authorization: Bearer <token>`. Field/`.env` key/`__main__` lookup
+all named `earthdata_token`. Confirmed live: an anonymous request to the
+SEDAC download URL redirects through `urs.earthdata.nasa.gov/oauth/authorize`
+to a 401 Basic-auth challenge; the same bearer token already used for
+ltdr_ndvi/oco2 works here too (303 → signed CloudFront/S3 URL → real zip
+bytes).
 
 ## Workstream B — legacy, never migrated (~30 dirs)
 
 No config.toml / no data_manager usage; each is a TIGER-style rewrite.
 Triage which are still wanted before investing:
 
-`acled`, `afrobarometer`, `distance_to_groads`
+`acled`, `afrobarometer`,
 `globalsolaratlas`, `globalwindatlas`,
 `gold`, `gem`, `drug`, `diamond`, `petroleum`,
 `modis_landcover`, `srtm`, `ucdp`, `gcdf_v3`
-`black_marble`*,
 
-\* `black_marble` has partial scripts (no Dataset class).
 
 ## Workstream C — ingest JSONs — DONE
 

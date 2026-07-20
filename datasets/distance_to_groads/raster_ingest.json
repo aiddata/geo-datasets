@@ -58,7 +58,7 @@
     "mapped": false,
     "mappings": {},
     "citation": "Center for International Earth Science Information Network - CIESIN - Columbia University, and Information Technology Outreach Services - ITOS - University of Georgia. 2013. Global Roads Open Access Data Set, Version 1 (gROADSv1). Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). http://dx.doi.org/10.7927/H4VD6WCT. Accessed DAY MONTH YEAR.",
-    "sources_web": "http://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1",
+    "sources_web": "https://www.earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.0",
     "sources_name": "Center for International Earth Science Information Network - CIESIN",
     "tags": [
         "accessibility",
