@@ -80,6 +80,12 @@ smoke**, plus the specific notes below.
 | air_pollution | deploy + smoke | **rebuilt** from a standalone Py2 rasterize script; moved from Workstream B. Source CSV requires a **manual download** (ACS supplementary file is behind a Cloudflare bot challenge, no mirror found) |
 | atlasofurbanexpansion | deploy + smoke | **rebuilt** from Py2 `cities_prep.py`/`col_order.py` (200-city sample, 4 boundary levels); moved from Workstream B; live-verified metadata merge + geometry pipeline against real source data |
 | distance_to_groads | deploy + smoke | **rebuilt** from `build_dist_to_groads.py` (per-continent shapefiles, dead source); now pulls the single global gROADS v1 file geodatabase via Earthdata bearer token, rasterized directly from the zip (`/vsizip/`, no extraction); moved from Workstream B; COG output; live-verified download + rasterize against real source data |
+| gold | deploy + smoke | **rebuilt** from Py2 script; categorical + distance; manual download (ResearchGate); moved from Workstream B |
+| gem | deploy + smoke | **rebuilt** from Py2 script; binary + distance; manual download (paivilujala.com); moved from Workstream B |
+| drug | deploy + smoke | **rebuilt** from Py2 script; categorical + distance, live-verified multi-layer mix logic; manual download (paivilujala.com); moved from Workstream B |
+| diamond | deploy + smoke | **rebuilt** from Py2 script; binary + distance; manual download (PRIO, Entra-gated); moved from Workstream B |
+| petroleum | deploy + smoke | **rebuilt** from Py2 script; binary + distance, onshore only; manual download (PRIO, Entra-gated); moved from Workstream B |
+| gebco2026 | deploy + smoke | **new**: replaces the planned `srtm` migration (abandoned after discovering SRTMGL3 ships as 14,297 individual tiles — a mosaic wasn't tractable). GEBCO_2026 ships as just 8 global quadrant tiles instead; downloads the ~4.2GB zip (no auth), mosaics the 8 tiles into one seamless global elevation COG via `rasterio.merge` (reads each tile's own georeferencing rather than us parsing filenames; chunked internally so it doesn't need the full ~7GB array in memory), and derives a global slope COG (Horn's method, hand-implemented in numpy — `richdem` was considered but its latest PyPI release has no wheel past Python 3.7 and fails to build from source on 3.12; it also wouldn't solve the degree-of-longitude latitude-scaling problem any better, since that's a per-row correction we apply ourselves regardless of library). Full pipeline verified against the real 4.2GB source (tile placement, seam continuity, slope values) before committing; slope is strip-processed to bound memory (~1.4GB/strip, not the ~30-60GB a naive full-array approach would need) |
 | worldpop_pop_count_new | deploy + smoke | new: Global 2015-2030 R2025A |
 | critical_habitats | deploy + smoke | |
 | cru_ts | deploy + smoke | |
@@ -143,10 +149,47 @@ bytes).
 No config.toml / no data_manager usage; each is a TIGER-style rewrite.
 Triage which are still wanted before investing:
 
-`acled`, `afrobarometer`,
-`globalsolaratlas`, `globalwindatlas`,
-`gold`, `gem`, `drug`, `diamond`, `petroleum`,
-`modis_landcover`, `srtm`, `ucdp`, `gcdf_v3`
+`acled`, `afrobarometer`, `modis_landcover`, `ucdp`,
+`gcdf_v3`
+
+### gold, gem, drug, diamond, petroleum — migrated
+
+All five shared one shape: a Py2 script (`fiona.open()` on a hardcoded
+`/sciclone/aiddata10/...` shapefile path, `print` statements) that rasterizes
+point/polygon deposit data to a global 0.01°, -180/180/-90/90 grid and called
+the now-nonexistent `distancerasters.build_distance_array` (replaced by the
+`DistanceRaster` class — same fix already applied in `distance_to_groads`).
+Ingest JSONs were already on the current schema (Workstream C);
+`gold`/`drug`'s `categorical_raster_ingest.json` `mappings` (`none`/type
+labels/`mix`) matched each script's category-encoding scheme exactly (loop
+index per layer, `mixed_val=4` where a cell has >1 layer) — no
+reinterpretation needed, just reimplementation (confirmed by rasterizing real
+source data for each and checking the combined output against expectation
+before committing).
+
+All five stay **manual-download** (confirmed decision) — a `raw_dir`-placed
+source file/shapefile, documented in each README, same pattern as
+`air_pollution` — even though `gem`/`drug` resolve via a plain HTTP GET
+(kept manual anyway for consistency across the group). `petroleum` stays
+**onshore-only**, matching the original script/ingest JSON exactly.
+
+| dataset | shape | source (verified) | placement |
+|---|---|---|---|
+| gold | categorical (dGOLD_L/S/NL → 1/2/3, mix→4) + distance | ResearchGate — 403s on automated requests | extracted shapefiles per layer: `<raw_dir>/<layer>/<layer>.shp` (zip contents unverifiable — bot-blocked) |
+| gem | binary + distance | paivilujala.com/gemdata.html — direct `.zip`, live-verified (1022 features) | zip as-is at `<raw_dir>/gemdata.zip`, read via `/vsizip/` |
+| drug | categorical (CANNABIS/COCA BUSH/OPIUM POPPY → 1/2/3, mix→4) + distance | paivilujala.com/drugdata.html — direct `.zip`, live-verified (combine/mix logic confirmed against real overlapping South America data) | zip as-is at `<raw_dir>/drugdata.zip`, read via `/vsizip/` |
+| diamond | binary + distance | prio.org/data/10 → `cdn.cloud.prio.org`, confirmed Microsoft Entra (organizational) login gate | extracted `DIADATA.shp` at `<raw_dir>/` (zip contents unverifiable — login-gated) |
+| petroleum | binary + distance, onshore only | prio.org/data/11 → same Entra gate | extracted `Petrodata_Onshore_V1.2.shp` at `<raw_dir>/` (zip contents unverifiable) |
+
+For gold/diamond/petroleum the source zip could not be fetched (bot-blocked
+or login-gated), so — unlike gem/drug, where the internal zip layout was
+confirmed live and the flow reads straight from the zip via `/vsizip/` — these
+three expect an already-extracted shapefile directly in `raw_dir` rather than
+guessing an unverified internal zip path. All five: `main.py`
+(Dataset/flow, COG output via the `write_cog()` pattern), `config.toml`,
+README with manual download steps; old `.py`/misc files removed (including
+petroleum's dead PBS `job` script and stray lowercase `readme.md`).
+Remaining: deploy + cluster smoke.
 
 
 ## Workstream C — ingest JSONs — DONE

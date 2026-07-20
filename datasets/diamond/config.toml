@@ -1,0 +1,27 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/diamond"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/diamond"
+
+pixel_size = 0.01
+
+overwrite_binary_raster = false
+overwrite_distance_raster = true
+
+
+[run]
+max_workers = 1
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/diamond/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/diamond"
+
+
+[deploy]
+deployment_name = "diamond"
+image_tag = "083d531"
+version = 1
+flow_file_name = "main"
+flow_name = "diamond"
+work_pool = "geodata"

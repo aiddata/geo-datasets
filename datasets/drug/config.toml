@@ -1,0 +1,27 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/drug"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/drug"
+
+pixel_size = 0.01
+
+overwrite_categorical_raster = false
+overwrite_distance_raster = true
+
+
+[run]
+max_workers = 1
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/drug/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/drug"
+
+
+[deploy]
+deployment_name = "drug"
+image_tag = "083d531"
+version = 1
+flow_file_name = "main"
+flow_name = "drug"
+work_pool = "geodata"
