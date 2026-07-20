@@ -11,6 +11,7 @@ from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
+import rasterio
 import requests
 from distancerasters import rasterize
 from pydantic import field_validator
@@ -69,6 +70,24 @@ class AfricaChildMortality(Dataset):
                 dst.write(response.content)
         logger.info(f"Downloaded {self.download_path}")
 
+    def write_cog(self, array, affine, nodata, dst_path):
+        meta = {
+            "count": 1,
+            "crs": "EPSG:4326",
+            "dtype": "float64",
+            "transform": affine,
+            "driver": "COG",
+            "compress": "LZW",
+            "height": array.shape[0],
+            "width": array.shape[1],
+            "nodata": nodata,
+        }
+        with self.tmp_to_dst_file(
+            dst_path, make_dst_dir=True, validate_cog=True
+        ) as tmp:
+            with rasterio.open(tmp, "w", **meta) as dst:
+                dst.write(array.astype("float64"), 1)
+
     def process(self, decade):
         logger = self.get_logger()
 
@@ -84,16 +103,15 @@ class AfricaChildMortality(Dataset):
         gdf = gpd.GeoDataFrame(df)
 
         logger.info(f"Rasterizing decade {decade} to {output_path}")
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        rasterize(
+        array, affine = rasterize(
             gdf,
             attribute=DATA_FIELD,
             pixel_size=PIXEL_SIZE,
             bounds=gdf.geometry.total_bounds,
-            output=str(output_path),
             fill=-1,
             nodata=-1,
         )
+        self.write_cog(array, affine, -1, output_path)
         logger.info(f"Wrote {output_path}")
 
     def main(self):

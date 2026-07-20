@@ -1,0 +1,24 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/air_pollution"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/air_pollution"
+
+overwrite_process = true
+
+
+[run]
+max_workers = 4
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/air_pollution/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/air_pollution"
+
+
+[deploy]
+deployment_name = "air_pollution"
+image_tag = "083d531"
+version = 1
+flow_file_name = "main"
+flow_name = "air_pollution"
+work_pool = "geodata"

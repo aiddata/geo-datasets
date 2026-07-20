@@ -45,8 +45,15 @@ Audited 2026-07-16.
 9. **README**: strip generic uv/deploy boilerplate (lives in central docs);
    keep dataset-specific config documentation and data-source notes. Pattern:
    commit `3778296` (esa_landcover).
-10. Deploy and smoke-run on the cluster; verify output lands on the share with
-   `9198:9915` ownership.
+10. **Output rasters must be COGs.** `driver="COG", compress="LZW"` (as in
+    esa_landcover). For datasets using `distancerasters.rasterize()`: don't
+    pass its `output=` kwarg (that writes a plain GTiff via `export_raster`);
+    instead take the returned `(array, affine)` and write directly with
+    `rasterio` + the COG driver, wrapped in `tmp_to_dst_file(...,
+    validate_cog=True)`. See `africa_child_mortality`/`air_pollution`
+    `write_cog()` for the pattern.
+11. Deploy and smoke-run on the cluster; verify output lands on the share with
+    `9198:9915` ownership.
 
 ## Done
 
@@ -70,6 +77,7 @@ smoke**, plus the specific notes below.
 |---|---|---|
 | accessibility_map | deploy + smoke | **rebuilt** from a comment stub (JRC access_50k, year 2000); moved from Workstream B |
 | africa_child_mortality | deploy + smoke | **rebuilt** from a standalone Py2 rasterize script; moved from Workstream B |
+| air_pollution | deploy + smoke | **rebuilt** from a standalone Py2 rasterize script; moved from Workstream B. Source CSV requires a **manual download** (ACS supplementary file is behind a Cloudflare bot challenge, no mirror found) |
 | worldpop_pop_count_new | deploy + smoke | new: Global 2015-2030 R2025A |
 | critical_habitats | deploy + smoke | |
 | cru_ts | deploy + smoke | |
@@ -130,7 +138,7 @@ No config.toml / no data_manager usage; each is a TIGER-style rewrite.
 Triage which are still wanted before investing:
 
 `acled`,
-`afrobarometer`, `air_pollution`,
+`afrobarometer`,
 `atlasofurbanexpansion`, `black_marble`*, `boundaries`, `diamond`,
 `distance_to_groads`, `drug`, `gcdf_v3`, `gdp_grid`, `gem`,
 `ghs_pop`, `gimms_modis_ndvi`, `global_forest_change`, `globalsolaratlas`,
@@ -187,8 +195,15 @@ GeoQuery's `IngestFeatureCollection` schema instead.
   from a fixed local path; now a Dataset/flow that downloads the source text
   file directly from its Dropbox share link (`?dl=1`, stable — no need for the
   ephemeral pre-signed `dl.dropboxusercontent.com` URL a browser session
-  generates) and rasterizes it per decade with `distancerasters`, reusing the
-  original rasterization logic.
+  generates) and rasterizes it per decade with `distancerasters`, writing
+  output as a COG (see checklist item 10).
+- **air_pollution rebuilt**: moved from Workstream B into A. Was a standalone
+  Py2 script (`build_air_pollution_rasters.py`); now a Dataset/flow, COG
+  output. The ACS "SI 005" source file is behind a Cloudflare bot challenge
+  (confirmed 403 even with a browser User-Agent) with no mirror found, so the
+  download step could not be automated — the flow expects
+  `GBD2013final.csv` to already be placed in `raw_dir` manually; see
+  `air_pollution/README.md`.
 - **acled README** refreshed with source/citation/status; still Workstream B
   (no flow — rasterization was done manually in QGIS from point data).
 
