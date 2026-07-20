@@ -48,7 +48,7 @@
     "variable_description": "wind speed in meters per second",
     "mapped": false,
     "mappings": {},
-    "citation": "Wind data obtained from the \u201cGlobal Wind Atlas 2.0, a free, web-based application developed, owned and operated by the Technical University of Denmark (DTU) in partnership with the World Bank Group, utilizing data provided by Vortex, with funding provided by the Energy Sector Management Assistance Program (ESMAP). https://globalsolaratlas.info. Accessed online 2019-03-05.",
+    "citation": "Wind data obtained from the \u201cGlobal Wind Atlas 2.0, a free, web-based application developed, owned and operated by the Technical University of Denmark (DTU) in partnership with the World Bank Group, utilizing data provided by Vortex, with funding provided by the Energy Sector Management Assistance Program (ESMAP). https://globalwindatlas.info. Accessed online 2019-03-05.",
     "sources_web": "https://globalwindatlas.info/about/",
     "sources_name": "Global Wind Atlas",
     "tags": [
