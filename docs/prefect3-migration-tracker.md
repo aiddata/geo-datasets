@@ -100,7 +100,6 @@ smoke**, plus the specific notes below.
 | gpw | deploy + smoke | `.env` cookie/secret; switched to Earthdata dl |
 | ltdr_ndvi | deploy + smoke | Earthdata token via `.env`; naming bug fixed |
 | oco2 | deploy + smoke | Earthdata token; bumped to 11.2r/11.3r version-by-year; live-verified |
-| ookla_speedtest | **anomaly**: config.toml but zero .py files — investigate | |
 
 ### Secret handling — settled design
 
@@ -138,16 +137,13 @@ lookup all named `earthdata_token`.
 No config.toml / no data_manager usage; each is a TIGER-style rewrite.
 Triage which are still wanted before investing:
 
-`acled`,
-`afrobarometer`,
-`black_marble`*, `boundaries`, `diamond`,
-`distance_to_groads`, `drug`, `gcdf_v3`, `gdp_grid`, `gem`,
-`ghs_pop`, `gimms_modis_ndvi`, `global_forest_change`, `globalsolaratlas`,
-`globalwindatlas`, `gold`, `historic_gimms_ndvi`, `kummu_gdp_hdi`*,
-`landsat7`, `modis_landcover`, `other`, `petroleum`, `speibase`, `srtm`,
-`ucdp`
+`acled`, `afrobarometer`, `distance_to_groads`
+`globalsolaratlas`, `globalwindatlas`,
+`gold`, `gem`, `drug`, `diamond`, `petroleum`,
+`modis_landcover`, `srtm`, `ucdp`, `gcdf_v3`
+`black_marble`*,
 
-\* `black_marble` and `kummu_gdp_hdi` have partial scripts (no Dataset class).
+\* `black_marble` has partial scripts (no Dataset class).
 
 ## Workstream C — ingest JSONs — DONE
 
