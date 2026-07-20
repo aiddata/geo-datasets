@@ -2,15 +2,15 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/access_50k",
+    "path": "/data/datasets/map_motorized_travel_time_to_healthcare_2020",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
-    "name": "access_50k_2000",
-    "short_name": "access_2000",
-    "title": "Travel time to major cities",
-    "description": "Estimated travel time (in minutes) to the nearest city of 50,000 or more people in year 2000.",
-    "details": "No additional processing of raw data.",
+    "name": "map_motorized_travel_time_to_healthcare_2020",
+    "short_name": "Motorized Travel Time to Healthcare 2020",
+    "title": "Motorized Travel Time to Healthcare Facilities (2019)",
+    "description": "Estimated motorized travel time (in minutes) to the nearest healthcare facility, for the year 2019.",
+    "details": "",
     "processing_class": "zonal_stats",
     "processing_options": [
         {
@@ -57,13 +57,14 @@
     "variable_description": "time in minutes",
     "mapped": false,
     "mappings": {},
-    "citation": "Nelson, A. (2008) Estimated travel time to the nearest city of 50,000 or more people in year 2000. Global Environment Monitoring Unit - Joint Research Centre of the European Commission, Ispra Italy. Available at http://forobs.jrc.ec.europa.eu/products/gam/",
-    "sources_web": "http://forobs.jrc.ec.europa.eu/products/gam",
-    "sources_name": " Global Environment Monitoring Unit - Joint Research Centre of the European Commission",
+    "citation": "D.J. Weiss, A. Nelson, C.A. Vargas-Ruiz, K. Gligoric, S. Bavadekar, E. Gabrilovich, A. Bertozzi-Villa, J. Rozier, H.S. Gibson, T. Shekel, C. Kamath, A. Lieber, K. Schulman, Y. Shao, V. Qarkaxhija, A.K. Nandi, S.H. Keddie, S. Rumisha, P. Amratia, R. Arambepola, E.G. Chestnutt, J.J. Millar, T.L. Symons, E. Cameron, K.E. Battle, S. Bhatt, and P.W. Gething. Global maps of travel time to healthcare facilities. (2020). Nature Medicine. doi:10.1038/s41591-020-1059-1.",
+    "sources_web": "https://data.malariaatlas.org/",
+    "sources_name": "Malaria Atlas Project",
     "tags": [
-        "jrc",
         "accessibility",
-        "economics"
+        "travel time",
+        "healthcare",
+        "malaria atlas project"
     ],
     "ingest_src": null,
     "coverage_dependency": null

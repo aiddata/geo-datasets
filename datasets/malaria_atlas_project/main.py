@@ -4,38 +4,73 @@ Download and prepare data from the Malaria Atlas Project
 https://data.malariaatlas.org
 
 Data is no longer directly available from a file server but is instead provided via a GeoServer instance.
-This can still be retrieved using a standard request call but to determine the proper URL requires initiating the download via their website mapping platform and tracing the corresponding network call. This process only needs to be done once for new datasets; URLs for the datasets listed below have already been identifed.
+This can still be retrieved using a standard request call but to determine the proper URL requires initiating the download via their website mapping platform and tracing the corresponding network call (look for the `DirectDownload` CSW request). This process only needs to be done once per dataset; URLs for the datasets listed below have already been identified.
 
+Datasets come in two shapes, selected per entry in `DATASET_LOOKUP` via `temporal`:
+
+- **temporal** (e.g. `pf_incidence_rate`): the archive contains one GeoTIFF per
+  year, named `<resource>_<year>.tif`. The `years` config field selects which
+  years to extract.
+- **static** (e.g. `travel_time_to_cities_2015`): the archive contains a single
+  GeoTIFF. `years` is ignored.
+
+To add a new dataset: find its `ResourceId` (CSW) — e.g. via the WCS
+`GetCapabilities` document for the relevant GeoServer workspace, which lists
+`CoverageId`s in `<workspace>__<resource>` form — build the DirectDownload URL,
+add an entry to `DATASET_LOOKUP` below, and set `dataset` in `config.toml` to
+its key. No code changes needed for a new dataset of an existing shape.
 
 Current download options:
-- pf_incidence_rate: incidence data for Plasmodium falciparum species of malaria (rate per 1000 people)
+- pf_incidence_rate: Malaria (Plasmodium falciparum) incidence rate, per 1,000 people, 2000-2021 (temporal)
+- travel_time_to_cities_2015: travel time (minutes) to the nearest city, 2015 (static)
+- motorized_travel_time_to_healthcare_2020: motorized travel time (minutes) to the nearest healthcare facility, 2019 (static)
+- walking_travel_time_to_healthcare_2020: walking-only travel time (minutes) to the nearest healthcare facility, 2019 (static)
 
-
-Unless otherwise specified, all datasets are:
-- global
-- from 2000-2020
-- downloaded as a single zip file containing each datasets (all data in zip root directory)
-- single band LZW-compressed GeoTIFF files at 2.5 arcminute resolution
+Unless otherwise specified, all datasets are global, single-band, LZW-compressed
+GeoTIFFs.
 """
 
 import os
 import shutil
 from copy import copy
 from pathlib import Path
-from typing import List
 from zipfile import ZipFile
 
 import requests
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
+DATASET_LOOKUP = {
+    "pf_incidence_rate": {
+        "temporal": True,
+        "workspace": "Malaria",
+        "resource": "202206_Global_Pf_Incidence_Rate",
+    },
+    "travel_time_to_cities_2015": {
+        "temporal": False,
+        "workspace": "Accessibility",
+        "resource": "201501_Global_Travel_Time_to_Cities",
+    },
+    "motorized_travel_time_to_healthcare_2020": {
+        "temporal": False,
+        "workspace": "Accessibility",
+        "resource": "202001_Global_Motorized_Travel_Time_to_Healthcare",
+    },
+    "walking_travel_time_to_healthcare_2020": {
+        "temporal": False,
+        "workspace": "Accessibility",
+        "resource": "202001_Global_Walking_Only_Travel_Time_To_Healthcare",
+    },
+}
+
 
 class MalariaAtlasProjectConfiguration(BaseDatasetConfiguration):
     raw_dir: str
     output_dir: str
-    # Comma-separated years (e.g. "2000,2001"). String, not list, so the
-    # Prefect run form renders a text input rather than the array widget,
-    # whose "add item" button submits the form.
-    years: str
+    # Comma-separated years (e.g. "2000,2001"). Only used for temporal
+    # datasets; ignored for static ones. String, not list, so the Prefect
+    # run form renders a text input rather than the array widget, whose
+    # "add item" button submits the form.
+    years: str = ""
     dataset: str
     overwrite_download: bool
     overwrite_processing: bool
@@ -53,14 +88,8 @@ class MalariaAtlasProject(Dataset):
         self.overwrite_download = config.overwrite_download
         self.overwrite_processing = config.overwrite_processing
 
-        dataset_lookup = {
-            "pf_incidence_rate": {
-                "data_zipFile_url": "https://data.malariaatlas.org/geoserver/Malaria/ows?service=CSW&version=2.0.1&request=DirectDownload&ResourceId=Malaria:202206_Global_Pf_Incidence_Rate",
-                "data_name": "202206_Global_Pf_Incidence_Rate",
-            },
-        }
-
-        self.data_info = dataset_lookup[self.dataset]
+        self.data_info = DATASET_LOOKUP[self.dataset]
+        self.data_info["geoserver_url"] = f"https://data.malariaatlas.org/geoserver/{self.data_info['workspace']}/ows?service=CSW&version=2.0.1&request=DirectDownload&ResourceId={self.data_info['workspace']}:{self.data_info['resource']}"
 
     def test_connection(self):
         # test connection
@@ -111,7 +140,6 @@ class MalariaAtlasProject(Dataset):
                 if k in profile:
                     del profile[k]
 
-            print(profile)
             logger.info(profile)
 
             with rasterio.open(dst_path, "w+", **profile) as dst:
@@ -137,7 +165,7 @@ class MalariaAtlasProject(Dataset):
                     # write data to output window
                     dst.write(r, 1, window=dst_window)
 
-    def copy_data_files(self, zip_file_local_name):
+    def copy_data_files(self, zip_file_local_name, dataset_output_dir):
 
         logger = self.get_logger()
 
@@ -163,10 +191,10 @@ class MalariaAtlasProject(Dataset):
 
         flist = []
         for year in years:
-            year_file_name = self.data_info["data_name"] + f"_{year}.tif"
+            year_file_name = self.data_info["resource"] + f"_{year}.tif"
 
             tif_path = raw_geotiff_dir / year_file_name
-            cog_path = self.output_dir / self.dataset / year_file_name[7:]
+            cog_path = dataset_output_dir / year_file_name[7:]
 
             flist.append((zip_file_local_name, year_file_name, tif_path, cog_path))
 
@@ -209,33 +237,52 @@ class MalariaAtlasProject(Dataset):
     def main(self):
 
         logger = self.get_logger()
+        info = self.data_info
 
         raw_zip_dir = self.raw_dir / "zip" / self.dataset
         raw_zip_dir.mkdir(parents=True, exist_ok=True)
+
+        dataset_output_dir = self.output_dir / self.dataset
+        dataset_output_dir.mkdir(parents=True, exist_ok=True)
 
         logger.info("Testing Connection...")
         self.test_connection()
 
         logger.info("Running data download")
-        zip_file_local_name = raw_zip_dir / (self.data_info["data_name"] + ".zip")
+        zip_file_local_name = raw_zip_dir / f"{self.dataset}.zip"
         # download data zipFile from url to the local output directory
         downloads = self.run_tasks(
             self.manage_download,
-            [(self.data_info["data_zipFile_url"], zip_file_local_name)],
+            [(info["geoserver_url"], zip_file_local_name)],
         )
         self.log_run(downloads)
 
-        dataset_output_dir = self.output_dir / self.dataset
-        dataset_output_dir.mkdir(parents=True, exist_ok=True)
+        if info["temporal"]:
+            logger.info("Copying data files")
+            file_copy_list = self.copy_data_files(
+                zip_file_local_name, dataset_output_dir
+            )
+            copy_futures = self.run_tasks(self.copy_files, file_copy_list)
+            self.log_run(copy_futures)
 
-        logger.info("Copying data files")
-        file_copy_list = self.copy_data_files(zip_file_local_name)
-        copy_futures = self.run_tasks(self.copy_files, file_copy_list)
-        self.log_run(copy_futures)
+            logger.info("Converting raw tifs to COGs")
+            conversions = self.run_tasks(self.convert_to_cog, copy_futures.results())
+            self.log_run(conversions)
+        else:
+            archive_tif = f"{info['resource']}.tif"
+            raw_geotiff_dir = self.raw_dir / "geotiff" / self.dataset
+            raw_geotiff_dir.mkdir(parents=True, exist_ok=True)
 
-        logger.info("Converting raw tifs to COGs")
-        conversions = self.run_tasks(self.convert_to_cog, copy_futures.results())
-        self.log_run(conversions)
+            tif_path = raw_geotiff_dir / archive_tif
+            cog_path = dataset_output_dir / archive_tif
+
+            logger.info("Copying data file")
+            dst_path, cog_path = self.copy_files(
+                zip_file_local_name, archive_tif, tif_path, cog_path
+            )
+
+            logger.info("Converting raw tif to COG")
+            self.convert_to_cog(dst_path, cog_path)
 
 
 try:
@@ -243,7 +290,6 @@ try:
 except:
     pass
 else:
-
     @flow
     def malaria_atlas_project(config: MalariaAtlasProjectConfiguration):
         MalariaAtlasProject(config).run(config.run)

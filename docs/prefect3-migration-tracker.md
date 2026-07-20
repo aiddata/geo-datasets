@@ -68,6 +68,7 @@ smoke**, plus the specific notes below.
 
 | dataset | remaining work | status |
 |---|---|---|
+| accessibility_map | deploy + smoke | **rebuilt** from a comment stub (JRC access_50k, year 2000); moved from Workstream B |
 | worldpop_pop_count_new | deploy + smoke | new: Global 2015-2030 R2025A |
 | critical_habitats | deploy + smoke | |
 | cru_ts | deploy + smoke | |
@@ -77,7 +78,7 @@ smoke**, plus the specific notes below.
 | distance_to_water | deploy + smoke | |
 | gpm | deploy + smoke | |
 | landscan_pop | deploy + smoke | |
-| malaria_atlas_project | deploy + smoke | |
+| malaria_atlas_project | deploy + smoke | merged with travel-time family, see below |
 | modis_lst | deploy + smoke | |
 | pm25 | deploy + smoke | Box app setup for download |
 | plad | deploy + smoke | |
@@ -127,7 +128,7 @@ lookup all named `earthdata_token`.
 No config.toml / no data_manager usage; each is a TIGER-style rewrite.
 Triage which are still wanted before investing:
 
-`accessibility_map`, `accessibility_to_cities_2015_v1.0`, `acled`,
+`acled`,
 `africa_child_mortality`, `afrobarometer`, `air_pollution`,
 `atlasofurbanexpansion`, `black_marble`*, `boundaries`, `diamond`,
 `distance_to_groads`, `drug`, `gcdf_v3`, `gdp_grid`, `gem`,
@@ -163,6 +164,23 @@ GeoQuery's `IngestFeatureCollection` schema instead.
 - **Earthdata token** for oco2 + ltdr_ndvi (`a3383c7`); oco2 also bumped to the
   11.2r/11.3r version-by-year layout (11.1r was removed from GES DISC).
 - **Secret naming/rotation thread closed** — see "Secret handling" above.
+- **accessibility_map rebuilt**: moved from Workstream B into A. Was a
+  one-line comment stub; now downloads the JRC `access_50k.zip` archive and
+  rewrites the packaged GeoTIFF as a COG via `/vsizip/` (no on-disk unzip step).
+- **accessibility_to_cities_2015_v1.0 merged into malaria_atlas_project**:
+  both are Malaria Atlas Project GeoServer products. `malaria_atlas_project`
+  is now a multi-dataset flow selecting between **temporal** products
+  (archive has one GeoTIFF per year, e.g. `pf_incidence_rate`) and **static**
+  ones (single GeoTIFF, e.g. `travel_time_to_cities_2015`) via a `dataset`
+  config field and a `DATASET_LOOKUP` table in `main.py`. Also added two more
+  static products discovered on the same GeoServer workspace:
+  `motorized_travel_time_to_healthcare_2020` and
+  `walking_travel_time_to_healthcare_2020` (Weiss et al. 2020, Nature
+  Medicine). Each product has its own `<dataset>_raster_ingest.json`. The
+  standalone `accessibility_to_cities_2015_v1.0` directory was removed. The
+  design is meant to be extended further — adding another MAP product (of
+  either shape) needs only a new `DATASET_LOOKUP` entry and ingest JSON, no
+  other code changes. See `malaria_atlas_project/README.md`.
 
 ## Sweep completed 2026-07-16 (commits 4ccd6c5, 2fe3bfc, 7682144, 3e88649, d42ae20)
 
