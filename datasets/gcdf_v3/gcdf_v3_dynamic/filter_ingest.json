@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "dev_data/gcdf_v301_dynamic/gcdf_v301_dynamic.gpkg",
+    "path": "/data/datasets/gcdf_v301_dynamic/gcdf_v301_dynamic.gpkg",
     "type": "feature",
     "file_extension": ".gpkg",
     "file_mask": null,
@@ -13,6 +13,9 @@
     "details": "",
     "other": {
         "version": "v301",
+        "outcomes": {
+            "Commitment Value": "Commitment Value"
+        },
         "filters": {
             "Commitment Year": {
                 "type": "range",

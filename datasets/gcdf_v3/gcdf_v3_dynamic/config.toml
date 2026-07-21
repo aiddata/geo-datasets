@@ -1,0 +1,25 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gcdf_v3_dynamic"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gcdf_v3_dynamic"
+
+overwrite_download = false
+overwrite_process = true
+
+
+[run]
+max_workers = 1
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gcdf_v3_dynamic/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/gcdf_v3/gcdf_v3_dynamic"
+
+
+[deploy]
+deployment_name = "gcdf_v3_dynamic"
+image_tag = "083d531"
+version = 1
+flow_file_name = "main"
+flow_name = "gcdf_v301_dynamic"
+work_pool = "geodata"
