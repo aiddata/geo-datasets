@@ -217,6 +217,8 @@ class UCDP(Dataset):
 
         gdf.to_file(output_path, layer=self.dataset, driver="GPKG")
 
+        return gdf
+
 
     def update_filter_ingest(self):
 
@@ -242,7 +244,8 @@ class UCDP(Dataset):
                     "type": props["filter_type"],
                 }
                 if props["filter_type"] == "categorical":
-                    field_dict["categories"] = self.gdf[field].unique().tolist()
+                    # unique values sorted
+                    field_dict["categories"] = sorted(self.gdf[field].unique().tolist())
                 elif props["filter_type"] == "range":
                     field_dict["min"] = int(self.gdf[field].min())
                     field_dict["max"] = int(self.gdf[field].max())
@@ -252,8 +255,8 @@ class UCDP(Dataset):
                 filter_ingest["other"]["filters"][field] = field_dict
 
 
-        logger.info(f"Writing {self.filter_ingest_path}")
-        with self.tmp_to_dst_file(self.filter_ingest_path, make_dst_dir=True) as tmp:
+        logger.info(f"Writing {FILTER_INGEST_TEMPLATE}")
+        with self.tmp_to_dst_file(FILTER_INGEST_TEMPLATE, make_dst_dir=True) as tmp:
             with open(tmp, "w") as f:
                 json.dump(filter_ingest, f, indent=4)
 
