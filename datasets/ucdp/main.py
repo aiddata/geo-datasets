@@ -4,20 +4,8 @@ UCDP Georeferenced Event Dataset (GED) — conflict deaths
 https://ucdp.uu.se/downloads/
 
 Downloads the GED global CSV (currently v26.1 — UCDP releases a new version
-roughly annually; download_url will need bumping when they do) and rasterizes
-the "best" fatality estimate per year to a 0.01 degree grid, both combined
-across all violence types and broken out by type (state-based, non-state,
-one-sided) — one flow producing all four variants from a single download.
+roughly annually; download_url will need bumping when they do)
 
-The UCDP GED Polygons dataset (v1.1, from 2012), which a separate older
-script in this directory used for a binary conflict-occurrence raster, is no
-longer listed on the UCDP downloads page and appears to have been retired;
-that output is dropped rather than migrated.
-
-Note on aggregation: multiple events can fall in the same grid cell. Points
-are rounded to the pixel grid and summed (via groupby) *before*
-rasterizing — rasterizing points directly with `attribute=` would keep only
-one event's value per pixel rather than the summed total.
 """
 import json
 from pathlib import Path
