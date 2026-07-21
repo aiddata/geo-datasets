@@ -9,7 +9,7 @@ dataset = "ged261"
 [run]
 max_workers = 8
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ucdp/logs"
-backend = "local"
+backend = "prefect"
 
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
