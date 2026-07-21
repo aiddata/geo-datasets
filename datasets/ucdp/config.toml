@@ -1,0 +1,26 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ucdp"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ucdp"
+
+overwrite_download = false
+overwrite_process = true
+
+dataset = ged261
+
+[run]
+max_workers = 8
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ucdp/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/ucdp"
+
+
+[deploy]
+deployment_name = "ucdp"
+image_tag = "083d531"
+version = 2
+flow_file_name = "main"
+flow_name = "ucdp"
+work_pool = "geodata"

@@ -1,0 +1,42 @@
+{
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/ucdp_v261_deaths",
+    "type": "feature",
+    "file_extension": ".gpkg",
+    "file_mask": "None",
+    "name": "ucdp_v261_deaths",
+    "short_name": "ucdp_v261_deaths",
+    "title": "UCDP Conflict Deaths (v26.1)",
+    "description": "Number of total fatalities resulting from conflict events based on the UCDP Georeferenced Event Dataset (GED) global version 26.1.",
+    "details": "",
+    "processing_class": "filter_and_agg",
+    "processing_options": [
+        {
+            "function": "ucdp_v261_dynamic_filter_and_agg",
+            "short_name": "ucdp_v261_filter_agg",
+            "description": "Filter projects based on user selection and aggregate selected category of deaths",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+    },
+    "variable_factor": 1,
+    "variable_description": "count of deaths",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Sundberg, Ralph, and Erik Melander, 2013, 'Introducing the UCDP Georeferenced Event Dataset', Journal of Peace Research, vol.50, no.4, 523-532 \n Högbladh Stina, 2026, 'UCDP GED Codebook version 26.1', Department of Peace and Conflict Research, Uppsala University",
+    "sources_web": "https://ucdp.uu.se/downloads/",
+    "sources_name": "UCDP",
+    "tags": [
+        "ucdp",
+        "conflict",
+        "deaths"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
+}
