@@ -4,7 +4,7 @@ output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ucdp"
 overwrite_download = false
 overwrite_process = true
 
-dataset = ged261
+dataset = "ged261"
 
 [run]
 max_workers = 8

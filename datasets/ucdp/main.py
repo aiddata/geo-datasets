@@ -157,7 +157,7 @@ FIELD_DICT = {
 }
 
 
-class UcdpConfiguration(BaseDatasetConfiguration):
+class UCDPConfiguration(BaseDatasetConfiguration):
     raw_dir: str
     output_dir: str
     overwrite_download: bool
@@ -170,11 +170,11 @@ class UcdpConfiguration(BaseDatasetConfiguration):
         return Path(f)
 
 
-class Ucdp(Dataset):
+class UCDP(Dataset):
 
     name = "UCDP GED Conflict Deaths"
 
-    def __init__(self, config: UcdpConfiguration):
+    def __init__(self, config: UCDPConfiguration):
         self.config = config
         self.raw_dir = config.raw_dir
         self.output_dir = config.output_dir
@@ -273,16 +273,16 @@ class Ucdp(Dataset):
     def main(self):
         logger = self.get_logger()
 
-        logger.info("Running UCDP GED download")
+        logger.info("Downloading...")
         self.download()
 
-        logger.info("Loading GED data")
+        logger.info("Loading data...")
         self.df = self.load_data()
 
         logger.info(f"Processing...")
         self.gdf = self.process()
 
-        logger.info("Updating filter_ingest.json")
+        logger.info("Updating ingest JSON...")
         self.update_filter_ingest()
 
 
@@ -293,10 +293,10 @@ except ImportError:
 else:
 
     @flow
-    def ucdp(config: UcdpConfiguration):
-        Ucdp(config).run(config.run)
+    def ucdp(config: UCDPConfiguration):
+        UCDP(config).run(config.run)
 
 
 if __name__ == "__main__":
-    config = get_config(UcdpConfiguration)
-    Ucdp(config).run(config.run)
+    config = get_config(UCDPConfiguration)
+    UCDP(config).run(config.run)
