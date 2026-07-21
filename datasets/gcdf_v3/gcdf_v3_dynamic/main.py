@@ -17,6 +17,8 @@ from pydantic import field_validator
 
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
+FILTER_INGEST_TEMPLATE = Path(__file__).parent / "filter_ingest.json"
+
 DOWNLOAD_URL = "https://github.com/aiddata/gcdf-geospatial-data/releases/download/v3.0.1/all_combined_global.gpkg.zip"
 GPKG_NAME = "all_combined_global.gpkg"
 LAYER_NAME = "all_combined_global"
@@ -28,8 +30,6 @@ RENAME_DICT = {
     "Completion.Year": "Completion Year",
     "geometry": "geometry",
 }
-# the filter_ingest.json template checked into this dataset's directory
-FILTER_INGEST_TEMPLATE = Path(__file__).parent / "filter_ingest.json"
 
 
 class GcdfV301DynamicConfiguration(BaseDatasetConfiguration):
@@ -57,7 +57,6 @@ class GcdfV301Dynamic(Dataset):
 
         self.download_path = self.raw_dir / "all_combined_global.gpkg.zip"
         self.output_path = self.output_dir / "gcdf_v301_dynamic.gpkg"
-        self.filter_ingest_path = self.output_dir / "filter_ingest.json"
 
     def download(self):
         logger = self.get_logger()
@@ -111,27 +110,35 @@ class GcdfV301Dynamic(Dataset):
 
         filter_ingest["other"]["filters"] = {
             "Commitment Year": {
+                "display": "Commitment Year",
+                "aggregate": True,
                 "type": "range",
                 "min": int(gdf["Commitment Year"].min()),
                 "max": int(gdf["Commitment Year"].max()),
             },
             "Completion Year": {
+                "display": "Completion Year",
+                "aggregate": True,
                 "type": "range",
                 "min": int(gdf["Completion Year"].min()),
                 "max": int(gdf["Completion Year"].max()),
             },
             "Project Status": {
+                "display": "Project Status",
+                "aggregate": True,
                 "type": "categorical",
-                "categories": gdf["Project Status"].unique().tolist(),
+                "categories": sorted(gdf["Project Status"].unique().tolist()),
             },
             "Sector Name": {
+                "display": "Sector Name",
+                "aggregate": True,
                 "type": "categorical",
-                "categories": gdf["Sector Name"].unique().tolist(),
+                "categories": sorted(gdf["Sector Name"].unique().tolist()),
             },
         }
 
-        logger.info(f"Writing {self.filter_ingest_path}")
-        with self.tmp_to_dst_file(self.filter_ingest_path, make_dst_dir=True) as tmp:
+        logger.info(f"Writing {FILTER_INGEST_TEMPLATE}")
+        with self.tmp_to_dst_file(FILTER_INGEST_TEMPLATE, make_dst_dir=True) as tmp:
             with open(tmp, "w") as f:
                 json.dump(filter_ingest, f, indent=4)
 

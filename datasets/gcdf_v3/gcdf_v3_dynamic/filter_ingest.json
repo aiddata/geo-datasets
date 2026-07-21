@@ -18,16 +18,22 @@
         },
         "filters": {
             "Commitment Year": {
+                "display": "Commitment Year",
+                "aggregate": true,
                 "type": "range",
                 "min": 2000,
                 "max": 2021
             },
             "Completion Year": {
+                "display": "Completion Year",
+                "aggregate": true,
                 "type": "range",
                 "min": 2000,
                 "max": 2023
             },
             "Project Status": {
+                "display": "Project Status",
+                "aggregate": true,
                 "type": "categorical",
                 "categories": [
                     "Completion",
@@ -36,29 +42,31 @@
                 ]
             },
             "Sector Name": {
+                "display": "Sector Name",
+                "aggregate": true,
                 "type": "categorical",
                 "categories": [
-                    "HEALTH",
-                    "EMERGENCY RESPONSE",
-                    "GOVERNMENT AND CIVIL SOCIETY",
-                    "INDUSTRY, MINING, CONSTRUCTION",
-                    "COMMUNICATIONS",
-                    "OTHER SOCIAL INFRASTRUCTURE AND SERVICES",
-                    "EDUCATION",
-                    "ENERGY",
                     "AGRICULTURE, FORESTRY, FISHING",
-                    "WATER SUPPLY AND SANITATION",
-                    "TRANSPORT AND STORAGE",
-                    "OTHER MULTISECTOR",
-                    "TRADE POLICIES AND REGULATIONS",
                     "BUSINESS AND OTHER SERVICES",
+                    "COMMUNICATIONS",
                     "DEVELOPMENTAL FOOD AID/FOOD SECURITY ASSISTANCE",
-                    "OTHER COMMODITY ASSISTANCE",
-                    "RECONSTRUCTION RELIEF AND REHABILITATION",
-                    "GENERAL ENVIRONMENTAL PROTECTION",
+                    "DISASTER PREVENTION AND PREPAREDNESS",
+                    "EDUCATION",
+                    "EMERGENCY RESPONSE",
+                    "ENERGY",
                     "GENERAL BUDGET SUPPORT",
+                    "GENERAL ENVIRONMENTAL PROTECTION",
+                    "GOVERNMENT AND CIVIL SOCIETY",
+                    "HEALTH",
+                    "INDUSTRY, MINING, CONSTRUCTION",
+                    "OTHER COMMODITY ASSISTANCE",
+                    "OTHER MULTISECTOR",
+                    "OTHER SOCIAL INFRASTRUCTURE AND SERVICES",
                     "POPULATION POLICIES/PROGRAMMES AND REPRODUCTIVE HEALTH",
-                    "DISASTER PREVENTION AND PREPAREDNESS"
+                    "RECONSTRUCTION RELIEF AND REHABILITATION",
+                    "TRADE POLICIES AND REGULATIONS",
+                    "TRANSPORT AND STORAGE",
+                    "WATER SUPPLY AND SANITATION"
                 ]
             }
         }

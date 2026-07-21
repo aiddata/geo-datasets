@@ -8,7 +8,7 @@ overwrite_process = true
 [run]
 max_workers = 1
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gcdf_v3_dynamic/logs"
-
+backend = "local"
 
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
