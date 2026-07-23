@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/globalwindatlas_windspeed",
+    "path": "/data/datasets/globalwindatlas/windspeed",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

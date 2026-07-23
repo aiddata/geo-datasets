@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/globalsolaratlas_pvout",
+    "path": "/data/datasets/globalsolaratlas/pvout",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
