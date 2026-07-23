@@ -1,0 +1,47 @@
+{
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/acled/acled.gpkg",
+    "type": "feature",
+    "file_extension": ".gpkg",
+    "file_mask": "None",
+    "name": "acled",
+    "short_name": "acled",
+    "title": "ACLED Conflict Events",
+    "description": "Georeferenced political violence and protest events from the Armed Conflict Location & Event Data Project (ACLED).",
+    "details": "Manually downloaded from the ACLED data export tool. Converted from CSV to GeoPackage with event_count (=1 per event) and fatalities as aggregate outcomes.",
+    "processing_class": "filter_and_agg",
+    "processing_options": [
+        {
+            "function": "acled_dynamic_filter_and_agg",
+            "short_name": "acled_filter_agg",
+            "description": "Filter events by user-selected criteria and aggregate the chosen outcome (event count or fatalities) over the unit of analysis.",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "outcomes": {
+            "event_count": "Event Count",
+            "fatalities": "Fatalities"
+        },
+        "filters": {}
+    },
+    "variable_factor": 1,
+    "variable_description": "count of events or fatalities",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Raleigh, Clionadh, Andrew Linke, Håvard Hegre and Joakim Karlsen. 2010. Introducing ACLED-Armed Conflict Location and Event Data. Journal of Peace Research 47(5) 651-660.",
+    "sources_web": "https://acleddata.com",
+    "sources_name": "ACLED",
+    "tags": [
+        "acled",
+        "conflict",
+        "events"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
+}

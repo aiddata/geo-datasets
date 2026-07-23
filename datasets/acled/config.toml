@@ -1,0 +1,24 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/acled"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/acled"
+
+overwrite_process = false
+
+
+[run]
+max_workers = 4
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/acled/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/acled"
+
+
+[deploy]
+deployment_name = "acled"
+image_tag = "083d531"
+version = 1
+flow_file_name = "main"
+flow_name = "acled"
+work_pool = "geodata"
