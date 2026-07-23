@@ -28,13 +28,132 @@
             "event_count": "Event Count",
             "fatalities": "Fatalities"
         },
-        "filters": {}
+        "filters": {
+            "year": {
+                "display": "Year",
+                "aggregate": false,
+                "type": "categorical",
+                "categories": [
+                    1997,
+                    1998,
+                    1999,
+                    2000,
+                    2001,
+                    2002,
+                    2003,
+                    2004,
+                    2005,
+                    2006,
+                    2007,
+                    2008,
+                    2009,
+                    2010,
+                    2011,
+                    2012,
+                    2013,
+                    2014,
+                    2015,
+                    2016,
+                    2017,
+                    2018,
+                    2019,
+                    2020,
+                    2021,
+                    2022,
+                    2023,
+                    2024
+                ]
+            },
+            "disorder_type": {
+                "display": "Disorder Type",
+                "aggregate": true,
+                "type": "categorical",
+                "categories": [
+                    "Demonstrations",
+                    "Political violence",
+                    "Political violence; Demonstrations",
+                    "Strategic developments"
+                ]
+            },
+            "event_type": {
+                "display": "Event Type",
+                "aggregate": true,
+                "type": "categorical",
+                "categories": [
+                    "Battles",
+                    "Explosions/Remote violence",
+                    "Protests",
+                    "Riots",
+                    "Strategic developments",
+                    "Violence against civilians"
+                ]
+            },
+            "sub_event_type": {
+                "display": "Sub-Event Type",
+                "aggregate": true,
+                "type": "categorical",
+                "categories": [
+                    "Abduction/forced disappearance",
+                    "Agreement",
+                    "Air/drone strike",
+                    "Armed clash",
+                    "Arrests",
+                    "Attack",
+                    "Change to group/activity",
+                    "Chemical weapon",
+                    "Disrupted weapons use",
+                    "Excessive force against protesters",
+                    "Government regains territory",
+                    "Grenade",
+                    "Headquarters or base established",
+                    "Looting/property destruction",
+                    "Mob violence",
+                    "Non-state actor overtakes territory",
+                    "Non-violent transfer of territory",
+                    "Other",
+                    "Peaceful protest",
+                    "Protest with intervention",
+                    "Remote explosive/landmine/IED",
+                    "Sexual violence",
+                    "Shelling/artillery/missile attack",
+                    "Suicide bomb",
+                    "Violent demonstration"
+                ]
+            },
+            "geo_precision": {
+                "display": "Location Precision",
+                "aggregate": true,
+                "type": "categorical",
+                "categories": [
+                    1,
+                    2,
+                    3
+                ]
+            },
+            "time_precision": {
+                "display": "Date Precision",
+                "aggregate": true,
+                "type": "categorical",
+                "categories": [
+                    1,
+                    2,
+                    3
+                ]
+            },
+            "fatalities": {
+                "display": "Fatalities",
+                "aggregate": true,
+                "type": "range",
+                "min": 0,
+                "max": 1350
+            }
+        }
     },
     "variable_factor": 1,
     "variable_description": "count of events or fatalities",
     "mapped": false,
     "mappings": {},
-    "citation": "Raleigh, Clionadh, Andrew Linke, Håvard Hegre and Joakim Karlsen. 2010. Introducing ACLED-Armed Conflict Location and Event Data. Journal of Peace Research 47(5) 651-660.",
+    "citation": "Raleigh, Clionadh, Andrew Linke, H\u00e5vard Hegre and Joakim Karlsen. 2010. Introducing ACLED-Armed Conflict Location and Event Data. Journal of Peace Research 47(5) 651-660.",
     "sources_web": "https://acleddata.com",
     "sources_name": "ACLED",
     "tags": [

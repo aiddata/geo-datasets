@@ -3,7 +3,7 @@
 Georeferenced political violence and protest events from the
 [Armed Conflict Location & Event Data Project (ACLED)](https://acleddata.com).
 
-**Coverage:** Global, 1997–present  
+**Coverage:** Global, 1997–present
 **Source:** [ACLED data export tool](https://acleddata.com/data-export-tool/)
 
 ## Setup
@@ -23,11 +23,6 @@ The flow picks the most-recently-named CSV if multiple are present.
 
 Output file: `acled.gpkg` (layer: `acled`)
 
-## Run
-
-```bash
-python main.py
-```
 
 ## Citation
 

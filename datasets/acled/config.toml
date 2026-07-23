@@ -7,7 +7,7 @@ overwrite_process = false
 [run]
 max_workers = 4
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/acled/logs"
-
+backend = "local"
 
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
