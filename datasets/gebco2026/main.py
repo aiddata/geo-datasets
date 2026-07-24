@@ -55,8 +55,8 @@ class Gebco2026(Dataset):
         self.overwrite_slope = config.overwrite_slope
 
         self.download_path = self.raw_dir / ZIP_NAME
-        self.elevation_path = self.output_dir / "gebco2026_elevation.tif"
-        self.slope_path = self.output_dir / "gebco2026_slope.tif"
+        self.elevation_path = self.output_dir / "elevation" / "gebco2026_elevation.tif"
+        self.slope_path = self.output_dir / "slope" / "gebco2026_slope.tif"
 
     def download(self):
         logger = self.get_logger()

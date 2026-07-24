@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/drugdata_categorical_201708",
+    "path": "/data/datasets/drug/categorical",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

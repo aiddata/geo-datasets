@@ -4,7 +4,7 @@
     "is_global": false,
     "name": "atlasofurbanexpansion2016_studyarea",
     "short_name": "Atlas of Urban Expansion 2016: Study Area",
-    "path": "/data/datasets/atlasofurbanexpansion2016_studyarea",
+    "path": "/data/datasets/atlasofurbanexpansion/2016_studyarea.geojson",
     "type": "boundary",
     "file_extension": ".geojson",
     "file_mask": "None",

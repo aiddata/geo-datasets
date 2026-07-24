@@ -4,7 +4,7 @@
     "is_global": false,
     "name": "atlasofurbanexpansion2016_urban_edge_t1",
     "short_name": "Atlas of Urban Expansion 2016: Urban Edge 1990",
-    "path": "/data/datasets/atlasofurbanexpansion2016_urban_edge_t1",
+    "path": "/data/datasets/atlasofurbanexpansion/2016_urban_edge_t1.geojson",
     "type": "boundary",
     "file_extension": ".geojson",
     "file_mask": "None",
