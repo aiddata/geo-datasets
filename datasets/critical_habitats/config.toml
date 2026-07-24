@@ -4,8 +4,8 @@ raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/critical_habitats/20
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/critical_habitats/2023"
 
 max_retries = 5
-overwrite_download = true
-overwrite_output = true
+overwrite_download = false
+overwrite_output = false
 
 
 [run]

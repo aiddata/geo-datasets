@@ -2,7 +2,7 @@ raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/accessibility_map"
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/access_50k"
 
 overwrite_download = false
-overwrite_process = true
+overwrite_process = false
 
 
 [run]

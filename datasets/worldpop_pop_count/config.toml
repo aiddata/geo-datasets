@@ -6,7 +6,7 @@ raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/worldpop/population_
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/worldpop/population_counts/1km_mosaic"
 
 overwrite_download = false
-overwrite_processing = true
+overwrite_processing = false
 
 
 [run]

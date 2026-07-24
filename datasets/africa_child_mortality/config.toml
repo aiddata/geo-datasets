@@ -2,7 +2,7 @@ raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/africa_child_mortali
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/africa_child_mortality"
 
 overwrite_download = false
-overwrite_process = true
+overwrite_process = false
 
 
 [run]

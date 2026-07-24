@@ -3,7 +3,7 @@ output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gebco/gebco2
 
 overwrite_download = false
 overwrite_elevation = false
-overwrite_slope = true
+overwrite_slope = false
 
 
 [run]

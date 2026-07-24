@@ -20,7 +20,7 @@ output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ltdr/avhrr_n
 
 overwrite_download = false
 validate_download = true
-overwrite_processing = true
+overwrite_processing = false
 
 
 [run]

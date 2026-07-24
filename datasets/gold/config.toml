@@ -4,7 +4,7 @@ output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/goldata_v12"
 pixel_size = 0.01
 
 overwrite_categorical_raster = false
-overwrite_distance_raster = true
+overwrite_distance_raster = false
 
 
 [run]

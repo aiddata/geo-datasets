@@ -23,9 +23,9 @@ monthly_files = "avg_rade9h.masked,cf_cvg"
 # change var - set to intended output directories
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/viirs_ntl"
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/viirs_ntl"
-overwrite_download = true
-overwrite_extract = true
-overwrite_processing = true
+overwrite_download = false
+overwrite_extract = false
+overwrite_processing = false
 max_retries = 5
 
 # Browser session cookie for eogdata.mines.edu. Log in at

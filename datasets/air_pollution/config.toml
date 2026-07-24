@@ -1,7 +1,7 @@
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/air_pollution"
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/air_pollution"
 
-overwrite_process = true
+overwrite_process = false
 
 
 [run]

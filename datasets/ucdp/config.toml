@@ -2,7 +2,7 @@ raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ucdp"
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ucdp"
 
 overwrite_download = false
-overwrite_process = true
+overwrite_process = false
 
 dataset = "ged261"
 

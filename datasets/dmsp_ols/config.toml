@@ -12,7 +12,7 @@ run_avg_x_pct = true
 mod_auth_openidc_session = "<ADD-MOD_AUTH_OPENIDC_SESSION>"
 
 overwrite_download = false
-overwrite_processing = true
+overwrite_processing = false
 
 
 [run]
