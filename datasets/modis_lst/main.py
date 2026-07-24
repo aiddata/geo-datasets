@@ -1,72 +1,33 @@
+"""
+MODIS Land Surface Temperature MOD11C3 v061 (LP DAAC LPCLOUD)
+
+Downloads monthly 0.05-degree CMG HDF4 files from LP DAAC via CMR search,
+extracts day/night LST layers, and aggregates to yearly means.
+
+Data source: https://www.earthdata.nasa.gov/data/catalog/lpcloud-mod11c3-061
+CMR concept:  C2565791021-LPCLOUD  (verify: https://cmr.earthdata.nasa.gov/search/collections.json?short_name=MOD11C3&version=061&provider=LPCLOUD)
+"""
+
 import os
 import shutil
 import warnings
 from pathlib import Path
-from typing import  Union
-from urllib.parse import urlparse
+from typing import Optional, Union
 
 import numpy as np
 import rasterio
 import requests
 from affine import Affine
-from bs4 import BeautifulSoup
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 from pyhdf.SD import SD, SDC
 
 
-def listFD(url, ext=""):
-    """Find all links in a webpage
-
-    Option matching on string at end of links founds
-
-    Returns list of complete (absolute) links
-    """
-    page = requests.get(url).text
-    soup = BeautifulSoup(page, "html.parser")
-    urllist = [
-        url + "/" + node.get("href").strip("/")
-        for node in soup.find_all("a")
-        if node.get("href").endswith(ext)
-    ]
-    return urllist
-
-
-class SessionWithHeaderRedirection(requests.Session):
-    """
-    overriding requests.Session.rebuild_auth to mantain headers when redirected
-    from: https://wiki.earthdata.nasa.gov/display/EL/How+To+Access+Data+With+Python
-    """
-
-    AUTH_HOST = "urs.earthdata.nasa.gov"
-
-    def __init__(self, username, password):
-        super().__init__()
-        self.auth = (username, password)
-
-    def rebuild_auth(self, prepared_request, response):
-        """
-        Overrides from the library to keep headers when redirected to or from
-        the NASA auth host.
-        """
-
-        headers = prepared_request.headers
-        url = prepared_request.url
-        if "Authorization" in headers:
-            original_parsed = requests.utils.urlparse(response.request.url)
-            redirect_parsed = requests.utils.urlparse(url)
-            if (
-                (original_parsed.hostname != redirect_parsed.hostname)
-                and redirect_parsed.hostname != self.AUTH_HOST
-                and original_parsed.hostname != self.AUTH_HOST
-            ):
-                del headers["Authorization"]
-        return
+CMR_GRANULES_URL = "https://cmr.earthdata.nasa.gov/search/granules.json"
+CONCEPT_ID = "C2565788897-LPCLOUD"
 
 
 def export_raster(data, path, meta, **kwargs):
-    """
-    Export raster array to geotiff
-    """
+    """Export raster array to geotiff."""
     if not isinstance(meta, dict):
         raise ValueError("meta must be a dictionary")
 
@@ -95,29 +56,18 @@ def export_raster(data, path, meta, **kwargs):
                 )
             meta[k] = v
 
-    # write geotif file
     with rasterio.open(path, "w", **meta) as dst:
         dst.write(data)
 
 
 def aggregate_rasters(file_list, method="mean"):
     """
-    Aggregate multiple rasters
-
-    Aggregates multiple rasters with same features (dimensions, transform,
+    Aggregate multiple rasters with same features (dimensions, transform,
     pixel size, etc.) and creates single layer using aggregation method
     specified.
 
     Supported methods: mean (default), max, min, sum
-
-    Arguments
-        file_list (list): list of file paths for rasters to be aggregated
-        method (str): method used for aggregation
-
-    Return
-        result: rasterio Raster instance
     """
-
     store = None
     for ix, file_path in enumerate(file_list):
         try:
@@ -130,36 +80,25 @@ def aggregate_rasters(file_list, method="mean"):
 
         if store is None:
             store = active.copy()
-
         else:
-            # make sure dimensions match
             if active.shape != store.shape:
                 raise Exception("Dimensions of rasters do not match")
 
             if method == "max":
                 store = np.ma.array((store, active)).max(axis=0)
-
-                # non masked array alternatives
-                # store = np.maximum.reduce([store, active])
-                # store = np.vstack([store, active]).max(axis=0)
-
             elif method == "mean":
                 if ix == 1:
                     weights = (~store.mask).astype(int)
-
                 store = np.ma.average(
                     np.ma.array((store, active)),
                     axis=0,
                     weights=[weights, (~active.mask).astype(int)],
                 )
                 weights += (~active.mask).astype(int)
-
             elif method == "min":
                 store = np.ma.array((store, active)).min(axis=0)
-
             elif method == "sum":
                 store = np.ma.array((store, active)).sum(axis=0)
-
             else:
                 raise Exception("Invalid method")
 
@@ -171,8 +110,8 @@ class MODISLandSurfaceTempConfiguration(BaseDatasetConfiguration):
     process_dir: str
     raw_dir: str
     output_dir: str
-    username: str
-    password: str
+    # NASA Earthdata Login bearer token — stored in gitignored .env, not committed.
+    earthdata_token: str
     # Comma-separated years (e.g. "2000,2001"). String, not list, so the
     # Prefect run form renders a text input rather than the array widget,
     # whose "add item" button submits the form.
@@ -186,17 +125,13 @@ class MODISLandSurfaceTemp(Dataset):
     name = "MODIS Land Surface Temperatures"
 
     def __init__(self, config: MODISLandSurfaceTempConfiguration):
-        self.username = config.username
-        self.password = config.password
+        self.auth_headers = {"Authorization": f"Bearer {config.earthdata_token}"}
 
-        self.years = [v.strip() for v in config.years.split(",") if v.strip()]
+        self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
 
         self.overwrite_download = config.overwrite_download
         self.overwrite_monthly = config.overwrite_monthly
         self.overwrite_yearly = config.overwrite_yearly
-
-        self.root_url = "https://e4ftl01.cr.usgs.gov"
-        self.data_url = os.path.join(self.root_url, "MOLT/MOD11C3.061")
 
         self.process_dir = Path(config.process_dir)
         self.raw_dir = Path(config.raw_dir)
@@ -207,101 +142,104 @@ class MODISLandSurfaceTemp(Dataset):
 
         self.method = "mean"
 
+    # ── CMR search ──────────────────────────────────────────────────────────
+
     def test_connection(self):
         logger = self.get_logger()
         logger.info("Testing connection...")
+        resp = requests.get(
+            CMR_GRANULES_URL,
+            params={"concept_id": CONCEPT_ID, "page_size": 1},
+            headers=self.auth_headers,
+            timeout=30,
+        )
+        resp.raise_for_status()
+        logger.info("Connection successful")
 
-        test_request = requests.get(self.data_url)
-        test_request.raise_for_status()
-
-    def build_download_list(self):
+    def search_granules(self, year: int) -> list[dict]:
+        """Return all CMR granule entries for a given year."""
         logger = self.get_logger()
+        results = []
+        page = 1
+        while True:
+            resp = requests.get(
+                CMR_GRANULES_URL,
+                params={
+                    "concept_id": CONCEPT_ID,
+                    "temporal[]": f"{year}-01-01T00:00:00Z,{year}-12-31T23:59:59Z",
+                    "page_size": 2000,
+                    "page_num": page,
+                },
+                headers=self.auth_headers,
+                timeout=60,
+            )
+            resp.raise_for_status()
+            hits = resp.json()["feed"]["entry"]
+            if not hits:
+                break
+            results.extend(hits)
+            page += 1
+        logger.info(f"Found {len(results)} granules for {year}")
+        return results
 
+    @staticmethod
+    def granule_download_url(granule: dict) -> Optional[str]:
+        """Extract the HTTPS .hdf download URL from a CMR granule entry."""
+        for link in granule.get("links", []):
+            href = link.get("href", "")
+            if (
+                href.startswith("https://")
+                and href.endswith(".hdf")
+                and link.get("rel", "").endswith("data#")
+            ):
+                return href
+        return None
+
+    # ── Download ─────────────────────────────────────────────────────────────
+
+    def build_download_list(self) -> list[tuple]:
+        logger = self.get_logger()
         logger.info("Preparing data download")
+        tasks = []
+        for year in self.years:
+            granules = self.search_granules(year)
+            for g in granules:
+                url = self.granule_download_url(g)
+                if url is None:
+                    continue
+                # time_start = "2000-03-01T00:00:00.000Z" → temporal = "200003"
+                time_start = g.get("time_start", "")
+                temporal = time_start[:7].replace("-", "")
+                hdf_name = Path(url).name
+                dst_path = self.raw_dir / f"{temporal}_{hdf_name}"
+                tmp_path = self.process_dir / f"{temporal}_{hdf_name}"
+                tasks.append((url, tmp_path, dst_path))
+        return tasks
 
-        # Note: calling listFD outside of the main block (on every process)
-        #       caused some connection issues. Did not debug issue further
-        #       as there is no need for this to be outside of main.
-        """
-        Filters links based on:
-        1) dirname within link matches url being searched (i.e., not a link to an external page, only subdirectories of current url)
-        2) basename matches YYYY.MM.DD format
-        3) YYYY in basename matches a year in year_list
-        """
-
+    def download_file(self, url: str, tmp_file: Path, dst_file: Path):
         logger = self.get_logger()
-
-        flist = []
-        missing_files_count = 0
-
-        url_list = listFD(self.data_url)
-
-        for url in url_list:
-            u = urlparse(url)
-            if u.netloc == urlparse(self.data_url).netloc:
-                p = Path(u.path)
-                if len(p.name.split(".")) == 3:
-                    if p.name.split(".")[0] in self.years:
-                        # get full url for each hdf file
-                        hdf_url_list = listFD(url, "hdf")
-                        if len(hdf_url_list) == 0:
-                            hdf_url = "Error"
-                            missing_files_count += 1
-                        else:
-                            hdf_url = hdf_url_list[0]
-
-                        # get temporal string from url parent directory
-                        # convert from YYYY.MM.DD to YYYYMM
-                        temporal = "".join(p.name.split(".")[0:2])
-
-                        # use basename from url to create local filename
-                        hdf_url_name = Path(urlparse(hdf_url).path).name
-                        tmp_path = self.process_dir / (f"{temporal}_{hdf_url_name}")
-                        dst_path = self.raw_dir / (f"{temporal}_{hdf_url_name}")
-
-                        flist.append((hdf_url, tmp_path, dst_path))
-
-        # confirm HDF url was found for each temporal directory
-        missing_files_msg = f"{missing_files_count} missing HDF files"
-        if missing_files_count > 0:
-            logger.warning(missing_files_msg)
-        else:
-            logger.info(missing_files_msg)
-
-        return flist
-
-    def download_file(self, url, tmp_file, dst_file):
-        """
-        download individual file using session created
-
-        this needs to be a standalone function rather than a method
-        of SessionWithHeaderRedirection because we need to be able
-        to pass it to our mpi4py map function
-        """
-
-        logger = self.get_logger()
+        dst_file, tmp_file = Path(dst_file), Path(tmp_file)
         self.process_dir.mkdir(parents=True, exist_ok=True)
 
         if dst_file.exists() and not self.overwrite_download:
             logger.info(f"File already exists: {dst_file}. Skipping...")
-        else:
-            Path(tmp_file).parent.mkdir(parents=True, exist_ok=True)
+            return
 
-            # create session with the user credentials that will be used to authenticate access to the data
-            # Note: session can be serialized but because we are streaming the files it cannot
-            session = SessionWithHeaderRedirection(self.username, self.password)
-            # release the connection pool until one file is completed. Instead we create a new
-            # session for each process to use on its own.
-
-            with session.get(url, stream=True) as r:
+        tmp_file.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            with requests.get(url, headers=self.auth_headers, stream=True, timeout=300) as r:
                 r.raise_for_status()
                 with open(tmp_file, "wb") as f:
                     for chunk in r.iter_content(chunk_size=1024 * 1024):
                         f.write(chunk)
-
             logger.info(f"Downloaded to tmp: {url} > {tmp_file}")
             shutil.copyfile(tmp_file, dst_file)
             logger.info(f"Copied to dst: {tmp_file} > {dst_file}")
+        except Exception:
+            tmp_file.unlink(missing_ok=True)
+            raise
+
+    # ── Processing (unchanged) ────────────────────────────────────────────────
 
     def build_process_list(self):
         flist = []
@@ -331,20 +269,16 @@ class MODISLandSurfaceTemp(Dataset):
         logger = self.get_logger()
         self.process_dir.mkdir(parents=True, exist_ok=True)
 
-        # convert input_path to a str if it isn't one already
-        # (pyhdf doesn't like taking pathlib.Path objects)
+        # pyhdf doesn't accept pathlib.Path objects
         if isinstance(input_path, Path):
             input_path = input_path.as_posix()
 
         if self.overwrite_monthly or not os.path.isfile(output_path):
-            # read HDF data files
             file = SD(input_path, SDC.READ)
             img = file.select(layer)
             data = img.get() * img.attributes()["scale_factor"]
 
-            # define the affine transformation
-            #   5600m or 0.05 degree resolution
-            #   global coverage
+            # 5600m / 0.05 degree resolution, global coverage
             transform = Affine(0.05, 0, -180, 0, -0.05, 90)
             meta = {
                 "transform": transform,
@@ -352,7 +286,6 @@ class MODISLandSurfaceTemp(Dataset):
                 "height": data.shape[0],
                 "width": data.shape[1],
             }
-            # need to wrap data in array so it is 3-dimensions to account for raster band
             export_raster(np.array([data]), tmp_path, meta, quiet=True)
 
             logger.info(f"Processed to tmp: {input_path} > {tmp_path}")
@@ -378,7 +311,6 @@ class MODISLandSurfaceTemp(Dataset):
             year_months = {}
 
             for mfile in month_files:
-                # year associated with month
                 myear = mfile.name.split("_")[-1][:4]
                 if myear not in year_months:
                     year_months[myear] = list()
@@ -419,20 +351,16 @@ class MODISLandSurfaceTemp(Dataset):
             logger.info(f"{out_path} already exists, skipping...")
 
     def main(self):
-        # Test Connection
         self.test_connection()
 
-        # Download
         download_list = self.build_download_list()
         download = self.run_tasks(self.download_file, download_list)
         self.log_run(download)
 
-        # Process
         process_list = self.build_process_list()
         process = self.run_tasks(self.process_hdf, process_list)
         self.log_run(process)
 
-        # Aggregate
         data_to_agg = self.build_aggregation_list()
         agg = self.run_tasks(self.run_yearly_data, data_to_agg)
         self.log_run(agg)
@@ -440,7 +368,7 @@ class MODISLandSurfaceTemp(Dataset):
 
 try:
     from prefect import flow
-except:
+except Exception:
     pass
 else:
     @flow
@@ -449,5 +377,7 @@ else:
 
 
 if __name__ == "__main__":
+    import dotenv
+    dotenv.load_dotenv()
     config = get_config(MODISLandSurfaceTempConfiguration)
     MODISLandSurfaceTemp(config).run(config.run)
