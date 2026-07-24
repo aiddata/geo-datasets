@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/gem/distance",
+    "path": "/data/datasets/gemdata_201708/gemstone_distance.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

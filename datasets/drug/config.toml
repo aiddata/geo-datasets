@@ -1,5 +1,5 @@
-raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/drug"
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/drug"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/drugdata_201708"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/drugdata_201708"
 
 pixel_size = 0.01
 
@@ -9,7 +9,7 @@ overwrite_distance_raster = true
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/drug/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/drugdata_201708/logs"
 
 
 [repo]

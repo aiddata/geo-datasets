@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/diamond/distance",
+    "path": "/data/datasets/diamond_201708/diamond_distance.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

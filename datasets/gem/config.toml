@@ -1,5 +1,5 @@
-raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gem"
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gem"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gemdata_201708"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gemdata_201708"
 
 pixel_size = 0.01
 
@@ -9,7 +9,7 @@ overwrite_distance_raster = true
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gem/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gemdata_201708/logs"
 
 
 [repo]

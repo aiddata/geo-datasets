@@ -77,7 +77,7 @@ class Diamond(Dataset):
     def build_binary_raster(self):
         logger = self.get_logger()
 
-        binary_path = self.output_dir / "binary" / "diamond_binary.tif"
+        binary_path = self.output_dir / "diamond_binary.tif"
         if not self.overwrite_binary_raster and binary_path.exists():
             logger.info(f"Binary raster exists, skipping: {binary_path}")
             return None, None
@@ -107,7 +107,7 @@ class Diamond(Dataset):
     def build_distance_raster(self, diamond, affine):
         logger = self.get_logger()
 
-        distance_path = self.output_dir / "distance" / "diamond_distance.tif"
+        distance_path = self.output_dir / "diamond_distance.tif"
         if not self.overwrite_distance_raster and distance_path.exists():
             logger.info(f"Distance raster exists, skipping: {distance_path}")
             return

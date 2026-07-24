@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/diamond/binary",
+    "path": "/data/datasets/diamond_201708/diamond_binary.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

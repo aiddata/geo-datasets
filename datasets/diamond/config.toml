@@ -1,5 +1,5 @@
-raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/diamond"
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/diamond"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/diamond_201708"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/diamond_201708"
 
 pixel_size = 0.01
 
@@ -9,7 +9,7 @@ overwrite_distance_raster = true
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/diamond/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/diamond_201708/logs"
 
 
 [repo]

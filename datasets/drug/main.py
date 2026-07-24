@@ -83,7 +83,7 @@ class Drug(Dataset):
     def build_categorical_raster(self):
         logger = self.get_logger()
 
-        categorical_path = self.output_dir / "categorical" / "drug_categorical.tif"
+        categorical_path = self.output_dir / "drug_categorical.tif"
         if not self.overwrite_categorical_raster and categorical_path.exists():
             logger.info(f"Categorical raster exists, skipping: {categorical_path}")
             return None, None
@@ -118,7 +118,7 @@ class Drug(Dataset):
     def build_distance_raster(self, categorical, affine):
         logger = self.get_logger()
 
-        distance_path = self.output_dir / "distance" / "drug_distance.tif"
+        distance_path = self.output_dir / "drug_distance.tif"
         if not self.overwrite_distance_raster and distance_path.exists():
             logger.info(f"Distance raster exists, skipping: {distance_path}")
             return

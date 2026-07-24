@@ -115,7 +115,7 @@ class Gold(Dataset):
     def build_distance_raster(self, lootable, affine):
         logger = self.get_logger()
 
-        distance_path = self.output_dir / "distance" / "gold_distance.tif"
+        distance_path = self.output_dir / "gold_distance.tif"
         if not self.overwrite_distance_raster and distance_path.exists():
             logger.info(f"Distance raster exists, skipping: {distance_path}")
             return
@@ -131,7 +131,7 @@ class Gold(Dataset):
     def build_categorical_raster(self, output, affine):
         logger = self.get_logger()
 
-        categorical_path = self.output_dir / "categorical" / "gold_categorical.tif"
+        categorical_path = self.output_dir / "gold_categorical.tif"
         if not self.overwrite_categorical_raster and categorical_path.exists():
             logger.info(f"Categorical raster exists, skipping: {categorical_path}")
             return

@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/drug/distance",
+    "path": "/data/datasets/drugdata_201708/drug_distance.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

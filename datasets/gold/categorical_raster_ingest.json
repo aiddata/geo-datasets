@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/gold/categorical",
+    "path": "/data/datasets/goldata_v12/gold_categorical.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

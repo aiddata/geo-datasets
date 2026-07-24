@@ -1,5 +1,5 @@
-raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gold"
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gold"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/goldata_v12"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/goldata_v12"
 
 pixel_size = 0.01
 
@@ -9,7 +9,7 @@ overwrite_distance_raster = true
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gold/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/goldata_v12/logs"
 
 
 [repo]
