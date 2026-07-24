@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/dvnl_2022",
+    "path": "/data/datasets/dvnl",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "dvnl_YYYY.tif",

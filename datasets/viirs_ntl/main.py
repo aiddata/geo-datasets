@@ -23,6 +23,10 @@ from data_manager import BaseDatasetConfiguration, Dataset, get_config
 KEEPALIVE_URL = "https://eogdata.mines.edu/nighttime_light/"
 KEEPALIVE_INTERVAL = 30  # seconds
 
+# monthly data isn't configurable by version (unlike annual, via
+# annual_version) — the download URL is hardcoded to v10
+MONTHLY_VERSION = "v10"
+
 
 class VIIRS_NTL_Configuration(BaseDatasetConfiguration):
     raw_dir: str
@@ -342,12 +346,13 @@ class VIIRS_NTL(Dataset):
         logger = self.get_logger()
 
         if self.run_annual:
+            annual_dir = self.output_dir / "annual" / self.annual_version
             for year in self.years:
                 annual_avg_glob_str = (
                     self.raw_dir / f"raw_extracted_viirs_ntl_{year}_average_masked.tif"
                 )
                 output_avg_glob = (
-                    self.output_dir / f"viirs_ntl_annual_{year}_avg_masked.tif"
+                    annual_dir / "avg_masked" / f"viirs_ntl_annual_{year}_avg_masked.tif"
                 )
                 if annual_avg_glob_str.exists():
                     task_list.append((annual_avg_glob_str, output_avg_glob))
@@ -360,7 +365,7 @@ class VIIRS_NTL(Dataset):
                     self.raw_dir / f"raw_extracted_viirs_ntl_{year}_cf_cvg.tif"
                 )
                 output_cloud_glob = (
-                    self.output_dir / f"viirs_ntl_annual_{year}_cf_cvg.tif"
+                    annual_dir / "cf_cvg" / f"viirs_ntl_annual_{year}_cf_cvg.tif"
                 )
                 if annual_cloud_glob_str.exists():
                     task_list.append((annual_cloud_glob_str, output_cloud_glob))
@@ -370,6 +375,7 @@ class VIIRS_NTL(Dataset):
                     )
 
         if self.run_monthly:
+            monthly_dir = self.output_dir / "monthly" / MONTHLY_VERSION
             for year in self.years:
                 for month in self.months:
                     format_month = str(month).zfill(2)
@@ -379,7 +385,8 @@ class VIIRS_NTL(Dataset):
                         / f"raw_extracted_viirs_ntl_{year}_{format_month}_avg_rade9h.masked.tif"
                     )
                     output_avg_glob = (
-                        self.output_dir
+                        monthly_dir
+                        / "avg_masked"
                         / f"viirs_ntl_monthly_{year}_{format_month}_avg_masked.tif"
                     )
                     if monthly_avg_glob_str.exists():
@@ -394,7 +401,8 @@ class VIIRS_NTL(Dataset):
                         / f"raw_extracted_viirs_ntl_{year}_{format_month}_cf_cvg.tif"
                     )
                     output_cloud_glob = (
-                        self.output_dir
+                        monthly_dir
+                        / "cf_cvg"
                         / f"viirs_ntl_monthly_{year}_{format_month}_cf_cvg.tif"
                     )
                     if monthly_cloud_glob_str.exists():
@@ -430,7 +438,7 @@ class VIIRS_NTL(Dataset):
                 )
                 meta.update(**kwargs)
                 with self.tmp_to_dst_file(
-                    output_path, validate_cog=True
+                    output_path, make_dst_dir=True, validate_cog=True
                 ) as tmp_dst_path:
                     with rasterio.open(tmp_dst_path, "w", **meta) as dst:
                         for ji, window in src.block_windows(1):

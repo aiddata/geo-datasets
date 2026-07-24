@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/map_travel_time_to_cities_2015",
+    "path": "/data/datasets/malaria_atlas_project/travel_time_to_cities_2015",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

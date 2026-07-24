@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/modis_landcover_61",
+    "path": "/data/datasets/MODIS/MCD12Q1.061",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "mcd12q1_061_lc_type1_YYYY.tif",

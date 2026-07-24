@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/onshore_petroleum_v12",
+    "path": "/data/datasets/petroleum/binary",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

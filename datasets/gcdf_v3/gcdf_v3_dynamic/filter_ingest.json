@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/gcdf_v301_dynamic/gcdf_v301_dynamic.gpkg",
+    "path": "/data/datasets/gcdf_v3_dynamic/gcdf_v301_dynamic.gpkg",
     "type": "feature",
     "file_extension": ".gpkg",
     "file_mask": null,

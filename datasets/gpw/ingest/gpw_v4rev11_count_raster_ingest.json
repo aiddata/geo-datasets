@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/gpw_v4_rev11_count",
+    "path": "/data/datasets/gpw/gpw_v4_rev11/count",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "gpw_v4_population_count_adjusted_to_2015_unwpp_country_totals_rev11_YYYY_30_sec.tif",

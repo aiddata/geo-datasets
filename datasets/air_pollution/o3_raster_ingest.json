@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/ambient_air_pollution_2013_o3",
+    "path": "/data/datasets/air_pollution/o3",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "o3_YYYY.tif",

@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/map_pf_incidence_rate",
+    "path": "/data/datasets/malaria_atlas_project/pf_incidence_rate",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "Global_Pf_Incidence_Rate_YYYY.tif",

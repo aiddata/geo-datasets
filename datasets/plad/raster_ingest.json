@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/plad_v70_leader_birthplace",
+    "path": "/data/datasets/plad/v70",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "leader_birthplace_data_YYYY.tif",

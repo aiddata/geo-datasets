@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/dist_to_coast_237",
+    "path": "/data/datasets/distance_to_coast/2.3.7/distance",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

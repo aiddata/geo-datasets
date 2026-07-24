@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/dist_to_water_237_d4533ef",
+    "path": "/data/datasets/distance_to_water/2.3.7_d4533ef/distance",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

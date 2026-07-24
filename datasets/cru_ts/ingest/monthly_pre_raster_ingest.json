@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/cru_ts_407_pre_monthly_mean",
+    "path": "/data/datasets/cru_ts/cru_ts_4.07/monthly/pre",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "cru.pre.YYYYMM.tif",

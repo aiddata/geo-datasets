@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/esa_lc",
+    "path": "/data/datasets/esa_landcover",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "esa_lc_YYYY.tif",

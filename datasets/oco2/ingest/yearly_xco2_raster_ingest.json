@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/oco2_v111r_xco2_yearly",
+    "path": "/data/datasets/gesdisc/OCO2_L2_Lite_FP/xco2/year_interp",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "xco2_YYYY.tif",

@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/surface_pm25_monthly_V5GL04",
+    "path": "/data/datasets/pm25/V5GL04/Global/Monthly",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "V5GL04.HybridPM25.Global.200504-YYYYMM.tif ",

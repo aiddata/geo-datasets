@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/modis_lst_mod11c3_061_day_annual_mean",
+    "path": "/data/datasets/MODIS/terra/MOLT/MOD11C3.061/yearly/day/mean",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "modis_lst_day_cmg_YYYY.tif",

@@ -110,7 +110,7 @@ class Petroleum(Dataset):
     def build_distance_raster(self, petroleum, affine):
         logger = self.get_logger()
 
-        distance_path = self.output_dir / "petroleum_distance.tif"
+        distance_path = self.output_dir / "distance" / "petroleum_distance.tif"
         if not self.overwrite_distance_raster and distance_path.exists():
             logger.info(f"Distance raster exists, skipping: {distance_path}")
             return

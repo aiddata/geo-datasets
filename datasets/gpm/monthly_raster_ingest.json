@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/gpm_precipitation_v07b_monthly",
+    "path": "/data/datasets/gpm/v07b/monthly",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "gpm_precipitation_YYYY_MM.tif",

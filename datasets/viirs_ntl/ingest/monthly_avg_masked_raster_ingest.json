@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/viirs_ntl_monthly_v10_vcmcfg_avg_masked",
+    "path": "/data/datasets/viirs_ntl/monthly/v10/avg_masked",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "YYYYMM.tif",

@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/dist_to_geoBoundaries_borders",
+    "path": "/data/datasets/distance_to_country_borders",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

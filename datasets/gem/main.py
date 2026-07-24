@@ -107,7 +107,7 @@ class Gem(Dataset):
     def build_distance_raster(self, gem, affine):
         logger = self.get_logger()
 
-        distance_path = self.output_dir / "gemstone_distance.tif"
+        distance_path = self.output_dir / "distance" / "gemstone_distance.tif"
         if not self.overwrite_distance_raster and distance_path.exists():
             logger.info(f"Distance raster exists, skipping: {distance_path}")
             return

@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/worldpop_pop_count",
+    "path": "/data/datasets/worldpop/population_counts/1km_mosaic",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "ppp_YYYY_1km_Aggregated.tif",

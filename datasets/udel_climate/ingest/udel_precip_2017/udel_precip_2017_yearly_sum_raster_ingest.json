@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/udel_precip_v501_sum",
+    "path": "/data/datasets/udel_climate/precip_2017/yearly/sum",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "precip_YYYY_sum.tif",

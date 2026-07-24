@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/wdpa_iucn_cat_202406",
+    "path": "/data/datasets/wdpa/202406/iucn_cat",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

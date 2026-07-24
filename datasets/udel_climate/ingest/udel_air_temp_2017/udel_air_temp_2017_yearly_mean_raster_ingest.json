@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/udel_air_temp_v501_mean",
+    "path": "/data/datasets/udel_climate/air_temp_2017/yearly/mean",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "air_temp_YYYY_mean.tif",
