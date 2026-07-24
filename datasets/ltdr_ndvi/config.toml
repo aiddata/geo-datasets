@@ -15,8 +15,8 @@ data_num = 466
 years = "2000,2022"
 
 # output directories
-raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ltdr_ndvi"
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ltdr_ndvi"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ltdr/avhrr_ndvi_v5"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ltdr/avhrr_ndvi_v5"
 
 overwrite_download = false
 validate_download = true
@@ -26,7 +26,7 @@ overwrite_processing = true
 [run]
 backend = "local"
 max_workers = 4
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ltdr_ndvi/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ltdr/avhrr_ndvi_v5/logs"
 
 
 [repo]

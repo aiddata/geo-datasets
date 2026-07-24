@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/ltdr_ndvi/yearly",
+    "path": "/data/datasets/ltdr/avhrr_ndvi_v5/yearly",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "avhrr_ndvi_v5_YYYY.tif",

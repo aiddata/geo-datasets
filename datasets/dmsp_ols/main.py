@@ -205,7 +205,7 @@ class DMSPOLS(Dataset):
         """
         logger = self.get_logger()
         sat, year = satyear[0:3], satyear[3:7]
-        output_path = self.output_dir / f"dmsp_ols_{satyear}_stable_lights_calibrated.tif"
+        output_path = self.output_dir / f"{satyear}.v4c_web.stable_lights.avg_vis_calibrated.tif"
 
         if output_path.exists() and not self.overwrite_processing:
             logger.info(f"Calibrated file exists: {output_path}")

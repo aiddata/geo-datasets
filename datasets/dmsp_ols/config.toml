@@ -1,5 +1,5 @@
-raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/dmsp_ols"
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/dmsp_ols"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/dmsp_ntl"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/dmsp_ntl/v4composites_calibrated_201709"
 
 # download the v4 composites and build the Elvidge-2014 calibrated stable-lights product
 run_composites = true
@@ -19,7 +19,7 @@ overwrite_processing = true
 backend = "prefect"
 task_runner = "concurrent"
 max_workers = 5
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/dmsp_ols/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/dmsp_ntl/logs"
 
 
 [repo]

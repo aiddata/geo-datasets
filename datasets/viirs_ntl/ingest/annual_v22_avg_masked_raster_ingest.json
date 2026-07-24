@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/viirs_ntl/annual/v22/avg_masked",
+    "path": "/data/datasets/viirs/eogdata/annual/v22/avg_masked",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "viirs_ntl_annual_YYYY_avg_masked.tif",

@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/viirs_ntl/monthly/v10/cf_cvg",
+    "path": "/data/datasets/viirs/eogdata/monthly_notile/v10/vcmcfg/cf_cvg",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "YYYYMM.tif",

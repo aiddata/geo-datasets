@@ -33,7 +33,7 @@ class WDPA(Dataset):
         self.raw_dir = Path(config.raw_dir) / self.version
         self.zip_path = self.raw_dir / self.download_path.name
         self.gdb_path = self.raw_dir / f"{self.download_path.stem}.gdb"
-        self.output_dir = Path(config.output_dir) / self.version / "iucn_cat"
+        self.output_dir = Path(config.output_dir) / f"iucn_cat_{self.version}"
         self.output_path = self.output_dir / "wdpa_iucn_cat.tif"
 
         self.max_retries = config.max_retries

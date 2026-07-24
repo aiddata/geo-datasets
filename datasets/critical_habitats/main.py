@@ -27,9 +27,8 @@ class CRHAB(Dataset):
 
         self.download_url = config.download_url
         self.download_path = Path(config.download_url)
-        self.version = str(self.download_path.stem.split("_")[-1])
 
-        self.raw_dir = Path(config.raw_dir) / self.version
+        self.raw_dir = Path(config.raw_dir) 
         self.zip_path = self.raw_dir / self.download_path.name
         self.data_path = (
             self.raw_dir
@@ -37,7 +36,7 @@ class CRHAB(Dataset):
             / "01_Data"
             / "Basic_Critical_Habitat_Raster.tif"
         )
-        self.output_dir = Path(config.output_dir) / self.version
+        self.output_dir = Path(config.output_dir) 
         self.output_path = self.output_dir / "critical_habitats.tif"
 
         self.max_retries = config.max_retries

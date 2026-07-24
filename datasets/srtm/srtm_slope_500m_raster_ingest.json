@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/srtm_slope_500m",
+    "path": "/data/datasets/srtm/srtm_slope_500m",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

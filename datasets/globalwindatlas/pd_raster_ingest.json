@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/globalwindatlas/powerdensity",
+    "path": "/data/datasets/globalwindatlas/GWA2.1/powerdensity",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",

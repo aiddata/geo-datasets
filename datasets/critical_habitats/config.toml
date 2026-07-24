@@ -1,7 +1,7 @@
 download_url = "https://datadownload-production.s3.us-east-1.amazonaws.com/WCMC_043_GlobalCH_IFCPS6_2023.zip"
 
-raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/critical_habitats"
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/critical_habitats"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/critical_habitats/2023"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/critical_habitats/2023"
 
 max_retries = 5
 overwrite_download = true
@@ -10,7 +10,7 @@ overwrite_output = true
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/critical_habitats/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/critical_habitats/2023/logs"
 
 
 [repo]

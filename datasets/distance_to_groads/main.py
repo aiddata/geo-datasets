@@ -129,7 +129,7 @@ class DistanceToGRoads(Dataset):
     def build_distance_raster(self, roads, affine):
         logger = self.get_logger()
 
-        distance_path = self.output_dir / "groads_distance.tif"
+        distance_path = self.output_dir / "distance" / "groads_distance.tif"
         if not self.overwrite_distance_raster and distance_path.exists():
             logger.info(f"Distance raster exists, skipping: {distance_path}")
             return
