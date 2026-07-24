@@ -2,7 +2,6 @@ import os
 import warnings
 from ftplib import FTP_TLS
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import rasterio
@@ -171,7 +170,7 @@ class GPM(Dataset):
         data folder format:
             arthurhouftps.pps.eosdis.nasa.gov/gpmdata/2014/05/03/01/gis/
         file name:
-            3B-MO.MS.MRG.3IMERG.20140501-S000000-E235959.05.V05B.tif
+            3B-MO.MS.MRG.3IMERG.20140501-S000000-E235959.05.V07B.tif
         """
         logger = self.get_logger()
 

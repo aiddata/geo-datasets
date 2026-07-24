@@ -19,7 +19,7 @@ directory = "datasets/africa_child_mortality"
 [deploy]
 deployment_name = "africa_child_mortality"
 image_tag = "083d531"
-version = 1
+version = 10
 flow_file_name = "main"
 flow_name = "africa_child_mortality"
 work_pool = "geodata"

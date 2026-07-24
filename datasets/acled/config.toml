@@ -18,7 +18,7 @@ directory = "datasets/acled"
 [deploy]
 deployment_name = "acled"
 image_tag = "083d531"
-version = 1
+version = 10
 flow_file_name = "main"
 flow_name = "acled"
 work_pool = "geodata"

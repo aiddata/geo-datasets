@@ -27,7 +27,7 @@ directory = "datasets/dvnl"
 [deploy]
 deployment_name = "dvnl"
 image_tag = "083d531"
-version = 2
+version = 10
 flow_file_name = "main"
 flow_name = "dvnl"
 work_pool = "geodata"

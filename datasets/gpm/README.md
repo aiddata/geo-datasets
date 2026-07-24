@@ -8,6 +8,8 @@ Overview:
 Access:
 Data can be explored via the HTTPS server (arthurhouhttps.pps.eosdis.nasa.gov) and downloaded through the FTPS server (arthurhouftps.pps.eosdis.nasa.gov).
 - Readme for FTPS server: https://storm.pps.eosdis.nasa.gov/storm/arthurhouFTP-FTPS-Transition.pdf
+- Must register on https://pps.gsfc.nasa.gov/register.html
+- You can then browse directly using: https://arthurhouhttps.pps.eosdis.nasa.gov/
 
 References:
 - Data website: https://gpm.nasa.gov/data/directory

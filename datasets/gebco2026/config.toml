@@ -7,7 +7,7 @@ overwrite_slope = false
 
 
 [run]
-max_workers = 1
+max_workers = 2
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gebco/gebco2026/logs"
 
 
@@ -20,7 +20,7 @@ directory = "datasets/gebco2026"
 [deploy]
 deployment_name = "gebco2026"
 image_tag = "083d531"
-version = 1
+version = 10
 flow_file_name = "main"
 flow_name = "gebco2026"
 work_pool = "geodata"

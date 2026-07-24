@@ -91,6 +91,7 @@ class LTDR_NDVI(Dataset):
             "N16_AVH13C1",
             "N18_AVH13C1",
             "N19_AVH13C1",
+            "M1_AVH13C1",
         ]
 
     def build_sensor_download_list(self, sensor: str):
@@ -176,7 +177,7 @@ class LTDR_NDVI(Dataset):
             "sensor_accept": [],
             "use_sensor_deny": False,
             "sensor_deny": [],
-            "use_year_accept": True,
+            "use_year_accept": False,
             "year_accept": ["2019", "2020"],
             "use_year_deny": False,
             "year_deny": ["2019"],
@@ -191,7 +192,7 @@ class LTDR_NDVI(Dataset):
             sensor = items[2]
             month = "{0:02d}".format(datetime.strptime(f"{year}+{day}", "%Y+%j").month)
             output_path = (
-                self.output_dir / "daily" / f"avhrr_ndvi_v5_{sensor}_{year}_{day}.tif"
+                self.output_dir / "daily" / f"avhrr_ndvi_{sensor}_{year}_{day}.tif"
             )
             df_dict_list.append(
                 {

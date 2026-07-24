@@ -12,7 +12,7 @@ overwrite_distance_raster = true
 
 
 [run]
-max_workers = 1
+max_workers = 4
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/distance_to_groads/logs"
 
 
@@ -25,7 +25,7 @@ directory = "datasets/distance_to_groads"
 [deploy]
 deployment_name = "distance_to_groads"
 image_tag = "083d531"
-version = 1
+version = 10
 flow_file_name = "main"
 flow_name = "distance_to_groads"
 work_pool = "geodata"

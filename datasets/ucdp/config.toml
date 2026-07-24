@@ -7,7 +7,7 @@ overwrite_process = false
 dataset = "ged261"
 
 [run]
-max_workers = 8
+max_workers = 2
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ucdp/logs"
 backend = "prefect"
 
@@ -20,7 +20,7 @@ directory = "datasets/ucdp"
 [deploy]
 deployment_name = "ucdp"
 image_tag = "083d531"
-version = 2
+version = 10
 flow_file_name = "main"
 flow_name = "ucdp"
 work_pool = "geodata"

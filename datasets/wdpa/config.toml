@@ -22,7 +22,7 @@ directory = "datasets/wdpa"
 [deploy]
 deployment_name = "WDPA"
 image_tag = "083d531"
-version = 1
+version = 10
 flow_file_name = "main"
 flow_name = "wdpa"
 work_pool = "geodata"

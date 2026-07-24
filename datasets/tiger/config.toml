@@ -5,7 +5,7 @@ raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/boundaries/tiger/raw"
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/boundaries/tiger"
 
 overwrite_download = false
-overwrite_process = true
+overwrite_process = false
 
 
 [run]
@@ -16,13 +16,13 @@ log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/boundaries/tiger/logs"
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "datasets/TIGER"
+directory = "datasets/tiger"
 
 
 [deploy]
-deployment_name = "TIGER"
+deployment_name = "tiger"
 image_tag = "083d531"
-version = 1
+version = 10
 flow_file_name = "main"
 flow_name = "TIGERDownloadFlow"
 work_pool = "geodata"

@@ -14,7 +14,7 @@ overwrite_processing = false
 
 
 [run]
-max_workers = 25
+max_workers = 20
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/worldpop/logs"
 
 
@@ -27,7 +27,7 @@ directory = "datasets/worldpop_pop_count_new"
 [deploy]
 deployment_name = "worldpop_pop_count_r2025a"
 image_tag = "083d531"
-version = 1
+version = 10
 flow_file_name = "main"
 flow_name = "worldpop_pop_count_r2025a"
 work_pool = "geodata"

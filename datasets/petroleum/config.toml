@@ -21,7 +21,7 @@ directory = "datasets/petroleum"
 [deploy]
 deployment_name = "petroleum"
 image_tag = "083d531"
-version = 1
+version = 10
 flow_file_name = "main"
 flow_name = "petroleum"
 work_pool = "geodata"

@@ -1,10 +1,10 @@
 # define range of years to download, process
 start_year = 1901
-end_year = 2022
+end_year = 2025
 
 # this should match the dir names used for raw data and to be used for processed data
-cru_version = "4.07"
-cru_url_dir = "cruts.2304141047.v4.07"
+cru_version = "4.10"
+cru_url_dir = "cruts.2604091129.v4.10"
 
 # output directories
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/cru_ts"
@@ -29,7 +29,7 @@ directory = "datasets/cru_ts"
 [deploy]
 deployment_name = "cru_ts"
 image_tag = "083d531"
-version = 4
+version = 10
 flow_file_name = "main"
 flow_name = "cru_ts"
 work_pool = "geodata"

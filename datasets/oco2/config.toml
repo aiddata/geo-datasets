@@ -17,7 +17,7 @@ overwrite_download = false
 overwrite_processing = false
 
 
-year_list = "2015,2016,2017,2018,2019,2020,2021"
+year_list = "2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025"
 
 # interpolation method for processing step
 interp_method = "linear"
@@ -32,7 +32,7 @@ run_g = true
 
 
 [run]
-max_workers = 6
+max_workers = 20
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gesdisc/OCO2_L2_Lite_FP.11.1r/logs"
 
 
@@ -45,7 +45,7 @@ directory = "datasets/oco2"
 [deploy]
 deployment_name = "oco2"
 image_tag = "083d531"
-version = 3
+version = 10
 flow_file_name = "main"
 flow_name = "oco2"
 work_pool = "geodata"

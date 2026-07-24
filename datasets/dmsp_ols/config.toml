@@ -18,7 +18,7 @@ overwrite_processing = false
 [run]
 backend = "prefect"
 task_runner = "concurrent"
-max_workers = 5
+max_workers = 10
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/dmsp_ntl/logs"
 
 
@@ -31,7 +31,7 @@ directory = "datasets/dmsp_ols"
 [deploy]
 deployment_name = "dmsp_ols"
 image_tag = "083d531"
-version = 1
+version = 10
 flow_file_name = "main"
 flow_name = "dmsp_ols"
 work_pool = "geodata"

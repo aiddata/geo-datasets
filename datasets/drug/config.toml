@@ -21,7 +21,7 @@ directory = "datasets/drug"
 [deploy]
 deployment_name = "drug"
 image_tag = "083d531"
-version = 1
+version = 10
 flow_file_name = "main"
 flow_name = "drug"
 work_pool = "geodata"

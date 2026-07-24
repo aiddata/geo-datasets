@@ -5,7 +5,7 @@ annual_version = "v21"
 # change var = set to year range wanted - range available 2012 - 2021 for montly, 2012-2021 for annual
 # IMPORTANT: we may not want to include 2012 because it uses a different range of months!!!
 # It is possible to download EITHER Apr-Dec 2012 OR Apr 2012 - Mar 2013 for the year 2012. This can be adjusted in main.py
-years = "2012,2013,2014,2015,2016,2017,2018,2019,2020,2021"
+years = "2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025"
 
 run_monthly = true
 # change var = set to month range wanted - range available 1 - 12 except 1 - 3 for 2012 and 10-12 for 2022
@@ -35,7 +35,7 @@ mod_auth_openidc_session="<ADD-MOD_AUTH_OPENIDC_SESSION>"
 
 
 [run]
-max_workers = 6
+max_workers = 15
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/viirs_ntl/logs"
 
 
@@ -48,7 +48,7 @@ directory = "datasets/viirs_ntl"
 [deploy]
 deployment_name = "viirs_ntl"
 image_tag = "083d531"
-version = 4
+version = 10
 flow_file_name = "main"
 flow_name = "viirs_ntl"
 work_pool = "geodata"
