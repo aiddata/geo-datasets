@@ -374,15 +374,17 @@ wheels = [
 
 [[package]]
 name = "boxsdk"
-version = "10.13.0"
+version = "3.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "attrs" },
+    { name = "python-dateutil" },
     { name = "requests" },
     { name = "requests-toolbelt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/90/a9/06b02d00dd1fec88b30dfb0a196a35f8f5e12867420d1d6f0b4602e70f74/boxsdk-10.13.0.tar.gz", hash = "sha256:c7829b5e8aea1d825f084332664846bee7c339c1ab0f4dee17bee8fe7d2beb40", size = 287077, upload-time = "2026-07-10T09:21:13.834Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/77/8c/30237e92c15cb8d3996babcab541ee16f4bfed81c5c610d448b6322cb350/boxsdk-3.6.1.tar.gz", hash = "sha256:09c2475fe2c51d0255b8314921f7dba6f75aa13461f93651cdb7093125f56dc1", size = 213854, upload-time = "2023-01-09T12:20:13.504Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/13/a3/003aaa2ba3e9e833d8d303dfb51ab3f3baeeff1ca3602a32d9ab8e070124/boxsdk-10.13.0-py3-none-any.whl", hash = "sha256:1d826489b1db3fc470e9ec0fb0b61760479373d1c55073d24f0b7a9008ed2ec2", size = 608929, upload-time = "2026-07-10T09:21:12.017Z" },
+    { url = "https://files.pythonhosted.org/packages/24/08/b0d40405ed9b280502204939f40f08f8a18cb5b71ee96eab96a43e5277a2/boxsdk-3.6.1-py2.py3-none-any.whl", hash = "sha256:a68baa858e4e35b3820315cefbe4d23789460c30aebb6951a35e4c5eddbf457a", size = 137528, upload-time = "2023-01-09T12:20:11.536Z" },
 ]
 
 [package.optional-dependencies]
@@ -1184,7 +1186,7 @@ requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.13.4" },
     { name = "bokeh", specifier = ">=2.4.3" },
     { name = "boto3", specifier = ">=1.37.35" },
-    { name = "boxsdk", extras = ["jwt"], specifier = ">=3.6.1" },
+    { name = "boxsdk", extras = ["jwt"], specifier = "==3.6.1" },
     { name = "cdsapi", specifier = ">=0.7.2" },
     { name = "click", specifier = ">=8.1.8" },
     { name = "dask-jobqueue", specifier = ">=0.8.1" },
@@ -3302,14 +3304,14 @@ wheels = [
 
 [[package]]
 name = "requests-toolbelt"
-version = "1.0.0"
+version = "0.10.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f3/61/d7545dafb7ac2230c70d38d31cbfe4cc64f7144dc41f6e4e4b78ecd9f5bb/requests-toolbelt-1.0.0.tar.gz", hash = "sha256:7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c88d5bc6", size = 206888, upload-time = "2023-05-01T04:11:33.229Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/0c/4c/07f01c6ac44f7784fa399137fbc8d0cdc1b5d35304e8c0f278ad82105b58/requests-toolbelt-0.10.1.tar.gz", hash = "sha256:62e09f7ff5ccbda92772a29f394a49c3ad6cb181d568b1337626b2abb628a63d", size = 208956, upload-time = "2022-10-25T03:14:58.576Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3f/51/d4db610ef29373b879047326cbf6fa98b6c1969d6f6dc423279de2b1be2c/requests_toolbelt-1.0.0-py2.py3-none-any.whl", hash = "sha256:cccfdd665f0a24fcf4726e690f65639d272bb0637b9b92dfd91a5568ccf6bd06", size = 54481, upload-time = "2023-05-01T04:11:28.427Z" },
+    { url = "https://files.pythonhosted.org/packages/05/d3/bf87a36bff1cb88fd30a509fd366c70ec30676517ee791b2f77e0e29817a/requests_toolbelt-0.10.1-py2.py3-none-any.whl", hash = "sha256:18565aa58116d9951ac39baa288d3adb5b3ff975c4f25eee78555d89e8f247f7", size = 54525, upload-time = "2022-10-25T03:14:55.289Z" },
 ]
 
 [[package]]
