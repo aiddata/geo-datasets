@@ -16,10 +16,10 @@ Columns:
 | `air_pollution - o3`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `air_pollution - pm25`                     | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `critical_habitats`                        | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
-| `cru_ts - monthly_pre`                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `cru_ts - monthly_tmp`                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `cru_ts - yearly_pre`                      | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `cru_ts - yearly_tmp`                      | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `cru_ts - monthly_pre`                     | [ ]      | [ ]     | [r] | [ ]      | [ ]  | [ ]      |
+| `cru_ts - monthly_tmp`                     | [ ]      | [ ]     | [r] | [ ]      | [ ]  | [ ]      |
+| `cru_ts - yearly_pre`                      | [ ]      | [ ]     | [r] | [ ]      | [ ]  | [ ]      |
+| `cru_ts - yearly_tmp`                      | [ ]      | [ ]     | [r] | [ ]      | [ ]  | [ ]      |
 | `diamond - binary`                         | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `diamond - distance`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `distance_to_coast`                        | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |

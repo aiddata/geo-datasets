@@ -20,7 +20,7 @@ directory = "datasets/gebco2026"
 [deploy]
 deployment_name = "gebco2026"
 image_tag = "083d531"
-version = 10
+version = 11
 flow_file_name = "main"
 flow_name = "gebco2026"
 work_pool = "geodata"

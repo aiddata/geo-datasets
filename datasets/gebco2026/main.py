@@ -111,6 +111,8 @@ class Gebco2026(Dataset):
                 "compress": "LZW",
                 "dtype": dtype,
                 "nodata": nodata,
+                # global mosaic is well over the 4GB Classic TIFF limit
+                "BIGTIFF": "YES",
             }
 
             logger.info(f"Mosaicking {len(tiles)} tiles to {self.elevation_path}")
@@ -146,6 +148,8 @@ class Gebco2026(Dataset):
             "height": height,
             "width": width,
             "nodata": slope_nodata,
+            # global raster is well over the 4GB Classic TIFF limit
+            "BIGTIFF": "YES",
         }
 
         # process the global raster in horizontal strips (with a 1-row halo
