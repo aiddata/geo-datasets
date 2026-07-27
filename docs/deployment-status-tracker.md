@@ -10,45 +10,45 @@ Columns:
 
 | Dataset                                    | Existing | Symlink | Ran | Verified | Prod | Ingested |
 |--------------------------------------------|----------|---------|-----|----------|------|----------|
-| `accessibility_map`                        | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `accessibility_map`                        | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `acled`                                    | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `africa_child_mortality`                   | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `air_pollution - o3`                       | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `air_pollution - pm25`                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `africa_child_mortality`                   | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `air_pollution - o3`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `air_pollution - pm25`                     | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `critical_habitats`                        | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `cru_ts - monthly_pre`                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `cru_ts - monthly_tmp`                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `cru_ts - yearly_pre`                      | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `cru_ts - yearly_tmp`                      | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `diamond - binary`                         | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `diamond - distance`                       | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `distance_to_coast`                        | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `distance_to_country_border`               | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `distance_to_groads`                       | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `distance_to_water`                        | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `dmsp_ols`                                 | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `drug - categorical`                       | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `drug - distance`                          | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `dvnl`                                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `diamond - binary`                         | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `diamond - distance`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `distance_to_coast`                        | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `distance_to_country_border`               | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `distance_to_groads`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `distance_to_water`                        | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `dmsp_ols`                                 | [?]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `drug - categorical`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `drug - distance`                          | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `dvnl`                                     | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `esa_landcover`                            | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `gcdf_v3_dynamic`                          | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `gebco2026 - elevation`                    | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `gebco2026 - slope`                        | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `gem - binary`                             | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `gem - distance`                           | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `globalsolaratlas - pvout`                 | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `globalwindatlas - pd`                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `globalwindatlas - ws`                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `gold - categorical`                       | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `gold - distance`                          | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `gem - binary`                             | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `gem - distance`                           | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `globalsolaratlas - pvout`                 | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `globalwindatlas - pd`                     | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `globalwindatlas - ws`                     | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `gold - categorical`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `gold - distance`                          | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `gpm - monthly`                            | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `gpm - yearly`                             | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `gpw - v3_count`                           | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `gpw - v3_density`                         | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `gpw - v4_count`                           | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `gpw - v4_density`                         | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `gpw - v4rev11_count`                      | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `gpw - v4rev11_density`                    | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `gpw - v3_count`                           | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `gpw - v3_density`                         | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `gpw - v4_count`                           | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `gpw - v4_density`                         | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `gpw - v4rev11_count`                      | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `gpw - v4rev11_density`                    | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `landscan_pop`                             | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `ltdr_ndvi - v6_monthly`                   | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `ltdr_ndvi - v6_yearly`                    | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
@@ -63,13 +63,13 @@ Columns:
 | `modis_lst - 061/yearly_night`             | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `oco2 - monthly_xco2`                      | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `oco2 - yearly_xco2`                       | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `petroleum - binary`                       | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `petroleum - distance`                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `plad`                                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `petroleum - binary`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `petroleum - distance`                     | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `plad`                                     | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `pm25 - monthly`                           | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `pm25 - yearly`                            | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `srtm - srtm_elevation_500m`               | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `srtm - srtm_slope_500m`                   | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `srtm - srtm_elevation_500m`               | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `srtm - srtm_slope_500m`                   | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `ucdp - ged261_filter_ingest.json`         | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `udel_climate - air_temp_2017_yearly_mean` | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `udel_climate - precip_2017_yearly_mean`   | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
@@ -83,5 +83,5 @@ Columns:
 | `viirs - monthly_avg_masked`               | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `viirs - monthly_cf_cvg`                   | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `wdpa - wdpa_iucn`                         | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `worldpop_pop_count`                       | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `worldpop_pop_count`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `worldpop_pop_count_new`                   | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
