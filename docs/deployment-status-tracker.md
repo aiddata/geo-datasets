@@ -11,11 +11,11 @@ Columns:
 | Dataset                                    | Existing | Symlink | Ran | Verified | Prod | Ingested |
 |--------------------------------------------|----------|---------|-----|----------|------|----------|
 | `accessibility_map`                        | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `acled`                                    | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `acled`                                    | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
 | `africa_child_mortality`                   | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `air_pollution - o3`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `air_pollution - pm25`                     | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `critical_habitats`                        | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
+| `critical_habitats`                        | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
 | `cru_ts - monthly_pre`                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `cru_ts - monthly_tmp`                     | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `cru_ts - yearly_pre`                      | [ ]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |

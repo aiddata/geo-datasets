@@ -55,7 +55,7 @@ class CRU_TS(Dataset):
 
         self.cru_version = config.cru_version
         self.cru_url_dir = config.cru_url_dir
-        self.dl_file_years_str = "1901.2022"
+        self.dl_file_years_str = f"{config.start_year}.{config.end_year}"
 
         # note that later in the download URL, there is no second underscore
         # there is more code in self.download() to correct for this difference
@@ -242,7 +242,7 @@ class CRU_TS(Dataset):
         logger.info(f"Running variable: {var}")
         var_dir = self.output_dir / "monthly" / var
         var_dir.mkdir(parents=True, exist_ok=True)
-        in_path = f"netcdf:{self.raw_dir.as_posix()}/cru_ts{self.cru_version}.1901.2022.{var}.dat.nc:{var}"
+        in_path = f"netcdf:{self.raw_dir.as_posix()}/cru_ts{self.cru_version}.{self.start_year}.{self.end_year}.{var}.dat.nc:{var}"
 
         src = rasterio.open(in_path)
 

@@ -10,7 +10,7 @@ overwrite_output = false
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/critical_habitats/2025/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/critical_habitats/2025/logs"
 
 
 [repo]
