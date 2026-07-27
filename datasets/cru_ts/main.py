@@ -52,7 +52,9 @@ class CRU_TS(Dataset):
     name = "Climatic Research Unit gridded Time Series"
 
     def __init__(self, config: CRU_TS_Configuration):
-
+        self.config = config
+        self.start_year = config.start_year
+        self.end_year = config.end_year
         self.cru_version = config.cru_version
         self.cru_url_dir = config.cru_url_dir
         self.dl_file_years_str = f"{config.start_year}.{config.end_year}"

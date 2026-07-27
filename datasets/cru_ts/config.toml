@@ -29,7 +29,7 @@ directory = "datasets/cru_ts"
 [deploy]
 deployment_name = "cru_ts"
 image_tag = "083d531"
-version = 11
+version = 12
 flow_file_name = "main"
 flow_name = "cru_ts"
 work_pool = "geodata"
