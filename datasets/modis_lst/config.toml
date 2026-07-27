@@ -22,7 +22,7 @@ directory = "datasets/modis_lst"
 [deploy]
 deployment_name = "modis_lst"
 image_tag = "083d531"
-version = 10
+version = 11
 flow_file_name = "main"
 flow_name = "modis_lst"
 work_pool = "geodata"
