@@ -374,17 +374,18 @@ wheels = [
 
 [[package]]
 name = "boxsdk"
-version = "3.6.1"
+version = "3.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "python-dateutil" },
     { name = "requests" },
     { name = "requests-toolbelt" },
+    { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/77/8c/30237e92c15cb8d3996babcab541ee16f4bfed81c5c610d448b6322cb350/boxsdk-3.6.1.tar.gz", hash = "sha256:09c2475fe2c51d0255b8314921f7dba6f75aa13461f93651cdb7093125f56dc1", size = 213854, upload-time = "2023-01-09T12:20:13.504Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6a/44/39398213d5e65cca65929cf2cea2c299bf1e3c0c867da297d0fafedd3a11/boxsdk-3.8.0.tar.gz", hash = "sha256:060cde0910988357b98ebdb09a5e25d6455e71fbb2741ec9e71d80895dca5728", size = 216446, upload-time = "2023-07-25T11:01:10.273Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/08/b0d40405ed9b280502204939f40f08f8a18cb5b71ee96eab96a43e5277a2/boxsdk-3.6.1-py2.py3-none-any.whl", hash = "sha256:a68baa858e4e35b3820315cefbe4d23789460c30aebb6951a35e4c5eddbf457a", size = 137528, upload-time = "2023-01-09T12:20:11.536Z" },
+    { url = "https://files.pythonhosted.org/packages/c4/bb/c2ba52c50a456a8c61a84d758d3a4ef4b4f9f8fc71f10efd54251cda6f6d/boxsdk-3.8.0-py2.py3-none-any.whl", hash = "sha256:24e210b7d704159b4ef668e95737491f35a593026df96710d66070165d88357e", size = 138473, upload-time = "2023-07-25T11:01:07.802Z" },
 ]
 
 [package.optional-dependencies]
@@ -1186,7 +1187,7 @@ requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.13.4" },
     { name = "bokeh", specifier = ">=2.4.3" },
     { name = "boto3", specifier = ">=1.37.35" },
-    { name = "boxsdk", extras = ["jwt"], specifier = "==3.6.1" },
+    { name = "boxsdk", extras = ["jwt"], specifier = "==3.8.0" },
     { name = "cdsapi", specifier = ">=0.7.2" },
     { name = "click", specifier = ">=8.1.8" },
     { name = "dask-jobqueue", specifier = ">=0.8.1" },
@@ -3936,11 +3937,11 @@ wheels = [
 
 [[package]]
 name = "urllib3"
-version = "2.7.0"
+version = "1.26.20"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/53/0c/06f8b233b8fd13b9e5ee11424ef85419ba0d8ba0b3138bf360be2ff56953/urllib3-2.7.0.tar.gz", hash = "sha256:231e0ec3b63ceb14667c67be60f2f2c40a518cb38b03af60abc813da26505f4c", size = 433602, upload-time = "2026-05-07T16:13:18.596Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/e8/6ff5e6bc22095cfc59b6ea711b687e2b7ed4bdb373f7eeec370a97d7392f/urllib3-1.26.20.tar.gz", hash = "sha256:40c2dc0c681e47eb8f90e7e27bf6ff7df2e677421fd46756da1161c39ca70d32", size = 307380, upload-time = "2024-08-29T15:43:11.37Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/3e/5db95bcf282c52709639744ca2a8b149baccf648e39c8cc87553df9eae0c/urllib3-2.7.0-py3-none-any.whl", hash = "sha256:9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897", size = 131087, upload-time = "2026-05-07T16:13:17.151Z" },
+    { url = "https://files.pythonhosted.org/packages/33/cf/8435d5a7159e2a9c83a95896ed596f68cf798005fe107cc655b5c5c14704/urllib3-1.26.20-py2.py3-none-any.whl", hash = "sha256:0ed14ccfbf1c30a9072c7ca157e4319b70d65f623e91e7b32fadb2853431016e", size = 144225, upload-time = "2024-08-29T15:43:08.921Z" },
 ]
 
 [[package]]
