@@ -30,7 +30,7 @@ directory = "datasets/malaria_atlas_project"
 [deploy]
 deployment_name = "malaria_atlas_project"
 image_tag = "083d531"
-version = 10
+version = 11
 flow_file_name = "main"
 flow_name = "malaria_atlas_project"
 work_pool = "geodata"

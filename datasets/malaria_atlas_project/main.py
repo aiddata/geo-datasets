@@ -96,6 +96,25 @@ class MalariaAtlasProject(Dataset):
         test_request = requests.get("https://data.malariaatlas.org", verify=True)
         test_request.raise_for_status()
 
+    def find_static_tif(self, zip_path):
+        """Locate the single .tif in a static dataset's zip.
+
+        The archive's internal filename isn't assumed to match the
+        resource name — it's read from the zip's actual namelist every
+        time (e.g. the "travel_time_to_cities_2015" resource's archive tif
+        is actually named "..._Travel_Time_to_Cities_2015.tif", and
+        "motorized_..._2020"'s is "..._2019.tif").
+        """
+        with ZipFile(zip_path) as zf:
+            matches = [n for n in zf.namelist() if n.endswith(".tif")]
+        if len(matches) == 0:
+            raise Exception(f"No .tif found in {zip_path}")
+        if len(matches) > 1:
+            raise Exception(
+                f"Expected exactly one .tif in {zip_path}, found {len(matches)}: {matches}"
+            )
+        return matches[0]
+
     def copy_files(self, zip_path, zip_file, dst_path, cog_path):
         if not os.path.isfile(dst_path) or self.overwrite_processing:
             with ZipFile(zip_path) as myzip:
@@ -269,7 +288,7 @@ class MalariaAtlasProject(Dataset):
             conversions = self.run_tasks(self.convert_to_cog, copy_futures.results())
             self.log_run(conversions)
         else:
-            archive_tif = f"{info['resource']}.tif"
+            archive_tif = self.find_static_tif(zip_file_local_name)
             raw_geotiff_dir = self.raw_dir / "geotiff" / self.dataset
             raw_geotiff_dir.mkdir(parents=True, exist_ok=True)
 
