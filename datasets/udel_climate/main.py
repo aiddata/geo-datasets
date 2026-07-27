@@ -119,7 +119,7 @@ class UDelClimate(Dataset):
         year = fpath.name.split(".")[1]
 
         # load csv to gdf
-        data = pd.read_csv(fpath, sep="\s+", header=None)
+        data = pd.read_csv(fpath, sep=r"\s+", header=None)
         data.columns = ["lon", "lat"] + months + ["extra"]
 
         gdf = gpd.GeoDataFrame(data, geometry=gpd.points_from_xy(data.lon, data.lat))
