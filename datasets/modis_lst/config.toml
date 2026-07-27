@@ -2,7 +2,7 @@ process_dir = "/tmp"
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/MODIS/terra/MOLT/MOD11C3.061"
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/MODIS/terra/MOLT/MOD11C3.061"
 earthdata_token = "<token>"
-years = "2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022"
+years = "2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025"
 overwrite_download = false
 overwrite_monthly = false
 overwrite_yearly = false
@@ -22,7 +22,7 @@ directory = "datasets/modis_lst"
 [deploy]
 deployment_name = "modis_lst"
 image_tag = "083d531"
-version = 4
+version = 10
 flow_file_name = "main"
 flow_name = "modis_lst"
 work_pool = "geodata"
