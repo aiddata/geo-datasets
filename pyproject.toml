@@ -9,7 +9,7 @@ dependencies = [
     "beautifulsoup4>=4.13.4",
     "bokeh>=2.4.3",
     "boto3>=1.37.35",
-    "boxsdk[jwt]==3.6.1",
+    "boxsdk[jwt]==3.14.0",
     "cdsapi>=0.7.2",
     "click>=8.1.8",
     "dask-jobqueue>=0.8.1",
