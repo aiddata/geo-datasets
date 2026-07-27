@@ -8,7 +8,7 @@ earthdata_token = "<ADD-EARTHDATA-TOKEN>"
 
 overwrite_download = false
 overwrite_binary_raster = false
-overwrite_distance_raster = true
+overwrite_distance_raster = false
 
 
 [run]
