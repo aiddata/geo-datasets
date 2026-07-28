@@ -13,9 +13,15 @@ If you have an enterprise account (e.g. from your university) these steps may re
 3. Create a new app: "Custom App", "Server Authentication (with JWT)", name it whatever you want.
 4. On the app's Configuration page, under "Application Scopes", enable "Write all files and folders stored in Box" (required to download files).
 5. Under "Advanced Features", enable "Generate user access tokens".
-6. Under "Add and Manage Public Keys", click "Generate a Public/Private Keypair" (requires 2-factor auth) and move the downloaded JSON to `box_login_config.json` in this directory.
+6. Under "Add and Manage Public Keys", click "Generate a Public/Private Keypair" (requires 2-factor auth) and save the downloaded JSON as `box_config.json` in this directory (gitignored).
 7. On the app's Authorization page, submit it for authorization.
 8. Authorize the application from your Box Admin page (following the emailed link is easiest).
+
+For local runs, put the same JSON minified to a single line in a gitignored `.env` in this directory:
+```
+box_config=<the minified JSON>
+```
+`scripts/deploy.py` reads `box_config.json` directly and passes it (minified) as the `box_config` parameter for Prefect deployments, so no `.env` entry is needed for that path.
 
 ## Quick start
 
@@ -23,6 +29,7 @@ If you have an enterprise account (e.g. from your university) these steps may re
     - `years` is a comma-separated list of years to process
     - `raw_dir` / `output_dir` are the download and output directories
     - `overwrite_download` / `overwrite_processing`, if true, overwrite existing files rather than skip them
+    - `box_config` — the Box JWT app-auth JSON; leave the `<ADD-…>` placeholder in `config.toml` and set the real value in `.env` (see Set up your Box application)
 
 ## Manual downloading
 

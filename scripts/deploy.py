@@ -24,6 +24,7 @@ prefect agent start -q 'work_queue_name'
 """
 
 import inspect
+import json
 import os
 import sys
 import tomllib
@@ -63,6 +64,13 @@ if (dataset_dir / ".env").exists():
             if "=" in line:
                 key, value = line.strip().split("=", 1)
                 config[key] = value
+
+# check for box_config.json and, if present, minify and pass it as the
+# "box_config" parameter (some datasets, e.g. pm25, expect a Box JWT
+# app-auth JSON string rather than a nested config.toml table)
+if (dataset_dir / "box_config.json").exists():
+    with open(dataset_dir / "box_config.json", "r") as f:
+        config["box_config"] = json.dumps(json.load(f))
 
 # load flow
 module_name = config["deploy"]["flow_file_name"]

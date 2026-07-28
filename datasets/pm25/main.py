@@ -2,10 +2,10 @@
 # version: multiple file download - HPC version, based off Dr. Goodman's script for converting nc file to tiff image, MONTHLY data
 
 import hashlib
+import json
 import os
 import warnings
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import rasterio
@@ -13,7 +13,6 @@ from affine import Affine
 from boxsdk import Client, JWTAuth
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 from netCDF4 import Dataset as NCDFDataset
-from pydantic import BaseModel
 
 
 def export_raster(data, path, meta, **kwargs):
@@ -65,27 +64,13 @@ def sha1(filename):
     return h.hexdigest()
 
 
-class BoxAppAuth(BaseModel):
-    publicKeyID: str
-    privateKey: str
-    passphrase: str
-
-
-class BoxAppSettings(BaseModel):
-    clientID: str
-    clientSecret: str
-    appAuth: BoxAppAuth
-    enterpriseID: str
-
-
-class BoxConfig(BaseModel):
-    boxAppSettings: BoxAppSettings
-
-
 class PM25Configuration(BaseDatasetConfiguration):
     raw_dir: str
     output_dir: str
-    box_config: BoxConfig
+    # Box JWT app-auth JSON (see README), stringified so it can be passed as a
+    # single Prefect parameter. Provided via the gitignored .env / deployment
+    # parameter, not committed.
+    box_config: str
     version: str
     # Comma-separated years (e.g. "2000,2001"). String, not list, so the
     # Prefect run form renders a text input rather than the array widget,
@@ -108,7 +93,7 @@ class PM25(Dataset):
 
         self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
 
-        self.box_config = config.box_config
+        self.box_config = json.loads(config.box_config)
 
         # skip existing files while downloading?
         self.overwrite_downloads = config.overwrite_downloads
@@ -391,5 +376,9 @@ else:
 
 
 if __name__ == "__main__":
+    import dotenv
+    dotenv.load_dotenv()
     config = get_config(PM25Configuration)
+    # secret comes from the gitignored .env for local runs
+    config.box_config = os.environ.get("box_config")
     PM25(config).run(config.run)
