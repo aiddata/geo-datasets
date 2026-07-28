@@ -32,7 +32,7 @@ directory = "datasets/landscan_pop"
 [deploy]
 deployment_name = "landscan_pop"
 image_tag = "083d531"
-version = 11
+version = 12
 flow_file_name = "main"
 flow_name = "landscan_pop"
 work_pool = "geodata"

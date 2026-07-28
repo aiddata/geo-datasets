@@ -82,7 +82,7 @@ class LandScanPop(Dataset):
         """Submit the usage-info form for a given year and return the presigned S3 URL"""
         response = requests.post(
             DOWNLOAD_REQUEST_URL,
-            data={
+            json={
                 "email": self.landscan_email,
                 "primary_use": self.landscan_primary_use,
                 "sector": self.landscan_sector,
