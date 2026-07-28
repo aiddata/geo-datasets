@@ -1,4 +1,4 @@
-download_url = "https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_Jun2024_Public.zip"
+download_url = "https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_Jul2026_Public.zip"
 
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/wdpa/"
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/wdpa"
@@ -22,7 +22,7 @@ directory = "datasets/wdpa"
 [deploy]
 deployment_name = "WDPA"
 image_tag = "083d531"
-version = 10
+version = 11
 flow_file_name = "main"
 flow_name = "wdpa"
 work_pool = "geodata"
