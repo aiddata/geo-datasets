@@ -906,7 +906,7 @@ wheels = [
 
 [[package]]
 name = "distancerasters"
-version = "0.4.1"
+version = "0.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "affine" },
@@ -915,15 +915,15 @@ dependencies = [
     { name = "rasterio" },
     { name = "rasterstats" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/88/ee/0e61be7d71a24ce43a58aced2b8ad7aa0e7170ab915bb3f2dd4bf6f1313f/distancerasters-0.4.1.tar.gz", hash = "sha256:17b3b147ece642dfcff346c1724c842e6612ca37a9cd05706bb89fd528f97a21", size = 339908, upload-time = "2026-05-31T01:16:12.714Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bd/f0/3f6e5e9f4c66b3d5715805c4a81f65ea90c2665eed7bca69df5c719a6ca4/distancerasters-0.4.2.tar.gz", hash = "sha256:1c336ba04cde2cd36ef40a26bc0b361a5ff5a3303e80fb4c8245e5d98dc4f36a", size = 340450, upload-time = "2026-07-28T14:58:06.014Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ea/47/8d53404750c152a830bc2ed52b61de2fa62185428c4fbda168926afd78c6/distancerasters-0.4.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:3a7a9f4fd28137fde08d0c6e50c3a34c07d5b98772d09ddc55c5f5ec0b6ef375", size = 296208, upload-time = "2026-05-31T01:16:05.749Z" },
-    { url = "https://files.pythonhosted.org/packages/b2/74/602c5dc67a0a5ecae2a5e6768f6e7a16a7de772822907c9752859427a961/distancerasters-0.4.1-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:37834672df4ae7e2eaacf3aa1557b09779d9eb97667edc434a3a5b8f59ee4c07", size = 346970, upload-time = "2026-05-31T01:16:06.641Z" },
-    { url = "https://files.pythonhosted.org/packages/d1/fd/7d1475bdcfb503d7fba5b0a5aa62d5fa82708bc8d95003646341c1734e04/distancerasters-0.4.1-cp312-cp312-win_amd64.whl", hash = "sha256:482e1a7a00ee2f4755a200cba0cb82334a0ad84f78fd5beeeb75b5340a25eca3", size = 179971, upload-time = "2026-05-31T01:16:07.807Z" },
-    { url = "https://files.pythonhosted.org/packages/fd/cb/ad40a4c8ccde14f064c764049107efe04f74e1314f0bba18376efeba81f6/distancerasters-0.4.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:373129b2a5efc378de4ada82cee768d486e0037e4e811deb6adf3a4733e0b5ec", size = 296187, upload-time = "2026-05-31T01:16:08.909Z" },
-    { url = "https://files.pythonhosted.org/packages/00/18/ae5336f92de324a498dd7259ba8f51447ea1393da0c0bb4b9295f5255a0b/distancerasters-0.4.1-cp313-cp313-win_amd64.whl", hash = "sha256:609cdb944791c8e83eace3a5794e1ec30000775dc18fa63850c2183f6c98b664", size = 179830, upload-time = "2026-05-31T01:16:10.134Z" },
-    { url = "https://files.pythonhosted.org/packages/5e/90/75ac5285f4728c4a6cdf7542a31d7589ad3243f53bbb03c7d9a657c4c259/distancerasters-0.4.1-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:39ae09554e735545cd3ffb9de1b7f113fd7ffd108e1591d9e206bff2c3a846dd", size = 296568, upload-time = "2026-05-31T01:16:10.91Z" },
-    { url = "https://files.pythonhosted.org/packages/42/8a/6c3e8b80c0799660a47fbcf316c5d0cbd9569da3a684135ff4cc94f979d3/distancerasters-0.4.1-cp314-cp314-win_amd64.whl", hash = "sha256:5300adedcdc81d69038282c80077e4c7fe4f9017dd4d88ed90d02acf7f9e896b", size = 179787, upload-time = "2026-05-31T01:16:11.842Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/59/63aa80d53006fc7d818c7318c6175d9424c5fe550ab5a2683a37d25d7a07/distancerasters-0.4.2-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:c94b7bda1d96438e120ffb0d6be360894e1a127cae51f2b972f2b104ea02363b", size = 298974, upload-time = "2026-07-28T14:57:58.296Z" },
+    { url = "https://files.pythonhosted.org/packages/49/b5/a00aa82fb19da6eddd1eb74d77e70ca7e66d5adc41592470d98c6a1d332a/distancerasters-0.4.2-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:2598d85097be55f05bef638ef6200603ebcd7a0269cffa23958939cf9e17df12", size = 352367, upload-time = "2026-07-28T14:57:59.419Z" },
+    { url = "https://files.pythonhosted.org/packages/50/91/85f77346e8148cc7f6e02c16762c77554fd167eff3313afaac9a274304e8/distancerasters-0.4.2-cp312-cp312-win_amd64.whl", hash = "sha256:2ce5aa6f5b038f323c31bfa2448833804cad03db896739901a8f23dd21f98158", size = 185923, upload-time = "2026-07-28T14:58:00.552Z" },
+    { url = "https://files.pythonhosted.org/packages/74/31/0ea427fc685da6d613ad84d72412f80a196daf5c0357c3d716c1e54a4365/distancerasters-0.4.2-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:69f317ed6d0c544422e5822fc80d89d9e3ff19be2bca7ccc990b5a5c858f423a", size = 299212, upload-time = "2026-07-28T14:58:01.536Z" },
+    { url = "https://files.pythonhosted.org/packages/a0/90/2e7c0df5360546c23d87ddb2518a51f0d156062f6555ea3986642e8d03d9/distancerasters-0.4.2-cp313-cp313-win_amd64.whl", hash = "sha256:e13d6f9fd0cc5059bead657871cd2f0be84b5faf7d5de48aecc9a05098f899e6", size = 185808, upload-time = "2026-07-28T14:58:02.692Z" },
+    { url = "https://files.pythonhosted.org/packages/db/42/2e77c2a463fafd34983a3ff439ea51f198f20b75e1f65fb43442ddad2fe4/distancerasters-0.4.2-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:ad8fe78f4479510671a8f7c24b16bad060512f73bb346d929c94237fe396a21f", size = 300063, upload-time = "2026-07-28T14:58:03.791Z" },
+    { url = "https://files.pythonhosted.org/packages/f0/d1/711d06a9a4bb03f2506145b0e41467e76a5db1521ab88bfc005c25d42606/distancerasters-0.4.2-cp314-cp314-win_amd64.whl", hash = "sha256:d0aeb0ee3ab9c2c06fc6e424de4b49f5d80caab2ac3dee9f08e6b43f1a622ea9", size = 185940, upload-time = "2026-07-28T14:58:04.89Z" },
 ]
 
 [[package]]
@@ -1193,7 +1193,7 @@ requires-dist = [
     { name = "dask-jobqueue", specifier = ">=0.8.1" },
     { name = "dask-kubernetes", specifier = ">=2025.4.1" },
     { name = "data-manager", editable = "data_manager" },
-    { name = "distancerasters", specifier = "~=0.4.1" },
+    { name = "distancerasters", specifier = "~=0.4.2" },
     { name = "distributed", specifier = ">=2023.3.1" },
     { name = "fiona", specifier = ">=1.10.1" },
     { name = "geopandas", specifier = ">=1.0.1" },
