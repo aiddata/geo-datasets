@@ -24,8 +24,8 @@ directory = "datasets/distance_to_groads"
 
 [deploy]
 deployment_name = "distance_to_groads"
-image_tag = "083d531"
-version = 10
+image_tag = "148bd36"
+version = 11
 flow_file_name = "main"
 flow_name = "distance_to_groads"
 work_pool = "geodata"
