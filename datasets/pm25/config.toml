@@ -26,8 +26,8 @@ directory = "datasets/pm25"
 
 [deploy]
 deployment_name = "PM25"
-image_tag = "083d531"
-version = 11
+image_tag = "148bd36"
+version = 13
 flow_file_name = "main"
 flow_name = "pm25"
 work_pool = "geodata"
