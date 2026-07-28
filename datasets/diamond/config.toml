@@ -9,7 +9,7 @@ overwrite_distance_raster = false
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/diamond_201708/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/diamond_201708/logs"
 
 
 [repo]

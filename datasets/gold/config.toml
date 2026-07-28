@@ -9,7 +9,7 @@ overwrite_distance_raster = false
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/goldata_v12/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/goldata_v12/logs"
 
 
 [repo]

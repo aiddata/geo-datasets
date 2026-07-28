@@ -7,7 +7,7 @@ overwrite_process = false
 
 [run]
 max_workers = 3
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/africa_child_mortality/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/africa_child_mortality/logs"
 
 
 [repo]

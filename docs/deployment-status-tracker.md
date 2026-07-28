@@ -41,8 +41,8 @@ Columns:
 | `globalwindatlas - ws`                     | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `gold - categorical`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `gold - distance`                          | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `gpm - monthly`                            | [ ]      | [ ]     | [r] | [ ]      | [ ]  | [ ]      |
-| `gpm - yearly`                             | [ ]      | [ ]     | [r] | [ ]      | [ ]  | [ ]      |
+| `gpm - monthly`                            | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
+| `gpm - yearly`                             | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
 | `gpw - v3_count`                           | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `gpw - v3_density`                         | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `gpw - v4_count`                           | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
@@ -70,7 +70,7 @@ Columns:
 | `pm25 - yearly`                            | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
 | `srtm - srtm_elevation_500m`               | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `srtm - srtm_slope_500m`                   | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `ucdp - ged261_filter_ingest.json`         | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
+| `ucdp - ged261_filter_ingest.json`         | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
 | `udel_climate - air_temp_2017_yearly_mean` | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `udel_climate - precip_2017_yearly_mean`   | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `udel_climate - precip_2017_yearly_sum`    | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |

@@ -8,7 +8,7 @@ dataset = "ged261"
 
 [run]
 max_workers = 2
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/ucdp/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ucdp/logs"
 backend = "prefect"
 
 [repo]

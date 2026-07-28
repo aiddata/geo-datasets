@@ -13,7 +13,7 @@ overwrite_distance_raster = false
 
 [run]
 max_workers = 4
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/distance_to_groads/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/distance_to_groads/logs"
 
 
 [repo]

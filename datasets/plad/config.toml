@@ -11,7 +11,7 @@ overwrite_output = false
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/plad/v70/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/plad/v70/logs"
 
 
 [repo]

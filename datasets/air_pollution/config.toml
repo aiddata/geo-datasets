@@ -6,7 +6,7 @@ overwrite_process = false
 
 [run]
 max_workers = 4
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/air_pollution/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/air_pollution/logs"
 
 
 [repo]

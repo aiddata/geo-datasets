@@ -1,5 +1,5 @@
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/accessibility_map"
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/access_50k"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/accessibility_map"
 
 overwrite_download = false
 overwrite_process = false
@@ -7,7 +7,7 @@ overwrite_process = false
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/access_50k/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/accessibility_map/logs"
 
 
 [repo]
