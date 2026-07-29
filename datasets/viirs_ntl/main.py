@@ -176,8 +176,6 @@ class VIIRS_NTL(Dataset):
                 year_fragment = "201204-201303" if int(year) == 2012 else str(year)
                 config_fragment = f"_global_{file_config}_"
 
-                year_frament =
-
                 for ftype in self.annual_file_types:
                     download_dest: Optional[str] = None
                     for link in link_list:
