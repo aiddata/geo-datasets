@@ -165,7 +165,7 @@ class VIIRS_NTL(Dataset):
                         YEAR=year, TYPE=file, CONFIG=file_config
                     )
                     local_filename = (
-                        self.raw_dir / f"raw_viirs_ntl_{annual_version}_{year}_{file}.tif.gz"
+                        self.raw_dir / "annual" / f"raw_viirs_ntl_{annual_version}_{year}_{file}.tif.gz"
                     )
                     task_list.append((download_dest, local_filename))
         if self.run_monthly:
@@ -234,7 +234,7 @@ class VIIRS_NTL(Dataset):
                         else:
                             local_filename = (
                                 self.raw_dir
-                                / f"raw_viirs_ntl_{year}_{format_month}_{file}.tif.gz"
+                                / "monthly" / f"raw_viirs_ntl_{year}_{format_month}_{file}.tif.gz"
                             )
                             task_list.append((file_link, local_filename))
 
@@ -252,6 +252,7 @@ class VIIRS_NTL(Dataset):
             logger.info(f"Download Exists: {local_filename}")
         else:
             logger.info(f"Attempting to download from {download_dest}...")
+            local_filename.parent().mkdir(parents=True, exists_ok=True)
             try:
                 with requests.get(
                     download_dest,
