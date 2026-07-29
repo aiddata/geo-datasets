@@ -13,10 +13,11 @@ months = "1,2,3,4,5,6,7,8,9,10,11,12"
 cf_minimum = 1
 
 # change var = set variables to file type, options - only cf_cvg, average_masked needed
-annual_file_types = "average_masked,cf_cvg"
+annual_file_types = "average_masked,cf_cvg,lit_mask"
 
 # change var = set variables to file type, options - only avg_rade9h.masked, cf_cvg needed (2021 and 2022 don't have avg_rade9h.masked yet)
-monthly_file_types = "avg_rade9h.masked,cf_cvg"
+#monthly_file_types = "avg_rade9h.masked,cf_cvg"
+monthly_file_types = "avg_rade9h,cf_cvg"
 
 # change var - set to intended output directories
 raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/viirs_ntl"
@@ -46,7 +47,7 @@ directory = "datasets/viirs_ntl"
 [deploy]
 deployment_name = "viirs_ntl"
 image_tag = "083d531"
-version = 18
+version = 20
 flow_file_name = "main"
 flow_name = "viirs_ntl"
 work_pool = "geodata"
