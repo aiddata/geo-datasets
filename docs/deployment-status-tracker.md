@@ -56,7 +56,7 @@ Columns:
 | `map - pf_incidence_rate`                  | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
 | `map - cities_2015`                        | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
 | `map - walking_healthcare_2020`            | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
-| `modis_landcover`                          | [ ]      | [ ]     | [R] | [ ]      | [ ]  | [ ]      |
+| `modis_landcover`                          | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
 | `modis_lst - 061/monthly_day`              | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
 | `modis_lst - 061/monthly_night`            | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
 | `modis_lst - 061/yearly_day`               | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
@@ -74,14 +74,10 @@ Columns:
 | `udel_climate - air_temp_2017_yearly_mean` | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `udel_climate - precip_2017_yearly_mean`   | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `udel_climate - precip_2017_yearly_sum`    | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `viirs - annual_v20_avg_masked`            | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
-| `viirs - annual_v20_cf_cvg`                | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
-| `viirs - annual_v21_avg_masked`            | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
-| `viirs - annual_v21_cf_cvg`                | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
-| `viirs - annual_v22_avg_masked`            | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
-| `viirs - annual_v22_cf_cvg`                | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
-| `viirs - monthly_avg_masked`               | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
-| `viirs - monthly_cf_cvg`                   | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
+| `viirs - annual cf cvg`                    | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
+| `viirs - annual avg`                       | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
+| `viirs - monthly cf cvg`                   | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
+| `viirs - monthly avg`                      | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
 | `wdpa - wdpa_iucn`                         | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
 | `worldpop_pop_count`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `worldpop_pop_count_new`                   | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
