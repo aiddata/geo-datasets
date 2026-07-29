@@ -125,18 +125,22 @@ class VIIRS_NTL(Dataset):
         threading.Thread(target=ping, name="eog-keepalive", daemon=True).start()
         return stop
 
+    def get_annual_version_info(self, year) -> tuple[str, str]:
+        if int(year) < 2022:
+            annual_version = "v21"
+            file_config = "vcmcfg" if int(year) < 2014 else "vcmslcfg"
+        else:
+            annual_version = "v22"
+            file_config = "vcmslcfg"
+        return annual_version, file_config
+
     def build_download_list(self):
         task_list = []
         logger = self.get_logger()
 
         if self.run_annual:
             for year in self.years:
-                if int(year) < 2022:
-                    annual_version = "v21"
-                    file_config = "vcmcfg" if int(year) < 2014 else "vcmslcfg"
-                else:
-                    annual_version = "v22"
-                    file_config = "vcmslcfg"
+                annual_version, file_config = self.get_annual_version_info(year)
 
                 # Filenames embed a processing timestamp (e.g. "c202303062300")
                 # that changes whenever EOG reprocesses a year, so it can't be
@@ -315,9 +319,10 @@ class VIIRS_NTL(Dataset):
 
         if self.run_annual:
             for year in self.years:
+                annual_version, file_config = self.get_annual_version_info(year)
                 for file in self.annual_file_types:
                     raw_local_filename = (
-                        self.raw_dir / "annual" /f"raw_viirs_ntl_{year}_{file}.tif.gz"
+                        self.raw_dir / "annual" /f"raw_viirs_ntl_{annual_version}_{year}_{file}.tif.gz"
                     )
                     output_filename = (
                         self.raw_dir / "annual" /f"raw_extracted_viirs_ntl_{year}_{file}.tif"
@@ -383,6 +388,7 @@ class VIIRS_NTL(Dataset):
         if self.run_annual:
             annual_dir = self.output_dir / "annual" / self.annual_version
             for year in self.years:
+                annual_version, file_config = self.get_annual_version_info(year)
                 annual_avg_glob_str = (
                     self.raw_dir / "annual" / f"raw_extracted_viirs_ntl_{year}_average_masked.tif"
                 )
