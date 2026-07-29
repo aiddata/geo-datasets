@@ -46,7 +46,7 @@ directory = "datasets/viirs_ntl"
 [deploy]
 deployment_name = "viirs_ntl"
 image_tag = "083d531"
-version = 13
+version = 14
 flow_file_name = "main"
 flow_name = "viirs_ntl"
 work_pool = "geodata"
