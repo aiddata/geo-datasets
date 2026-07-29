@@ -36,7 +36,6 @@ class VIIRS_NTL_Configuration(BaseDatasetConfiguration):
     # form renders a text input rather than the array widget, whose "add
     # item" button submits the form.
     annual_files: str
-    annual_version: str
     run_monthly: bool
     # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
     # form renders a text input rather than the array widget, whose "add
@@ -67,7 +66,6 @@ class VIIRS_NTL(Dataset):
         self.raw_dir = Path(config.raw_dir)
         self.output_dir = Path(config.output_dir)
         self.run_annual: bool = config.run_annual
-        self.annual_version: str = config.annual_version
         self.annual_files = [v.strip() for v in config.annual_files.split(",") if v.strip()]
         self.run_monthly: bool = config.run_monthly
         self.monthly_files = [v.strip() for v in config.monthly_files.split(",") if v.strip()]
@@ -135,7 +133,14 @@ class VIIRS_NTL(Dataset):
             # TODO: pull from beautiful soup for file url, filter out non-available urls here
             for year in self.years:
                 for file in self.annual_files:
-                    if self.annual_version == "v21":
+                    if int(year) < 2022:
+                        annual_version = "v21"
+                    elif int(year) >= 2022:
+                        annual_version = "v22"
+                    else:
+                        raise ValueError(f"Year {year} outside anticipated range.")
+
+                    if annual_version == "v21":
                         if int(year) == 2012:
                             # IMPORTANT: this can either be 201204-201212 or 201204-201303
                             # depending on what we prefer!
@@ -146,7 +151,7 @@ class VIIRS_NTL(Dataset):
                             file_config = "vcmcfg"
                         else:
                             file_config = "vcmslcfg"
-                    elif self.annual_version == "v22":
+                    elif annual_version == "v22":
                         file_config = "vcmslcfg"
                         if int(year) == 2022:
                             download_url = "https://eogdata.mines.edu/nighttime_light/annual/v22/{YEAR}/VNL_v22_npp-j01_{YEAR}_global_{CONFIG}_c202303062300.{TYPE}.dat.tif.gz"
@@ -154,13 +159,13 @@ class VIIRS_NTL(Dataset):
                             download_url = "https://eogdata.mines.edu/nighttime_light/annual/v22/{YEAR}/VNL_npp_{YEAR}_global_{CONFIG}_v2_c202402081600.{TYPE}.dat.tif.gz"
                     else:
                         raise NotImplementedError(
-                            f"Annual version {self.annual_version} is not yet supported."
+                            f"Annual version {annual_version} is not yet supported."
                         )
                     download_dest = download_url.format(
                         YEAR=year, TYPE=file, CONFIG=file_config
                     )
                     local_filename = (
-                        self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
+                        self.raw_dir / f"raw_viirs_ntl_{annual_version}_{year}_{file}.tif.gz"
                     )
                     task_list.append((download_dest, local_filename))
         if self.run_monthly:
