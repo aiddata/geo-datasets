@@ -252,7 +252,7 @@ class VIIRS_NTL(Dataset):
             logger.info(f"Download Exists: {local_filename}")
         else:
             logger.info(f"Attempting to download from {download_dest}...")
-            local_filename.parent().mkdir(parents=True, exists_ok=True)
+            Path(local_filename).parent().mkdir(parents=True, exist_ok=True)
             try:
                 with requests.get(
                     download_dest,
