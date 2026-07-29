@@ -35,12 +35,12 @@ class VIIRS_NTL_Configuration(BaseDatasetConfiguration):
     # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
     # form renders a text input rather than the array widget, whose "add
     # item" button submits the form.
-    annual_files: str
+    annual_file_types: str
     run_monthly: bool
     # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
     # form renders a text input rather than the array widget, whose "add
     # item" button submits the form.
-    monthly_files: str
+    monthly_file_types: str
     # Comma-separated (e.g. "a,b"). String, not list, so the Prefect run
     # form renders a text input rather than the array widget, whose "add
     # item" button submits the form.
@@ -66,9 +66,9 @@ class VIIRS_NTL(Dataset):
         self.raw_dir = Path(config.raw_dir)
         self.output_dir = Path(config.output_dir)
         self.run_annual: bool = config.run_annual
-        self.annual_files = [v.strip() for v in config.annual_files.split(",") if v.strip()]
+        self.annual_file_types = [v.strip() for v in config.annual_file_types.split(",") if v.strip()]
         self.run_monthly: bool = config.run_monthly
-        self.monthly_files = [v.strip() for v in config.monthly_files.split(",") if v.strip()]
+        self.monthly_file_types = [v.strip() for v in config.monthly_file_types.split(",") if v.strip()]
         self.months = [int(v.strip()) for v in config.months.split(",") if v.strip()]
         self.years = [int(v.strip()) for v in config.years.split(",") if v.strip()]
         self.cookies = {"mod_auth_openidc_session": config.mod_auth_openidc_session}
@@ -130,44 +130,73 @@ class VIIRS_NTL(Dataset):
         logger = self.get_logger()
 
         if self.run_annual:
-            # TODO: pull from beautiful soup for file url, filter out non-available urls here
             for year in self.years:
-                for file in self.annual_files:
-                    if int(year) < 2022:
-                        annual_version = "v21"
-                    elif int(year) >= 2022:
-                        annual_version = "v22"
-                    else:
-                        raise ValueError(f"Year {year} outside anticipated range.")
+                if int(year) < 2022:
+                    annual_version = "v21"
+                    file_config = "vcmcfg" if int(year) < 2014 else "vcmslcfg"
+                else:
+                    annual_version = "v22"
+                    file_config = "vcmslcfg"
 
-                    if annual_version == "v21":
-                        if int(year) == 2012:
-                            # IMPORTANT: this can either be 201204-201212 or 201204-201303
-                            # depending on what we prefer!
-                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_201204-201303_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
-                        else:
-                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v21/{YEAR}/VNL_v21_npp_{YEAR}_global_{CONFIG}_c202205302300.{TYPE}.dat.tif.gz"
-                        if int(year) < 2014:
-                            file_config = "vcmcfg"
-                        else:
-                            file_config = "vcmslcfg"
-                    elif annual_version == "v22":
-                        file_config = "vcmslcfg"
-                        if int(year) == 2022:
-                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v22/{YEAR}/VNL_v22_npp-j01_{YEAR}_global_{CONFIG}_c202303062300.{TYPE}.dat.tif.gz"
-                        else:
-                            download_url = "https://eogdata.mines.edu/nighttime_light/annual/v22/{YEAR}/VNL_npp_{YEAR}_global_{CONFIG}_v2_c202402081600.{TYPE}.dat.tif.gz"
-                    else:
-                        raise NotImplementedError(
-                            f"Annual version {annual_version} is not yet supported."
+                # Filenames embed a processing timestamp (e.g. "c202303062300")
+                # that changes whenever EOG reprocesses a year, so it can't be
+                # hardcoded. Scrape the year's directory listing instead (same
+                # approach as the monthly listing below) and match on the
+                # parts of the filename that are actually stable.
+                dir_url = f"https://eogdata.mines.edu/nighttime_light/annual/{annual_version}/{year}/"
+                link_list: List[str] = []
+                attempts = 1
+                while attempts <= self.max_retries:
+                    try:
+                        r = requests.get(
+                            dir_url,
+                            headers={"User-Agent": "Mozilla/5.0"},
+                            cookies=self.cookies,
+                            allow_redirects=False,
                         )
-                    download_dest = download_url.format(
-                        YEAR=year, TYPE=file, CONFIG=file_config
-                    )
+                        if r.is_redirect:
+                            raise RuntimeError(
+                                f"Redirected to login listing {dir_url}: EOG session cookie expired."
+                            )
+                        soup = BeautifulSoup(r.content, "html.parser")
+                        for i in soup.find_all("tr"):
+                            link = str(i.findChild("a")["href"])
+                            link_list.append(urllib.parse.urljoin(dir_url, link))
+                        break
+                    except Exception as e:
+                        attempts += 1
+                        if attempts > self.max_retries:
+                            logger.info(f"Failed to list {dir_url}: {str(e)}")
+                        else:
+                            logger.info("Retrying listing: " + str(dir_url))
+
+                # IMPORTANT: 2012's composite window is ambiguous (it can be
+                # either Apr-Dec 2012 or Apr 2012-Mar 2013) - match the range
+                # we intend rather than just the bare year.
+                year_fragment = "201204-201303" if int(year) == 2012 else str(year)
+                config_fragment = f"_global_{file_config}_"
+
+                for ftype in self.annual_file_types:
+                    download_dest: Optional[str] = None
+                    for link in link_list:
+                        if (
+                            year_fragment in link
+                            and config_fragment in link
+                            and link.endswith(f"{ftype}.dat.tif.gz")
+                        ):
+                            download_dest = link
+                            break
+                    if download_dest is None:
+                        logger.info(
+                            f"Download option does not exist yet: {year}/{ftype}"
+                        )
+                        continue
+
                     local_filename = (
-                        self.raw_dir / "annual" / f"raw_viirs_ntl_{annual_version}_{year}_{file}.tif.gz"
+                        self.raw_dir / "annual" / f"raw_viirs_ntl_{annual_version}_{year}_{ftype}.tif.gz"
                     )
                     task_list.append((download_dest, local_filename))
+                    
         if self.run_monthly:
             for year in self.years:
                 for month in self.months:
@@ -221,20 +250,20 @@ class VIIRS_NTL(Dataset):
                             else:
                                 logger.info("Retrieved: " + str(download_dest))
 
-                    for file in self.monthly_files:
+                    for ftype in self.monthly_file_types:
                         file_link: Optional[str] = None
                         for link in link_list:
-                            if link.endswith(f"{file}.tif.gz"):
+                            if link.endswith(f"{ftype}.tif.gz"):
                                 file_link = link
                                 break
                         if file_link is None:
                             logger.info(
-                                f"Download option does not exist yet: {str(year)}/{format_month}/{file}"
+                                f"Download option does not exist yet: {str(year)}/{format_month}/{ftype}"
                             )
                         else:
                             local_filename = (
                                 self.raw_dir
-                                / "monthly" / f"raw_viirs_ntl_{year}_{format_month}_{file}.tif.gz"
+                                / "monthly" / f"raw_viirs_ntl_{year}_{format_month}_{ftype}.tif.gz"
                             )
                             task_list.append((file_link, local_filename))
 
@@ -286,7 +315,7 @@ class VIIRS_NTL(Dataset):
 
         if self.run_annual:
             for year in self.years:
-                for file in self.annual_files:
+                for file in self.annual_file_types:
                     raw_local_filename = (
                         self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
                     )
@@ -305,7 +334,7 @@ class VIIRS_NTL(Dataset):
                     if year == 2012 and month in [1, 2, 3]:
                         # dataset starts in April 2012!
                         continue
-                    for file in self.monthly_files:
+                    for file in self.monthly_file_types:
                         format_month = str(month).zfill(2)
 
                         raw_local_filename = (
