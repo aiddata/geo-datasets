@@ -176,6 +176,8 @@ class VIIRS_NTL(Dataset):
                 year_fragment = "201204-201303" if int(year) == 2012 else str(year)
                 config_fragment = f"_global_{file_config}_"
 
+                year_frament =
+
                 for ftype in self.annual_file_types:
                     download_dest: Optional[str] = None
                     for link in link_list:
@@ -196,7 +198,7 @@ class VIIRS_NTL(Dataset):
                         self.raw_dir / "annual" / f"raw_viirs_ntl_{annual_version}_{year}_{ftype}.tif.gz"
                     )
                     task_list.append((download_dest, local_filename))
-                    
+
         if self.run_monthly:
             for year in self.years:
                 for month in self.months:
@@ -317,10 +319,10 @@ class VIIRS_NTL(Dataset):
             for year in self.years:
                 for file in self.annual_file_types:
                     raw_local_filename = (
-                        self.raw_dir / f"raw_viirs_ntl_{year}_{file}.tif.gz"
+                        self.raw_dir / "annual" /f"raw_viirs_ntl_{year}_{file}.tif.gz"
                     )
                     output_filename = (
-                        self.raw_dir / f"raw_extracted_viirs_ntl_{year}_{file}.tif"
+                        self.raw_dir / "annual" /f"raw_extracted_viirs_ntl_{year}_{file}.tif"
                     )
                     if raw_local_filename.exists():
                         task_list.append((raw_local_filename, output_filename))
@@ -338,11 +340,11 @@ class VIIRS_NTL(Dataset):
                         format_month = str(month).zfill(2)
 
                         raw_local_filename = (
-                            self.raw_dir
+                            self.raw_dir / "monthly"
                             / f"raw_viirs_ntl_{year}_{format_month}_{file}.tif.gz"
                         )
                         output_filename = (
-                            self.raw_dir
+                            self.raw_dir / "monthly"
                             / f"raw_extracted_viirs_ntl_{year}_{format_month}_{file}.tif"
                         )
                         if raw_local_filename.exists():
@@ -384,7 +386,7 @@ class VIIRS_NTL(Dataset):
             annual_dir = self.output_dir / "annual" / self.annual_version
             for year in self.years:
                 annual_avg_glob_str = (
-                    self.raw_dir / f"raw_extracted_viirs_ntl_{year}_average_masked.tif"
+                    self.raw_dir / "annual" / f"raw_extracted_viirs_ntl_{year}_average_masked.tif"
                 )
                 output_avg_glob = (
                     annual_dir / "avg_masked" / f"viirs_ntl_annual_{year}_avg_masked.tif"
@@ -397,7 +399,7 @@ class VIIRS_NTL(Dataset):
                     )
 
                 annual_cloud_glob_str = (
-                    self.raw_dir / f"raw_extracted_viirs_ntl_{year}_cf_cvg.tif"
+                    self.raw_dir / "annual" /f"raw_extracted_viirs_ntl_{year}_cf_cvg.tif"
                 )
                 output_cloud_glob = (
                     annual_dir / "cf_cvg" / f"viirs_ntl_annual_{year}_cf_cvg.tif"
@@ -416,7 +418,7 @@ class VIIRS_NTL(Dataset):
                     format_month = str(month).zfill(2)
 
                     monthly_avg_glob_str = (
-                        self.raw_dir
+                        self.raw_dir / "monthly"
                         / f"raw_extracted_viirs_ntl_{year}_{format_month}_avg_rade9h.masked.tif"
                     )
                     output_avg_glob = (
@@ -432,7 +434,7 @@ class VIIRS_NTL(Dataset):
                         )
 
                     monthly_cloud_glob_str = (
-                        self.raw_dir
+                        self.raw_dir / "monthly"
                         / f"raw_extracted_viirs_ntl_{year}_{format_month}_cf_cvg.tif"
                     )
                     output_cloud_glob = (
