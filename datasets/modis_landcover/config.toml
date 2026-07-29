@@ -6,7 +6,7 @@ raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/MODIS/MCD12Q1.061"
 process_dir = "/tmp/mcd12q1_061"
 output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/MODIS/MCD12Q1.061"
 
-years = "2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023"
+years = "2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025"
 lc_type = "LC_Type1"
 
 overwrite_download = false
@@ -27,8 +27,8 @@ directory = "datasets/modis_landcover"
 
 [deploy]
 deployment_name = "modis_landcover"
-image_tag = "083d531"
-version = 11
+image_tag = "148bd36"
+version = 13
 flow_file_name = "main"
 flow_name = "modis_landcover"
 work_pool = "geodata"

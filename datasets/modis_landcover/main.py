@@ -9,6 +9,7 @@ Data source: https://lpdaac.usgs.gov/products/mcd12q1v061/
 CMR concept:  C2484079608-LPCLOUD
 """
 
+import re
 import shutil
 from pathlib import Path
 from typing import Optional
@@ -16,14 +17,20 @@ from typing import Optional
 import rasterio
 import requests
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
+from pyhdf.SD import SD, SDC
 from rasterio.merge import merge as merge_tiles
-from rasterio.transform import array_bounds
+from rasterio.transform import array_bounds, from_bounds
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 
 
 CMR_GRANULES_URL = "https://cmr.earthdata.nasa.gov/search/granules.json"
 CONCEPT_ID = "C2484079608-LPCLOUD"
 EOS_GRID_NAME = "MCD12Q1"
+# GDAL's HDF4 driver isn't compiled into this project's rasterio wheel (opening
+# any "HDF4_EOS:..." subdataset string fails generically regardless of what's
+# actually at the path - confirmed against known-good, known-missing, and
+# corrupted files alike), so tiles are read directly with pyhdf instead.
+SINUSOIDAL_CRS = "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs"
 
 
 class MCD12Q1Configuration(BaseDatasetConfiguration):
@@ -149,6 +156,27 @@ class MCD12Q1(Dataset):
                 tasks.append((hdf, tile_tif))
         return tasks
 
+    @staticmethod
+    def parse_grid_extent(hdf: SD, grid_name: str) -> tuple[float, float, float, float]:
+        """Parse a named grid's (ulx, uly, lrx, lry) extent, in projected
+        meters, from the file's HDF-EOS StructMetadata."""
+        struct_meta = hdf.attributes(full=1)["StructMetadata.0"][0]
+        grid_block = re.search(
+            rf'GROUP=GRID_\d+\s+GridName="{re.escape(grid_name)}".*?END_GROUP=GRID_\d+',
+            struct_meta,
+            re.DOTALL,
+        )
+        if not grid_block:
+            raise ValueError(f'Grid "{grid_name}" not found in StructMetadata')
+        block = grid_block.group(0)
+        ul = re.search(r"UpperLeftPointMtrs=\(([^,]+),([^)]+)\)", block)
+        lr = re.search(r"LowerRightMtrs=\(([^,]+),([^)]+)\)", block)
+        if not ul or not lr:
+            raise ValueError(f'Could not parse extent for grid "{grid_name}"')
+        ulx, uly = float(ul.group(1)), float(ul.group(2))
+        lrx, lry = float(lr.group(1)), float(lr.group(2))
+        return ulx, uly, lrx, lry
+
     def process_tile(self, hdf_path: Path, tile_tif: Path):
         """Extract land cover subdataset from one HDF4 tile to GeoTIFF."""
         logger = self.get_logger()
@@ -156,15 +184,26 @@ class MCD12Q1(Dataset):
         if tile_tif.exists() and not self.overwrite_processing:
             logger.info(f"Tile already processed: {tile_tif.name}")
             return
-        subdataset = f'HDF4_EOS:EOS_GRID:"{hdf_path}":{EOS_GRID_NAME}:{self.lc_type}'
         tmp = tile_tif.with_suffix(".tmp.tif")
         try:
-            with rasterio.open(subdataset) as src:
-                data = src.read()
-                meta = src.meta.copy()
-                meta.update(driver="GTiff", compress="LZW", tiled=True)
-                with rasterio.open(tmp, "w", **meta) as dst:
-                    dst.write(data)
+            hdf = SD(hdf_path.as_posix(), SDC.READ)
+            data = hdf.select(self.lc_type).get()
+            ulx, uly, lrx, lry = self.parse_grid_extent(hdf, EOS_GRID_NAME)
+            height, width = data.shape
+            transform = from_bounds(ulx, lry, lrx, uly, width, height)
+            meta = {
+                "driver": "GTiff",
+                "dtype": str(data.dtype),
+                "count": 1,
+                "width": width,
+                "height": height,
+                "crs": SINUSOIDAL_CRS,
+                "transform": transform,
+                "compress": "LZW",
+                "tiled": True,
+            }
+            with rasterio.open(tmp, "w", **meta) as dst:
+                dst.write(data, 1)
             shutil.move(str(tmp), tile_tif)
             logger.info(f"Extracted: {tile_tif.name}")
         except Exception as e:
