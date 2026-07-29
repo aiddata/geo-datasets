@@ -66,8 +66,8 @@ Columns:
 | `petroleum - binary`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `petroleum - distance`                     | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `plad`                                     | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `pm25 - monthly`                           | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
-| `pm25 - yearly`                            | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
+| `pm25 - monthly`                           | [ ]      | [ ]     | [R] | [ ]      | [ ]  | [ ]      |
+| `pm25 - yearly`                            | [ ]      | [ ]     | [R] | [ ]      | [ ]  | [ ]      |
 | `srtm - srtm_elevation_500m`               | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `srtm - srtm_slope_500m`                   | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `ucdp - ged261_filter_ingest.json`         | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |

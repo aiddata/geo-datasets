@@ -10,12 +10,15 @@ CMR concept:  C2484079608-LPCLOUD
 """
 
 import shutil
-import subprocess
 from pathlib import Path
 from typing import Optional
 
+import rasterio
 import requests
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
+from rasterio.merge import merge as merge_tiles
+from rasterio.transform import array_bounds
+from rasterio.warp import Resampling, calculate_default_transform, reproject
 
 
 CMR_GRANULES_URL = "https://cmr.earthdata.nasa.gov/search/granules.json"
@@ -156,24 +159,17 @@ class MCD12Q1(Dataset):
         subdataset = f'HDF4_EOS:EOS_GRID:"{hdf_path}":{EOS_GRID_NAME}:{self.lc_type}'
         tmp = tile_tif.with_suffix(".tmp.tif")
         try:
-            subprocess.run(
-                [
-                    "gdal_translate",
-                    "-of", "GTiff",
-                    "-co", "COMPRESS=LZW",
-                    "-co", "TILED=YES",
-                    subdataset,
-                    str(tmp),
-                ],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
+            with rasterio.open(subdataset) as src:
+                data = src.read()
+                meta = src.meta.copy()
+                meta.update(driver="GTiff", compress="LZW", tiled=True)
+                with rasterio.open(tmp, "w", **meta) as dst:
+                    dst.write(data)
             shutil.move(str(tmp), tile_tif)
             logger.info(f"Extracted: {tile_tif.name}")
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             tmp.unlink(missing_ok=True)
-            raise RuntimeError(f"gdal_translate failed for {hdf_path.name}: {e.stderr}") from e
+            raise RuntimeError(f"Failed to extract subdataset for {hdf_path.name}: {e}") from e
 
     # ── Mosaic & reproject ───────────────────────────────────────────────────
 
@@ -198,52 +194,57 @@ class MCD12Q1(Dataset):
             logger.warning(f"No tiles to mosaic in {tile_dir}")
             return
 
-        tmp_sin = self.process_dir / (output_tif.stem + "_sin.tif")
         tmp_wgs84 = self.process_dir / (output_tif.stem + "_wgs84.tmp.tif")
         try:
-            # Mosaic in native MODIS sinusoidal projection
-            subprocess.run(
-                [
-                    "gdal_merge.py",
-                    "-of", "GTiff",
-                    "-co", "COMPRESS=LZW",
-                    "-co", "TILED=YES",
-                    "-co", "BIGTIFF=YES",
-                    "-init", "255",
-                    "-n", "255",
-                    "-o", str(tmp_sin),
-                ] + [str(t) for t in tiles],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
+            # Mosaic in native MODIS sinusoidal projection. nodata=255 both
+            # marks 255 pixels in the inputs as transparent (skip on overlap)
+            # and fills the output background with 255, matching the old
+            # `-init 255 -n 255` gdal_merge.py behavior.
+            srcs = [rasterio.open(t) for t in tiles]
+            try:
+                mosaic_data, mosaic_transform = merge_tiles(srcs, nodata=255)
+                src_crs = srcs[0].crs
+            finally:
+                for s in srcs:
+                    s.close()
             logger.info(f"Mosaicked {len(tiles)} tiles for {output_tif.stem}")
 
             # Reproject SIN → WGS84; nearest-neighbor preserves integer class values
-            subprocess.run(
-                [
-                    "gdalwarp",
-                    "-t_srs", "EPSG:4326",
-                    "-r", "near",
-                    "-ot", "Byte",
-                    "-co", "COMPRESS=LZW",
-                    "-co", "TILED=YES",
-                    "-co", "BIGTIFF=YES",
-                    "-srcnodata", "255",
-                    "-dstnodata", "255",
-                    str(tmp_sin),
-                    str(tmp_wgs84),
-                ],
-                check=True,
-                capture_output=True,
-                text=True,
+            _, height, width = mosaic_data.shape
+            sin_bounds = array_bounds(height, width, mosaic_transform)
+            dst_transform, dst_width, dst_height = calculate_default_transform(
+                src_crs, "EPSG:4326", width, height, *sin_bounds
             )
+            dst_meta = {
+                "driver": "GTiff",
+                "dtype": "uint8",
+                "count": 1,
+                "crs": "EPSG:4326",
+                "transform": dst_transform,
+                "width": dst_width,
+                "height": dst_height,
+                "nodata": 255,
+                "compress": "LZW",
+                "tiled": True,
+                "bigtiff": "YES",
+            }
+            with rasterio.open(tmp_wgs84, "w", **dst_meta) as dst:
+                reproject(
+                    source=mosaic_data[0],
+                    destination=rasterio.band(dst, 1),
+                    src_transform=mosaic_transform,
+                    src_crs=src_crs,
+                    dst_transform=dst_transform,
+                    dst_crs="EPSG:4326",
+                    src_nodata=255,
+                    dst_nodata=255,
+                    resampling=Resampling.nearest,
+                )
             shutil.move(str(tmp_wgs84), output_tif)
             logger.info(f"Reprojected to WGS84: {output_tif.name}")
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"GDAL command failed: {e.stderr}") from e
+        except Exception as e:
+            raise RuntimeError(f"Mosaic/reproject failed for {output_tif.name}: {e}") from e
         finally:
-            tmp_sin.unlink(missing_ok=True)
             tmp_wgs84.unlink(missing_ok=True)
 
     # ── Orchestration ─────────────────────────────────────────────────────────

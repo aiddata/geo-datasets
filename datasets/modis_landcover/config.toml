@@ -28,7 +28,7 @@ directory = "datasets/modis_landcover"
 [deploy]
 deployment_name = "modis_landcover"
 image_tag = "083d531"
-version = 10
+version = 11
 flow_file_name = "main"
 flow_name = "modis_landcover"
 work_pool = "geodata"
