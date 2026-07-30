@@ -445,6 +445,9 @@ class VIIRS_NTL(Dataset):
                     {
                         "driver": "COG",
                         "compress": "LZW",
+                        # global VIIRS rasters are large enough to trip GDAL's
+                        # Classic TIFF 4GB/32-bit-offset limit mid-write
+                        "BIGTIFF": "YES",
                     }
                 )
                 meta.update(**kwargs)

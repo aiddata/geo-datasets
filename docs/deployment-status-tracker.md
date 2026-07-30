@@ -74,10 +74,10 @@ Columns:
 | `udel_climate - air_temp_2017_yearly_mean` | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `udel_climate - precip_2017_yearly_mean`   | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `udel_climate - precip_2017_yearly_sum`    | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
-| `viirs - annual cf cvg`                    | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
-| `viirs - annual avg`                       | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
-| `viirs - monthly cf cvg`                   | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
-| `viirs - monthly avg`                      | [ ]      | [ ]     | [X] | [ ]      | [ ]  | [ ]      |
+| `viirs - annual cf cvg`                    | [ ]      | [ ]     | [R] | [ ]      | [ ]  | [ ]      |
+| `viirs - annual avg`                       | [ ]      | [ ]     | [R] | [ ]      | [ ]  | [ ]      |
+| `viirs - monthly cf cvg`                   | [ ]      | [ ]     | [R] | [ ]      | [ ]  | [ ]      |
+| `viirs - monthly avg`                      | [ ]      | [ ]     | [R] | [ ]      | [ ]  | [ ]      |
 | `wdpa - wdpa_iucn`                         | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
 | `worldpop_pop_count`                       | [c]      | [ ]     | [ ] | [ ]      | [ ]  | [ ]      |
 | `worldpop_pop_count_new`                   | [ ]      | [ ]     | [c] | [ ]      | [ ]  | [ ]      |
