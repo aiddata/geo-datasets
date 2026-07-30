@@ -7,13 +7,13 @@ overwrite_process = false
 
 [run]
 max_workers = 1
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/gcdf_v3_dynamic/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/gcdf_v3_dynamic/logs"
 backend = "prefect"
 
 [repo]
 url = "https://github.com/aiddata/geo-datasets.git"
 branch = "master"
-directory = "datasets/gcdf_v3/gcdf_v3_dynamic"
+directory = "datasets/gcdf_v3_dynamic"
 
 
 [deploy]
