@@ -388,70 +388,40 @@ class VIIRS_NTL(Dataset):
         if self.run_annual:
             annual_dir = self.output_dir / "annual"
             for year in self.years:
-                annual_version, file_config = self.get_annual_version_info(year)
-                annual_avg_glob_str = (
-                    self.raw_dir / "annual" / f"raw_extracted_viirs_ntl_{year}_average_masked.tif"
-                )
-                output_avg_glob = (
-                    annual_dir / "avg_masked" / f"viirs_ntl_annual_{year}_avg_masked.tif"
-                )
-                if annual_avg_glob_str.exists():
-                    task_list.append((annual_avg_glob_str, output_avg_glob))
-                else:
-                    logger.info(
-                        f"Failed to find extracted raw file: {str(annual_avg_glob_str)}"
+                for ftype in self.annual_file_types:
+                    raw_annual_glob_str = (
+                        self.raw_dir / "annual" / f"raw_extracted_viirs_ntl_{year}_{ftype}.tif"
                     )
-
-                annual_cloud_glob_str = (
-                    self.raw_dir / "annual" /f"raw_extracted_viirs_ntl_{year}_cf_cvg.tif"
-                )
-                output_cloud_glob = (
-                    annual_dir / "cf_cvg" / f"viirs_ntl_annual_{year}_cf_cvg.tif"
-                )
-                if annual_cloud_glob_str.exists():
-                    task_list.append((annual_cloud_glob_str, output_cloud_glob))
-                else:
-                    logger.info(
-                        f"Failed to find extracted raw file: {str(annual_cloud_glob_str)}"
+                    output_annual_glob = (
+                        annual_dir / f"viirs_ntl_annual_{year}_{ftype}.tif"
                     )
+                    if raw_annual_glob_str.exists():
+                        task_list.append((raw_annual_glob_str, output_annual_glob))
+                    else:
+                        logger.info(
+                            f"Failed to find extracted raw file: {str(raw_annual_glob_str)}"
+                        )
 
         if self.run_monthly:
             monthly_dir = self.output_dir / "monthly" / MONTHLY_VERSION
             for year in self.years:
                 for month in self.months:
                     format_month = str(month).zfill(2)
-
-                    monthly_avg_glob_str = (
-                        self.raw_dir / "monthly"
-                        / f"raw_extracted_viirs_ntl_{year}_{format_month}_avg_rade9h.masked.tif"
-                    )
-                    output_avg_glob = (
-                        monthly_dir
-                        / "avg_masked"
-                        / f"viirs_ntl_monthly_{year}_{format_month}_avg_masked.tif"
-                    )
-                    if monthly_avg_glob_str.exists():
-                        task_list.append((monthly_avg_glob_str, output_avg_glob))
-                    else:
-                        logger.info(
-                            f"Failed to find extracted raw file: {str(monthly_avg_glob_str)}"
+                    for ftype in self.monthly_file_types:
+                        raw_monthly_glob_str = (
+                            self.raw_dir / "monthly"
+                            / f"raw_extracted_viirs_ntl_{year}_{format_month}_{ftype}.tif"
                         )
-
-                    monthly_cloud_glob_str = (
-                        self.raw_dir / "monthly"
-                        / f"raw_extracted_viirs_ntl_{year}_{format_month}_cf_cvg.tif"
-                    )
-                    output_cloud_glob = (
-                        monthly_dir
-                        / "cf_cvg"
-                        / f"viirs_ntl_monthly_{year}_{format_month}_cf_cvg.tif"
-                    )
-                    if monthly_cloud_glob_str.exists():
-                        task_list.append((monthly_cloud_glob_str, output_cloud_glob))
-                    else:
-                        logger.info(
-                            f"Failed to find extracted raw file: {str(monthly_cloud_glob_str)}"
+                        output_monthly_glob = (
+                            monthly_dir
+                            / f"viirs_ntl_monthly_{year}_{format_month}_{ftype}.tif"
                         )
+                        if raw_monthly_glob_str.exists():
+                            task_list.append((raw_monthly_glob_str, output_monthly_glob))
+                        else:
+                            logger.info(
+                                f"Failed to find extracted raw file: {str(raw_monthly_glob_str)}"
+                            )
 
         return task_list
 
