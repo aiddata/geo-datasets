@@ -19,7 +19,7 @@ directory = "datasets/gcdf_v3/gcdf_v3_dynamic"
 [deploy]
 deployment_name = "gcdf_v3_dynamic"
 image_tag = "083d531"
-version = 10
+version = 11
 flow_file_name = "main"
 flow_name = "gcdf_v301_dynamic"
 work_pool = "geodata"
