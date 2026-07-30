@@ -386,7 +386,7 @@ class VIIRS_NTL(Dataset):
         logger = self.get_logger()
 
         if self.run_annual:
-            annual_dir = self.output_dir / "annual" / self.annual_version
+            annual_dir = self.output_dir / "annual"
             for year in self.years:
                 annual_version, file_config = self.get_annual_version_info(year)
                 annual_avg_glob_str = (
