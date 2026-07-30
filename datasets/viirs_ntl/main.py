@@ -390,7 +390,7 @@ class VIIRS_NTL(Dataset):
             for year in self.years:
                 for ftype in self.annual_file_types:
                     raw_annual_glob_str = (
-                        self.raw_dir / "annual" / f"raw_extracted_viirs_ntl_{year}_{ftype}.tif"
+                        self.raw_dir / "annual" / ftype /f"raw_extracted_viirs_ntl_{year}_{ftype}.tif"
                     )
                     output_annual_glob = (
                         annual_dir / f"viirs_ntl_annual_{year}_{ftype}.tif"
@@ -413,8 +413,7 @@ class VIIRS_NTL(Dataset):
                             / f"raw_extracted_viirs_ntl_{year}_{format_month}_{ftype}.tif"
                         )
                         output_monthly_glob = (
-                            monthly_dir
-                            / f"viirs_ntl_monthly_{year}_{format_month}_{ftype}.tif"
+                            monthly_dir / ftype / f"viirs_ntl_monthly_{year}_{format_month}_{ftype}.tif"
                         )
                         if raw_monthly_glob_str.exists():
                             task_list.append((raw_monthly_glob_str, output_monthly_glob))
