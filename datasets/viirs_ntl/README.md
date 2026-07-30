@@ -39,7 +39,6 @@ EOG controls (kept warm by the keep-alive during a run). If a run fails with a
 Review and edit the variables in `config.toml` as needed:
 
 - `run_annual` / `run_monthly` toggle the two products
-- `annual_version` selects the annual release (e.g. `v22`)
 - `years` / `months` are comma-separated lists to process
 - `annual_files` / `monthly_files` are comma-separated file types to fetch
 - `cf_minimum` is the cloud-free-coverage threshold used to binarize the `cf_cvg` product
@@ -47,6 +46,10 @@ Review and edit the variables in `config.toml` as needed:
 - `overwrite_download` / `overwrite_extract` / `overwrite_processing`, if true, overwrite existing files rather than skipping
 - `max_retries` is the retry count for the monthly directory listing
 - `mod_auth_openidc_session` — the EOG cookie; leave the `<ADD-…>` placeholder in `config.toml` and set the real value in `.env` (see Authentication)
+
+Note:
+- the monthly produce is not masked as the premasked product is only available for the 2012-2020 period, and the 2021-2023 products are not yet available in a premasked form.
+- TODO: the annual masks can be applied to the monthly products, but this is not yet implemented in the code.
 
 ## Source
 
