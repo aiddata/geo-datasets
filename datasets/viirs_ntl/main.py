@@ -370,9 +370,21 @@ class VIIRS_NTL(Dataset):
             return (raw_local_filename, output_filename)
         else:
             try:
-                with gzip.open(raw_local_filename, "rb") as f_in:
-                    with open(output_filename, "wb") as f_out:
-                        shutil.copyfileobj(f_in, f_out)
+                def unzip_and_copy(src_path, dst_path):
+                    with gzip.open(src_path, "rb") as f_in:
+                        with open(dst_path, "wb") as f_out:
+                            shutil.copyfileobj(f_in, f_out)
+
+                # loop to check if output exists and is not 0 bytes
+                attempts = 0
+                while not output_filename.exists() or output_filename.stat().st_size == 0:
+                    unzip_and_copy(raw_local_filename, output_filename)
+                    attempts += 1
+                    if attempts > 5:
+                        raise RuntimeError(
+                            f"Failed to extract {str(raw_local_filename)} after 5 attempts."
+                        )
+
                 logger.info(f"Extracted file to: {output_filename}")
                 return (raw_local_filename, output_filename)
             except Exception as e:
