@@ -731,25 +731,27 @@ class Dataset(ABC):
                 from dask_kubernetes.operator import KubeCluster, make_cluster_spec
                 from prefect_dask import DaskTaskRunner
 
-                if not params.worker_image or not params.worker_pvc_claim:
+                if not params.worker_image:
                     raise ValueError(
-                        "worker_image/worker_pvc_claim are not set - deploy "
-                        "this dataset with scripts/deploy.py, which sets "
-                        "them automatically from [deploy].image_tag and the "
-                        "target work pool's base_job_template."
+                        "worker_image is not set - deploy this dataset with "
+                        "scripts/deploy.py, which sets it automatically from "
+                        "[deploy].image_tag."
                     )
 
                 # Scheduler and worker pods use the same image as the flow-run
                 # pod (the client), so dask/distributed versions match across
                 # all three - a mismatch there breaks the distributed
                 # protocol - and so data_manager and the dataset's own code
-                # are consistently available to workers as well. The PVC
-                # claim also matches the flow-run pod's own (staging vs prod
-                # follows whichever work pool this was deployed to).
+                # are consistently available to workers as well.
+                # TODO: "nova-geodata-prod" is the actual name of the (only)
+                # PVC in use; it isn't a prod-vs-staging distinction (that's
+                # just a directory convention within it - see
+                # kubernetes/utilities/base-job-template.json). Revisit
+                # renaming it to something less misleading, e.g. "nova-geodata".
                 volumes = [
                     {
                         "name": "sciclone",
-                        "persistentVolumeClaim": {"claimName": params.worker_pvc_claim},
+                        "persistentVolumeClaim": {"claimName": "nova-geodata-prod"},
                     }
                 ]
                 # matches the flow-run pod's own mount path (see

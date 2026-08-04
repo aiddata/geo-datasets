@@ -80,14 +80,6 @@ class RunParameters(BaseModel):
     `[deploy].image_tag` used for the flow-run pod itself - not meant to be
     set by hand in a dataset's config.toml.
     """
-    worker_pvc_claim: Optional[str] = None
-    """
-    PersistentVolumeClaim name for dask scheduler/worker pods when using the
-    "kubernetes" task runner. Set automatically by `scripts/deploy.py` from
-    the target work pool's own base_job_template, so it always matches
-    whatever claim (staging, prod, ...) the flow-run pod itself mounts - not
-    meant to be set by hand in a dataset's config.toml.
-    """
 
 
 class BaseDatasetConfiguration(BaseModel):
