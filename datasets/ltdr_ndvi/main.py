@@ -103,11 +103,9 @@ class LTDR_NDVI(Dataset):
             description: dict = json.loads(requests.get(dir_url).content)
             return description["content"]
 
-        # validates md5 hash of a file
-        def validate(filepath: Union[str, os.PathLike], md5: str) -> bool:
-            with open(filepath, "rb") as chk:
-                data = chk.read()
-                return md5 == hashlib.md5(data).hexdigest()
+        # validates file size
+        def validate(filepath: Union[str, os.PathLike], size: int) -> bool:
+            return os.path.getsize(filepath) == size
 
         # this is what we'll return
         # list of tuples, each including:
@@ -137,7 +135,7 @@ class LTDR_NDVI(Dataset):
                         # if file is already downloaded, and we aren't in overwrite mode
                         if dst.exists() and not self.overwrite_download:
                             if self.validate_download:
-                                if validate(dst, file_detail["md5sum"]):
+                                if validate(dst, file_detail["size"]):
                                     logger.info(f"File validated: {dst.as_posix()}")
                                     download_list.append(
                                         (False, (day_download_url, dst))
