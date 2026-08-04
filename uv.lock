@@ -1171,6 +1171,7 @@ dependencies = [
     { name = "netcdf4" },
     { name = "pandas" },
     { name = "prefect" },
+    { name = "prefect-dask" },
     { name = "proj" },
     { name = "pyhdf" },
     { name = "python-dotenv" },
@@ -1202,6 +1203,7 @@ requires-dist = [
     { name = "netcdf4", specifier = ">=1.7.2" },
     { name = "pandas", specifier = ">=2.1.0" },
     { name = "prefect", specifier = ">=3.7.5" },
+    { name = "prefect-dask", specifier = ">=0.3.7" },
     { name = "proj", specifier = ">=0.2.0" },
     { name = "pyhdf", specifier = ">=0.11.6" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
@@ -2485,6 +2487,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/56/03/905ed55a75d5dafa7caf2150ccda295c01ad750e25bc1c4555db2d0ca80e/prefect-3.7.8.tar.gz", hash = "sha256:f8e363d44b92ca11abae3a9307bf1325236c3387cd5969694e7b03a5179ab6d8", size = 14160532, upload-time = "2026-07-09T22:02:40.064Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7d/5c/47d17acb87e352fbf1e39f2d0170a25bc40e4e3fd6fb6fa36f2230263350/prefect-3.7.8-py3-none-any.whl", hash = "sha256:6816c7f938c4a78b0b6b6f74e254a77472cb2773ad4a62462452ccfadbf9acbf", size = 15097251, upload-time = "2026-07-09T22:02:36.69Z" },
+]
+
+[[package]]
+name = "prefect-dask"
+version = "0.3.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "distributed" },
+    { name = "prefect" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/34/08/c2782cde9f870188c1a313e1deafa5ad4449aa3343ef05e3b4e857a6f401/prefect_dask-0.3.7.tar.gz", hash = "sha256:a6ba8794b13e3743429797250ad550bedddaecdbab6c082182cfa878fe9528c4", size = 20529, upload-time = "2026-06-05T19:39:13.03Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/70/d8/e7478aa23695dc1e1d2e0ee1ffd4a5f155b86347ec2780d1d9e8cc1668c2/prefect_dask-0.3.7-py3-none-any.whl", hash = "sha256:b814adbfc3cd68ae4255bc930d38c02172c2af5a4dfe367edab75f30f7c90465", size = 14509, upload-time = "2026-06-05T19:39:11.767Z" },
 ]
 
 [[package]]
