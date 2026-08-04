@@ -731,29 +731,39 @@ class Dataset(ABC):
                 from dask_kubernetes.operator import KubeCluster, make_cluster_spec
                 from prefect_dask import DaskTaskRunner
 
-                spec = make_cluster_spec(name="selector-example", n_workers=2)
-                spec["spec"]["worker"]["spec"]["containers"][0][
-                    "image"
-                ] = "docker.io/jacobwhall/geodata-dask"
-                spec["spec"]["worker"]["spec"]["containers"][0][
-                    "imagePullPolicy"
-                ] = "Always"
-                spec["spec"]["worker"]["spec"]["containers"][0]["env"] = [
-                    {
-                        "name": "DATA_MANAGER_VERSION",
-                        "value": os.environ["DATA_MANAGER_VERSION"],
-                    }
-                ]
-                spec["spec"]["worker"]["spec"]["containers"][0]["volumeMounts"] = [
-                    {"name": "sciclone", "mountPath": "/sciclone"}
-                ]
+                if not params.worker_image:
+                    raise ValueError(
+                        "worker_image is not set - deploy this dataset with "
+                        "scripts/deploy.py, which sets it automatically from "
+                        "[deploy].image_tag."
+                    )
 
-                spec["spec"]["worker"]["spec"]["volumes"] = [
+                # Scheduler and worker pods use the same image as the flow-run
+                # pod (the client), so dask/distributed versions match across
+                # all three - a mismatch there breaks the distributed
+                # protocol - and so data_manager and the dataset's own code
+                # are consistently available to workers as well.
+                volumes = [
                     {
                         "name": "sciclone",
                         "persistentVolumeClaim": {"claimName": "nova-geodata-prod"},
                     }
                 ]
+                # matches the flow-run pod's own mount path (see
+                # kubernetes/utilities/base-job-template.json) so that
+                # raw_dir/output_dir paths resolve identically for workers
+                volume_mounts = [
+                    {"name": "sciclone", "mountPath": "/sciclone/nova/REU/geo"}
+                ]
+
+                spec = make_cluster_spec(name="selector-example", n_workers=2)
+                for role in ("scheduler", "worker"):
+                    container = spec["spec"][role]["spec"]["containers"][0]
+                    container["image"] = params.worker_image
+                    container["imagePullPolicy"] = "IfNotPresent"
+                    container["volumeMounts"] = volume_mounts
+                spec["spec"]["scheduler"]["spec"]["volumes"] = volumes
+                spec["spec"]["worker"]["spec"]["volumes"] = volumes
 
                 dask_task_runner_kwargs = {
                     "cluster_class": KubeCluster,

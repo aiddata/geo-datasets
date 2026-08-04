@@ -77,6 +77,11 @@ module_name = config["deploy"]["flow_file_name"]
 flow_name = config["deploy"]["flow_name"]
 flow_image = "ghcr.io/aiddata/geo-datasets:{}".format(config["deploy"]["image_tag"])
 
+# for the "kubernetes" task runner, dask scheduler/worker pods should use the
+# same image as the flow-run pod itself, so they have a matching data_manager
+# version and Python environment
+config.setdefault("run", {})["worker_image"] = flow_image
+
 
 # create and load storage block
 git_repo_url = config["repo"]["url"]

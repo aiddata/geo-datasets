@@ -73,6 +73,13 @@ class RunParameters(BaseModel):
     Conda environment to use when running the dataset.
     **Deprecated because we do not use this in the new Prefect/Kubernetes setup**
     """
+    worker_image: Optional[str] = None
+    """
+    Image reference for dask scheduler/worker pods when using the "kubernetes"
+    task runner. Set automatically by `scripts/deploy.py` from the same
+    `[deploy].image_tag` used for the flow-run pod itself - not meant to be
+    set by hand in a dataset's config.toml.
+    """
 
 
 class BaseDatasetConfiguration(BaseModel):
