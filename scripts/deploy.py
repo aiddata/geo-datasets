@@ -23,6 +23,7 @@ prefect agent start -q 'work_queue_name'
 
 """
 
+import asyncio
 import inspect
 import json
 import os
@@ -30,6 +31,7 @@ import sys
 import tomllib
 from pathlib import Path
 
+from prefect import get_client
 from prefect.runner.storage import GitRepository
 
 from data_manager import Dataset
@@ -81,6 +83,28 @@ flow_image = "ghcr.io/aiddata/geo-datasets:{}".format(config["deploy"]["image_ta
 # same image as the flow-run pod itself, so they have a matching data_manager
 # version and Python environment
 config.setdefault("run", {})["worker_image"] = flow_image
+
+
+async def get_work_pool_pvc_claim(pool_name: str) -> str:
+    """
+    Read the PersistentVolumeClaim name the given work pool's flow-run pods
+    actually mount, straight from its live base_job_template - this is the
+    same claim dask scheduler/worker pods need to mount so raw_dir/output_dir
+    paths resolve identically, and it's the authoritative source for which
+    claim a given work pool (e.g. staging vs prod) is really configured with,
+    rather than assuming a hardcoded name.
+    """
+    async with get_client() as client:
+        work_pool = await client.read_work_pool(pool_name)
+    pod_spec = work_pool.base_job_template["job_configuration"]["job_manifest"][
+        "spec"
+    ]["template"]["spec"]
+    return pod_spec["volumes"][0]["persistentVolumeClaim"]["claimName"]
+
+
+config["run"]["worker_pvc_claim"] = asyncio.run(
+    get_work_pool_pvc_claim(config["deploy"]["work_pool"])
+)
 
 
 # create and load storage block

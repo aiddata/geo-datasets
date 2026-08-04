@@ -731,22 +731,25 @@ class Dataset(ABC):
                 from dask_kubernetes.operator import KubeCluster, make_cluster_spec
                 from prefect_dask import DaskTaskRunner
 
-                if not params.worker_image:
+                if not params.worker_image or not params.worker_pvc_claim:
                     raise ValueError(
-                        "worker_image is not set - deploy this dataset with "
-                        "scripts/deploy.py, which sets it automatically from "
-                        "[deploy].image_tag."
+                        "worker_image/worker_pvc_claim are not set - deploy "
+                        "this dataset with scripts/deploy.py, which sets "
+                        "them automatically from [deploy].image_tag and the "
+                        "target work pool's base_job_template."
                     )
 
                 # Scheduler and worker pods use the same image as the flow-run
                 # pod (the client), so dask/distributed versions match across
                 # all three - a mismatch there breaks the distributed
                 # protocol - and so data_manager and the dataset's own code
-                # are consistently available to workers as well.
+                # are consistently available to workers as well. The PVC
+                # claim also matches the flow-run pod's own (staging vs prod
+                # follows whichever work pool this was deployed to).
                 volumes = [
                     {
                         "name": "sciclone",
-                        "persistentVolumeClaim": {"claimName": "nova-geodata-prod"},
+                        "persistentVolumeClaim": {"claimName": params.worker_pvc_claim},
                     }
                 ]
                 # matches the flow-run pod's own mount path (see
