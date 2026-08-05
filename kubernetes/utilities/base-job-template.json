@@ -89,7 +89,7 @@
       "namespace": {
         "type": "string",
         "title": "Namespace",
-        "default": "geo-datasets",
+        "default": "geo-datasets-staging",
         "description": "The Kubernetes namespace to create jobs within."
       },
       "annotations": {

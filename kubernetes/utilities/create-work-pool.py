@@ -48,7 +48,7 @@ async def create_work_pool(wp_kwargs):
 )
 @click.option(
     "--namespace",
-    default="geo-datasets",
+    default="geo-datasets-staging",
     help="Kubernetes namespace to run flow jobs in",
     type=str,
 )
