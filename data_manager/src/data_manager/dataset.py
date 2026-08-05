@@ -758,10 +758,10 @@ class Dataset(ABC):
                 # kubernetes/utilities/base-job-template.json) so that
                 # raw_dir/output_dir paths resolve identically for workers
                 volume_mounts = [
-                    {"name": "sciclone", "mountPath": "/sciclone/nova/REU/geo"}
+                    {"name": "sciclone", "mountPath": "/sciclone/nova/REU/geo/geoquery"}
                 ]
 
-                spec = make_cluster_spec(name="selector-example", n_workers=2)
+                spec = make_cluster_spec(name=f"dask-{self.name}", n_workers=2)
                 for role in ("scheduler", "worker"):
                     container = spec["spec"][role]["spec"]["containers"][0]
                     container["image"] = params.worker_image
