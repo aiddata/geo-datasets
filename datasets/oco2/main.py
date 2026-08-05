@@ -157,7 +157,7 @@ class OCO2(Dataset):
             # else:
             #     return
             #     # return (0, "Success", url)
-        return (0, "Success", url)
+        return local_filename
 
     @staticmethod
     def drop_existing_files(file_tuples, overwrite=False):
@@ -383,7 +383,7 @@ class OCO2(Dataset):
         download_list = self.run_tasks(self.prepare_download_list, [[y] for y in self.year_list])
 
         print("Running data download")
-        self.run_tasks(self.manage_download, download_list.results()[0])
+        download_results = self.run_tasks(self.manage_download, download_list.results()[0])
 
         # prepare daily data
         input_list = glob.glob(os.path.join(self.raw_dir, "oco2_LtCO2_*.nc4"))
