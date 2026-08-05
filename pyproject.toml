@@ -25,6 +25,7 @@ dependencies = [
     "pandas>=2.1.0",
     "prefect>=3.7.5",
     "prefect-dask>=0.3.7",
+    "prefect-kubernetes>=0.7.11",
     "proj>=0.2.0",
     "pyhdf>=0.11.6",
     "python-dotenv>=1.0.0",
