@@ -384,7 +384,7 @@ class OCO2(Dataset):
         download_list = self.run_tasks(self.prepare_download_list, [[y] for y in self.year_list])
 
         print("Running data download")
-        self.run_tasks(self.manage_download, download_list)
+        self.run_tasks(self.manage_download, download_list[3])
 
         # prepare daily data
         input_list = glob.glob(os.path.join(self.raw_dir, "oco2_LtCO2_*.nc4"))
