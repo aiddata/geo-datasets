@@ -36,8 +36,8 @@ directory = "datasets/ltdr_ndvi"
 
 [deploy]
 deployment_name = "ltdr_ndvi"
-version = 16
-image_tag = "1248cac"
+version = 17
+image_tag = "1eb7fa4"
 flow_file_name = "main"
 flow_name = "ltdr_ndvi"
 work_pool = "geodata"
