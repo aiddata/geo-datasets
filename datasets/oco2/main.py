@@ -108,8 +108,6 @@ class OCO2(Dataset):
         test_request.raise_for_status()
 
     def prepare_download_list(self, year):
-        print("Preparing data download")
-
         print(f"\tFinding files for year {year}")
         year_url = self.version_url(year)
         year_files = find_files(year_url, ".nc4", headers=self.auth_headers)
@@ -384,7 +382,7 @@ class OCO2(Dataset):
         download_list = self.run_tasks(self.prepare_download_list, [[y] for y in self.year_list])
 
         print("Running data download")
-        self.run_tasks(self.manage_download, download_list[3])
+        self.run_tasks(self.manage_download, download_list.results()[0])
 
         # prepare daily data
         input_list = glob.glob(os.path.join(self.raw_dir, "oco2_LtCO2_*.nc4"))
