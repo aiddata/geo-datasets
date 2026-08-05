@@ -22,7 +22,6 @@ overwrite_processing = false
 
 
 [run]
-backend = "local"
 max_workers = 24
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ltdr/avhrr_ndvi_v6/logs"
 retries = 6

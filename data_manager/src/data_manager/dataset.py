@@ -2,6 +2,7 @@ import csv
 import logging
 import multiprocessing
 import os
+import re
 import shutil
 import time
 from abc import ABC, abstractmethod
@@ -756,17 +757,31 @@ class Dataset(ABC):
                 ]
                 # matches the flow-run pod's own mount path (see
                 # kubernetes/utilities/base-job-template.json) so that
-                # raw_dir/output_dir paths resolve identically for workers
+                # raw_dir/output_dir paths resolve identically for workers -
+                # must stay in sync with that file's mountPath
                 volume_mounts = [
-                    {"name": "sciclone", "mountPath": "/sciclone/nova/REU/geo/geoquery"}
+                    {"name": "sciclone", "mountPath": "/sciclone/nova/REU/geo"}
                 ]
+                # dask worker/scheduler pods do the same disk-heavy raster
+                # work as the flow-run pod, which needed an explicit
+                # ephemeral-storage request after being evicted under node
+                # disk pressure with none set (see base-job-template.json)
+                resources = {
+                    "requests": {"ephemeral-storage": "10Gi"},
+                    "limits": {"ephemeral-storage": "20Gi"},
+                }
 
-                spec = make_cluster_spec(name=f"dask-{self.name}", n_workers=2)
+                # DaskCluster is a Kubernetes custom resource, so its name
+                # must be a valid DNS-1123 label - self.name (e.g. "OCO-2
+                # Carbon Dioxide") isn't
+                name_slug = re.sub(r"[^a-z0-9]+", "-", self.name.lower()).strip("-")
+                spec = make_cluster_spec(name=f"dask-{name_slug}", n_workers=2)
                 for role in ("scheduler", "worker"):
                     container = spec["spec"][role]["spec"]["containers"][0]
                     container["image"] = params.worker_image
                     container["imagePullPolicy"] = "IfNotPresent"
                     container["volumeMounts"] = volume_mounts
+                    container["resources"] = resources
                 spec["spec"]["scheduler"]["spec"]["volumes"] = volumes
                 spec["spec"]["worker"]["spec"]["volumes"] = volumes
 
