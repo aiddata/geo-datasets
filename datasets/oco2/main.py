@@ -157,6 +157,7 @@ class OCO2(Dataset):
             # else:
             #     return
             #     # return (0, "Success", url)
+        return (0, "Success", url)
 
     @staticmethod
     def drop_existing_files(file_tuples, overwrite=False):
