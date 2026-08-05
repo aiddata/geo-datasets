@@ -381,7 +381,7 @@ class OCO2(Dataset):
         os.makedirs(self.raw_dir, exist_ok=True)
 
         print("Preparing data download list")
-        download_list = self.run_tasks(self.prepare_download_list, self.year_list)
+        download_list = self.run_tasks(self.prepare_download_list, [[y] for y in self.year_list])
 
         print("Running data download")
         self.run_tasks(self.manage_download, download_list)
