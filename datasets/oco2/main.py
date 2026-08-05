@@ -381,9 +381,12 @@ class OCO2(Dataset):
 
         print("Preparing data download list")
         download_list = self.run_tasks(self.prepare_download_list, [[y] for y in self.year_list])
+        # prepare_download_list returns one file list per year; flatten across
+        # all years rather than just the first one
+        flat_download_list = [f for year_files in download_list.results() for f in year_files]
 
         print("Running data download")
-        download_results = self.run_tasks(self.manage_download, download_list.results()[0])
+        download_results = self.run_tasks(self.manage_download, flat_download_list)
 
         # prepare daily data
         input_list = glob.glob(os.path.join(self.raw_dir, "oco2_LtCO2_*.nc4"))
