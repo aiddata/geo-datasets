@@ -107,6 +107,24 @@ class OCO2(Dataset):
         )
         test_request.raise_for_status()
 
+    def prepare_download_list(self, year):
+        print("Preparing data download")
+
+        print(f"\tFinding files for year {year}")
+        year_url = self.version_url(year)
+        year_files = find_files(year_url, ".nc4", headers=self.auth_headers)
+
+        df = pd.DataFrame({"raw_url": year_files})
+
+        # use basename from url to create local filename
+        df["output"] = df["raw_url"].apply(
+            lambda x: os.path.join(self.raw_dir, os.path.basename(x))
+        )
+
+        # generate list of tasks to iterate over
+        flist = list(zip(df["raw_url"], df["output"]))
+        return flist
+
     def manage_download(self, url, local_filename):
         """Download an individual file, authenticating with the Earthdata token."""
 
@@ -152,31 +170,6 @@ class OCO2(Dataset):
         output path.
         """
         return [f for f in file_tuples if overwrite or not file_exists(f[1])]
-
-    def download_data(self):
-        print("Preparing data download")
-
-        year_file_list = []
-        for year in self.year_list:
-            print(f"\tFinding files for year {year}")
-            year_url = self.version_url(year)
-            year_files = find_files(year_url, ".nc4", headers=self.auth_headers)
-            year_file_list.extend(year_files)
-
-        df = pd.DataFrame({"raw_url": year_file_list})
-
-        # use basename from url to create local filename
-        df["output"] = df["raw_url"].apply(
-            lambda x: os.path.join(self.raw_dir, os.path.basename(x))
-        )
-
-        os.makedirs(self.raw_dir, exist_ok=True)
-
-        # generate list of tasks to iterate over
-        flist = list(zip(df["raw_url"], df["output"]))
-
-        print("Running data download")
-        return self.run_tasks(self.manage_download, flist)
 
     def convert_daily(self, input_path, output_path):
         """
@@ -385,8 +378,13 @@ class OCO2(Dataset):
         output_df.to_csv(output_path, index=False)
 
     def main(self):
-        # download data
-        self.download_data()
+        os.makedirs(self.raw_dir, exist_ok=True)
+
+        print("Preparing data download list")
+        download_list = self.run_tasks(self.prepare_download_list, self.year_list)
+
+        print("Running data download")
+        self.run_tasks(self.manage_download, download_list)
 
         # prepare daily data
         input_list = glob.glob(os.path.join(self.raw_dir, "oco2_LtCO2_*.nc4"))
