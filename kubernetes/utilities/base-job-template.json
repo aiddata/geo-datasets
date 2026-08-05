@@ -129,6 +129,32 @@
         "default": null,
         "description": "The memory resource limit for the Kubernetes job container. Uses Kubernetes resource quantity format (e.g. '128Mi', '1Gi'). If not provided, no memory limit is configured."
       },
+      "ephemeral_storage_request": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Ephemeral Storage Request",
+        "default": "10Gi",
+        "description": "The ephemeral-storage resource request for the Kubernetes job container. Uses Kubernetes resource quantity format (e.g. '10Gi'). Jobs with no request are scheduled opportunistically and evicted first under node disk pressure, regardless of actual usage."
+      },
+      "ephemeral_storage_limit": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Ephemeral Storage Limit",
+        "default": "20Gi",
+        "description": "The ephemeral-storage resource limit for the Kubernetes job container. Uses Kubernetes resource quantity format (e.g. '20Gi')."
+      },
       "backoff_limit": {
         "type": "integer",
         "title": "Backoff Limit",
@@ -274,11 +300,13 @@
                 "resources": {
                   "limits": {
                     "cpu": "{{ cpu_limit }}",
-                    "memory": "{{ memory_limit }}"
+                    "memory": "{{ memory_limit }}",
+                    "ephemeral-storage": "{{ ephemeral_storage_limit }}"
                   },
                   "requests": {
                     "cpu": "{{ cpu_request }}",
-                    "memory": "{{ memory_request }}"
+                    "memory": "{{ memory_request }}",
+                    "ephemeral-storage": "{{ ephemeral_storage_request }}"
                   }
                 },
                 "imagePullPolicy": "{{ image_pull_policy }}",
