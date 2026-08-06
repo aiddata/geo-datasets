@@ -389,7 +389,10 @@ class OCO2(Dataset):
         download_results = self.run_tasks(self.manage_download, flat_download_list)
 
         # prepare daily data
-        input_list = glob.glob(os.path.join(self.raw_dir, "oco2_LtCO2_*.nc4"))
+        input_list = []
+        for y in self.year_list:
+            input_list.extend(glob.glob(os.path.join(self.raw_dir, f"oco2_LtCO2_{y}*.nc4")))
+            
         output_list = [
             os.path.join(
                 self.day_dir, "xco2_20{}.csv".format(os.path.basename(i).split("_")[2])
