@@ -3,15 +3,16 @@ LandMark: Indigenous Peoples' Lands & Territories and Local Community Lands
 
 https://landmarkmap.org/data-methods/access-data
 
-Manually downloaded (no automated download step - see README). Produces two
-outputs from the same source archive:
-  - points, buffered to small polygons, as a "feature" type dataset
-  - the polygon layer, as-is, as a "boundary" type dataset
+Manually downloaded (no automated download step - see README). Combines the
+source archive's point and polygon layers (points buffered to small
+polygons) into a single GeoPackage, written to two locations so it can be
+ingested twice: once as a "feature" type, once as a "boundary" type.
 """
 
 from pathlib import Path
 
 import geopandas as gpd
+import pandas as pd
 
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
@@ -36,8 +37,8 @@ class LandMarkMap(Dataset):
         self.buffer_meters = config.buffer_meters
         self.overwrite_process = config.overwrite_process
 
-        self.point_output_path = self.feature_output_dir / "landmarkmap_points.gpkg"
-        self.poly_output_path = self.boundary_output_dir / "landmarkmap_polygons.gpkg"
+        self.feature_output_path = self.feature_output_dir / "landmarkmap.gpkg"
+        self.boundary_output_path = self.boundary_output_dir / "landmarkmap.gpkg"
 
     def find_shapefile(self, pattern: str) -> Path:
         """Find the single shapefile matching a glob pattern under raw_dir/shp.
@@ -56,55 +57,49 @@ class LandMarkMap(Dataset):
             raise Exception(f"Multiple shapefiles matching {pattern!r} found: {matches}")
         return matches[0]
 
-    def process_points(self):
-        """Buffer point features to small polygons and write a GeoPackage."""
+    def build_combined_gdf(self) -> gpd.GeoDataFrame:
+        """Read points and polygons, buffer points to polygons, and combine
+        both layers into a single GeoDataFrame in EPSG:4326."""
         logger = self.get_logger()
-
-        if self.point_output_path.exists() and not self.overwrite_process:
-            logger.info(f"Output exists, skipping: {self.point_output_path}")
-            return
 
         point_shp = self.find_shapefile("LandMark_IP_LC_point_public_v*.shp")
         logger.info(f"Reading points from {point_shp}")
-        gdf = gpd.read_file(point_shp, engine="pyogrio")
-        logger.info(f"Loaded {len(gdf)} point features")
+        points = gpd.read_file(point_shp, engine="pyogrio")
+        logger.info(f"Loaded {len(points)} point features")
 
         # source CRS (EPSG:3857) is already in meters, so buffering here
         # doesn't require reprojecting first
-        gdf["geometry"] = gdf.buffer(self.buffer_meters)
-        gdf = gdf.to_crs(OUTPUT_CRS)
-
-        self.point_output_path.parent.mkdir(parents=True, exist_ok=True)
-        gdf.to_file(self.point_output_path, driver="GPKG")
-        logger.info(f"Saved {self.point_output_path}")
-
-    def process_polygons(self):
-        """Reproject the polygon layer and write a GeoPackage."""
-        logger = self.get_logger()
-
-        if self.poly_output_path.exists() and not self.overwrite_process:
-            logger.info(f"Output exists, skipping: {self.poly_output_path}")
-            return
+        points["geometry"] = points.buffer(self.buffer_meters)
 
         poly_shp = self.find_shapefile("LandMark_IP_LC_poly_public_v*.shp")
         logger.info(f"Reading polygons from {poly_shp}")
-        gdf = gpd.read_file(poly_shp, engine="pyogrio", force_2d=True)
-        logger.info(f"Loaded {len(gdf)} polygon features")
+        polygons = gpd.read_file(poly_shp, engine="pyogrio", force_2d=True)
+        logger.info(f"Loaded {len(polygons)} polygon features")
 
-        gdf = gdf.to_crs(OUTPUT_CRS)
-
-        self.poly_output_path.parent.mkdir(parents=True, exist_ok=True)
-        gdf.to_file(self.poly_output_path, driver="GPKG")
-        logger.info(f"Saved {self.poly_output_path}")
+        combined = gpd.GeoDataFrame(
+            pd.concat([points, polygons], ignore_index=True), crs=points.crs
+        )
+        combined = combined.to_crs(OUTPUT_CRS)
+        logger.info(f"Combined into {len(combined)} total features")
+        return combined
 
     def main(self):
         logger = self.get_logger()
 
-        logger.info("Processing points -> feature output")
-        self.process_points()
+        if (
+            self.feature_output_path.exists()
+            and self.boundary_output_path.exists()
+            and not self.overwrite_process
+        ):
+            logger.info("Outputs exist, skipping")
+            return
 
-        logger.info("Processing polygons -> boundary output")
-        self.process_polygons()
+        gdf = self.build_combined_gdf()
+
+        for output_path in (self.feature_output_path, self.boundary_output_path):
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            gdf.to_file(output_path, driver="GPKG")
+            logger.info(f"Saved {output_path}")
 
 
 try:
