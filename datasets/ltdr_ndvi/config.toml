@@ -22,10 +22,10 @@ overwrite_processing = false
 
 
 [run]
-max_workers = 24
+max_workers = 100
 log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/ltdr/avhrr_ndvi_v6/logs"
-retries = 6
-task_runner = "kubernetes"
+retries = 10
+task_runner = "concurrent"
 
 
 [repo]
@@ -36,7 +36,7 @@ directory = "datasets/ltdr_ndvi"
 
 [deploy]
 deployment_name = "ltdr_ndvi"
-version = 17
+version = 18
 image_tag = "1eb7fa4"
 flow_file_name = "main"
 flow_name = "ltdr_ndvi"
