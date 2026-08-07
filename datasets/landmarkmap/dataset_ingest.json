@@ -1,0 +1,65 @@
+{
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "name": "landmarkmap_ipcl_dataset",
+    "short_name": "IPCL Data",
+    "path": "/data/datasets/landmarkmap/landmarkmap_ipcl.gpkg",
+    "type": "feature",
+    "file_extension": ".gpkg",
+    "file_mask": "None",
+    "title": "LandMark: Indigenous Peoples' and Community Lands",
+    "description": "Locations of Indigenous Peoples' and local community lands and territories from LandMark. Measures percent overlap with the unit of analysis.",
+    "details": "Based on both polygons and points (points buffered to small polygons).",
+    "tags": [
+        "landmark",
+        "indigenous",
+        "community lands",
+        "land tenure"
+    ],
+    "citation": "LandMark: The Global Platform of Indigenous and Community Lands. https://landmarkmap.org/",
+    "source_name": "LandMark",
+    "source_url": "https://landmarkmap.org/",
+    "other": {
+        "filters": {
+            "identity": {
+                "display": "Identity",
+                "aggregate": true,
+                "type": "categorical",
+                "categories": [
+                    "Community",
+                    "Indigenous"
+                ]
+            },
+            "doc_status": {
+                "display": "Documentation Status",
+                "aggregate": true,
+                "type": "categorical",
+                "categories": [
+                    "Documented",
+                    "Held or used under customary tenure",
+                    "Held or used with formal land claim submitted",
+                    "Not documented"
+                ]
+            }
+        }
+    },
+    "processing_class": "filter_and_agg",
+    "processing_options": [
+        {
+            "function": "landmarkmap_filter_and_agg",
+            "short_name": "landmarkmap_filter_agg",
+            "description": "Filter features by user-selected criteria and compute percent overlap with the unit of analysis.",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        }
+    ],
+    "variable_factor": 1,
+    "variable_description": "percent overlap with LandMark community/Indigenous land points (buffered)",
+    "mapped": false,
+    "mappings": {},
+      "ingest_src": null,
+    "coverage_dependency": null
+}

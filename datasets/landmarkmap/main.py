@@ -11,6 +11,7 @@ outputs from the same source archive:
 
 from pathlib import Path
 
+import pandas as pd
 import geopandas as gpd
 
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
@@ -20,7 +21,7 @@ OUTPUT_CRS = "EPSG:4326"
 
 class LandMarkMapConfiguration(BaseDatasetConfiguration):
     raw_dir: str
-    feature_output_dir: str
+    dataset_output_dir: str
     boundary_output_dir: str
     buffer_meters: float
     overwrite_process: bool
@@ -31,13 +32,13 @@ class LandMarkMap(Dataset):
 
     def __init__(self, config: LandMarkMapConfiguration):
         self.raw_dir = Path(config.raw_dir)
-        self.feature_output_dir = Path(config.feature_output_dir)
+        self.dataset_output_dir = Path(config.dataset_output_dir)
         self.boundary_output_dir = Path(config.boundary_output_dir)
         self.buffer_meters = config.buffer_meters
         self.overwrite_process = config.overwrite_process
 
-        self.point_output_path = self.feature_output_dir / "landmarkmap_points.gpkg"
-        self.poly_output_path = self.boundary_output_dir / "landmarkmap_polygons.gpkg"
+        self.dataset_output_path = self.dataset_output_dir / "landmarkmap.gpkg"
+        self.boundary_output_path = self.boundary_output_dir / "landmarkmap.gpkg"
 
     def find_shapefile(self, pattern: str) -> Path:
         """Find the single shapefile matching a glob pattern under raw_dir/shp.
@@ -56,55 +57,60 @@ class LandMarkMap(Dataset):
             raise Exception(f"Multiple shapefiles matching {pattern!r} found: {matches}")
         return matches[0]
 
-    def process_points(self):
+    def process(self):
         """Buffer point features to small polygons and write a GeoPackage."""
         logger = self.get_logger()
 
-        if self.point_output_path.exists() and not self.overwrite_process:
-            logger.info(f"Output exists, skipping: {self.point_output_path}")
+        dataset_exists = False
+        boundary_exists = False
+        if self.dataset_output_path.exists() and not self.overwrite_process:
+            logger.info(f"Output exists, skipping: {self.dataset_output_path}")
+            dataset_exists = True
+
+        if self.boundary_output_path.exists() and not self.overwrite_process:
+            logger.info(f"Output exists, skipping: {self.boundary_output_path}")
+            boundary_exists = True
+
+        if dataset_exists and boundary_exists:
+            logger.info("Both outputs exist, skipping processing")
             return
 
         point_shp = self.find_shapefile("LandMark_IP_LC_point_public_v*.shp")
         logger.info(f"Reading points from {point_shp}")
-        gdf = gpd.read_file(point_shp, engine="pyogrio")
-        logger.info(f"Loaded {len(gdf)} point features")
+        points_gdf = gpd.read_file(point_shp, engine="pyogrio")
+        logger.info(f"Loaded {len(points_gdf)} point features")
 
         # source CRS (EPSG:3857) is already in meters, so buffering here
         # doesn't require reprojecting first
-        gdf["geometry"] = gdf.buffer(self.buffer_meters)
-        gdf = gdf.to_crs(OUTPUT_CRS)
-
-        self.point_output_path.parent.mkdir(parents=True, exist_ok=True)
-        gdf.to_file(self.point_output_path, driver="GPKG")
-        logger.info(f"Saved {self.point_output_path}")
-
-    def process_polygons(self):
-        """Reproject the polygon layer and write a GeoPackage."""
-        logger = self.get_logger()
-
-        if self.poly_output_path.exists() and not self.overwrite_process:
-            logger.info(f"Output exists, skipping: {self.poly_output_path}")
-            return
+        points_gdf["geometry"] = points_gdf.buffer(self.buffer_meters)
+        points_gdf = points_gdf.to_crs(OUTPUT_CRS)
 
         poly_shp = self.find_shapefile("LandMark_IP_LC_poly_public_v*.shp")
         logger.info(f"Reading polygons from {poly_shp}")
-        gdf = gpd.read_file(poly_shp, engine="pyogrio", force_2d=True)
-        logger.info(f"Loaded {len(gdf)} polygon features")
+        poly_gdf = gpd.read_file(poly_shp, engine="pyogrio", force_2d=True)
+        logger.info(f"Loaded {len(poly_gdf)} polygon features")
 
-        gdf = gdf.to_crs(OUTPUT_CRS)
+        poly_gdf = poly_gdf.to_crs(OUTPUT_CRS)
 
-        self.poly_output_path.parent.mkdir(parents=True, exist_ok=True)
-        gdf.to_file(self.poly_output_path, driver="GPKG")
-        logger.info(f"Saved {self.poly_output_path}")
+        gdf = gpd.GeoDataFrame(
+            gpd.GeoSeries(pd.concat([points_gdf.geometry, poly_gdf.geometry], ignore_index=True)),
+            columns=["geometry"],
+            crs=OUTPUT_CRS,
+        )
+
+        self.dataset_output_path.parent.mkdir(parents=True, exist_ok=True)
+        gdf.to_file(self.dataset_output_path, driver="GPKG")
+        logger.info(f"Saved {self.dataset_output_path}")
+
+        self.boundary_output_path.parent.mkdir(parents=True, exist_ok=True)
+        gdf.to_file(self.boundary_output_path, driver="GPKG")
+        logger.info(f"Saved {self.boundary_output_path}")
 
     def main(self):
         logger = self.get_logger()
 
-        logger.info("Processing points -> feature output")
-        self.process_points()
-
-        logger.info("Processing polygons -> boundary output")
-        self.process_polygons()
+        logger.info("Processing LandMark dataset and boundary")
+        self.process()
 
 
 try:
