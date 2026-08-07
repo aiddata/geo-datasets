@@ -45,8 +45,8 @@ directory = "datasets/oco2"
 
 [deploy]
 deployment_name = "oco2"
-image_tag = "1eb7fa4"
-version = 21
+image_tag = "935f288"
+version = 22
 flow_file_name = "main"
 flow_name = "oco2"
 work_pool = "geodata"
