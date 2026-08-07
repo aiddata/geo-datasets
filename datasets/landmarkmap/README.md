@@ -23,17 +23,16 @@ the data from the source site.
 
 ## Outputs
 
-The source package bundles a point layer and a polygon layer with the same
-attribute schema. This flow combines them into a single set of features
-(points buffered to small polygons, `buffer_meters`, default 100m; the
-polygon layer's 3D geometry flattened to 2D; both reprojected to EPSG:4326)
-and writes the **same combined GeoPackage to two locations**, so it can be
-ingested twice under two different types:
+The source package bundles two layers with the same attribute schema, which
+this flow turns into two separate GeoQuery datasets:
 
-- `feature_output_dir/landmarkmap.gpkg` - ingested as a `"feature"` type
-  (filterable, with a percent-overlap outcome - see Ingest below)
-- `boundary_output_dir/landmarkmap.gpkg` - ingested as a `"boundary"` type
-  (plain geometry, usable as a unit of analysis)
+- **Points** (`feature_output_dir/landmarkmap_points.gpkg`) - point
+  locations buffered to small polygons (`buffer_meters`, default 100m),
+  since GeoQuery's zonal-stats-style processing needs polygon geometry.
+  Ingested as a `"feature"` type.
+- **Polygons** (`boundary_output_dir/landmarkmap_polygons.gpkg`) - the
+  polygon layer as-is (reprojected to EPSG:4326; the source's 3D geometry
+  is flattened to 2D). Ingested as a `"boundary"` type.
 
 ## Quick start
 
