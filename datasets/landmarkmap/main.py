@@ -37,8 +37,8 @@ class LandMarkMap(Dataset):
         self.buffer_meters = config.buffer_meters
         self.overwrite_process = config.overwrite_process
 
-        self.dataset_output_path = self.dataset_output_dir / "landmarkmap.gpkg"
-        self.boundary_output_path = self.boundary_output_dir / "landmarkmap.gpkg"
+        self.dataset_output_path = self.dataset_output_dir / "landmarkmap_ipcl.gpkg"
+        self.boundary_output_path = self.boundary_output_dir / "landmarkmap_ipcl.gpkg"
 
     def find_shapefile(self, pattern: str) -> Path:
         """Find the single shapefile matching a glob pattern under raw_dir/shp.
@@ -93,9 +93,7 @@ class LandMarkMap(Dataset):
         poly_gdf = poly_gdf.to_crs(OUTPUT_CRS)
 
         gdf = gpd.GeoDataFrame(
-            gpd.GeoSeries(pd.concat([points_gdf.geometry, poly_gdf.geometry], ignore_index=True)),
-            columns=["geometry"],
-            crs=OUTPUT_CRS,
+            pd.concat([points_gdf, poly_gdf], ignore_index=True), crs=OUTPUT_CRS
         )
 
         self.dataset_output_path.parent.mkdir(parents=True, exist_ok=True)
