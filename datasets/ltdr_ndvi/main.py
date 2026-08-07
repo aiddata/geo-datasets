@@ -40,8 +40,21 @@ import numpy as np
 import pandas as pd
 import rasterio
 import requests
+from affine import Affine
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
+from pyhdf.SD import SD, SDC
 from rasterio.crs import CRS
+
+# LTDR AVH13C1 is a fixed global 0.05-degree grid (7200x3600), so the
+# geotransform doesn't need to be read from each file
+LTDR_TRANSFORM = Affine(0.05, 0, -180, 0, -0.05, 90)
+
+# LTDR has distributed AVH13C1 in two different container formats over the
+# years (same filename convention, different internal format) - detect which
+# one a given file actually is rather than assuming from its extension.
+# HDF5/NetCDF4 signature; classic HDF4 files (the "else" case below) start
+# with \x0e\x03\x13\x01 instead.
+HDF5_MAGIC = b"\x89HDF\r\n\x1a\n"
 
 
 class LTDR_NDVI_Configuration(BaseDatasetConfiguration):
@@ -227,6 +240,25 @@ class LTDR_NDVI(Dataset):
         return df
 
     @staticmethod
+    def read_ndvi_qa(path: Path) -> Tuple[np.ndarray, np.ndarray]:
+        """Read the NDVI and QA arrays out of an AVH13C1 file, whichever of
+        the two container formats it actually is (see HDF5_MAGIC above)."""
+        with open(path, "rb") as f:
+            magic = f.read(len(HDF5_MAGIC))
+
+        if magic == HDF5_MAGIC:
+            with rasterio.open(f'NETCDF:"{path.as_posix()}":NDVI') as ndvi_src:
+                ndvi_array = ndvi_src.read(1)
+            with rasterio.open(f'NETCDF:"{path.as_posix()}":QA') as qa_src:
+                qa_array = qa_src.read(1)
+        else:
+            hdf = SD(path.as_posix(), SDC.READ)
+            ndvi_array = hdf.select("NDVI").get()
+            qa_array = hdf.select("QA").get()
+
+        return ndvi_array, qa_array
+
+    @staticmethod
     def create_mask(qa_array, mask_vals):
         qa_mask_vals = [abs(x - 15) for x in mask_vals]
         mask_bin_array = [0] * 16
@@ -298,42 +330,33 @@ class LTDR_NDVI(Dataset):
             # qa_mask_vals = [15, 9, 8, 6, 4, 3, 2, 1]
             qa_mask_vals = [15, 9, 8, 1]
 
-            ndvi_gdal_path = f'HDF4_EOS:EOS_GRID:"{src.as_posix()}":Grid:NDVI'
-            qa_gdal_path = f'HDF4_EOS:EOS_GRID:"{src.as_posix()}":Grid:QA'
+            ndvi_array, qa_array = self.read_ndvi_qa(src)
 
-            # open data subdataset
-            with rasterio.open(ndvi_gdal_path) as ndvi_src:
-                ndvi_array = ndvi_src.read(1)
+            # create mask array using our chosen mask values
+            qa_mask = self.create_mask(qa_array, qa_mask_vals)
 
-                # open quality assurance subdataset
-                with rasterio.open(qa_gdal_path) as qa_src:
-                    qa_array = qa_src.read(1)
+            # apply mask to dataset
+            ndvi_array[qa_mask] = -9999
 
-                    # create mask array using our chosen mask values
-                    qa_mask = self.create_mask(qa_array, qa_mask_vals)
+            ndvi_array[np.where((ndvi_array < 0) & (ndvi_array > -9999))] = 0
+            ndvi_array[np.where(ndvi_array > 10000)] = 10000
 
-                    # apply mask to dataset
-                    ndvi_array[qa_mask] = -9999
+            profile = {
+                "count": 1,
+                "driver": "COG",
+                "compress": "LZW",
+                "dtype": "int16",
+                "nodata": -9999,
+                "height": 3600,
+                "width": 7200,
+                "crs": CRS.from_epsg(4326),
+                "transform": LTDR_TRANSFORM,
+            }
 
-                ndvi_array[np.where((ndvi_array < 0) & (ndvi_array > -9999))] = 0
-                ndvi_array[np.where(ndvi_array > 10000)] = 10000
-
-                profile = {
-                    "count": 1,
-                    "driver": "COG",
-                    "compress": "LZW",
-                    "dtype": "int16",
-                    "nodata": -9999,
-                    "height": 3600,
-                    "width": 7200,
-                    "crs": CRS.from_epsg(4326),
-                    "transform": ndvi_src.transform,
-                }
-
-                with self.tmp_to_dst_file(output_path) as dst_path:
-                    with rasterio.open(dst_path, "w", **profile) as dst:
-                        # for some reason rasterio raises an exception if we don't specify that there is one index
-                        dst.write(ndvi_array, indexes=1)
+            with self.tmp_to_dst_file(output_path) as dst_path:
+                with rasterio.open(dst_path, "w", **profile) as dst:
+                    # for some reason rasterio raises an exception if we don't specify that there is one index
+                    dst.write(ndvi_array, indexes=1)
 
     def process_monthly_data(self, year_month, month_files, month_path):
         logger = self.get_logger()
