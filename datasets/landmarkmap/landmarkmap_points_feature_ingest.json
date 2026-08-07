@@ -1,0 +1,125 @@
+{
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/landmarkmap/landmarkmap_points.gpkg",
+    "type": "feature",
+    "file_extension": ".gpkg",
+    "file_mask": "None",
+    "name": "landmarkmap_points",
+    "short_name": "LandMark Points",
+    "title": "LandMark: Indigenous Peoples' and Community Lands (Points)",
+    "description": "Point locations of Indigenous Peoples' and local community lands and territories from LandMark, buffered to small (100m) polygons.",
+    "details": "Buffered from point geometry so overlap with a unit of analysis can be computed. See the polygon layer (type: boundary) for actual mapped extents where available.",
+    "processing_class": "filter_and_agg",
+    "processing_options": [
+        {
+            "function": "landmarkmap_filter_and_agg",
+            "short_name": "landmarkmap_filter_agg",
+            "description": "Filter features by user-selected criteria and compute percent overlap with the unit of analysis.",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        }
+    ],
+    "other": {
+        "outcomes": {
+            "percent_overlap": "Percent Overlap"
+        },
+        "filters": {
+            "identity": {
+                "display": "Identity",
+                "aggregate": true,
+                "type": "categorical",
+                "categories": [
+                    "Community",
+                    "Indigenous"
+                ]
+            },
+            "doc_status": {
+                "display": "Documentation Status",
+                "aggregate": true,
+                "type": "categorical",
+                "categories": [
+                    "Documented",
+                    "Held or used under customary tenure",
+                    "Held or used with formal land claim submitted",
+                    "Not documented"
+                ]
+            },
+            "country": {
+                "display": "Country",
+                "aggregate": true,
+                "type": "categorical",
+                "categories": [
+                    "Afghanistan",
+                    "Antigua and Barbuda",
+                    "Australia",
+                    "Bolivia",
+                    "Botswana",
+                    "Brazil",
+                    "Cambodia",
+                    "Cameroon",
+                    "Canada",
+                    "Central African Republic",
+                    "Chile",
+                    "Colombia",
+                    "Costa Rica",
+                    "Democratic Republic of the Congo",
+                    "Ecuador",
+                    "Equatorial Guinea",
+                    "Finland",
+                    "Gabon",
+                    "Greenland (Denmark)",
+                    "Guyana",
+                    "Guyane Française",
+                    "India",
+                    "Ireland",
+                    "Italy",
+                    "Kenya",
+                    "Liberia",
+                    "Malawi",
+                    "Malaysia",
+                    "Mexico",
+                    "Mongolia",
+                    "Mozambique",
+                    "Myanmar",
+                    "Namibia",
+                    "Nepal",
+                    "New Zealand",
+                    "Nicaragua",
+                    "Panama",
+                    "Paraguay",
+                    "Perú",
+                    "Republic of the Congo",
+                    "South Africa",
+                    "Spain",
+                    "Taiwan",
+                    "Tanzania",
+                    "Uganda",
+                    "United Kingdom - England",
+                    "United States of America",
+                    "Venezuela",
+                    "Zambia",
+                    "Zimbabwe"
+                ]
+            }
+        }
+    },
+    "variable_factor": 1,
+    "variable_description": "percent overlap with LandMark community/Indigenous land points (buffered)",
+    "mapped": false,
+    "mappings": {},
+    "citation": "LandMark: The Global Platform of Indigenous and Community Lands. https://landmarkmap.org/",
+    "sources_web": "https://landmarkmap.org/",
+    "sources_name": "LandMark",
+    "tags": [
+        "landmark",
+        "indigenous",
+        "community lands",
+        "land tenure"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
+}

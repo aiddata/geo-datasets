@@ -1,0 +1,27 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/landmarkmap"
+feature_output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/landmarkmap"
+boundary_output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/boundaries/landmarkmap"
+
+buffer_meters = 100
+
+overwrite_process = false
+
+
+[run]
+max_workers = 1
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/landmarkmap/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/landmarkmap"
+
+
+[deploy]
+deployment_name = "landmarkmap"
+image_tag = "935f288"
+version = 1
+flow_file_name = "main"
+flow_name = "landmarkmap"
+work_pool = "geodata"
