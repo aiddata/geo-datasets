@@ -266,9 +266,10 @@ class LTDR_NDVI(Dataset):
             mask_bin_array[x] = 1
         mask_bin = int("".join(map(str, mask_bin_array)), 2)
 
-        flag = lambda i: (i & 65535 & mask_bin) != 0
-
-        qa_mask = pd.DataFrame(qa_array).applymap(flag).to_numpy()
+        # upcast: qa_array is int16, and numpy (unlike Python's arbitrary-
+        # precision ints) raises OverflowError ANDing it directly against
+        # 65535, which doesn't fit in int16
+        qa_mask = (qa_array.astype(np.int32) & 65535 & mask_bin) != 0
         return qa_mask
 
     def process_daily_data(self, src, output_path):
