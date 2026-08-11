@@ -107,6 +107,10 @@ class LTDR_NDVI(Dataset):
             "M1_AVH13C1",
         ]
 
+    # validates file size
+    def validate(self, filepath: Union[str, os.PathLike], size: int) -> bool:
+        return os.path.getsize(filepath) == size
+
     def build_sensor_download_list(self, sensor: str):
         logger = self.get_logger()
 
@@ -115,10 +119,6 @@ class LTDR_NDVI(Dataset):
             logger.debug(f"Fetching {dir_url}")
             description: dict = json.loads(requests.get(dir_url).content)
             return description["content"]
-
-        # validates file size
-        def validate(filepath: Union[str, os.PathLike], size: int) -> bool:
-            return os.path.getsize(filepath) == size
 
         # this is what we'll return
         # list of tuples, each including:
@@ -137,6 +137,7 @@ class LTDR_NDVI(Dataset):
                     day_dir: str = "/".join([year_dir, day_details["name"]])
                     # for each file the sensor created for this day
                     for file_detail in dir_contents(day_dir):
+                        fsize = file_detail["size"]
                         day_download_url: str = file_detail["downloadsLink"]
                         dst = (
                             self.raw_dir
@@ -148,35 +149,42 @@ class LTDR_NDVI(Dataset):
                         # if file is already downloaded, and we aren't in overwrite mode
                         if dst.exists() and not self.overwrite_download:
                             if self.validate_download:
-                                if validate(dst, file_detail["size"]):
+                                if self.validate(dst, fsize):
                                     logger.info(f"File validated: {dst.as_posix()}")
                                     download_list.append(
-                                        (False, (day_download_url, dst))
+                                        (False, (day_download_url, dst, fsize))
                                     )
                                 else:
                                     logger.info(
                                         f"File validation failed, queuing for download: {dst.as_posix()}"
                                     )
                                     download_list.append(
-                                        (True, (day_download_url, dst))
+                                        (True, (day_download_url, dst, fsize))
                                     )
                             else:
                                 logger.info(f"File exists, skipping: {dst.as_posix()}")
-                                download_list.append((False, (day_download_url, dst)))
+                                download_list.append((False, (day_download_url, dst, fsize)))
                         else:
                             logger.info(f"Queuing for download: {day_download_url}")
-                            download_list.append((True, (day_download_url, dst)))
+                            download_list.append((True, (day_download_url, dst, fsize)))
         return download_list
 
-    def download(self, src_url: str, final_dst_path: Union[str, os.PathLike]) -> None:
+    def download(self, src_url: str, final_dst_path: Union[str, os.PathLike], fsize: int) -> None:
         logger = self.get_logger()
         logger.info(f"Downloading {str(final_dst_path)}...")
-        with requests.get(src_url, headers=self.auth_headers, stream=True) as src:
-            src.raise_for_status()
-            with self.tmp_to_dst_file(final_dst_path, make_dst_dir=True) as dst_path:
-                with open(dst_path, "wb") as dst:
-                    for chunk in src.iter_content(chunk_size=8192):
-                        dst.write(chunk)
+
+        attempts = 0
+        while not final_dst_path.exists() or (final_dst_path.exists() and not self.validate(final_dst_path, fsize)):
+            attempts += 1
+            if attempts > 5:
+                logger.error(f"Failed to download {str(src_url)} after 5 attempts")
+                break
+            with requests.get(src_url, headers=self.auth_headers, stream=True) as src:
+                src.raise_for_status()
+                with self.tmp_to_dst_file(final_dst_path, make_dst_dir=True) as dst_path:
+                    with open(dst_path, "wb") as dst:
+                        for chunk in src.iter_content(chunk_size=8192):
+                            dst.write(chunk)
 
     def build_process_list(self, downloaded_files):
         # filter options to accept/deny based on sensor, year
