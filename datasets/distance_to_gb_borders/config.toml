@@ -1,0 +1,26 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/distance_to_gb_borders"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/distance_to_gb_borders"
+overwrite_download = false
+overwrite_extract = false
+overwrite_binary_raster = false
+overwrite_distance_raster = false
+adm_levels = "ADM0,ADM1,ADM2
+
+[run]
+max_workers = 3
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/distance_to_gb_borders/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/distance_to_gb_borders"
+
+
+[deploy]
+deployment_name = "distance_to_gb_borders"
+image_tag = "148bd36"
+version = 12
+flow_file_name = "main"
+flow_name = "distance_to_gb_borders"
+work_pool = "geodata"

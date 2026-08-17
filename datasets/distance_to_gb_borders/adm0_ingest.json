@@ -1,0 +1,69 @@
+{
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/distance_to_gb_borders/adm0",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "None",
+    "name": "dist_to_gb_borders_adm0",
+    "short_name": "Distance to ADM0 Border",
+    "title": "Distance to Country (ADM0) Borders (geoBoundaries)",
+    "description": "Distance to country ADM0 borders, measured in meters. Derived using geoBoundaries ADM0 (Country) boundaries.",
+    "details": "",
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_min",
+            "short_name": "min",
+            "description": "minimum distance per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.01
+    },
+    "variable_factor": 1,
+    "variable_description": "distance in meters",
+    "mapped": false,
+    "mappings": {},
+    "citation": "geoBoundaries https://www.geoboundaries.org/index.htmlg.",
+    "sources_web": "https://www.geoboundaries.org/index.html",
+    "sources_name": "geoBoundaries",
+    "tags": [
+        "accessibility",
+        "other"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
+}

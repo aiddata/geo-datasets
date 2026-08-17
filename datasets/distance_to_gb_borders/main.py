@@ -29,6 +29,8 @@ class DistanceToBorders(Dataset):
         self.overwrite_binary_raster = config.overwrite_binary_raster
         self.overwrite_distance_raster = config.overwrite_distance_raster
 
+        self.adm_levels = ["ADM0", "ADM1", "ADM2"]
+
     def raster_conditional(self, rarray):
         return rarray == 1
 
@@ -39,15 +41,15 @@ class DistanceToBorders(Dataset):
         )
         test_request.raise_for_status()
 
-    def manage_download(self):
+    def manage_download(self, level="ADM0"):
         """
         Download individual file
         """
 
         logger = self.get_logger()
 
-        download_dest = "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/CGAZ/geoBoundariesCGAZ_ADM0.zip"
-        local_filename = self.raw_dir / "geoBoundariesCGAZ_ADM0.zip"
+        download_dest = f"https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/CGAZ/geoBoundariesCGAZ_{level}.zip"
+        local_filename = self.raw_dir / f"geoBoundariesCGAZ_{level}.zip"
 
         if os.path.isfile(local_filename) and not self.overwrite_download:
             logger.info(f"Download Exists: {local_filename}")
@@ -61,30 +63,30 @@ class DistanceToBorders(Dataset):
 
         return (self, download_dest, local_filename)
 
-    def build_extract_list(self):
+    def build_extract_list(self, level="ADM0"):
         """
         Prepare file list to extract
         """
         logger = self.get_logger()
 
-        zip_name = self.raw_dir / "geoBoundariesCGAZ_ADM0.zip"
+        zip_name = self.raw_dir / f"geoBoundariesCGAZ_{level}.zip"
         task_list = []
-        zip_shp_file = "geoBoundariesCGAZ_ADM0.shp"
-        output_shp_file = self.raw_dir / "geoBoundariesCGAZ_ADM0.shp"
+        zip_shp_file = f"geoBoundariesCGAZ_{level}.shp"
+        output_shp_file = self.raw_dir / f"geoBoundariesCGAZ_{level}.shp"
         if os.path.isfile(output_shp_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_shp_file}")
         else:
             task_list.append((zip_name, zip_shp_file, output_shp_file))
 
-        zip_shx_file = "geoBoundariesCGAZ_ADM0.shx"
-        output_shx_file = self.raw_dir / "geoBoundariesCGAZ_ADM0.shx"
+        zip_shx_file = f"geoBoundariesCGAZ_{level}.shx"
+        output_shx_file = self.raw_dir / f"geoBoundariesCGAZ_{level}.shx"
         if os.path.isfile(output_shx_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_shx_file}")
         else:
             task_list.append((zip_name, zip_shx_file, output_shx_file))
 
-        zip_prj_file = "geoBoundariesCGAZ_ADM0.prj"
-        output_prj_file = self.raw_dir / "geoBoundariesCGAZ_ADM0.prj"
+        zip_prj_file = f"geoBoundariesCGAZ_{level}.prj"
+        output_prj_file = self.raw_dir / f"geoBoundariesCGAZ_{level}.prj"
         if os.path.isfile(output_prj_file) and not self.overwrite_extract:
             logger.info(f"File previously extracted: {output_prj_file}")
         else:
@@ -113,14 +115,14 @@ class DistanceToBorders(Dataset):
         file_path = zip_path / zip_file
         return (file_path, dst_path)
 
-    def create_raster(self):
+    def create_raster(self, level="ADM0"):
         """
         Create binary and distance raster for borders
         """
         logger = self.get_logger()
         return_list = []
 
-        logger.info("Preparing rasterization")
+        logger.info(f"Preparing rasterization of {level}")
         pixel_size = 0.01
         xmin = -180
         xmax = 180
@@ -128,12 +130,12 @@ class DistanceToBorders(Dataset):
         ymax = 90
         affine = Affine(pixel_size, 0, xmin, 0, -pixel_size, ymax)
         shape = (int((ymax - ymin) / pixel_size), int((xmax - xmin) / pixel_size))
-        borders_path = str(self.raw_dir) + "/geoBoundariesCGAZ_ADM0.shp"
+        borders_path = str(self.raw_dir) + f"/geoBoundariesCGAZ_{level}.shp"
         borders, _ = dr.rasterize(borders_path, affine=affine, shape=shape)
 
-        logger.info("Creating binary borders raster")
+        logger.info(f"Creating binary borders raster for {level}")
         borders_output_raster_path = (
-            self.output_dir / "binary" / "geoboundaries_borders_binary.tif"
+            self.output_dir / level.lower() / "binary" / f"geoboundaries_{level}_borders_binary.tif"
         )
         if (
             os.path.isfile(borders_output_raster_path)
@@ -151,9 +153,9 @@ class DistanceToBorders(Dataset):
                 )
                 return_list.append((str(e), str(borders_output_raster_path)))
 
-        logger.info("Creating distance raster")
+        logger.info(f"Creating distance raster for {level}")
         distance_output_raster_path = (
-            self.output_dir / "geoboundaries_borders_distance.tif"
+            self.output_dir / level.lower() / f"geoboundaries_{level}_borders_distance.tif"
         )
         if (
             os.path.isfile(distance_output_raster_path)
@@ -186,19 +188,26 @@ class DistanceToBorders(Dataset):
         self.test_connection()
 
         logger.info("Running data download")
-        download = self.manage_download()
+        download = self.run_tasks(self.manage_download, self.adm_levels)
+        self.log_run(download)
 
         logger.info("Building extract list...")
-        extract_list = self.build_extract_list()
+        raw_extract_list = [self.build_extract_list(i) for i in self.adm_levels]
+        extract_list = []
+        for i in raw_extract_list:
+            extract_list.extend(i)
 
-        os.makedirs(self.output_dir, exist_ok=True)
+        for i in self.adm_levels:
+            (self.output_dir / i.lower()).mkdir(parents=True, exist_ok=True)
+
         if len(extract_list) != 0:
             logger.info("Extracting raw files")
             extraction = self.run_tasks(self.extract_files, extract_list)
             self.log_run(extraction)
 
         logger.info("Creating rasters")
-        create_raster = self.create_raster()
+        create_raster = self.run_tasks(self.create_raster, self.adm_levels)
+        self.log_run(create_raster)
 
 
 try:
