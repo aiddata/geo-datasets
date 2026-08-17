@@ -1,0 +1,29 @@
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/wglc"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/datasets/wglc"
+
+download_url = "https://zenodo.org/api/records/20277101/files/wglc_timeseries_05m_monthly.nc/content"
+download_filename = "wglc_timeseries_05m_monthly.nc"
+expected_md5 = "2aa081163a8d95b35b71f1da0daf0d38"
+
+overwrite_download = false
+overwrite_processing = false
+
+
+[run]
+max_workers = 4
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/wglc/logs"
+
+
+[repo]
+url = "https://github.com/aiddata/geo-datasets.git"
+branch = "master"
+directory = "datasets/wglc"
+
+
+[deploy]
+deployment_name = "wglc"
+image_tag = "935f288"
+version = 1
+flow_file_name = "main"
+flow_name = "wglc"
+work_pool = "geodata"

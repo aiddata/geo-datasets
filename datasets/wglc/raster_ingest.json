@@ -1,0 +1,63 @@
+{
+    "active": true,
+    "public": true,
+    "is_global": true,
+    "path": "/data/datasets/wglc",
+    "type": "raster",
+    "file_extension": ".tif",
+    "file_mask": "wglc_density_YYYY_MM.tif",
+    "name": "wglc_density_monthly",
+    "short_name": "WGLC Lightning Density (Monthly)",
+    "title": "WWLLN Global Lightning Climatology: Monthly Stroke Density",
+    "description": "Monthly lightning stroke density derived from the World Wide Lightning Location Network (WWLLN), gridded at 5 arc-minute resolution and corrected for detection efficiency.",
+    "details": "Extracted from the WGLC 5 arc-minute monthly timeseries (2010-2025). Only the density variable is available at this resolution; power statistics are only published at 30 arc-minute resolution and are not currently ingested.",
+    "processing_class": "zonal_stats",
+    "processing_options": [
+        {
+            "function": "rasterstats_default_mean",
+            "short_name": "mean",
+            "description": "average lightning stroke density per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_max",
+            "short_name": "max",
+            "description": "maximum lightning stroke density per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "float"
+        },
+        {
+            "function": "rasterstats_default_count",
+            "short_name": "count",
+            "description": "total count of pixels per unit of analysis",
+            "kwargs": {},
+            "active": true,
+            "public": false,
+            "result_type": "int"
+        }
+    ],
+    "other": {
+        "resolution": 0.0833333333
+    },
+    "variable_factor": 1,
+    "variable_description": "lightning stroke density (strokes km-2 d-1)",
+    "mapped": false,
+    "mappings": {},
+    "citation": "Kaplan, J. O., & Lau, K. H.-K. (2022). World Wide Lightning Location Network (WWLLN) Global Lightning Climatology (WGLC) and time series, 2022 update. Earth System Science Data, 14(12), 5665-5670. https://doi.org/10.5194/essd-14-5665-2022",
+    "sources_web": "https://zenodo.org/records/20277101",
+    "sources_name": "Kaplan, J.O. and Lau, K.H.-K. (WGLC); World Wide Lightning Location Network (WWLLN)",
+    "tags": [
+        "lightning",
+        "wwlln",
+        "wglc",
+        "climate",
+        "weather"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
+}
