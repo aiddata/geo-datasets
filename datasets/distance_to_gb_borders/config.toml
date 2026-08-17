@@ -20,7 +20,7 @@ directory = "datasets/distance_to_gb_borders"
 [deploy]
 deployment_name = "distance_to_gb_borders"
 image_tag = "148bd36"
-version = 12
+version = 13
 flow_file_name = "main"
 flow_name = "distance_to_gb_borders"
 work_pool = "geodata"

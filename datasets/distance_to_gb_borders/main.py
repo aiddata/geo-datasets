@@ -16,6 +16,7 @@ class DistanceToBordersConfiguration(BaseDatasetConfiguration):
     overwrite_extract: bool
     overwrite_binary_raster: bool
     overwrite_distance_raster: bool
+    adm_levels: str
 
 
 class DistanceToBorders(Dataset):
@@ -28,8 +29,7 @@ class DistanceToBorders(Dataset):
         self.overwrite_extract = config.overwrite_extract
         self.overwrite_binary_raster = config.overwrite_binary_raster
         self.overwrite_distance_raster = config.overwrite_distance_raster
-
-        self.adm_levels = ["ADM0", "ADM1", "ADM2"]
+        self.adm_levels = [i.strip() for i in config.adm_levels.split(",") if i.strip()]
 
     def raster_conditional(self, rarray):
         return rarray == 1
