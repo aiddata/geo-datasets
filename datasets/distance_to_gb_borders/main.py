@@ -188,7 +188,7 @@ class DistanceToBorders(Dataset):
         self.test_connection()
 
         logger.info("Running data download")
-        download = self.run_tasks(self.manage_download, self.adm_levels)
+        download = self.run_tasks(self.manage_download, [[i] for i in self.adm_levels])
         self.log_run(download)
 
         logger.info("Building extract list...")
@@ -206,7 +206,7 @@ class DistanceToBorders(Dataset):
             self.log_run(extraction)
 
         logger.info("Creating rasters")
-        create_raster = self.run_tasks(self.create_raster, self.adm_levels)
+        create_raster = self.run_tasks(self.create_raster, [[i] for i in self.adm_levels])
         self.log_run(create_raster)
 
 
