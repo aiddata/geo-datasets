@@ -45,11 +45,13 @@ class WGLC(Dataset):
     def __init__(self, config: WGLCConfiguration):
         self.raw_dir = Path(config.raw_dir)
         self.output_dir = Path(config.output_dir)
+        self.year_agg_method = config.year_agg_method
         self.monthly_dir = self.output_dir / "monthly"
-        self.yearly_dir = self.output_dir / "yearly"
+        # subdirectory per aggregation method, so switching year_agg_method
+        # doesn't collide with or overwrite output from a different method
+        self.yearly_dir = self.output_dir / "yearly" / self.year_agg_method
         self.download_url = config.download_url
         self.expected_md5 = config.expected_md5
-        self.year_agg_method = config.year_agg_method
         self.overwrite_download = config.overwrite_download
         self.overwrite_processing = config.overwrite_processing
 

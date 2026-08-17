@@ -54,9 +54,11 @@ Review and edit the variables in `config.toml` as needed:
    file's own `time` variable (CF `days since 2010-01-01`), not assumed
    from position.
 3. **Yearly** - aggregates each complete year's 12 monthly COGs (via
-   `year_agg_method`) into an annual COG in `output_dir/yearly/`, named
-   `wglc_density_<year>.tif`. Years with fewer than 12 monthly files (e.g.
-   an in-progress current year) are skipped.
+   `year_agg_method`) into an annual COG in `output_dir/yearly/<year_agg_method>/`
+   (e.g. `yearly/sum/`), named `wglc_density_<year>.tif`. The method is part
+   of the path so switching `year_agg_method` doesn't collide with or
+   overwrite output from a different method. Years with fewer than 12
+   monthly files (e.g. an in-progress current year) are skipped.
 
 ## Citation
 
