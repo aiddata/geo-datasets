@@ -27,7 +27,7 @@ directory = "datasets/wglc"
 [deploy]
 deployment_name = "wglc"
 image_tag = "935f288"
-version = 1
+version = 2
 flow_file_name = "main"
 flow_name = "wglc"
 work_pool = "geodata"
