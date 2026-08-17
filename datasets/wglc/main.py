@@ -13,6 +13,7 @@ import hashlib
 from pathlib import Path
 
 import netCDF4 as nc
+import numpy as np
 import rasterio
 import requests
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
@@ -30,6 +31,10 @@ class WGLCConfiguration(BaseDatasetConfiguration):
     download_filename: str
     # Zenodo-published MD5 of the source file; verified after download.
     expected_md5: str
+    # How to aggregate a year's 12 monthly bands: "sum" (default) totals the
+    # monthly density values as a proxy for annual lightning activity;
+    # "mean"/"max"/"min" are also supported.
+    year_agg_method: str
     overwrite_download: bool
     overwrite_processing: bool
 
@@ -40,8 +45,11 @@ class WGLC(Dataset):
     def __init__(self, config: WGLCConfiguration):
         self.raw_dir = Path(config.raw_dir)
         self.output_dir = Path(config.output_dir)
+        self.monthly_dir = self.output_dir / "monthly"
+        self.yearly_dir = self.output_dir / "yearly"
         self.download_url = config.download_url
         self.expected_md5 = config.expected_md5
+        self.year_agg_method = config.year_agg_method
         self.overwrite_download = config.overwrite_download
         self.overwrite_processing = config.overwrite_processing
 
@@ -87,7 +95,7 @@ class WGLC(Dataset):
         """Extract one monthly band from the source NetCDF to a COG."""
         logger = self.get_logger()
 
-        output_path = self.output_dir / f"wglc_density_{year}_{month:02d}.tif"
+        output_path = self.monthly_dir / f"wglc_density_{year}_{month:02d}.tif"
         if output_path.exists() and not self.overwrite_processing:
             logger.info(f"Output exists, skipping: {output_path}")
             return
@@ -111,6 +119,68 @@ class WGLC(Dataset):
                     dst.write(data, 1)
         logger.info(f"Saved {output_path}")
 
+    def build_year_tasks(self):
+        """Group monthly COGs by year; only years with a complete 12 months."""
+        year_months = {}
+        for f in self.monthly_dir.glob("wglc_density_*.tif"):
+            year = f.stem.split("_")[2]
+            year_months.setdefault(year, []).append(f)
+        return [
+            (year, sorted(files))
+            for year, files in year_months.items()
+            if len(files) == 12
+        ]
+
+    def aggregate_rasters(self, file_list):
+        """Aggregate same-shape rasters with self.year_agg_method, respecting nodata."""
+        stack = None
+        profile = None
+        for i, path in enumerate(sorted(file_list)):
+            with rasterio.open(path) as src:
+                data = src.read(1, masked=True)
+                if profile is None:
+                    profile = src.profile
+                if stack is None:
+                    stack = np.ma.empty((len(file_list), *data.shape), dtype=data.dtype)
+                stack[i] = data
+
+        if self.year_agg_method == "sum":
+            result = stack.sum(axis=0)
+        elif self.year_agg_method == "mean":
+            result = stack.mean(axis=0)
+        elif self.year_agg_method == "max":
+            result = stack.max(axis=0)
+        elif self.year_agg_method == "min":
+            result = stack.min(axis=0)
+        else:
+            raise ValueError(f"Unsupported year_agg_method: {self.year_agg_method!r}")
+
+        return result.filled(profile["nodata"]), profile
+
+    def process_year(self, year: str, month_files: list):
+        """Aggregate a year's monthly COGs into a single annual COG."""
+        logger = self.get_logger()
+
+        output_path = self.yearly_dir / f"wglc_density_{year}.tif"
+        if output_path.exists() and not self.overwrite_processing:
+            logger.info(f"Output exists, skipping: {output_path}")
+            return
+
+        data, profile = self.aggregate_rasters(month_files)
+        # profile comes from a monthly COG's own tiling metadata (blockxsize/
+        # blockysize/tiled/interleave), which the COG driver computes itself
+        # and warns about if passed back in as creation options
+        for key in ("blockxsize", "blockysize", "tiled", "interleave"):
+            profile.pop(key, None)
+        profile.update(driver="COG", compress="LZW")
+
+        with self.tmp_to_dst_file(
+            output_path, make_dst_dir=True, validate_cog=True
+        ) as tmp_dst:
+            with rasterio.open(tmp_dst, "w", **profile) as dst:
+                dst.write(data, 1)
+        logger.info(f"Saved {output_path}")
+
     def main(self):
         logger = self.get_logger()
 
@@ -123,6 +193,13 @@ class WGLC(Dataset):
         logger.info(f"Processing {len(process_list)} monthly bands")
         results = self.run_tasks(self.process_band, process_list)
         self.log_run(results)
+
+        logger.info("Building year list")
+        year_tasks = self.build_year_tasks()
+
+        logger.info(f"Aggregating {len(year_tasks)} years")
+        year_results = self.run_tasks(self.process_year, year_tasks)
+        self.log_run(year_results)
 
 
 try:

@@ -39,6 +39,8 @@ Review and edit the variables in `config.toml` as needed:
   file (Zenodo's URLs end in `/content`, so the real filename can't be
   derived from the URL and is given explicitly; the MD5 is verified after
   every download)
+- `year_agg_method` - how to combine a year's 12 monthly rasters into the
+  annual output: `sum` (default), `mean`, `max`, or `min`
 - `overwrite_download` / `overwrite_processing`, if true, overwrite existing
   files rather than skipping them
 
@@ -46,10 +48,15 @@ Review and edit the variables in `config.toml` as needed:
 
 1. **Download** - fetches the source NetCDF, verifying it against the
    published MD5 checksum
-2. **Process** - extracts each monthly band (192 as of the 2026 release,
-   Jan 2010 - Dec 2025) to a COG, named `wglc_density_<year>_<month>.tif`.
-   Band-to-date mapping is read from the file's own `time` variable
-   (CF `days since 2010-01-01`), not assumed from position.
+2. **Monthly** - extracts each monthly band (192 as of the 2026 release,
+   Jan 2010 - Dec 2025) to a COG in `output_dir/monthly/`, named
+   `wglc_density_<year>_<month>.tif`. Band-to-date mapping is read from the
+   file's own `time` variable (CF `days since 2010-01-01`), not assumed
+   from position.
+3. **Yearly** - aggregates each complete year's 12 monthly COGs (via
+   `year_agg_method`) into an annual COG in `output_dir/yearly/`, named
+   `wglc_density_<year>.tif`. Years with fewer than 12 monthly files (e.g.
+   an in-progress current year) are skipped.
 
 ## Citation
 

@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/wglc",
+    "path": "/data/datasets/wglc/monthly",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "wglc_density_YYYY_MM.tif",
