@@ -217,7 +217,7 @@ except:
 else:
 
     @flow
-    def distance_to_country_border(config: DistanceToBordersConfiguration):
+    def distance_to_gb_borders(config: DistanceToBordersConfiguration):
         DistanceToBorders(config).run(config.run)
 
 

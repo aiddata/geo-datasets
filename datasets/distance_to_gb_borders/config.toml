@@ -4,7 +4,7 @@ overwrite_download = false
 overwrite_extract = false
 overwrite_binary_raster = false
 overwrite_distance_raster = false
-adm_levels = "ADM0,ADM1,ADM2
+adm_levels = "ADM0,ADM1,ADM2"
 
 [run]
 max_workers = 3
