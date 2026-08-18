@@ -24,7 +24,7 @@ directory = "datasets/geoboundaries"
 [deploy]
 deployment_name = "geoBoundaries"
 image_tag = "083d531"
-version = 10
+version = 11
 flow_file_name = "main"
 flow_name = "geoBoundariesDownloadFlow"
 work_pool = "geodata"
