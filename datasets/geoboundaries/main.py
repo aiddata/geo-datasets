@@ -81,9 +81,9 @@ class geoBoundariesDownloadDataset(Dataset):
             if self.rebuild_meta:
                 logger.info(f"Rebuilding metadata for {fc_name}")
                 meta_only = True
-        elif self.skip_existing:
-            logger.warning(f"Skipping existing: {fc_name}")
-            return
+            elif self.skip_existing:
+                logger.warning(f"Skipping existing: {fc_name}")
+                return
         else:
             logger.info(f"Downloading: {dl_url}")
 
