@@ -5,7 +5,7 @@
     "path": "/data/datasets/distance_to_gb_borders/adm0/geoboundaries_ADM0_borders_distance.tif",
     "type": "raster",
     "file_extension": ".tif",
-    "file_mask": "None",
+    "file_mask": "geoboundaries_ADM0_borders_distance.tif",
     "name": "dist_to_gb_borders_adm0",
     "short_name": "Distance to ADM0 Border",
     "title": "Distance to Country (ADM0) Borders (geoBoundaries)",
