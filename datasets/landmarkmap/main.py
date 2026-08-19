@@ -96,6 +96,15 @@ class LandMarkMap(Dataset):
             pd.concat([points_gdf, poly_gdf], ignore_index=True), crs=OUTPUT_CRS
         )
 
+        # fill na/nan values per column based on the dtype it should hold
+        for column in gdf.columns:
+            if column == "geometry":
+                continue
+            elif pd.api.types.is_numeric_dtype(gdf[column]):
+                gdf[column] = gdf[column].fillna(0)
+            else:
+                gdf[column] = gdf[column].fillna("")
+
         self.dataset_output_path.parent.mkdir(parents=True, exist_ok=True)
         gdf.to_file(self.dataset_output_path, driver="GPKG")
         logger.info(f"Saved {self.dataset_output_path}")
