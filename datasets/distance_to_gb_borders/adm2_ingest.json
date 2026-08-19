@@ -5,7 +5,7 @@
     "path": "/data/datasets/distance_to_gb_borders/adm2/geoboundaries_ADM2_borders_distance.tif",
     "type": "raster",
     "file_extension": ".tif",
-    "file_mask": "geoboundaries_ADM2_borders_distance.tif",
+    "file_mask": "None",
     "name": "dist_to_gb_borders_adm2",
     "short_name": "Distance to ADM2 Border",
     "title": "Distance to ADM2 Borders (geoBoundaries)",
