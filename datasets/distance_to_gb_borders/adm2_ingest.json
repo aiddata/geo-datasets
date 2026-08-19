@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/distance_to_gb_borders/adm2",
+    "path": "/data/datasets/distance_to_gb_borders/adm2/geoboundaries_ADM2_borders_distance.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
