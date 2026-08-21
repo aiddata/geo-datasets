@@ -2,7 +2,7 @@
     "active": true,
     "public": true,
     "is_global": true,
-    "path": "/data/datasets/access_50k",
+    "path": "/data/datasets/accessibility_map/access_50k.tif",
     "type": "raster",
     "file_extension": ".tif",
     "file_mask": "None",
