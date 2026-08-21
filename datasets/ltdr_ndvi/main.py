@@ -510,7 +510,7 @@ class LTDR_NDVI(Dataset):
 
         month_df["output_path"] = month_df.apply(
             lambda x: (
-                self.output_dir / "monthly/avhrr_ndvi_v5_{}.tif".format(x["year_month"])
+                self.output_dir / "monthly/avhrr_ndvi_{}.tif".format(x["year_month"])
             ).as_posix(),
             axis=1,
         )
@@ -524,7 +524,7 @@ class LTDR_NDVI(Dataset):
         year_df.columns = ["year", "month_path_list", "count"]
 
         year_df["output_path"] = year_df["year"].apply(
-            lambda x: (self.output_dir / f"yearly/avhrr_ndvi_v5_{x}.tif").as_posix()
+            lambda x: (self.output_dir / f"yearly/avhrr_ndvi_{x}.tif").as_posix()
         )
 
         # Make _qlist arrays, which are handled by prep_xxx_data functions as lists of tasks
