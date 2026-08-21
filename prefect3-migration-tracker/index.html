@@ -1,0 +1,1512 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Prefect 3 migration tracker - GeoQuery Dataset Ingest Pipelines</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#prefect-3-migration-tracker" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="https://aiddata.org" title="GeoQuery Dataset Ingest Pipelines" class="md-header__button md-logo" aria-label="GeoQuery Dataset Ingest Pipelines" data-md-component="logo">
+      
+  <img src="https://cdn.prod.website-files.com/5914719ba6e62162556bd443/5b71a50b4c381931b61a7a9a_triangles.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            GeoQuery Dataset Ingest Pipelines
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Prefect 3 migration tracker
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aiddata/geo-datasets" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../dataset-guide/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Writing Pipelines
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../deployment-guide/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Deploying Pipelines
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/data_manager/" class="md-tabs__link">
+          
+  
+  
+  Code Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://aiddata.org" title="GeoQuery Dataset Ingest Pipelines" class="md-nav__button md-logo" aria-label="GeoQuery Dataset Ingest Pipelines" data-md-component="logo">
+      
+  <img src="https://cdn.prod.website-files.com/5914719ba6e62162556bd443/5b71a50b4c381931b61a7a9a_triangles.svg" alt="logo">
+
+    </a>
+    GeoQuery Dataset Ingest Pipelines
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aiddata/geo-datasets" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../dataset-guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Pipelines
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Writing Pipelines
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/dev-env/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setting Up Your Environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/planning-script/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning Your Ingest Script
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/writing-code/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Some Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/dataset-class/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview of the Dataset class
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/adding-boilerplate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding Boilerplate
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/running/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Your Dataset
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/tips/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tips &amp; Tricks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../deployment-guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploying Pipelines
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deploying Pipelines
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-guide/build-container/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building the job-runner Container
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-guide/prefect/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploying to Prefect
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-guide/helm-chart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploying the Helm Chart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-guide/k8s-debug/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging Jobs in Kubernetes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Code Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../reference/data_manager/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    data_manager
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    data_manager
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/data_manager/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/data_manager/dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    dataset
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="prefect-3-migration-tracker">Prefect 3 migration tracker<a class="headerlink" href="#prefect-3-migration-tracker" title="Permanent link">&para;</a></h1>
+<p>Status of migrating datasets to the self-hosted Prefect 3 server
+(work pool <code>geodata</code>, image <code>ghcr.io/aiddata/geo-datasets:&lt;sha&gt;</code>).
+Audited 2026-07-16.</p>
+<h2 id="per-dataset-migration-checklist">Per-dataset migration checklist<a class="headerlink" href="#per-dataset-migration-checklist" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>config.toml</strong>: <code>work_pool = "geodata"</code>; all paths under
+   <code>/sciclone/nova/REU/geo/...</code> (<code>aiddata10</code> is not mounted in flow pods);
+   <code>image_tag</code> set to a current CI-built SHA; remove <code>data_manager_version</code>
+   (vestigial — data_manager is baked into the image).</li>
+<li><strong>Flow file</strong>: must contain a <code>Dataset</code> subclass (deploy.py requires it;
+   the class <code>.name</code> becomes the deployment name — config's <code>deployment_name</code>
+   is ignored) plus a <code>@flow</code> wrapper and <code>get_config</code> entrypoint.</li>
+<li><strong>Dependencies</strong>: every third-party import must be in the root
+   <code>pyproject.toml</code>/<code>uv.lock</code> (that is what the image installs). Missing deps
+   require a relock, CI image rebuild, and <code>image_tag</code> bump.</li>
+<li><strong>Secrets</strong>: never in config.toml. Gitignored <code>.env</code> in the dataset dir;
+   env var name must equal the config model field name — deploy.py overlays
+   <code>.env</code> values onto config by key, and the value becomes a deployment
+   parameter. Local runs: <code>__main__</code> does <code>load_dotenv()</code> + explicit assignment.
+   Any secret already committed must be <strong>rotated</strong>.</li>
+<li><strong>UI-editable list fields</strong>: use comma-separated strings, not <code>List[...]</code> —
+   the Prefect UI array widget's "add item" button submits the form (frontend
+   bug, present through 3.7.8; no schema shape avoids it).</li>
+<li><strong>Order</strong>: config-model changes must reach <code>master</code> <strong>before</strong> running
+   <code>scripts/deploy.py &lt;dataset&gt;</code> — the parameter schema is built from master,
+   not the working tree.</li>
+<li><strong>Ingest JSON</strong>: convert to the esa_landcover <code>raster_ingest.json</code> schema
+   (all legacy files uniformly miss the same 16 keys — <code>tags</code>, <code>path</code>,
+   <code>is_global</code>, <code>sources_name</code>, <code>mapped</code>, <code>coverage_dependency</code>,
+   <code>processing_options</code>, ... — and carry 5 stale ones: <code>version</code>, <code>options</code>,
+   <code>base</code>, <code>extras</code>; keep <code>short_name</code>). <code>path</code> uses the <code>/data/datasets/&lt;name&gt;</code>
+   convention. <code>processing_options[].function</code> must be one of the
+   <code>rasterstats_default_*</code> functions in the GeoQuery backend
+   (<code>min</code>/<code>max</code>/<code>mean</code>/<code>sum</code>/<code>count</code>/<code>categorical</code>).</li>
+<li><strong>Interruption-safe writes</strong>: downloads and processing outputs should go
+   through <code>Dataset.tmp_to_dst_file</code> so an interrupted task cannot leave a
+   partial file that a later run mistakes for a complete one. Pass
+   <code>tmp_dir=&lt;dir on the destination filesystem&gt;</code> — the default <code>/tmp</code> is pod
+   ephemeral storage, and with many workers × GB-scale files that gets pods
+   evicted. (Fixed in data_manager: the helper now preserves umask-standard
+   file modes and cleans up its per-file temp directory.)</li>
+<li><strong>README</strong>: strip generic uv/deploy boilerplate (lives in central docs);
+   keep dataset-specific config documentation and data-source notes. Pattern:
+   commit <code>3778296</code> (esa_landcover).</li>
+<li><strong>Output rasters must be COGs.</strong> <code>driver="COG", compress="LZW"</code> (as in
+    esa_landcover). For datasets using <code>distancerasters.rasterize()</code>: don't
+    pass its <code>output=</code> kwarg (that writes a plain GTiff via <code>export_raster</code>);
+    instead take the returned <code>(array, affine)</code> and write directly with
+    <code>rasterio</code> + the COG driver, wrapped in <code>tmp_to_dst_file(...,
+    validate_cog=True)</code>. See <code>africa_child_mortality</code>/<code>air_pollution</code>
+    <code>write_cog()</code> for the pattern.</li>
+<li>Deploy and smoke-run on the cluster; verify output lands on the share with
+    <code>9198:9915</code> ownership.</li>
+</ol>
+<h2 id="done">Done<a class="headerlink" href="#done" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>geoboundaries</td>
+<td>first migration; comma-separated <code>dl_iso3_list</code></td>
+</tr>
+<tr>
+<td>TIGER</td>
+<td>rewritten from argparse script; national layers only</td>
+</tr>
+<tr>
+<td>esa_landcover</td>
+<td>CDS API v2→new endpoint; <code>CDSAPI_KEY</code> secret pattern; reference for ingest JSON + README format</td>
+</tr>
+<tr>
+<td>worldpop_pop_count</td>
+<td>migrated; <strong>cluster smoke passed 2026-07-16</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="workstream-a-datasets-with-configs">Workstream A — datasets with configs<a class="headerlink" href="#workstream-a-datasets-with-configs" title="Permanent link">&para;</a></h2>
+<p>All code-prep waves are <strong>done</strong> across the datasets below: common config sweep
+(commit <code>32f7b5e</code>), ingest JSONs → current schema (<code>4ccd6c5</code>), list fields →
+comma strings (<code>2fe3bfc</code>, <code>7682144</code>), READMEs (<code>3e88649</code>, <code>d42ae20</code>), and the
+<code>.env</code> secret pattern (<code>a0b010e</code>). All pinned to image <code>083d531</code> (cdsapi, scipy,
+python-dotenv, tmp_to_dst fixes). What remains is per-dataset <strong>deploy + cluster
+smoke</strong>, plus the specific notes below.</p>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>remaining work</th>
+<th>status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>accessibility_map</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from a comment stub (JRC access_50k, year 2000); moved from Workstream B</td>
+</tr>
+<tr>
+<td>africa_child_mortality</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from a standalone Py2 rasterize script; moved from Workstream B</td>
+</tr>
+<tr>
+<td>air_pollution</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from a standalone Py2 rasterize script; moved from Workstream B. Source CSV requires a <strong>manual download</strong> (ACS supplementary file is behind a Cloudflare bot challenge, no mirror found)</td>
+</tr>
+<tr>
+<td>atlasofurbanexpansion</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from Py2 <code>cities_prep.py</code>/<code>col_order.py</code> (200-city sample, 4 boundary levels); moved from Workstream B; live-verified metadata merge + geometry pipeline against real source data</td>
+</tr>
+<tr>
+<td>distance_to_groads</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from <code>build_dist_to_groads.py</code> (per-continent shapefiles, dead source); now pulls the single global gROADS v1 file geodatabase via Earthdata bearer token, rasterized directly from the zip (<code>/vsizip/</code>, no extraction); moved from Workstream B; COG output; live-verified download + rasterize against real source data</td>
+</tr>
+<tr>
+<td>gold</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from Py2 script; categorical + distance; manual download (ResearchGate); moved from Workstream B</td>
+</tr>
+<tr>
+<td>gem</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from Py2 script; binary + distance; manual download (paivilujala.com); moved from Workstream B</td>
+</tr>
+<tr>
+<td>drug</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from Py2 script; categorical + distance, live-verified multi-layer mix logic; manual download (paivilujala.com); moved from Workstream B</td>
+</tr>
+<tr>
+<td>diamond</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from Py2 script; binary + distance; manual download (PRIO, Entra-gated); moved from Workstream B</td>
+</tr>
+<tr>
+<td>petroleum</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from Py2 script; binary + distance, onshore only; manual download (PRIO, Entra-gated); moved from Workstream B</td>
+</tr>
+<tr>
+<td>acled</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from manual QGIS rasterization; now filter_and_agg (GPKG); manual CSV download (ACLED requires registration); <code>event_count</code> + <code>fatalities</code> outcomes; backend processor <code>acled_dynamic_filter_and_agg</code> added; moved from Workstream B</td>
+</tr>
+<tr>
+<td>ucdp</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong>, consolidating what were 2 top-level scripts + an abandoned per-violence-type WIP (<code>type_and_year/</code>) into one flow: one GED CSV download produces 4 fatality-sum outputs (all/state-based/non-state/one-sided). Dropped the GED Polygons-based binary conflict-occurrence output — that dataset (v1.1, 2012) is no longer listed on UCDP's downloads page, confirmed gone. Caught a real bug in the abandoned WIP script: it rasterized points directly with <code>attribute=</code>, which keeps only one event's value per pixel rather than summing overlapping events (verified against real data: ~38% undercount in a sample year/category); the new flow uses the original top-level script's correct round-to-grid-then-groupby-sum approach instead. Moved from Workstream B</td>
+</tr>
+<tr>
+<td>gcdf_v3_dynamic</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from a standalone script (<code>type: feature</code>/<code>filter_and_agg</code>, not raster — a different shape than most of this tracker). Downloads AidData's GCDF v3.0.1 buffered-project-polygon GeoPackage from GitHub releases, renames/subsets to the filter fields, and refreshes <code>filter_ingest.json</code>'s year ranges/category lists from the actual data on every run. <code>gcdf_v3_boundaries</code>/<code>gcdf_v3_static</code> are out of scope — generated by a separate repo (<code>aiddata/china-osm-geodata</code>), not a flow here. Full pipeline (download, rename/subset, GPKG round-trip, filter values) verified against the real ~496MB release before committing — filter values matched the already-checked-in <code>filter_ingest.json</code> exactly</td>
+</tr>
+<tr>
+<td>gebco2026</td>
+<td>deploy + smoke</td>
+<td><strong>new</strong>: replaces the planned <code>srtm</code> migration (abandoned after discovering SRTMGL3 ships as 14,297 individual tiles — a mosaic wasn't tractable). GEBCO_2026 ships as just 8 global quadrant tiles instead; downloads the ~4.2GB zip (no auth), mosaics the 8 tiles into one seamless global elevation COG via <code>rasterio.merge</code> (reads each tile's own georeferencing rather than us parsing filenames; chunked internally so it doesn't need the full ~7GB array in memory), and derives a global slope COG (Horn's method, hand-implemented in numpy — <code>richdem</code> was considered but its latest PyPI release has no wheel past Python 3.7 and fails to build from source on 3.12; it also wouldn't solve the degree-of-longitude latitude-scaling problem any better, since that's a per-row correction we apply ourselves regardless of library). Full pipeline verified against the real 4.2GB source (tile placement, seam continuity, slope values) before committing; slope is strip-processed to bound memory (~1.4GB/strip, not the ~30-60GB a naive full-array approach would need)</td>
+</tr>
+<tr>
+<td>worldpop_pop_count_new</td>
+<td>deploy + smoke</td>
+<td>new: Global 2015-2030 R2025A</td>
+</tr>
+<tr>
+<td>critical_habitats</td>
+<td>deploy + smoke</td>
+<td></td>
+</tr>
+<tr>
+<td>cru_ts</td>
+<td>deploy + smoke</td>
+<td></td>
+</tr>
+<tr>
+<td>distance_to_country_border</td>
+<td>deploy + smoke</td>
+<td></td>
+</tr>
+<tr>
+<td>wdpa</td>
+<td>deploy + smoke</td>
+<td></td>
+</tr>
+<tr>
+<td>distance_to_coast</td>
+<td>deploy + smoke</td>
+<td></td>
+</tr>
+<tr>
+<td>distance_to_water</td>
+<td>deploy + smoke</td>
+<td></td>
+</tr>
+<tr>
+<td>gpm</td>
+<td>deploy + smoke</td>
+<td></td>
+</tr>
+<tr>
+<td>landscan_pop</td>
+<td>deploy + smoke</td>
+<td></td>
+</tr>
+<tr>
+<td>malaria_atlas_project</td>
+<td>deploy + smoke</td>
+<td>merged with travel-time family, see below</td>
+</tr>
+<tr>
+<td>modis_landcover</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from GLCF v5.1 FTP shell scripts; now LP DAAC LPCLOUD (MCD12Q1 v061); CMR search → HDF4 download → <code>gdal_translate</code> tile extraction → <code>gdal_merge.py</code>+<code>gdalwarp</code> mosaic/reproject to WGS84; Earthdata bearer token; moved from Workstream B</td>
+</tr>
+<tr>
+<td>modis_lst</td>
+<td>deploy + smoke</td>
+<td></td>
+</tr>
+<tr>
+<td>pm25</td>
+<td>deploy + smoke</td>
+<td>Box app setup for download</td>
+</tr>
+<tr>
+<td>plad</td>
+<td>deploy + smoke</td>
+<td></td>
+</tr>
+<tr>
+<td>udel_climate</td>
+<td>deploy + smoke</td>
+<td></td>
+</tr>
+<tr>
+<td>worldpop_age_sex</td>
+<td>deploy + smoke</td>
+<td>per sex×age×year — large</td>
+</tr>
+<tr>
+<td>dmsp_ols</td>
+<td>deploy + smoke</td>
+<td><strong>rebuilt</strong> from EOG; cookie auth + our Elvidge-2014 calibration; live-verified</td>
+</tr>
+<tr>
+<td>dvnl</td>
+<td>deploy + smoke</td>
+<td>EOG cookie auth done + live-verified</td>
+</tr>
+<tr>
+<td>viirs_ntl</td>
+<td>deploy + smoke</td>
+<td>EOG cookie auth done + live-verified</td>
+</tr>
+<tr>
+<td>gpw</td>
+<td>deploy + smoke</td>
+<td><code>.env</code> cookie/secret; switched to Earthdata dl</td>
+</tr>
+<tr>
+<td>ltdr_ndvi</td>
+<td>deploy + smoke</td>
+<td>Earthdata token via <code>.env</code>; naming bug fixed</td>
+</tr>
+<tr>
+<td>oco2</td>
+<td>deploy + smoke</td>
+<td>Earthdata token; bumped to 11.2r/11.3r version-by-year; live-verified</td>
+</tr>
+</tbody>
+</table>
+<h3 id="secret-handling-settled-design">Secret handling — settled design<a class="headerlink" href="#secret-handling-settled-design" title="Permanent link">&para;</a></h3>
+<p><code>.env</code> (gitignored, per dataset) → <code>deploy.py</code> overlays each line onto the
+config → the value becomes a <strong>deployment parameter</strong>. The <code>.env</code> key MUST equal
+the config model field name (deploy overlays by key match) — the recurring bug
+(esa <code>CDSAPI_KEY</code>, ltdr <code>token</code>/<code>EARTHDATA_TOKEN</code>). The token/cookie is stored in
+the deployment params (server DB, visible in the Prefect UI); <strong>accepted</strong> since
+Prefect access is controlled. No Secret blocks. No outstanding credential
+rotations (the previously-flagged ones were placeholders or already expired; a
+working token now lives in each <code>.env</code>). <strong>Token freshness:</strong> Earthdata tokens
+expire (~60 days) and are not auto-refreshed — re-run <code>deploy.py</code> with a fresh
+<code>.env</code> token to rotate oco2/ltdr.</p>
+<h3 id="eog-eogdataminesedu-cookie-auth-dvnl-viirs_ntl-dmsp_ols">EOG (eogdata.mines.edu) cookie auth — dvnl, viirs_ntl, dmsp_ols<a class="headerlink" href="#eog-eogdataminesedu-cookie-auth-dvnl-viirs_ntl-dmsp_ols" title="Permanent link">&para;</a></h3>
+<p>EOG moved programmatic OAuth access behind a paid tier. These datasets
+authenticate with a browser <code>mod_auth_openidc_session</code> cookie: config field →
+<code>.env</code> / deploy param, all EOG GETs send the cookie with <code>allow_redirects=False</code>
++ a redirect-to-login guard, and a 30s keep-alive daemon thread holds the
+short-lived session open during the download phase. A 30s ping was confirmed to
+keep a session alive for a full hour. <strong>Operational:</strong> grab a fresh cookie
+immediately before a run (it idles out in minutes); a stale cookie fails loudly
+with "redirected to login" rather than writing a login page over a raster.</p>
+<h3 id="earthdata-bearer-token-oco2-ltdr_ndvi-distance_to_groads-modis_landcover">Earthdata bearer token — oco2, ltdr_ndvi, distance_to_groads, modis_landcover<a class="headerlink" href="#earthdata-bearer-token-oco2-ltdr_ndvi-distance_to_groads-modis_landcover" title="Permanent link">&para;</a></h3>
+<p>All four pull from NASA Earthdata Login services (oco2 = GES DISC, ltdr =
+LAADS, distance_to_groads = SEDAC, modis_landcover = LP DAAC LPCLOUD); a
+single token from urs.earthdata.nasa.gov authenticates CMR granule search and
+downloads across all of them via <code>Authorization: Bearer &lt;token&gt;</code>.
+Field/<code>.env</code> key/<code>__main__</code> lookup all named <code>earthdata_token</code>. Confirmed
+live: an anonymous request to the SEDAC download URL redirects through
+<code>urs.earthdata.nasa.gov/oauth/authorize</code> to a 401 Basic-auth challenge; the
+same bearer token already used for ltdr_ndvi/oco2 works here too
+(303 → signed CloudFront/S3 URL → real zip bytes).</p>
+<h2 id="workstream-b-legacy-never-migrated-30-dirs">Workstream B — legacy, never migrated (~30 dirs)<a class="headerlink" href="#workstream-b-legacy-never-migrated-30-dirs" title="Permanent link">&para;</a></h2>
+<p>No config.toml / no data_manager usage; each is a TIGER-style rewrite.
+Triage which are still wanted before investing:</p>
+<p><code>gcdf_v3</code> (partial — see note below; <code>gcdf_v3_boundaries</code>/<code>gcdf_v3_static</code> are
+generated by a separate repo, out of scope here)</p>
+<p><code>globalsolaratlas</code> — has <code>pvout_raster_ingest.json</code> + README but no flow or
+config.toml; not yet tracked. Triage before investing.</p>
+<p><code>globalwindatlas</code> — has <code>pd_raster_ingest.json</code>, <code>ws_raster_ingest.json</code> + README
+but no flow or config.toml; not yet tracked. Triage before investing.</p>
+<p><code>srtm</code> — abandoned; replaced by <code>gebco2026</code> (SRTMGL3 has 14,297 tiles, not
+tractable to mosaic). No flow needed.</p>
+<h3 id="gold-gem-drug-diamond-petroleum-migrated">gold, gem, drug, diamond, petroleum — migrated<a class="headerlink" href="#gold-gem-drug-diamond-petroleum-migrated" title="Permanent link">&para;</a></h3>
+<p>All five shared one shape: a Py2 script (<code>fiona.open()</code> on a hardcoded
+<code>/sciclone/aiddata10/...</code> shapefile path, <code>print</code> statements) that rasterizes
+point/polygon deposit data to a global 0.01°, -180/180/-90/90 grid and called
+the now-nonexistent <code>distancerasters.build_distance_array</code> (replaced by the
+<code>DistanceRaster</code> class — same fix already applied in <code>distance_to_groads</code>).
+Ingest JSONs were already on the current schema (Workstream C);
+<code>gold</code>/<code>drug</code>'s <code>categorical_raster_ingest.json</code> <code>mappings</code> (<code>none</code>/type
+labels/<code>mix</code>) matched each script's category-encoding scheme exactly (loop
+index per layer, <code>mixed_val=4</code> where a cell has &gt;1 layer) — no
+reinterpretation needed, just reimplementation (confirmed by rasterizing real
+source data for each and checking the combined output against expectation
+before committing).</p>
+<p>All five stay <strong>manual-download</strong> (confirmed decision) — a <code>raw_dir</code>-placed
+source file/shapefile, documented in each README, same pattern as
+<code>air_pollution</code> — even though <code>gem</code>/<code>drug</code> resolve via a plain HTTP GET
+(kept manual anyway for consistency across the group). <code>petroleum</code> stays
+<strong>onshore-only</strong>, matching the original script/ingest JSON exactly.</p>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>shape</th>
+<th>source (verified)</th>
+<th>placement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gold</td>
+<td>categorical (dGOLD_L/S/NL → 1/2/3, mix→4) + distance</td>
+<td>ResearchGate — 403s on automated requests</td>
+<td>extracted shapefiles per layer: <code>&lt;raw_dir&gt;/&lt;layer&gt;/&lt;layer&gt;.shp</code> (zip contents unverifiable — bot-blocked)</td>
+</tr>
+<tr>
+<td>gem</td>
+<td>binary + distance</td>
+<td>paivilujala.com/gemdata.html — direct <code>.zip</code>, live-verified (1022 features)</td>
+<td>zip as-is at <code>&lt;raw_dir&gt;/gemdata.zip</code>, read via <code>/vsizip/</code></td>
+</tr>
+<tr>
+<td>drug</td>
+<td>categorical (CANNABIS/COCA BUSH/OPIUM POPPY → 1/2/3, mix→4) + distance</td>
+<td>paivilujala.com/drugdata.html — direct <code>.zip</code>, live-verified (combine/mix logic confirmed against real overlapping South America data)</td>
+<td>zip as-is at <code>&lt;raw_dir&gt;/drugdata.zip</code>, read via <code>/vsizip/</code></td>
+</tr>
+<tr>
+<td>diamond</td>
+<td>binary + distance</td>
+<td>prio.org/data/10 → <code>cdn.cloud.prio.org</code>, confirmed Microsoft Entra (organizational) login gate</td>
+<td>extracted <code>DIADATA.shp</code> at <code>&lt;raw_dir&gt;/</code> (zip contents unverifiable — login-gated)</td>
+</tr>
+<tr>
+<td>petroleum</td>
+<td>binary + distance, onshore only</td>
+<td>prio.org/data/11 → same Entra gate</td>
+<td>extracted <code>Petrodata_Onshore_V1.2.shp</code> at <code>&lt;raw_dir&gt;/</code> (zip contents unverifiable)</td>
+</tr>
+</tbody>
+</table>
+<p>For gold/diamond/petroleum the source zip could not be fetched (bot-blocked
+or login-gated), so — unlike gem/drug, where the internal zip layout was
+confirmed live and the flow reads straight from the zip via <code>/vsizip/</code> — these
+three expect an already-extracted shapefile directly in <code>raw_dir</code> rather than
+guessing an unverified internal zip path. All five: <code>main.py</code>
+(Dataset/flow, COG output via the <code>write_cog()</code> pattern), <code>config.toml</code>,
+README with manual download steps; old <code>.py</code>/misc files removed (including
+petroleum's dead PBS <code>job</code> script and stray lowercase <code>readme.md</code>).
+Remaining: deploy + cluster smoke.</p>
+<h2 id="workstream-c-ingest-jsons-done">Workstream C — ingest JSONs — DONE<a class="headerlink" href="#workstream-c-ingest-jsons-done" title="Permanent link">&para;</a></h2>
+<p>All 87 ingest JSONs in the repo are now on the current schema (commits
+<code>4ccd6c5</code> for the 47 Workstream-A files, <code>52f939d</code> for the remaining 36 in
+Workstream-B dirs). Rasters use the esa <code>raster_ingest.json</code> schema; the 4
+atlasofurbanexpansion <code>*_boundary_ingest.json</code> files (<code>type: boundary</code>) use
+GeoQuery's <code>IngestFeatureCollection</code> schema instead.</p>
+<p><strong>Review flags (fill when the owning dataset is migrated):</strong>
+- Raster ingests: per-dataset <code>path</code>, <code>description</code>, <code>is_global</code> were carried
+  over mechanically — worth a human pass.
+- atlasofurbanexpansion boundaries: <code>spatial_extent</code> left <code>""</code> (needs the WKT
+  extent, derivable from the <code>.geojson</code>) and <code>is_global</code> set <code>false</code> for a
+  200-city sample (confirm).</p>
+<h2 id="recently-completed-beyond-the-sweep">Recently completed (beyond the sweep)<a class="headerlink" href="#recently-completed-beyond-the-sweep" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>dmsp_ols rebuilt</strong> (commit <code>d3c3010</code>): moved from Workstream B into A. Was
+  two dead-repo shell scripts + a Py2 processing.py; now a Dataset/flow pulling
+  v4 composites from EOG (cookie auth), applying our Elvidge-2014 calibration →
+  COG, plus avg_lights_x_pct download-only. Old scripts in <code>archive/</code>.</li>
+<li><strong>EOG cookie auth</strong> for viirs_ntl (<code>a231975</code>), dvnl (<code>46e15d2</code>), dmsp_ols.</li>
+<li><strong>Earthdata token</strong> for oco2 + ltdr_ndvi (<code>a3383c7</code>); oco2 also bumped to the
+  11.2r/11.3r version-by-year layout (11.1r was removed from GES DISC).</li>
+<li><strong>Secret naming/rotation thread closed</strong> — see "Secret handling" above.</li>
+<li><strong>accessibility_map rebuilt</strong>: moved from Workstream B into A. Was a
+  one-line comment stub; now downloads the JRC <code>access_50k.zip</code> archive and
+  rewrites the packaged GeoTIFF as a COG via <code>/vsizip/</code> (no on-disk unzip step).</li>
+<li><strong>accessibility_to_cities_2015_v1.0 merged into malaria_atlas_project</strong>:
+  both are Malaria Atlas Project GeoServer products. <code>malaria_atlas_project</code>
+  is now a multi-dataset flow selecting between <strong>temporal</strong> products
+  (archive has one GeoTIFF per year, e.g. <code>pf_incidence_rate</code>) and <strong>static</strong>
+  ones (single GeoTIFF, e.g. <code>travel_time_to_cities_2015</code>) via a <code>dataset</code>
+  config field and a <code>DATASET_LOOKUP</code> table in <code>main.py</code>. Also added two more
+  static products discovered on the same GeoServer workspace:
+  <code>motorized_travel_time_to_healthcare_2020</code> and
+  <code>walking_travel_time_to_healthcare_2020</code> (Weiss et al. 2020, Nature
+  Medicine). Each product has its own <code>&lt;dataset&gt;_raster_ingest.json</code>. The
+  standalone <code>accessibility_to_cities_2015_v1.0</code> directory was removed. The
+  design is meant to be extended further — adding another MAP product (of
+  either shape) needs only a new <code>DATASET_LOOKUP</code> entry and ingest JSON, no
+  other code changes. See <code>malaria_atlas_project/README.md</code>.</li>
+<li><strong>africa_child_mortality rebuilt</strong>: moved from Workstream B into A. Was a
+  standalone Py2 script (<code>rasterize_childmortality.py</code>) reading a point file
+  from a fixed local path; now a Dataset/flow that downloads the source text
+  file directly from its Dropbox share link (<code>?dl=1</code>, stable — no need for the
+  ephemeral pre-signed <code>dl.dropboxusercontent.com</code> URL a browser session
+  generates) and rasterizes it per decade with <code>distancerasters</code>, writing
+  output as a COG (see checklist item 10).</li>
+<li><strong>air_pollution rebuilt</strong>: moved from Workstream B into A. Was a standalone
+  Py2 script (<code>build_air_pollution_rasters.py</code>); now a Dataset/flow, COG
+  output. The ACS "SI 005" source file is behind a Cloudflare bot challenge
+  (confirmed 403 even with a browser User-Agent) with no mirror found, so the
+  download step could not be automated — the flow expects
+  <code>GBD2013final.csv</code> to already be placed in <code>raw_dir</code> manually; see
+  <code>air_pollution/README.md</code>.</li>
+<li><strong>acled README</strong> refreshed with source/citation/status; still Workstream B
+  (no flow — rasterization was done manually in QGIS from point data).</li>
+<li>
+<p><strong>atlasofurbanexpansion rebuilt</strong>: moved from Workstream B into A. Was two
+  standalone Py2 scripts (<code>cities_prep.py</code>, <code>col_order.py</code>, the latter tied to
+  the old GeoQuery pipeline and dropped). Now a Dataset/flow: downloads the
+  Areas &amp; Densities / Blocks &amp; Roads metadata tables and each of the 200
+  cities' GIS archives, dissolves each city's boundary per level (<code>studyArea</code>,
+  <code>urban_edge_t1/t2/t3</code>) with <code>shapely.ops.unary_union</code>, reprojects to
+  EPSG:4326 with <code>geopandas</code>, and writes one GeoJSON <code>FeatureCollection</code> per
+  level. Metadata-merge and geometry logic were verified end-to-end against
+  live source data (200 cities, correct dissolve/reproject/MultiPolygon
+  output) before committing. The Workstream C review flag on
+  <code>spatial_extent</code>/<code>is_global</code> for the 4 boundary ingests (above) is now
+  actionable since the dataset produces the GeoJSONs directly.</p>
+</li>
+<li>
+<p><strong>modis_landcover rebuilt</strong> (commit <code>b184eb1</code>): moved from Workstream B into A. Was a GLCF v5.1 FTP <code>wget</code> + <code>gdal_merge.py</code> shell script pair; now a Dataset/flow against LP DAAC LPCLOUD (MCD12Q1 v061, CMR concept C2484079608-LPCLOUD). Pipeline: CMR search paginates ~317 HDF4 tile granules per year → Bearer-token download → <code>gdal_translate</code> extracts <code>LC_Type1</code> EOS grid subdataset from each tile → <code>gdal_merge.py</code> mosaics in MODIS sinusoidal → <code>gdalwarp -r near</code> reprojects to WGS84. IGBP class mappings unchanged from v5.1. Same Earthdata bearer token pattern as oco2/ltdr_ndvi/distance_to_groads.</p>
+</li>
+<li>
+<p><strong>acled rebuilt</strong> (commit <code>14ccc16</code>): moved from Workstream B into A. Was an unmigrated raster produced manually in QGIS; now a Dataset/flow expecting a manually downloaded ACLED CSV in <code>raw_dir</code>, converts to a GeoPackage, and refreshes <code>acled_filter_ingest.json</code> with live year ranges, event-type categories, and fatality ranges. Processing type: <code>filter_and_agg</code> (same shape as <code>ucdp</code>). Backend processor <code>acled_dynamic_filter_and_agg</code> added to geoquery-update. Outcomes: <code>event_count</code> (synthetic, 1/event) and <code>fatalities</code>. Old <code>raster_ingest.json</code> retained until the new ingest is live.</p>
+</li>
+<li>
+<p><strong>geoboundaries + TIGER READMEs added</strong> (this commit): both were in the Done section with <code>main.py</code>/<code>config.toml</code> but no README. Added dataset-specific READMEs for both. Confirmed neither uses a committed ingest JSON (geoboundaries = boundary download utility; TIGER = generates ingest JSON dynamically per run).</p>
+</li>
+<li>
+<p><strong>globalsolaratlas + globalwindatlas noted in Workstream B</strong>: both directories have ingest JSONs and READMEs but no flow or config.toml. Added to tracker for triage.</p>
+</li>
+</ul>
+<h2 id="sweep-completed-2026-07-16-commits-4ccd6c5-2fe3bfc-7682144-3e88649-d42ae20">Sweep completed 2026-07-16 (commits 4ccd6c5, 2fe3bfc, 7682144, 3e88649, d42ae20)<a class="headerlink" href="#sweep-completed-2026-07-16-commits-4ccd6c5-2fe3bfc-7682144-3e88649-d42ae20" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Ingest JSONs</strong>: all 47 workstream-A files converted to the current schema
+  via <code>scripts/convert_ingest_json.py</code> (zero drift). Per-dataset <code>path</code>,
+  <code>description</code>, <code>is_global</code> still worth a human pass.</li>
+<li><strong>List → comma-string</strong>: every UI-editable list field converted (years,
+  months, methods, download/raster/file lists) across the 15 datasets that had
+  them; parse restored in each <code>__init__</code>.</li>
+<li><strong>READMEs</strong>: boilerplate stripped from the 10 that had one; 9 missing ones
+  generated from ingest content. All drafts — enrich run-specific detail.</li>
+</ul>
+<p>Still per-dataset: deploy + cluster smoke, secrets rotation (above), and
+reviewing the generated README/ingest content.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "navigation.footer", "navigation.instant", "navigation.tabs", "toc.follow", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
