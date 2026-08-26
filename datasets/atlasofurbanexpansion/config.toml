@@ -19,7 +19,7 @@ directory = "datasets/atlasofurbanexpansion"
 [deploy]
 deployment_name = "atlasofurbanexpansion"
 image_tag = "083d531"
-version = 12
+version = 13
 flow_file_name = "main"
 flow_name = "atlasofurbanexpansion"
 work_pool = "geodata"
