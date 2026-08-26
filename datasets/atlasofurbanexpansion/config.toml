@@ -1,5 +1,5 @@
-raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/atlasofurbanexpansion"
-output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/boundaries/atlasofurbanexpansion"
+raw_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/atlasofurbanexpansion/2016"
+output_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/boundaries/atlasofurbanexpansion/2016"
 
 overwrite_download = false
 overwrite_process = false
@@ -7,7 +7,7 @@ overwrite_process = false
 
 [run]
 max_workers = 12
-log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/atlasofurbanexpansion/logs"
+log_dir = "/sciclone/nova/REU/geo/geoquery/staging/data/raw/atlasofurbanexpansion/2016/logs"
 
 
 [repo]
@@ -19,7 +19,7 @@ directory = "datasets/atlasofurbanexpansion"
 [deploy]
 deployment_name = "atlasofurbanexpansion"
 image_tag = "083d531"
-version = 10
+version = 11
 flow_file_name = "main"
 flow_name = "atlasofurbanexpansion"
 work_pool = "geodata"
