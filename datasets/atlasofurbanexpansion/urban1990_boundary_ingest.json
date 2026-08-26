@@ -5,7 +5,6 @@
     "name": "atlasofurbanexpansion2016_urban_edge_t1",
     "short_name": "Atlas of Urban Expansion 2016: Urban Edge 1990",
     "path": "/data/boundaries/atlasofurbanexpansion/2016/urban_edge_t1/urban_edge_t1.geojson",
-    "type": "boundary",
     "file_extension": ".geojson",
     "file_mask": "None",
     "title": "Global Sample of 200 Cities - Urban Extents 1990",

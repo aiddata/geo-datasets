@@ -5,7 +5,6 @@
     "name": "atlasofurbanexpansion2016_studyarea",
     "short_name": "Atlas of Urban Expansion 2016: Study Area",
     "path": "/data/boundaries/atlasofurbanexpansion/2016/studyArea/studyArea.geojson",
-    "type": "boundary",
     "file_extension": ".geojson",
     "file_mask": "None",
     "title": "Global Sample of 200 Cities - Study Area",
