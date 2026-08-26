@@ -24,7 +24,8 @@ import requests
 from pydantic import field_validator
 from shapely.geometry import mapping, shape
 from shapely.geometry.multipolygon import MultiPolygon
-from shapely.ops import transform, unary_union
+from shapely import force_2d
+from shapely.ops import unary_union
 
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
@@ -191,10 +192,7 @@ class AtlasOfUrbanExpansion(Dataset):
         if gdf.crs is not None and gdf.crs.to_epsg() != 4326:
             gdf = gdf.to_crs(epsg=4326)
 
-        # remove z-coordinates if they exist
-        gdf["geometry"] = gdf["geometry"].map(
-            lambda g: transform(lambda x, y, *_: (x, y), g)
-        )
+        gdf["geometry"] = gdf["geometry"].map(force_2d)
 
         geom = unary_union(gdf.geometry).buffer(0)
         if geom.geom_type == "Polygon":
