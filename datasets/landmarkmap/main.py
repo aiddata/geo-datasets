@@ -96,6 +96,8 @@ class LandMarkMap(Dataset):
             pd.concat([points_gdf, poly_gdf], ignore_index=True), crs=OUTPUT_CRS
         )
 
+        gdf.geometry = gdf.geometry.buffer(0)
+
         # fill na/nan values per column based on the dtype it should hold
         for column in gdf.columns:
             if column == "geometry":
