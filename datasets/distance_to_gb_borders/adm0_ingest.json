@@ -58,8 +58,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "geoBoundaries https://www.geoboundaries.org/index.htmlg.",
-    "sources_web": "https://www.geoboundaries.org/index.html",
-    "sources_name": "geoBoundaries",
+    "source_url": "https://www.geoboundaries.org/index.html",
+    "source_name": "geoBoundaries",
+    "license": "CC-BY-4.0",
+    "license_url": "https://www.geoboundaries.org",
     "tags": [
         "accessibility",
         "other"

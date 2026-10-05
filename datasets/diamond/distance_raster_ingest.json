@@ -58,8 +58,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Gilmore, Elisabeth; Nils Petter Gleditsch, P\u00e4ivi Lujala & Jan Ketil R\u00f8d, 2005. \u2018Conflict Diamonds: A New Dataset\u2019, Conflict Management and Peace Science 22(3): 257\u2013292",
-    "sources_web": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Diamond-Resources/",
-    "sources_name": "Peace Research Institute Oslo (PRIO)",
+    "source_url": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Diamond-Resources/",
+    "source_name": "Peace Research Institute Oslo (PRIO)",
+    "license": "Citation",
+    "license_url": "https://www.prio.org/data/11",
     "tags": [
         "environment",
         "resources",

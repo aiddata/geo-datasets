@@ -40,8 +40,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "C. D. Elvidge, K. E. Baugh, M. Zhizhin, and F.-C. Hsu, \u201cWhy VIIRS data are superior to DMSP for mapping nighttime lights,\u201d Asia-Pacific Advanced Network 35, vol. 35, p. 62, 2013.",
-    "sources_web": "https://eogdata.mines.edu/products/vnl/",
-    "sources_name": "Earth Observation Group - VIIRS Nighttime Lights",
+    "source_url": "https://eogdata.mines.edu/products/vnl/",
+    "source_name": "Earth Observation Group - VIIRS Nighttime Lights",
+    "license": "CC-BY-4.0",
+    "license_url": "https://eogdata.mines.edu/files/EOG_products_CC_License.pdf",
     "tags": [
         "nighttimelights",
         "viirs",

@@ -58,8 +58,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Balestri Sara & Mario A. Maggioni, 2014. \u2018Blood diamonds, dirty gold and spatial spill-overs: Measuring conflict dynamics in Western Africa\u2019, in Peace Economics, Peace science and Public Policy, Vol. 20 (4): 551-564.",
-    "sources_web": "https://www.researchgate.net/publication/281849073_GOLDATA_12_v",
-    "sources_name": "GOLDATA",
+    "source_url": "https://www.researchgate.net/publication/281849073_GOLDATA_12_v",
+    "source_name": "GOLDATA",
+    "license": "Citation",
+    "license_url": "https://www.prio.org/data",
     "tags": [
         "environment",
         "distance",

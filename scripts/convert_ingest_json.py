@@ -10,7 +10,9 @@ Mechanical mapping:
   `count` is public=false (internal QA stat), everything else public=true
 - options.resolution -> other.resolution; options.factor -> variable_factor;
   options.variable_description -> variable_description
-- extras.{citation,sources_web,sources_name,tags} hoisted to top level
+- extras.{citation,sources_web,sources_name,license,license_url,tags} hoisted to top
+  level; sources_web/sources_name are emitted as source_url/source_name to match
+  the GeoQuery Dataset model field names
 - extras.category_map -> mapped: true + mappings
 - dropped: base, version, options, extras
 
@@ -77,8 +79,10 @@ def convert(path: str) -> None:
         "mapped": bool(category_map),
         "mappings": category_map,
         "citation": extras.get("citation", ""),
-        "sources_web": extras.get("sources_web", ""),
-        "sources_name": extras.get("sources_name", ""),
+        "source_url": extras.get("sources_web", ""),
+        "source_name": extras.get("sources_name", ""),
+        "license": extras.get("license", ""),
+        "license_url": extras.get("license_url", ""),
         "tags": extras.get("tags", []),
         "ingest_src": None,
         "coverage_dependency": None,

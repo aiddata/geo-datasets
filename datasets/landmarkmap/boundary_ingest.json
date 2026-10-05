@@ -19,6 +19,8 @@
     "citation": "LandMark: The Global Platform of Indigenous and Community Lands. https://landmarkmap.org/",
     "source_name": "LandMark",
     "source_url": "https://landmarkmap.org/",
+    "license": "CC-BY-4.0",
+    "license_url": "https://landmarkmap.org/data-methods",
     "other": {},
     "spatial_extent": "",
     "ingest_src": null,

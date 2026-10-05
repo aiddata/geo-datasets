@@ -44,8 +44,10 @@
         "likely": 10
     },
     "citation": "UNEP-WCMC (2025) Global Critical Habitat screening layer (Version 2.1). Cambridge (UK): UN Environment Programme World Conservation Monitoring Centre. Data DOI: https://doi.org/10.34892/d3xm-qm60 . Other cited reference(s):UNEP-WCMC (2017) Global Critical Habitat screening layer (Version 1.0). Cambridge (UK): UN Environment Programme World Conservation Monitoring Centre. Data DOI:https://doi.org/10.34892/nc6d-0z73 .",
-    "sources_web": "https://data-gis.unep-wcmc.org/portal/home/item.html?id=97a22bbe36c84895846a2bdc27cef8ba",
-    "sources_name": "UN Environment Programme World Conservation Monitoring Centre (UNEP-WCMC) ",
+    "source_url": "https://data-gis.unep-wcmc.org/portal/home/item.html?id=97a22bbe36c84895846a2bdc27cef8ba",
+    "source_name": "UN Environment Programme World Conservation Monitoring Centre (UNEP-WCMC) ",
+    "license": "CC-BY-4.0 / CC-BY-NC-4.0",
+    "license_url": "https://doi.org/10.34892/snwv-a025",
     "tags": [
         "critical",
         "habitats",

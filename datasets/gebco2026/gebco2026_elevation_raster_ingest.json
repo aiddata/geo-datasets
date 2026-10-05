@@ -58,8 +58,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "GEBCO Compilation Group (2026) GEBCO_2026 Grid (doi:10.5285/gebco2026-grid).",
-    "sources_web": "https://www.gebco.net/data-products-gridded-bathymetry-data/gebco2026-grid",
-    "sources_name": "GEBCO (General Bathymetric Chart of the Oceans)",
+    "source_url": "https://www.gebco.net/data-products-gridded-bathymetry-data/gebco2026-grid",
+    "source_name": "GEBCO (General Bathymetric Chart of the Oceans)",
+    "license": "Citation",
+    "license_url": "https://www.gebco.net/data-products-gridded-bathymetry-data",
     "tags": [
         "gebco",
         "dem",

@@ -87,8 +87,10 @@
     ],
     "mapped": false,
     "citation": "Goodman, S., Zhang, S., Malik, A.A., Parks, B.C., Hall, J. 2024. AidData's Geospatial Global Chinese Development Finance Dataset. Scientific Data. https://doi.org/10.1038/s41597-024-03341-w",
-    "sources_web": "https://github.com/aiddata/gcdf-geospatial-data",
-    "sources_name": "AidData",
+    "source_url": "https://github.com/aiddata/gcdf-geospatial-data",
+    "source_name": "AidData",
+    "license": "ODC-By-1.0 / ODbL-1.0",
+    "license_url": "https://github.com/aiddata/gcdf-geospatial-data",
     "tags": [
         "aiddata",
         "china",

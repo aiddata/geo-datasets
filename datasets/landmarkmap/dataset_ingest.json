@@ -20,6 +20,8 @@
     "citation": "LandMark: The Global Platform of Indigenous and Community Lands. https://landmarkmap.org/",
     "source_name": "LandMark",
     "source_url": "https://landmarkmap.org/",
+    "license": "CC-BY-4.0",
+    "license_url": "https://landmarkmap.org/data-methods",
     "other": {
         "filters": {
             "identity": {
@@ -60,6 +62,6 @@
     "variable_description": "percent overlap with LandMark community/Indigenous land points (buffered)",
     "mapped": false,
     "mappings": {},
-      "ingest_src": null,
+    "ingest_src": null,
     "coverage_dependency": null
 }

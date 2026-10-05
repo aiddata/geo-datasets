@@ -40,8 +40,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Please visit https://landscan.ornl.gov/citations for detailed citations when using LandScan data.",
-    "sources_web": "https://landscan.ornl.gov/",
-    "sources_name": "Oak Ridge National Laboratory's LandScan",
+    "source_url": "https://landscan.ornl.gov/",
+    "source_name": "Oak Ridge National Laboratory's LandScan",
+    "license": "CC-BY-4.0",
+    "license_url": "https://landscan.ornl.gov/license",
     "tags": [
         "population",
         "count",

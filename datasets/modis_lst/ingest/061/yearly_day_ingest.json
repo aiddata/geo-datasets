@@ -49,8 +49,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Wan, Z., Hook, S., Hulley, G. (2015). MOD11C3 MODIS/Terra Land Surface Temperature/Emissivity Monthly L3 Global 0.05Deg CMG V061 [Data set]. NASA EOSDIS LP DAAC. doi: 10.5067/MODIS/MOD11C3.061",
-    "sources_web": "https://lpdaac.usgs.gov/products/mod11c3v061/",
-    "sources_name": "Land Processes Distributed Active Archive Center",
+    "source_url": "https://lpdaac.usgs.gov/products/mod11c3v061/",
+    "source_name": "Land Processes Distributed Active Archive Center",
+    "license": "CC0-1.0",
+    "license_url": "https://lpdaac.usgs.gov",
     "tags": [
         "nasa",
         "earthdata",

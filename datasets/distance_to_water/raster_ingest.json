@@ -58,8 +58,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical, High-resolution Shoreline Database, J. Geophys. Res., 101, #B4, pp. 8741-8743, 1996.",
-    "sources_web": "http://www.soest.hawaii.edu/pwessel/gshhg/",
-    "sources_name": "GSHHG: A Global Self-consistent, Hierarchical, High-resolution Geography Database",
+    "source_url": "http://www.soest.hawaii.edu/pwessel/gshhg/",
+    "source_name": "GSHHG: A Global Self-consistent, Hierarchical, High-resolution Geography Database",
+    "license": "LGPL-3.0",
+    "license_url": "https://www.soest.hawaii.edu/pwessel/gshhg/",
     "tags": [
         "accessibility",
         "other"

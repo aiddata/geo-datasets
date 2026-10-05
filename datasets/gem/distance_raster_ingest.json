@@ -58,8 +58,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Lujala, P\u00e4ivi 2009. Deadly Combat over Natural Resources: Gems, Petroleum, Drugs, and the Severity of Armed Civil Conflict. Journal of Conflict Resolution 53(1): 50-71.",
-    "sources_web": "http://www.paivilujala.com/gemdata.html",
-    "sources_name": "GEMDATA",
+    "source_url": "http://www.paivilujala.com/gemdata.html",
+    "source_name": "GEMDATA",
+    "license": "Citation",
+    "license_url": "https://www.prio.org/data/25",
     "tags": [
         "environment",
         "resources",

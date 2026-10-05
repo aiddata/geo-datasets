@@ -49,8 +49,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "G. Huffman, D. Bolvin, D. Braithwaite, K. Hsu, R. Joyce, P. Xie, 2014: Integrated Multi-satellitE Retrievals for GPM (IMERG), V07B. NASA's Precipitation Processing Center, accessed 27 June, 2024, arthurhouftps.pps.eosdis.nasa.gov",
-    "sources_web": "https://gpm.nasa.gov/data/directory",
-    "sources_name": "NASA Goddard Space Flight Center",
+    "source_url": "https://gpm.nasa.gov/data/directory",
+    "source_name": "NASA Goddard Space Flight Center",
+    "license": "CC0-1.0",
+    "license_url": "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies",
     "tags": [
         "nasa",
         "precipitation",

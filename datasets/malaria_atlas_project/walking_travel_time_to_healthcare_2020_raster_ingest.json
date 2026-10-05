@@ -58,8 +58,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "D.J. Weiss, A. Nelson, C.A. Vargas-Ruiz, K. Gligoric, S. Bavadekar, E. Gabrilovich, A. Bertozzi-Villa, J. Rozier, H.S. Gibson, T. Shekel, C. Kamath, A. Lieber, K. Schulman, Y. Shao, V. Qarkaxhija, A.K. Nandi, S.H. Keddie, S. Rumisha, P. Amratia, R. Arambepola, E.G. Chestnutt, J.J. Millar, T.L. Symons, E. Cameron, K.E. Battle, S. Bhatt, and P.W. Gething. Global maps of travel time to healthcare facilities. (2020). Nature Medicine. doi:10.1038/s41591-020-1059-1.",
-    "sources_web": "https://data.malariaatlas.org/",
-    "sources_name": "Malaria Atlas Project",
+    "source_url": "https://data.malariaatlas.org/",
+    "source_name": "Malaria Atlas Project",
+    "license": "CC-BY-3.0",
+    "license_url": "https://malariaatlas.org/open-access-policy/",
     "tags": [
         "accessibility",
         "travel time",

@@ -58,8 +58,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Buhaug, Halvard & P\u00e4ivi Lujala 2005. Accounting for Scale: Measuring Geography in Quantitative Studies of Civil War. Political Geography 24: 399-418.",
-    "sources_web": "http://www.paivilujala.com/drugdata.html",
-    "sources_name": "DRUGDATA",
+    "source_url": "http://www.paivilujala.com/drugdata.html",
+    "source_name": "DRUGDATA",
+    "license": "Citation",
+    "license_url": "https://www.prio.org/data/24",
     "tags": [
         "environment",
         "distance",

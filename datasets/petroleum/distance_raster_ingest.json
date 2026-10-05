@@ -58,8 +58,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Lujala, P\u00e4ivi; Jan Ketil R\u00f8d & Nadia Thieme, 2007. \u2018Fighting over Oil: Introducing A New Dataset\u2019, Conflict Management and Peace Science 24(3), 239-256.",
-    "sources_web": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Petroleum-Dataset/",
-    "sources_name": "Peace Research Institute Oslo (PRIO)",
+    "source_url": "https://www.prio.org/Data/Geographical-and-Resource-Datasets/Petroleum-Dataset/",
+    "source_name": "Peace Research Institute Oslo (PRIO)",
+    "license": "Citation",
+    "license_url": "https://www.prio.org/data/11",
     "tags": [
         "resources",
         "environment",
