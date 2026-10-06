@@ -49,8 +49,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Solar resource data obtained from the Global Solar Atlas, owned by the World Bank Group and provided by Solargis. https://globalsolaratlas.info. Accessed online 2019-03-04.",
-    "sources_web": "https://globalsolaratlas.info/about/",
-    "sources_name": "Global Solar Atlas",
+    "source_url": "https://globalsolaratlas.info/about/",
+    "source_name": "Global Solar Atlas",
+    "license": "CC-BY-4.0",
+    "license_url": "https://globalsolaratlas.info/support/terms-of-use",
     "tags": [
         "resources",
         "environment",

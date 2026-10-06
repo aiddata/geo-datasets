@@ -31,8 +31,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Bomprezzi, Pietro; Dreher, Axel; Fuchs, Andreas; Hailer, Teresa; Kammerlander, Andreas; Kaplan, Lennart; Marchesi, Silvia; Masi, Tania; Robert, Charlotte; Unfried, Kerstin, 2020, The Political Leaders Affiliation Database (PLAD), https://doi.org/10.7910/DVN/YUS575, Harvard Dataverse, V7",
-    "sources_web": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575",
-    "sources_name": "The Political Leaders Affiliation Database (PLAD)",
+    "source_url": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575",
+    "source_name": "The Political Leaders Affiliation Database (PLAD)",
+    "license": "CC0-1.0",
+    "license_url": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YUS575",
     "tags": [
         "political",
         "leaders",

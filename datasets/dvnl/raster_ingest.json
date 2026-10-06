@@ -67,8 +67,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Nechaev, D.; Zhizhin, M.; Poyda, A.; Ghosh, T.; Hsu, F.-C.; Elvidge, C. Cross-Sensor Nighttime Lights Image Calibration for DMSP/OLS and SNPP/VIIRS with Residual U-Net. Remote Sens. 2021, 13, 5026.",
-    "sources_web": "https://eogdata.mines.edu/products/dmsp/#dvnl",
-    "sources_name": "The Colorado School of Mines Earth Observation Group",
+    "source_url": "https://eogdata.mines.edu/products/dmsp/#dvnl",
+    "source_name": "The Colorado School of Mines Earth Observation Group",
+    "license": "CC-BY-4.0",
+    "license_url": "https://eogdata.mines.edu/files/EOG_products_CC_License.pdf",
     "tags": [
         "nighttimelights",
         "dmsp",

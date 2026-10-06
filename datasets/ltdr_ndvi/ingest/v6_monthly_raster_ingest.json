@@ -58,8 +58,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Pedelty JA, Devadiga S, Masuoka E et al. (2007) Generating a Long-term Land Data Record from the AVHRR and MODIS Instruments. Proceedings of IGARRS 2007, pp. 1021\u20131025. Institute of Electrical and Electronics Engineers, NY, USA.",
-    "sources_web": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/applications/ltdr/",
-    "sources_name": "NASA LAADS DAAC",
+    "source_url": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/applications/ltdr/",
+    "source_name": "NASA LAADS DAAC",
+    "license": "CC0-1.0",
+    "license_url": "https://ladsweb.modaps.eosdis.nasa.gov",
     "tags": [
         "nasa",
         "ltdr",

@@ -53,8 +53,10 @@
         "mix": 11
     },
     "citation": "UNEP-WCMC and IUCN (2026), Protected Planet: The World Database on Protected Areas (WDPA) [Online], July 2026, Cambridge, UK: UNEP-WCMC and IUCN. Available at: www.protectedplanet.net.",
-    "sources_web": "www.protectedplanet.net",
-    "sources_name": "IUCN and UNEP-WCMC",
+    "source_url": "www.protectedplanet.net",
+    "source_name": "IUCN and UNEP-WCMC",
+    "license": "License agreement",
+    "license_url": "https://www.protectedplanet.net/en/legal",
     "tags": [
         "protected",
         "conservation",

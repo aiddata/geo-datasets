@@ -58,8 +58,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Hay, S.I. and Snow, R.W., 2006. The Malaria Atlas Project: developing global maps of malaria risk. PLoS medicine, 3(12), p.e473.",
-    "sources_web": "https://data.malariaatlas.org/",
-    "sources_name": "Malaria Atlas Project",
+    "source_url": "https://data.malariaatlas.org/",
+    "source_name": "Malaria Atlas Project",
+    "license": "CC-BY-3.0",
+    "license_url": "https://malariaatlas.org/open-access-policy/",
     "tags": [
         "malaria",
         "health",

@@ -40,8 +40,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Marshall Burke, Sam Heft-Neal, and Eran Bendavid. Understanding variation in child mortality across Sub-Saharan Africa: A spatial analysis. The Lancet Global Health, 2016, Volume 4, Issue 12, e936-e94.",
-    "sources_web": "http://sheftneal9.wixsite.com/fse-data/paper-1",
-    "sources_name": "Stanford Data Portal",
+    "source_url": "http://sheftneal9.wixsite.com/fse-data/paper-1",
+    "source_name": "Stanford Data Portal",
+    "license": "Citation",
+    "license_url": "http://sheftneal9.wixsite.com/fse-data/paper-1",
     "tags": [
         "africa",
         "child",

@@ -239,8 +239,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Sundberg, Ralph, and Erik Melander, 2013, 'Introducing the UCDP Georeferenced Event Dataset', Journal of Peace Research, vol.50, no.4, 523-532 \n H\u00f6gbladh Stina, 2026, 'UCDP GED Codebook version 26.1', Department of Peace and Conflict Research, Uppsala University",
-    "sources_web": "https://ucdp.uu.se/downloads/",
-    "sources_name": "UCDP",
+    "source_url": "https://ucdp.uu.se/downloads/",
+    "source_name": "UCDP",
+    "license": "CC-BY-4.0",
+    "license_url": "https://ucdp.uu.se/downloads/",
     "tags": [
         "ucdp",
         "conflict",

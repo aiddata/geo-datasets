@@ -49,8 +49,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "OCO-2/OCO-3 Science Team, Vivienne Payne, Abhishek Chatterjee (2022), OCO-2 Level 2 bias-corrected XCO2 and other select fields from the full-physics retrieval aggregated as daily files, Retrospective processing V11.2r/11.3r, Greenbelt, MD, USA, Goddard Earth Sciences Data and Information Services Center (GES DISC),  Accessed: [2026-08-06], 10.5067/8E4VLCK16O6Q",
-    "sources_web": "https://disc.gsfc.nasa.gov/datasets/OCO2_L2_Lite_FP_11.3r/summary",
-    "sources_name": "NASA Goddard Earth Science Data and Information Services Center",
+    "source_url": "https://disc.gsfc.nasa.gov/datasets/OCO2_L2_Lite_FP_11.3r/summary",
+    "source_name": "NASA Goddard Earth Science Data and Information Services Center",
+    "license": "CC0-1.0",
+    "license_url": "https://disc.gsfc.nasa.gov",
     "tags": [
         "environment",
         "co2"

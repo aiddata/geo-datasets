@@ -49,8 +49,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Kaplan, J. O., & Lau, K. H.-K. (2022). World Wide Lightning Location Network (WWLLN) Global Lightning Climatology (WGLC) and time series, 2022 update. Earth System Science Data, 14(12), 5665-5670. https://doi.org/10.5194/essd-14-5665-2022",
-    "sources_web": "https://zenodo.org/records/20277101",
-    "sources_name": "Kaplan, J.O. and Lau, K.H.-K. (WGLC); World Wide Lightning Location Network (WWLLN)",
+    "source_url": "https://zenodo.org/records/20277101",
+    "source_name": "Kaplan, J.O. and Lau, K.H.-K. (WGLC); World Wide Lightning Location Network (WWLLN)",
+    "license": "CC-BY-4.0",
+    "license_url": "https://zenodo.org/records/20277101",
     "tags": [
         "lightning",
         "wwlln",

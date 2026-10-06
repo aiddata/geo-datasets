@@ -154,8 +154,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Raleigh, Clionadh, Andrew Linke, H\u00e5vard Hegre and Joakim Karlsen. 2010. Introducing ACLED-Armed Conflict Location and Event Data. Journal of Peace Research 47(5) 651-660.",
-    "sources_web": "https://acleddata.com",
-    "sources_name": "ACLED",
+    "source_url": "https://acleddata.com",
+    "source_name": "ACLED",
+    "license": "License agreement",
+    "license_url": "https://acleddata.com/eula",
     "tags": [
         "acled",
         "conflict",

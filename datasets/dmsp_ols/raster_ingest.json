@@ -67,8 +67,10 @@
     "mapped": false,
     "mappings": {},
     "citation": "Image and Data processing by NOAA's National Geophysical Data Center. DMSP data collected by the US Air Force Weather Agency.",
-    "sources_web": "https://eogdata.mines.edu/products/dmsp/",
-    "sources_name": "Earth Observation Group (EOG), Colorado School of Mines",
+    "source_url": "https://eogdata.mines.edu/products/dmsp/",
+    "source_name": "Earth Observation Group (EOG), Colorado School of Mines",
+    "license": "CC-BY-4.0",
+    "license_url": "https://eogdata.mines.edu/files/EOG_products_CC_License.pdf",
     "tags": [
         "nighttimelights",
         "dmsp",

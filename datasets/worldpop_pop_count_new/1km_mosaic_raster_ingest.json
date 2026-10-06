@@ -40,9 +40,16 @@
     "mapped": false,
     "mappings": {},
     "citation": "Bondarenko M., Priyatikanto R., Tejedor-Garavito N., Zhang W., McKeen T., Cunningham A., Woods T., Hilton J., Cihan D., Nosatiuk B., Brinkhoff T., Tatem A., Sorichetta A. (2025). The spatial distribution of population in 2015-2030 at a resolution of 30 arc (approximately 1km at the equator) R2025A version v1. Global Demographic Data Project - Funded by The Bill and Melinda Gates Foundation (INV-045237). WorldPop - School of Geography and Environmental Science, University of Southampton. https://dx.doi.org/10.5258/SOTON/WP00845",
-    "sources_web": "https://hub.worldpop.org/geodata/listing?id=137",
-    "sources_name": "WorldPop",
-    "tags": [ "population", "count", "worldpop", "economics" ],
+    "source_url": "https://hub.worldpop.org/geodata/listing?id=137",
+    "source_name": "WorldPop",
+    "license": "CC-BY-4.0",
+    "license_url": "https://hub.worldpop.org",
+    "tags": [
+        "population",
+        "count",
+        "worldpop",
+        "economics"
+    ],
     "ingest_src": null,
     "coverage_dependency": null
 }
