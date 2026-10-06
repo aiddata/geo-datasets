@@ -1,0 +1,1530 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Ingest path reconciliation tracker - GeoQuery Dataset Ingest Pipelines</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ingest-path-reconciliation-tracker" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="https://aiddata.org" title="GeoQuery Dataset Ingest Pipelines" class="md-header__button md-logo" aria-label="GeoQuery Dataset Ingest Pipelines" data-md-component="logo">
+      
+  <img src="https://cdn.prod.website-files.com/5914719ba6e62162556bd443/5b71a50b4c381931b61a7a9a_triangles.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            GeoQuery Dataset Ingest Pipelines
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Ingest path reconciliation tracker
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aiddata/geo-datasets" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../dataset-guide/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Writing Pipelines
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../deployment-guide/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Deploying Pipelines
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/data_manager/" class="md-tabs__link">
+          
+  
+  
+  Code Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://aiddata.org" title="GeoQuery Dataset Ingest Pipelines" class="md-nav__button md-logo" aria-label="GeoQuery Dataset Ingest Pipelines" data-md-component="logo">
+      
+  <img src="https://cdn.prod.website-files.com/5914719ba6e62162556bd443/5b71a50b4c381931b61a7a9a_triangles.svg" alt="logo">
+
+    </a>
+    GeoQuery Dataset Ingest Pipelines
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aiddata/geo-datasets" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../dataset-guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Pipelines
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Writing Pipelines
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/dev-env/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setting Up Your Environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/planning-script/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning Your Ingest Script
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/writing-code/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Some Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/dataset-class/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview of the Dataset class
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/adding-boilerplate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding Boilerplate
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/running/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Your Dataset
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset-guide/tips/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tips &amp; Tricks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../deployment-guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploying Pipelines
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deploying Pipelines
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-guide/build-container/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building the job-runner Container
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-guide/prefect/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploying to Prefect
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-guide/helm-chart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploying the Helm Chart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-guide/k8s-debug/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging Jobs in Kubernetes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Code Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../reference/data_manager/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    data_manager
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    data_manager
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/data_manager/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/data_manager/dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    dataset
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="ingest-path-reconciliation-tracker">Ingest path reconciliation tracker<a class="headerlink" href="#ingest-path-reconciliation-tracker" title="Permanent link">&para;</a></h1>
+<p>Audited 2026-07-21, revised after a second pass. Scope: every dataset
+directory with both a <code>config.toml</code> and ≥1 ingest JSON (33 directories).</p>
+<p><strong>The actual issue:</strong> <code>config.toml</code>'s <code>output_dir</code> plus whatever
+subdirectories <code>main.py</code> appends per output file are correct — that's where
+files really land. Ingest JSON <code>path</code> fields, in a lot of cases, don't
+mirror that real directory structure: they use a flattened, independently
+invented name instead of the real hierarchical path. <code>file_mask</code> correctness
+is a separate, secondary concern (not the focus here) — the fix in every
+row below is <strong>update the ingest JSON's <code>path</code></strong>, not the code.</p>
+<p>Paths below are given relative to <code>/data/datasets/</code> (the ingest side's
+common prefix) — i.e. the value to put after <code>/data/datasets/</code> in each
+<code>path</code> field.</p>
+<h2 id="already-fixed-this-session">Already fixed (this session)<a class="headerlink" href="#already-fixed-this-session" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>real path</th>
+<th>ingest path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gebco2026</code></td>
+<td><code>gebco/gebco2026/elevation</code>, <code>gebco/gebco2026/slope</code></td>
+<td>matches</td>
+</tr>
+<tr>
+<td><code>gold</code></td>
+<td><code>gold/categorical</code>, <code>gold/distance</code></td>
+<td>matches</td>
+</tr>
+<tr>
+<td><code>drug</code></td>
+<td><code>drug/categorical</code>, <code>drug/distance</code></td>
+<td>matches</td>
+</tr>
+</tbody>
+</table>
+<h2 id="not-an-issue">Not an issue<a class="headerlink" href="#not-an-issue" title="Permanent link">&para;</a></h2>
+<p><code>atlasofurbanexpansion</code> — boundary-type ingests (<code>type: boundary</code>) can
+validly have multiple files share one directory, unlike raster's
+<code>file_mask: "None"</code> convention. User corrected <code>output_dir</code> independently
+(now under <code>.../data/boundaries/atlasofurbanexpansion</code>). No further action.</p>
+<h2 id="fixed-simple-flat-real-path-ingest-path-just-used-a-different-name">Fixed — simple (flat real path, ingest path just used a different name)<a class="headerlink" href="#fixed-simple-flat-real-path-ingest-path-just-used-a-different-name" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>ingest file</th>
+<th>real path</th>
+<th>current ingest <code>path</code></th>
+<th>→ set <code>path</code> to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>accessibility_map</code></td>
+<td>raster_ingest.json</td>
+<td><code>access_50k</code></td>
+<td><code>access_50k</code></td>
+<td><em>(already correct)</em></td>
+</tr>
+<tr>
+<td><code>africa_child_mortality</code></td>
+<td>raster_ingest.json</td>
+<td><code>africa_child_mortality</code></td>
+<td><code>africa_child_mortality</code></td>
+<td><em>(already correct)</em></td>
+</tr>
+<tr>
+<td><code>dmsp_ols</code></td>
+<td>raster_ingest.json</td>
+<td><code>dmsp_ols</code></td>
+<td><code>dmsp_ols</code></td>
+<td><em>(already correct)</em></td>
+</tr>
+<tr>
+<td><code>ucdp</code></td>
+<td>ged261_filter_ingest.json</td>
+<td><code>ucdp/ged261.gpkg</code></td>
+<td><code>ucdp/ged261.gpkg</code></td>
+<td><em>(already correct)</em></td>
+</tr>
+<tr>
+<td><code>acled</code></td>
+<td>acled_filter_ingest.json</td>
+<td><code>acled/acled.gpkg</code></td>
+<td><code>acled/acled.gpkg</code></td>
+<td><em>(already correct)</em></td>
+</tr>
+<tr>
+<td><code>esa_landcover</code></td>
+<td>raster_ingest.json</td>
+<td><code>esa_landcover</code></td>
+<td><code>esa_lc</code></td>
+<td><code>esa_landcover</code></td>
+</tr>
+<tr>
+<td><code>dvnl</code></td>
+<td>raster_ingest.json</td>
+<td><code>dvnl</code></td>
+<td><code>dvnl_2022</code></td>
+<td><code>dvnl</code></td>
+</tr>
+<tr>
+<td><code>distance_to_country_border</code></td>
+<td>raster_ingest.json</td>
+<td><code>distance_to_country_borders</code></td>
+<td><code>dist_to_geoBoundaries_borders</code></td>
+<td><code>distance_to_country_borders</code></td>
+</tr>
+<tr>
+<td><code>distance_to_groads</code></td>
+<td>raster_ingest.json</td>
+<td><code>distance_to_groads</code></td>
+<td><code>dist_to_groads</code></td>
+<td><code>distance_to_groads</code></td>
+</tr>
+<tr>
+<td><code>modis_landcover</code></td>
+<td>raster_ingest.json</td>
+<td><code>MODIS/MCD12Q1.061</code></td>
+<td><code>modis_landcover_61</code></td>
+<td><code>MODIS/MCD12Q1.061</code></td>
+</tr>
+<tr>
+<td><code>landscan_pop</code></td>
+<td>raster_ingest.json</td>
+<td><code>landscan/population</code></td>
+<td><code>landscan_global_population</code></td>
+<td><code>landscan/population</code></td>
+</tr>
+<tr>
+<td><code>worldpop_pop_count</code></td>
+<td>1km_mosaic_raster_ingest.json</td>
+<td><code>worldpop/population_counts/1km_mosaic</code></td>
+<td><code>worldpop_pop_count</code></td>
+<td><code>worldpop/population_counts/1km_mosaic</code></td>
+</tr>
+<tr>
+<td><code>worldpop_pop_count_new</code></td>
+<td>1km_mosaic_raster_ingest.json</td>
+<td><code>worldpop/population_counts/1km_mosaic_r2025a</code></td>
+<td><code>worldpop_pop_count_r2025a</code></td>
+<td><code>worldpop/population_counts/1km_mosaic_r2025a</code></td>
+</tr>
+<tr>
+<td><code>gcdf_v3_dynamic</code></td>
+<td>filter_ingest.json</td>
+<td><code>gcdf_v3_dynamic/gcdf_v301_dynamic.gpkg</code> (real <code>output_dir</code> basename is <code>gcdf_v3_dynamic</code>, not <code>gcdf_v301_dynamic</code>)</td>
+<td><code>gcdf_v301_dynamic/gcdf_v301_dynamic.gpkg</code></td>
+<td><code>gcdf_v3_dynamic/gcdf_v301_dynamic.gpkg</code></td>
+</tr>
+</tbody>
+</table>
+<p>(First 5 rows confirmed already correct — included for completeness since
+they were re-checked this pass, not because they need changes.)</p>
+<h2 id="fixed-versioned-config-driven-version-string-is-part-of-the-real-path">Fixed — versioned (config-driven version string is part of the real path)<a class="headerlink" href="#fixed-versioned-config-driven-version-string-is-part-of-the-real-path" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>ingest file</th>
+<th>real path</th>
+<th>current ingest <code>path</code></th>
+<th>→ set <code>path</code> to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>critical_habitats</code></td>
+<td>raster_ingest.json</td>
+<td><code>critical_habitats/2</code> (version=2 in config)</td>
+<td><code>critical_habitats_v2</code></td>
+<td><code>critical_habitats/2</code></td>
+</tr>
+<tr>
+<td><code>distance_to_coast</code></td>
+<td>raster_ingest.json</td>
+<td><code>distance_to_coast/2.3.7/distance</code> (gshhg_version)</td>
+<td><code>dist_to_coast_237</code></td>
+<td><code>distance_to_coast/2.3.7/distance</code></td>
+</tr>
+<tr>
+<td><code>distance_to_water</code></td>
+<td>raster_ingest.json</td>
+<td><code>distance_to_water/2.3.7_d4533ef/distance</code> (gshhg_version_ne_hash[:7])</td>
+<td><code>dist_to_water_237_d4533ef</code></td>
+<td><code>distance_to_water/2.3.7_d4533ef/distance</code></td>
+</tr>
+<tr>
+<td><code>wdpa</code></td>
+<td>wdpa_iucn_raster_ingest.json</td>
+<td><code>wdpa/&lt;version&gt;/iucn_cat</code> — version comes from the downloaded file's name at run time (currently <code>202406</code>)</td>
+<td><code>wdpa_iucn_cat_202406</code></td>
+<td><code>wdpa/202406/iucn_cat</code> (<strong>re-check this one at deploy time</strong> — version isn't a fixed config value, it's derived from whatever WDPA release was last downloaded)</td>
+</tr>
+<tr>
+<td><code>plad</code></td>
+<td>raster_ingest.json</td>
+<td><code>plad/v70</code></td>
+<td><code>plad_v70_leader_birthplace</code></td>
+<td><code>plad/v70</code></td>
+</tr>
+<tr>
+<td><code>pm25</code></td>
+<td>yearly_raster_ingest.json</td>
+<td><code>pm25/V5GL04/Global/Annual</code></td>
+<td><code>surface_pm25_annual_V5GL04</code></td>
+<td><code>pm25/V5GL04/Global/Annual</code></td>
+</tr>
+<tr>
+<td><code>pm25</code></td>
+<td>monthly_raster_ingest.json</td>
+<td><code>pm25/V5GL04/Global/Monthly</code></td>
+<td><code>surface_pm25_monthly_V5GL04</code></td>
+<td><code>pm25/V5GL04/Global/Monthly</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="fixed-multi-output-binary-distance">Fixed — multi-output (binary + distance)<a class="headerlink" href="#fixed-multi-output-binary-distance" title="Permanent link">&para;</a></h2>
+<p>The previously-flagged asymmetry (binary in its own subdir, distance flat in
+the parent) is also fixed now — <code>main.py</code> for all three gives distance its
+own subdir too, matching binary's layout.</p>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>ingest file</th>
+<th>path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>diamond</code></td>
+<td>binary_raster_ingest.json</td>
+<td><code>diamond/binary</code></td>
+</tr>
+<tr>
+<td><code>diamond</code></td>
+<td>distance_raster_ingest.json</td>
+<td><code>diamond/distance</code></td>
+</tr>
+<tr>
+<td><code>gem</code></td>
+<td>binary_raster_ingest.json</td>
+<td><code>gem/binary</code></td>
+</tr>
+<tr>
+<td><code>gem</code></td>
+<td>distance_raster_ingest.json</td>
+<td><code>gem/distance</code></td>
+</tr>
+<tr>
+<td><code>petroleum</code></td>
+<td>binary_raster_ingest.json</td>
+<td><code>petroleum/binary</code></td>
+</tr>
+<tr>
+<td><code>petroleum</code></td>
+<td>distance_raster_ingest.json</td>
+<td><code>petroleum/distance</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="fixed-multi-output-periodvariable-subdirs">Fixed — multi-output (period/variable subdirs)<a class="headerlink" href="#fixed-multi-output-periodvariable-subdirs" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>dataset</th>
+<th>ingest file</th>
+<th>real path</th>
+<th>→ set <code>path</code> to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>air_pollution</code></td>
+<td>o3_raster_ingest.json</td>
+<td><code>air_pollution/o3</code></td>
+<td><code>air_pollution/o3</code></td>
+</tr>
+<tr>
+<td><code>air_pollution</code></td>
+<td>pm25_raster_ingest.json (this is the fus_calibrated/PM2.5 ingest, confusingly named)</td>
+<td><code>air_pollution/fus_calibrated</code></td>
+<td><code>air_pollution/fus_calibrated</code></td>
+</tr>
+<tr>
+<td><code>gpm</code></td>
+<td>monthly_raster_ingest.json</td>
+<td><code>gpm/v07b/monthly</code></td>
+<td><code>gpm/v07b/monthly</code></td>
+</tr>
+<tr>
+<td><code>gpm</code></td>
+<td>yearly_raster_ingest.json</td>
+<td><code>gpm/v07b/yearly/mean</code> (year_agg_method=mean)</td>
+<td><code>gpm/v07b/yearly/mean</code></td>
+</tr>
+<tr>
+<td><code>cru_ts</code></td>
+<td>monthly_tmp_raster_ingest.json</td>
+<td><code>cru_ts/cru_ts_4.07/monthly/tmp</code></td>
+<td><code>cru_ts/cru_ts_4.07/monthly/tmp</code></td>
+</tr>
+<tr>
+<td><code>cru_ts</code></td>
+<td>yearly_tmp_raster_ingest.json</td>
+<td><code>cru_ts/cru_ts_4.07/yearly/tmp/mean</code></td>
+<td><code>cru_ts/cru_ts_4.07/yearly/tmp/mean</code></td>
+</tr>
+<tr>
+<td><code>cru_ts</code></td>
+<td>monthly_pre_raster_ingest.json</td>
+<td><code>cru_ts/cru_ts_4.07/monthly/pre</code></td>
+<td><code>cru_ts/cru_ts_4.07/monthly/pre</code></td>
+</tr>
+<tr>
+<td><code>cru_ts</code></td>
+<td>yearly_pre_raster_ingest.json</td>
+<td><code>cru_ts/cru_ts_4.07/yearly/pre/mean</code></td>
+<td><code>cru_ts/cru_ts_4.07/yearly/pre/mean</code></td>
+</tr>
+<tr>
+<td><code>oco2</code></td>
+<td>monthly_xco2_raster_ingest.json</td>
+<td><code>gesdisc/OCO2_L2_Lite_FP/xco2/month_interp</code></td>
+<td><code>gesdisc/OCO2_L2_Lite_FP/xco2/month_interp</code></td>
+</tr>
+<tr>
+<td><code>oco2</code></td>
+<td>yearly_xco2_raster_ingest.json</td>
+<td><code>gesdisc/OCO2_L2_Lite_FP/xco2/year_interp</code></td>
+<td><code>gesdisc/OCO2_L2_Lite_FP/xco2/year_interp</code></td>
+</tr>
+<tr>
+<td><code>gpw</code></td>
+<td>gpw_v4rev11_count_raster_ingest.json</td>
+<td><code>gpw/gpw_v4_rev11/count</code></td>
+<td><code>gpw/gpw_v4_rev11/count</code></td>
+</tr>
+<tr>
+<td><code>gpw</code></td>
+<td>gpw_v4rev11_density_raster_ingest.json</td>
+<td><code>gpw/gpw_v4_rev11/density</code></td>
+<td><code>gpw/gpw_v4_rev11/density</code></td>
+</tr>
+<tr>
+<td><code>ltdr_ndvi</code></td>
+<td>v5_yearly_raster_ingest.json</td>
+<td><code>ltdr_ndvi/yearly</code></td>
+<td><code>ltdr_ndvi/yearly</code></td>
+</tr>
+<tr>
+<td><code>ltdr_ndvi</code></td>
+<td>v5_monthly_raster_ingest.json</td>
+<td><code>ltdr_ndvi/monthly</code></td>
+<td><code>ltdr_ndvi/monthly</code></td>
+</tr>
+<tr>
+<td><code>modis_lst</code> (<code>ingest/061/</code>)</td>
+<td>monthly_day_ingest.json</td>
+<td><code>MODIS/terra/MOLT/MOD11C3.061/monthly/day</code></td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>modis_lst</code> (<code>ingest/061/</code>)</td>
+<td>monthly_night_ingest.json</td>
+<td><code>MODIS/terra/MOLT/MOD11C3.061/monthly/night</code></td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>modis_lst</code> (<code>ingest/061/</code>)</td>
+<td>yearly_day_ingest.json</td>
+<td><code>MODIS/terra/MOLT/MOD11C3.061/yearly/day/mean</code></td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>modis_lst</code> (<code>ingest/061/</code>)</td>
+<td>yearly_night_ingest.json</td>
+<td><code>MODIS/terra/MOLT/MOD11C3.061/yearly/night/mean</code></td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>malaria_atlas_project</code></td>
+<td>pf_incidence_rate_raster_ingest.json</td>
+<td><code>malaria_atlas_project/pf_incidence_rate</code></td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>malaria_atlas_project</code></td>
+<td>travel_time_to_cities_2015_raster_ingest.json</td>
+<td><code>malaria_atlas_project/travel_time_to_cities_2015</code></td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>malaria_atlas_project</code></td>
+<td>motorized_travel_time_to_healthcare_2020_raster_ingest.json</td>
+<td><code>malaria_atlas_project/motorized_travel_time_to_healthcare_2020</code></td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>malaria_atlas_project</code></td>
+<td>walking_travel_time_to_healthcare_2020_raster_ingest.json</td>
+<td><code>malaria_atlas_project/walking_travel_time_to_healthcare_2020</code></td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>udel_climate</code></td>
+<td>udel_precip_2017_yearly_mean_raster_ingest.json</td>
+<td><code>udel_climate/precip_2017/yearly/mean</code></td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>udel_climate</code></td>
+<td>udel_precip_2017_yearly_sum_raster_ingest.json</td>
+<td><code>udel_climate/precip_2017/yearly/sum</code></td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>udel_climate</code></td>
+<td>udel_air_temp_2017_yearly_mean_raster_ingest.json</td>
+<td><code>udel_climate/air_temp_2017/yearly/mean</code></td>
+<td>same</td>
+</tr>
+</tbody>
+</table>
+<p>Note: <code>malaria_atlas_project</code>'s current <code>path</code>s use a <code>map_</code> prefix instead
+of the real <code>malaria_atlas_project/</code> directory name (e.g.
+<code>map_pf_incidence_rate</code> → <code>malaria_atlas_project/pf_incidence_rate</code>) — same
+pattern as everything else in this table, just called out since that
+dataset's mismatch is a flat rename rather than a dropped hierarchy level.</p>
+<h2 id="fixed-viirs_ntl-was-needs-a-decision">Fixed — <code>viirs_ntl</code> (was: needs a decision)<a class="headerlink" href="#fixed-viirs_ntl-was-needs-a-decision" title="Permanent link">&para;</a></h2>
+<p><code>main.py</code> now writes to <code>output_dir/{annual,monthly}/{version}/{avg_masked,cf_cvg}/</code>
+instead of flat filenames with no version component — v20/v21/v22 annual
+and v10 monthly (hardcoded, no config field) each get their own directory,
+so switching <code>annual_version</code> no longer overwrites a previous version's
+output. <code>write_cog</code>'s <code>tmp_to_dst_file</code> call picked up <code>make_dst_dir=True</code>
+since these subdirs no longer get created by <code>main()</code>'s single
+<code>os.makedirs(output_dir)</code> call. All 8 ingest JSON <code>path</code>s updated to match:</p>
+<table>
+<thead>
+<tr>
+<th>ingest file</th>
+<th>path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>annual_v20_avg_masked</td>
+<td><code>viirs_ntl/annual/v20/avg_masked</code></td>
+</tr>
+<tr>
+<td>annual_v20_cf_cvg</td>
+<td><code>viirs_ntl/annual/v20/cf_cvg</code></td>
+</tr>
+<tr>
+<td>annual_v21_avg_masked</td>
+<td><code>viirs_ntl/annual/v21/avg_masked</code></td>
+</tr>
+<tr>
+<td>annual_v21_cf_cvg</td>
+<td><code>viirs_ntl/annual/v21/cf_cvg</code></td>
+</tr>
+<tr>
+<td>annual_v22_avg_masked</td>
+<td><code>viirs_ntl/annual/v22/avg_masked</code></td>
+</tr>
+<tr>
+<td>annual_v22_cf_cvg</td>
+<td><code>viirs_ntl/annual/v22/cf_cvg</code></td>
+</tr>
+<tr>
+<td>monthly_avg_masked</td>
+<td><code>viirs_ntl/monthly/v10/avg_masked</code></td>
+</tr>
+<tr>
+<td>monthly_cf_cvg</td>
+<td><code>viirs_ntl/monthly/v10/cf_cvg</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>~~Orphaned ingest JSONs~~ — <strong>acknowledged, no action.</strong> Ignoring these
+  per direction:</li>
+<li><code>gpw</code>: <code>gpw_v3_count_raster_ingest.json</code>, <code>gpw_v3_density_raster_ingest.json</code>, <code>gpw_v4_count_raster_ingest.json</code>, <code>gpw_v4_density_raster_ingest.json</code></li>
+<li><code>ltdr_ndvi</code>: <code>v4_yearly_raster_ingest.json</code></li>
+<li><code>modis_lst</code>: all 4 files under <code>ingest/006/</code> (only <code>.061</code> is configured)</li>
+<li><code>udel_climate</code>: 6 files under <code>ingest/udel_air_temp_2014/</code> and <code>ingest/udel_precip_2014/</code> (also on a legacy <code>"base"</code> schema, not just orphaned)</li>
+</ul>
+<h2 id="out-of-scope-acknowledged-no-action-static-ones-with-no-flow">Out of scope — <strong>acknowledged, no action</strong> (static ones with no flow)<a class="headerlink" href="#out-of-scope-acknowledged-no-action-static-ones-with-no-flow" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>srtm</code>, <code>globalsolaratlas</code>, <code>globalwindatlas</code> — ingest JSONs present,
+  manual-download READMEs only, no flow.</li>
+<li><code>gcdf_v3/gcdf_v3_boundaries</code>, <code>gcdf_v3/gcdf_v3_static</code> — generated by a
+  separate repo (<code>aiddata/china-osm-geodata</code>), per <code>gcdf_v3/README.md</code>.</li>
+</ul>
+<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
+<p>All items resolved. Orphaned ingests and no-flow static datasets
+acknowledged as out of scope (no action needed).</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "navigation.footer", "navigation.instant", "navigation.tabs", "toc.follow", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
