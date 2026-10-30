@@ -1,5 +1,7 @@
 # Air Temperature (Yearly Average) - UDel
 
+** DEPRECATED AND NO LONGER BEING UPDATED **
+
 Average monthly air temperature per year in degrees Celsius. Created using UDel Air Temperature dataset (v5.01)
 
 ## Quick start
