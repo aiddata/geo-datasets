@@ -40,11 +40,16 @@ import requests
 from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
 DATASET_LOOKUP = {
-    "pf_incidence_rate": {
+    "pf_incidence_rate_202608": {
         "temporal": True,
         "workspace": "Malaria",
-        "resource": "202206_Global_Pf_Incidence_Rate",
+        "resource": "202608_Global_Pf_Incidence_Rate",
     },
+    # "pf_incidence_rate": {
+    #     "temporal": True,
+    #     "workspace": "Malaria",
+    #     "resource": "202206_Global_Pf_Incidence_Rate",
+    # },
     "travel_time_to_cities_2015": {
         "temporal": False,
         "workspace": "Accessibility",
