@@ -222,7 +222,10 @@ class MalariaAtlasProject(Dataset):
                 year_file_name = self.data_info["resource"] + f"_{year}.tif"
 
             tif_path = raw_geotiff_dir / year_file_name
-            cog_path = dataset_output_dir / year_file_name[7:]
+            if year_file_name.startswith("202206"):
+                cog_path = dataset_output_dir / year_file_name[7:]
+            else:
+                cog_path = dataset_output_dir / year_file_name
 
             flist.append((zip_file_local_name, year_file_name, tif_path, cog_path))
 
