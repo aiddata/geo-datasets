@@ -44,6 +44,7 @@ DATASET_LOOKUP = {
         "temporal": True,
         "workspace": "Malaria",
         "resource": "202608_Global_Pf_Incidence_Rate",
+        "filename": "2026_GBD2025_Global_Pf_Incidence_Rate_YYYY.tif",
     },
     # "pf_incidence_rate": {
     #     "temporal": True,
@@ -215,7 +216,10 @@ class MalariaAtlasProject(Dataset):
 
         flist = []
         for year in years:
-            year_file_name = self.data_info["resource"] + f"_{year}.tif"
+            if "filename" in self.data_info:
+                year_file_name = self.data_info["filename"].replace("YYYY", str(year))
+            else:
+                year_file_name = self.data_info["resource"] + f"_{year}.tif"
 
             tif_path = raw_geotiff_dir / year_file_name
             cog_path = dataset_output_dir / year_file_name[7:]
