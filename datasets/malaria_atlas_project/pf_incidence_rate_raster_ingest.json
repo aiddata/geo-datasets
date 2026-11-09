@@ -9,7 +9,7 @@
     "name": "map_pf_incidence_rate_202608",
     "short_name": "Malaria Atlas: Pf Incidence Rate",
     "title": "Malaria Atlas Project - Malaria (Pf) Incidence Rate",
-    "description": "Number of newly diagnosed Malaria (Plasmodium falciparum) cases per 1,000 population, in a given year",
+    "description": "Raw value is the estimated rate per person. Multiply by 1,000 to get the number of newly diagnosed Malaria (Plasmodium falciparum) cases per 1,000 population, in a given year",
     "details": "",
     "processing_class": "zonal_stats",
     "processing_options": [
@@ -53,8 +53,8 @@
     "other": {
         "resolution": 0.041666667
     },
-    "variable_factor": 1,
-    "variable_description": "rate per 1,000 people",
+    "variable_factor": 1000,
+    "variable_description": "Raw value is rate per person. Multiply by 1,000 to get rate per 1,000 people",
     "mapped": false,
     "mappings": {},
     "citation": "Hay, S.I. and Snow, R.W., 2006. The Malaria Atlas Project: developing global maps of malaria risk. PLoS medicine, 3(12), p.e473.",
