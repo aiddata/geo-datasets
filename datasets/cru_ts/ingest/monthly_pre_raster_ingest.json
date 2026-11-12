@@ -9,7 +9,7 @@
     "name": "cru_ts_407_pre_monthly_mean",
     "short_name": "CRU TS Precipitation (Monthly)",
     "title": "Monthly Precipitation - CRU TS (v4.07)",
-    "description": "Montly precipitation from Climate Research Unit (CRU) in millimeters. Version 4.07",
+    "description": "Monthly precipitation from Climate Research Unit (CRU) in millimeters. Version 4.07",
     "details": "Created by extracting monthly precipitation data from CRU",
     "processing_class": "zonal_stats",
     "processing_options": [

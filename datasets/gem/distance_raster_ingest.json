@@ -10,7 +10,7 @@
     "short_name": "Gemstone Mines: Distance",
     "title": "Distance to Gemstone Deposits",
     "description": "Distance to gemstone deposits, measured in meters.",
-    "details": "Consists of 1022 gemstone sites in 61 countries. It include ruby, sapphire, emerald, aquamarine, heliodor, moganite, goshenite, nephrite, jadeite, lapis lazuli, opal, tourmaline, periodit, topaz, pearl, garnet, zircon, spinel, amber, and quartz. It excludes diamonds, which are included in the diamond deposit dataset. Dataset downloaded August 2017.",
+    "details": "Consists of 1022 gemstone sites in 61 countries. It includes ruby, sapphire, emerald, aquamarine, heliodor, moganite, goshenite, nephrite, jadeite, lapis lazuli, opal, tourmaline, peridot, topaz, pearl, garnet, zircon, spinel, amber, and quartz. It excludes diamonds, which are included in the diamond deposit dataset. Dataset downloaded August 2017.",
     "processing_class": "zonal_stats",
     "processing_options": [
         {

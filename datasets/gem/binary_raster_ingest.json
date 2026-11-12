@@ -10,7 +10,7 @@
     "short_name": "Gemstone Mines: Binary",
     "title": "Gemstone Deposits",
     "description": "The gemstone dataset contains information on gemstone deposits throughout the world. Layer is a binary indicating areas with gemstone deposits.",
-    "details": "Consists of 1022 gemstone sites in 61 countries. It include ruby, sapphire, emerald, aquamarine, heliodor, moganite, goshenite, nephrite, jadeite, lapis lazuli, opal, tourmaline, periodit, topaz, pearl, garnet, zircon, spinel, amber, and quartz. It excludes diamonds, which are included in the diamond deposit dataset. Dataset downloaded August 2017.",
+    "details": "Consists of 1022 gemstone sites in 61 countries. It includes ruby, sapphire, emerald, aquamarine, heliodor, moganite, goshenite, nephrite, jadeite, lapis lazuli, opal, tourmaline, peridot, topaz, pearl, garnet, zircon, spinel, amber, and quartz. It excludes diamonds, which are included in the diamond deposit dataset. Dataset downloaded August 2017.",
     "processing_class": "zonal_stats",
     "processing_options": [
         {
@@ -46,7 +46,7 @@
     "license_url": "https://www.prio.org/data/25",
     "tags": [
         "environment",
-        "geomstone",
+        "gemstone",
         "resources"
     ],
     "ingest_src": null,

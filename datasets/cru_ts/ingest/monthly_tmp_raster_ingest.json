@@ -9,7 +9,7 @@
     "name": "cru_ts_407_tmp_monthly_mean",
     "short_name": "CRU TS Temperature (Monthly)",
     "title": "Monthly Temperature - CRU TS (v4.07)",
-    "description": "Montly temperature from Climate Research Unit (CRU) in degrees Celsius. Version 4.07",
+    "description": "Monthly temperature from Climate Research Unit (CRU) in degrees Celsius. Version 4.07",
     "details": "Created by extracting monthly temperature data from CRU",
     "processing_class": "zonal_stats",
     "processing_options": [

@@ -10,7 +10,7 @@
     "short_name": "GPM Precipitation v07B (Yearly)",
     "title": "Yearly IMERG (GPM) precipitation (v07B)",
     "description": "Yearly IMERG GPM (v07B) precipitation - Created by aggregating (mean) the monthly GPM precipitation",
-    "details": "Created by aggregatubg monthly IMERG V07B GPM data",
+    "details": "Created by aggregating monthly IMERG V07B GPM data",
     "processing_class": "zonal_stats",
     "processing_options": [
         {

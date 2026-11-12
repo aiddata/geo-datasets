@@ -9,8 +9,8 @@
     "name": "globalsolaratlas_pvout",
     "short_name": "Global Solar Atlas: PV Output",
     "title": "Photovoltaic power potential",
-    "description": "Longterm yearly average of daily totals of potential photovoltaic electricity production (kWh/kWp).",
-    "details": "Longterm yearly average of potential photovoltaic electricity production (PVOUT) in kWh/kWp, covering the period from 1994/1999/2007 (depending on the region) to 2015.",
+    "description": "Long-term yearly average of daily totals of potential photovoltaic electricity production (kWh/kWp).",
+    "details": "Long-term yearly average of potential photovoltaic electricity production (PVOUT) in kWh/kWp, covering the period from 1994/1999/2007 (depending on the region) to 2015.",
     "processing_class": "zonal_stats",
     "processing_options": [
         {
