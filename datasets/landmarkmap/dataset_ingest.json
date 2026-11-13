@@ -1,7 +1,7 @@
 {
     "active": true,
     "public": true,
-    "is_global": true,
+    "is_global": false,
     "name": "landmarkmap_ipcl_dataset",
     "short_name": "IPCL Data",
     "path": "/data/datasets/landmarkmap/landmarkmap_ipcl.gpkg",
