@@ -23,6 +23,9 @@
     "license": "CC-BY-4.0",
     "license_url": "https://landmarkmap.org/data-methods",
     "other": {
+        "outcomes": {
+            "coverage": "Share of Area Covered"
+        },
         "filters": {
             "identity": {
                 "display": "Identity",
