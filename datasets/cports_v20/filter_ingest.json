@@ -1,0 +1,246 @@
+{
+    "active": true,
+    "public": true,
+    "is_global": false,
+    "path": "/data/datasets/cports_v20/cports_v20_dynamic.gpkg",
+    "type": "feature",
+    "file_extension": ".gpkg",
+    "file_mask": null,
+    "name": "cports_v20_dynamic",
+    "short_name": "AidData CPORTS v2.0: Filtered Seaport Values",
+    "title": "Monetary value of Chinese-financed seaport developments (CPORTS v2.0)",
+    "description": "Monetary commitment value of Chinese-financed development from AidData's CPORTS Dataset v2.0.",
+    "details": null,
+    "other": {
+        "outcomes": {
+            "value": "Commitment Value"
+        },
+        "version": "v20",
+        "filters": {
+            "Commitment Year": {
+                "type": "range",
+                "min": 2001,
+                "max": 2025
+            },
+            "Implementation Start Year": {
+                "type": "range",
+                "min": 2001,
+                "max": 2024
+            },
+            "Completion Year": {
+                "type": "range",
+                "min": 2003,
+                "max": 2025
+            },
+            "Infrastructure": {
+                "type": "categorical",
+                "categories": [
+                    "True",
+                    "False"
+                ]
+            },
+            "Recommended for Aggregates": {
+                "type": "categorical",
+                "categories": [
+                    "True",
+                    "False"
+                ]
+            },
+            "Port Facility": {
+                "type": "categorical",
+                "categories": [
+                    "True",
+                    "False"
+                ]
+            },
+            "Port Equipment": {
+                "type": "categorical",
+                "categories": [
+                    "True",
+                    "False"
+                ]
+            },
+            "Port Stake Acquisition": {
+                "type": "categorical",
+                "categories": [
+                    "False",
+                    "True"
+                ]
+            },
+            "Chinese Entity Present": {
+                "type": "categorical",
+                "categories": [
+                    "False",
+                    "True"
+                ]
+            },
+            "Chinese Naval Activity": {
+                "type": "categorical",
+                "categories": [
+                    "True",
+                    "False"
+                ]
+            },
+            "Project Status": {
+                "type": "categorical",
+                "categories": [
+                    "Pipeline: Commitment",
+                    "Implementation",
+                    "Completion",
+                    "Pipeline: Pledge",
+                    "Suspended",
+                    "Cancelled"
+                ]
+            },
+            "Flow Type Simplified": {
+                "type": "categorical",
+                "categories": [
+                    "Loan",
+                    "Grant",
+                    "Debt Rescheduling",
+                    "Vague"
+                ]
+            },
+            "Flow Class": {
+                "type": "categorical",
+                "categories": [
+                    "Vague (ODA or OOF)",
+                    "OOF",
+                    "ODA",
+                    "OFIC",
+                    "Military"
+                ]
+            },
+            "Country of Activity": {
+                "type": "categorical",
+                "categories": [
+                    "Benin",
+                    "Nicaragua",
+                    "Spain",
+                    "Guinea",
+                    "New Zealand",
+                    "Brunei Darussalam",
+                    "Australia",
+                    "Colombia",
+                    "Indonesia",
+                    "Brazil",
+                    "Peru",
+                    "Cambodia",
+                    "Singapore",
+                    "Thailand",
+                    "Israel",
+                    "Pakistan",
+                    "Guyana",
+                    "Oman",
+                    "Turkey",
+                    "Mauritania",
+                    "Nigeria",
+                    "United States",
+                    "Sierra Leone",
+                    "Syrian Arab Republic",
+                    "Cameroon",
+                    "Comoros",
+                    "Myanmar",
+                    "Ecuador",
+                    "Sri Lanka",
+                    "United Arab Emirates",
+                    "Azerbaijan",
+                    "Antigua and Barbuda",
+                    "Ghana",
+                    "Philippines",
+                    "Greece",
+                    "Fiji",
+                    "Tonga",
+                    "Vanuatu",
+                    "Algeria",
+                    "Kenya",
+                    "Gambia",
+                    "Mozambique",
+                    "Papua New Guinea",
+                    "Cuba",
+                    "Cote d'Ivoire",
+                    "Panama",
+                    "Guinea-Bissau",
+                    "Samoa",
+                    "Tunisia",
+                    "Russia",
+                    "Congo",
+                    "Bangladesh",
+                    "Djibouti",
+                    "Angola",
+                    "Cabo Verde",
+                    "Mexico",
+                    "Sao Tome and Principe",
+                    "Montenegro",
+                    "Tanzania",
+                    "Yemen",
+                    "Venezuela",
+                    "Democratic Republic of the Congo",
+                    "Qatar",
+                    "Bahamas",
+                    "Viet Nam",
+                    "Timor-Leste",
+                    "Togo",
+                    "Sudan",
+                    "Equatorial Guinea",
+                    "Egypt",
+                    "Liberia",
+                    "Trinidad and Tobago",
+                    "Palau",
+                    "Georgia",
+                    "Uruguay",
+                    "Grenada",
+                    "Costa Rica",
+                    "Namibia",
+                    "Suriname",
+                    "Albania",
+                    "Malta",
+                    "Jamaica",
+                    "Iraq",
+                    "Lebanon",
+                    "Morocco"
+                ]
+            },
+            "Sector Name": {
+                "type": "categorical",
+                "categories": [
+                    "TRANSPORT AND STORAGE",
+                    "ENERGY",
+                    "INDUSTRY, MINING, CONSTRUCTION",
+                    "OTHER SOCIAL INFRASTRUCTURE AND SERVICES",
+                    "AGRICULTURE, FORESTRY, FISHING",
+                    "ACTION RELATING TO DEBT",
+                    "TRADE POLICIES AND REGULATIONS",
+                    "DEFENSE AND SECURITY",
+                    "RECONSTRUCTION RELIEF AND REHABILITATION"
+                ]
+            }
+        }
+    },
+    "variable_factor": 1,
+    "variable_description": "constant 2025 USD commitment value",
+    "processing_class": "filter_and_agg",
+    "processing_options": [
+        {
+            "function": "cports_v20_dynamic_filter_and_agg",
+            "short_name": "cportsv20_filter_agg",
+            "description": "Filter projects based on user selection and aggregate total commitment values in 2025 USD",
+            "kwargs": {},
+            "active": true,
+            "public": true,
+            "result_type": "int"
+        }
+    ],
+    "mapped": false,
+    "citation": "Goodman, S., Zhang, S., Malik, A.A., Parks, B.C., Hall, J. 2024. AidData's Geospatial Global Chinese Development Finance Dataset. Scientific Data. https://doi.org/10.1038/s41597-024-03341-w",
+    "source_url": "https://github.com/aiddata/gcdf-geospatial-data",
+    "source_name": "AidData",
+    "tags": [
+        "aiddata",
+        "china",
+        "ports",
+        "geocoded"
+    ],
+    "ingest_src": null,
+    "coverage_dependency": null
+}
