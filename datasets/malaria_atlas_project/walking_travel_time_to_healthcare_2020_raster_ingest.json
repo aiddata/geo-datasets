@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average travel time per unit of analysis",
+            "description": "Average walking travel time to healthcare {{{The average walking travel time to healthcare across the feature, in minutes.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum travel time per unit of analysis",
+            "description": "Maximum walking travel time to healthcare {{{The highest walking travel time to healthcare found anywhere in the feature, in minutes.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum travel time per unit of analysis",
+            "description": "Minimum walking travel time to healthcare {{{The lowest walking travel time to healthcare found anywhere in the feature, in minutes.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

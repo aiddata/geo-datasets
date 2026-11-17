@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_sum",
             "short_name": "sum",
-            "description": "number of pixels containing gemstone deposits for each unit of analysis",
+            "description": "Number of cells with gemstone deposits {{{How many grid cells in the feature contain gemstone deposits.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum NDVI value per unit of analysis",
+            "description": "Maximum vegetation (NDVI) {{{The highest vegetation (NDVI) found anywhere in the feature, on a scale of 0 to 10,000.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average NDVI value per unit of analysis",
+            "description": "Average vegetation (NDVI) {{{The average vegetation (NDVI) across the feature, on a scale of 0 to 10,000.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum NDVI value per unit of analysis",
+            "description": "Minimum vegetation (NDVI) {{{The lowest vegetation (NDVI) found anywhere in the feature, on a scale of 0 to 10,000.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

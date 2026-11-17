@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average travel time per unit of analysis",
+            "description": "Average travel time {{{The average travel time across the feature, in minutes.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum travel time per unit of analysis",
+            "description": "Maximum travel time {{{The highest travel time found anywhere in the feature, in minutes.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum travel time per unit of analysis",
+            "description": "Minimum travel time {{{The lowest travel time found anywhere in the feature, in minutes.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

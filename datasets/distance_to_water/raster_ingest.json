@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average distance per unit of analysis",
+            "description": "Average distance to water {{{The average distance to water across the feature, in meters.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum distance per unit of analysis",
+            "description": "Maximum distance to water {{{The highest distance to water found anywhere in the feature, in meters.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum distance per unit of analysis",
+            "description": "Minimum distance to water {{{The lowest distance to water found anywhere in the feature, in meters.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

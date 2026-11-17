@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_categorical",
             "short_name": "categorical",
-            "description": "Gold deposit type. Note: 'mix' is an additional category for cells that contain more than one deposit type.",
+            "description": "Count of cells in each class (Gold Deposits) {{{How many grid cells in the feature fall in each Gold Deposits class, with one column per class.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

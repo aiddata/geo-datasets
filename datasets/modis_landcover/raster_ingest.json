@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_categorical",
             "short_name": "categorical",
-            "description": "Land cover category proportions based on IGBP classification. Produces one column per category per year selected.",
+            "description": "Count of cells in each class (MODIS Land Cover) {{{How many grid cells in the feature fall in each MODIS Land Cover class, with one column per class.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

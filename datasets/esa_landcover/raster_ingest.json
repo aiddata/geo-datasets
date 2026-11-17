@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_categorical",
             "short_name": "categorical",
-            "description": "categories based on the IPCC / LCCS classification schemes. Warning: provides 13 category columns for each year selected",
+            "description": "Count of cells in each class (ESA Land Cover) {{{How many grid cells in the feature fall in each ESA Land Cover class, with one column per class.}}}",
             "kwargs": {
                 "nodata": -999
             },

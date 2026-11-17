@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average population density per unit of analysis",
+            "description": "Average population density {{{The average population density across the feature, in people per square kilometer.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum population density per unit of analysis",
+            "description": "Maximum population density {{{The highest population density found anywhere in the feature, in people per square kilometer.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -43,7 +43,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum population density per unit of analysis",
+            "description": "Minimum population density {{{The lowest population density found anywhere in the feature, in people per square kilometer.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

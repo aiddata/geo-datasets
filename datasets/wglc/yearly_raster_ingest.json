@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average annual lightning stroke density per unit of analysis",
+            "description": "Average lightning stroke density {{{The average lightning stroke density across the feature, as the annual sum of monthly strokes per square kilometer per day.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum annual lightning stroke density per unit of analysis",
+            "description": "Maximum lightning stroke density {{{The highest lightning stroke density found anywhere in the feature, as the annual sum of monthly strokes per square kilometer per day.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

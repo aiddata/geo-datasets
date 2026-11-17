@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_categorical",
             "short_name": "categorical",
-            "description": "number of pixels associated with each category of the likelihood of critical habitat presence",
+            "description": "Count of cells in each class (Global Critical Habitats Screening - Version 2.1) {{{How many grid cells in the feature fall in each Global Critical Habitats Screening - Version 2.1 class, with one column per class.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

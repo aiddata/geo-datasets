@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "presence of a leader birthplace in unit of analysis",
+            "description": "Leader birthplace present {{{1 if a political leader's birthplace is in the feature, 0 if not.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

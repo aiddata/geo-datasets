@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum PM2.5 value per unit of analysis",
+            "description": "Maximum PM2.5 concentration {{{The highest PM2.5 concentration found anywhere in the feature, in micrograms per cubic meter.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average PM2.5 value per unit of analysis",
+            "description": "Average PM2.5 concentration {{{The average PM2.5 concentration across the feature, in micrograms per cubic meter.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum PM2.5 value per unit of analysis",
+            "description": "Minimum PM2.5 concentration {{{The lowest PM2.5 concentration found anywhere in the feature, in micrograms per cubic meter.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

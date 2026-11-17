@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_categorical",
             "short_name": "categorical",
-            "description": "Drug type. Note: 'mix' is an additional category for cells that contain more than one drug type.",
+            "description": "Count of cells in each class (Drug Cultivation Sites) {{{How many grid cells in the feature fall in each Drug Cultivation Sites class, with one column per class.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum land surface temperature value per unit of analysis",
+            "description": "Maximum nighttime land surface temperature {{{The highest nighttime land surface temperature found anywhere in the feature, in kelvins.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average land surface temperature value per unit of analysis",
+            "description": "Average nighttime land surface temperature {{{The average nighttime land surface temperature across the feature, in kelvins.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum land surface temperature value per unit of analysis",
+            "description": "Minimum nighttime land surface temperature {{{The lowest nighttime land surface temperature found anywhere in the feature, in kelvins.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

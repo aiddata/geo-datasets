@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_sum",
             "short_name": "sum",
-            "description": "total population per unit of analysis",
+            "description": "Total population {{{The population added up over the whole feature.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

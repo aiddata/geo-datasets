@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_sum",
             "short_name": "sum",
-            "description": "count of pixels with at least one cloud free measurement within each unit of analysis",
+            "description": "Number of cells with a cloud-free measurement {{{How many grid cells in the feature had at least one cloud-free measurement that year.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

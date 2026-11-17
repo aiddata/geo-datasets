@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average slope within each unit of analysis",
+            "description": "Average slope {{{The average slope across the feature, in degrees.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum slope within each unit of analysis",
+            "description": "Maximum slope {{{The highest slope found anywhere in the feature, in degrees.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum slope within each unit of analysis",
+            "description": "Minimum slope {{{The lowest slope found anywhere in the feature, in degrees.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

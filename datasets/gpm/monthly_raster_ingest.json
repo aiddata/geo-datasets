@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum precipitation value per unit of analysis",
+            "description": "Maximum precipitation {{{The highest precipitation found anywhere in the feature, in thousandths of a millimeter per hour.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average precipitation value per unit of analysis",
+            "description": "Average precipitation {{{The average precipitation across the feature, in thousandths of a millimeter per hour.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum precipitation value per unit of analysis",
+            "description": "Minimum precipitation {{{The lowest precipitation found anywhere in the feature, in thousandths of a millimeter per hour.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

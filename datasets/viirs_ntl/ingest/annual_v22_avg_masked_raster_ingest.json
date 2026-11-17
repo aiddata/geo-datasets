@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum value measured within each unit of analysis",
+            "description": "Maximum light intensity {{{The highest light intensity found anywhere in the feature, in nanowatts per square centimeter per steradian.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average value measured  within each unit of analysis",
+            "description": "Average light intensity {{{The average light intensity across the feature, in nanowatts per square centimeter per steradian.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum value measured  within each unit of analysis",
+            "description": "Minimum light intensity {{{The lowest light intensity found anywhere in the feature, in nanowatts per square centimeter per steradian.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -43,7 +43,7 @@
         {
             "function": "rasterstats_default_sum",
             "short_name": "sum",
-            "description": "sum of values measured within each unit of analysis",
+            "description": "Total light intensity {{{The light intensity added up over the whole feature, in nanowatts per square centimeter per steradian.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

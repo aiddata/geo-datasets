@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average co2 concentration (ppm) per unit of analysis",
+            "description": "Average CO2 concentration {{{The average CO2 concentration across the feature, in parts per million (ppm).}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum co2 concentration (ppm) per unit of analysis",
+            "description": "Maximum CO2 concentration {{{The highest CO2 concentration found anywhere in the feature, in parts per million (ppm).}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum co2 concentration (ppm) per unit of analysis",
+            "description": "Minimum CO2 concentration {{{The lowest CO2 concentration found anywhere in the feature, in parts per million (ppm).}}}",
             "kwargs": {},
             "active": true,
             "public": true,

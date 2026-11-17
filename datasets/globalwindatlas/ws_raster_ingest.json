@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average wind speed per unit of analysis",
+            "description": "Average wind speed {{{The average wind speed across the feature, in meters per second.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum wind speed per unit of analysis",
+            "description": "Maximum wind speed {{{The highest wind speed found anywhere in the feature, in meters per second.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum wind speed per unit of analysis",
+            "description": "Minimum wind speed {{{The lowest wind speed found anywhere in the feature, in meters per second.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

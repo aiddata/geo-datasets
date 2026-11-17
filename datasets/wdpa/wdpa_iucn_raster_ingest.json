@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_categorical",
             "short_name": "categorical",
-            "description": "IUCN category (or relevant information when no category exists). Note: provides 12 category columns in total.",
+            "description": "Count of cells in each class (Protected Areas) {{{How many grid cells in the feature fall in each Protected Areas class, with one column per class.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

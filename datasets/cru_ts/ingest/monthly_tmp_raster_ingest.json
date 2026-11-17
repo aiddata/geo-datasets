@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum temperature value per unit of analysis",
+            "description": "Maximum temperature {{{The highest temperature found anywhere in the feature, in degrees Celsius.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average temperature value per unit of analysis",
+            "description": "Average temperature {{{The average temperature across the feature, in degrees Celsius.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum temperature value per unit of analysis",
+            "description": "Minimum temperature {{{The lowest temperature found anywhere in the feature, in degrees Celsius.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

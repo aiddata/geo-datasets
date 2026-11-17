@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average value measured within each unit of analysis",
+            "description": "Average malaria incidence rate {{{The average malaria incidence rate across the feature, as cases per person per year.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum value measured within each unit of analysis",
+            "description": "Minimum malaria incidence rate {{{The lowest malaria incidence rate found anywhere in the feature, as cases per person per year.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum value measured within each unit of analysis",
+            "description": "Maximum malaria incidence rate {{{The highest malaria incidence rate found anywhere in the feature, as cases per person per year.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

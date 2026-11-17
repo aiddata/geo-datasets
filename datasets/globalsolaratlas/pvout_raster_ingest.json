@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average potential photovoltaic electricity production (kWh/kWp) per unit of analysis",
+            "description": "Average solar power potential {{{The average solar power potential across the feature, in kWh per kWp.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum potential photovoltaic electricity production (kWh/kWp) per unit of analysis",
+            "description": "Maximum solar power potential {{{The highest solar power potential found anywhere in the feature, in kWh per kWp.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum potential photovoltaic electricity production (kWh/kWp) per unit of analysis",
+            "description": "Minimum solar power potential {{{The lowest solar power potential found anywhere in the feature, in kWh per kWp.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

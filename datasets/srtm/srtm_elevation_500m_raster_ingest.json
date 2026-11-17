@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average elevation within each unit of analysis",
+            "description": "Average elevation {{{The average elevation across the feature, in meters.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_max",
             "short_name": "max",
-            "description": "maximum elevation within each unit of analysis",
+            "description": "Maximum elevation {{{The highest elevation found anywhere in the feature, in meters.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
@@ -34,7 +34,7 @@
         {
             "function": "rasterstats_default_min",
             "short_name": "min",
-            "description": "minimum elevation within each unit of analysis",
+            "description": "Minimum elevation {{{The lowest elevation found anywhere in the feature, in meters.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

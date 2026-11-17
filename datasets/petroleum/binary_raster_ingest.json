@@ -25,7 +25,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "",
+            "description": "Share of area with on-shore petroleum {{{The share (0\u20131) of the feature that lies over on-shore petroleum deposits.}}}",
             "kwargs": {},
             "active": true,
             "public": true,

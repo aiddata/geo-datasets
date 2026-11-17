@@ -16,7 +16,7 @@
         {
             "function": "rasterstats_default_mean",
             "short_name": "mean",
-            "description": "average under-5 mortality for each unit of analysis",
+            "description": "Average under-5 mortality rate {{{The average under-5 mortality rate across the feature, in deaths per 1,000 child-years.}}}",
             "kwargs": {},
             "active": true,
             "public": true,
