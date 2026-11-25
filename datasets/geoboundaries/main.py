@@ -10,8 +10,7 @@ from data_manager import BaseDatasetConfiguration, Dataset, get_config
 
 
 class geoBoundariesDownloadConfiguration(BaseDatasetConfiguration):
-    version: str
-    gb_web_hash: str # commit
+    gb_version: str
     output_dir: str
     skip_existing: bool
     rebuild_meta: bool
@@ -33,19 +32,44 @@ class geoBoundariesDownloadDataset(Dataset):
 
     def __init__(self, config: geoBoundariesDownloadConfiguration):
         self.config = config
-        self.output_tag = f"gB{config.version}"
-        self.commit = config.gb_web_hash
-        self.output_path = config.output_dir / self.commit
+        self.gb_version = config.gb_version
+        self.release_version = None  # e.g. "8.0", set by resolve_release()
+        self.snapshot = None  # immutable snapshot hash, set by resolve_release()
+        self.output_path = config.output_dir / config.gb_version
         self.skip_existing = config.skip_existing
         self.rebuild_meta = config.rebuild_meta
         self.dl_iso3_list = [
             code.strip() for code in config.dl_iso3_list.split(",") if code.strip()
         ]
-        self.api_url = f"https://raw.githubusercontent.com/wmgeolab/gbWeb/{self.commit}/api/current/gbOpen/ALL/ALL/index.json"
+        self.releases_url = "https://www.geoboundaries.org/api/releases"
+        self.api_url = f"https://www.geoboundaries.org/api/{config.gb_version}/gbOpen/ALL/ALL/"
         self.ingest_dir = Path(config.ingest_dir)
+
+    def resolve_release(self):
+        """Look up the release's real version number and snapshot hash."""
+        logger = self.get_logger()
+
+        response = requests.get(self.releases_url)
+        response.raise_for_status()
+        releases = response.json()
+
+        release = next((r for r in releases if r["id"] == self.gb_version), None)
+        if release is None:
+            available = ", ".join(r["id"] for r in releases)
+            raise ValueError(
+                f"Unknown geoBoundaries release '{self.gb_version}'. Available: {available}"
+            )
+
+        self.release_version = release["version"]
+        self.snapshot = release["snapshotId"]
+        logger.info(
+            f"Resolved {self.gb_version} -> v{self.release_version}, snapshot {self.snapshot}"
+        )
 
     def prepare(self):
         logger = self.get_logger()
+
+        self.resolve_release()
 
         logger.info(f"Fetching geoBoundaries metadata from {self.api_url}")
         response = requests.get(self.api_url)
@@ -67,7 +91,7 @@ class geoBoundariesDownloadDataset(Dataset):
 
         iso3 = item["boundaryISO"]
         fc_type = item["boundaryType"]
-        fc_name = f"{self.output_tag}_{self.commit}_{iso3}_{fc_type}"
+        fc_name = f"{self.gb_version}_{iso3}_{fc_type}"
 
         logger.info(f"Processing: {fc_name}")
 
@@ -144,21 +168,18 @@ class geoBoundariesDownloadDataset(Dataset):
         iso3 = item["boundaryISO"]
         fc_type = item["boundaryType"]
 
-        raw_github_string_prefix = "https://github.com/wmgeolab/geoBoundaries/raw/"
-        data_commit = item["gjDownloadURL"].replace(raw_github_string_prefix, "").split("/")[0]
-
         return {
             "active": False,
             "public": True,
             "name": fc_name,
-            "path": str(self.ingest_dir / self.commit / self.gpkg_name), # strip out everything before /data/boundaries
+            "path": str(self.ingest_dir / self.gb_version / self.gpkg_name), # strip out everything before /data/boundaries
             "file_extension": ".gpkg",
-            "title": f"geoBoundaries v6 - {item['boundaryName']} {fc_type}",
+            "title": f"geoBoundaries v{self.release_version} - {item['boundaryName']} {fc_type}",
             "description": (
                 f"This feature collection represents the {fc_type} level "
-                f"boundaries for {item['boundaryName']} ({iso3}) from geoBoundaries v6."
+                f"boundaries for {item['boundaryName']} ({iso3}) from geoBoundaries v{self.release_version}."
             ),
-            "details": f"Based on GitHub commit {data_commit}",
+            "details": f"Based on geoBoundaries snapshot {self.snapshot}",
             "tags": ["geoboundaries", "administrative", "boundary"],
             "citation": (
                 "Runfola, D. et al. (2020) geoBoundaries: A global database of "
@@ -170,8 +191,8 @@ class geoBoundariesDownloadDataset(Dataset):
             "other": item.copy(),
             "ingest_src": "geoquery_automated",
             "is_global": False,
-            "group_name": f"gb_v6_{iso3.lower()}",
-            "group_title": f"{item['boundaryName']} - GeoBoundaries v6",
+            "group_name": f"{self.gb_version}_{iso3.lower()}",
+            "group_title": f"{item['boundaryName']} - GeoBoundaries v{self.release_version}",
             "group_class": "parent" if fc_type == "ADM0" else "child",
             "group_level": int(fc_type[3:]),
         }
