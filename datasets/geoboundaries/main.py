@@ -33,6 +33,7 @@ class geoBoundariesDownloadDataset(Dataset):
     def __init__(self, config: geoBoundariesDownloadConfiguration):
         self.config = config
         self.gb_version = config.gb_version
+        self.version_tag = f"v{config.gb_version.removeprefix('gb')}"  # gb80 -> v80
         self.release_version = None  # e.g. "8.0", set by resolve_release()
         self.snapshot = None  # immutable snapshot hash, set by resolve_release()
         self.output_path = config.output_dir / config.gb_version
@@ -91,7 +92,7 @@ class geoBoundariesDownloadDataset(Dataset):
 
         iso3 = item["boundaryISO"]
         fc_type = item["boundaryType"]
-        fc_name = f"{self.gb_version}_{iso3}_{fc_type}"
+        fc_name = f"gB_{self.version_tag}_{iso3}_{fc_type}"
 
         logger.info(f"Processing: {fc_name}")
 
@@ -191,7 +192,8 @@ class geoBoundariesDownloadDataset(Dataset):
             "other": item.copy(),
             "ingest_src": "geoquery_automated",
             "is_global": False,
-            "group_name": f"{self.gb_version}_{iso3.lower()}",
+            # GeoQuery docs match ^gb_v\d+_<iso3>$ to group releases of a country on one page
+            "group_name": f"gb_{self.version_tag}_{iso3.lower()}",
             "group_title": f"{item['boundaryName']} - GeoBoundaries v{self.release_version}",
             "group_class": "parent" if fc_type == "ADM0" else "child",
             "group_level": int(fc_type[3:]),
